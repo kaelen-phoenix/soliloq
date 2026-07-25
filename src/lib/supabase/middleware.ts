@@ -1,5 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
+import { destinoSegunEstado } from "../cuenta";
+import { leerEstadoCuenta } from "../cuenta-servidor";
 import type { Database } from "./types";
 
 const RUTAS_PUBLICAS = ["/ingresar", "/auth/callback"];
@@ -33,61 +35,40 @@ export async function actualizarSesion(request: NextRequest) {
   const path = request.nextUrl.pathname;
   const esRutaPublica = RUTAS_PUBLICAS.some((r) => path.startsWith(r));
 
-  if (!user) {
-    if (!esRutaPublica) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/ingresar";
-      return NextResponse.redirect(url);
-    }
-    return response;
-  }
-
-  if (esRutaPublica) {
+  const redirigir = (destino: string) => {
     const url = request.nextUrl.clone();
-    url.pathname = "/";
+    url.pathname = destino;
     return NextResponse.redirect(url);
+  };
+
+  if (!user) {
+    return esRutaPublica ? response : redirigir("/ingresar");
   }
 
-  const { data: perfil } = await supabase
-    .from("perfiles")
-    .select("rol, onboarding_completo")
-    .eq("id", user.id)
-    .maybeSingle();
+  if (esRutaPublica) return redirigir("/");
+
+  const estado = await leerEstadoCuenta(supabase, user.id);
+  const destino = destinoSegunEstado(estado);
 
   const enRol = path.startsWith("/elegir-rol");
   const enAltaPerfil = path.startsWith("/completar-perfil");
+  // Alta del segundo perfil: solo tiene sentido con el onboarding ya resuelto.
+  const enPerfilNuevo = path.startsWith("/perfil/nuevo");
 
-  if (!perfil?.rol) {
-    if (!enRol) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/elegir-rol";
-      return NextResponse.redirect(url);
-    }
-    return response;
+  if (destino === "elegir-rol") {
+    return enRol ? response : redirigir("/elegir-rol");
   }
 
-  // El rol se puede corregir mientras no exista el perfil; una vez creado queda fijo.
-  if (enRol) {
-    if (!perfil.onboarding_completo) return response;
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
+  if (destino === "completar-perfil") {
+    // Se permite volver a /elegir-rol para corregir mientras no exista ningún perfil.
+    return enRol || enAltaPerfil ? response : redirigir("/completar-perfil");
   }
 
-  if (!perfil.onboarding_completo) {
-    if (!enAltaPerfil) {
-      const url = request.nextUrl.clone();
-      url.pathname = "/completar-perfil";
-      return NextResponse.redirect(url);
-    }
-    return response;
-  }
+  // Con al menos un perfil creado, el onboarding terminó: esas pantallas ya no aplican.
+  if (enRol || enAltaPerfil) return redirigir("/");
 
-  if (enAltaPerfil) {
-    const url = request.nextUrl.clone();
-    url.pathname = "/";
-    return NextResponse.redirect(url);
-  }
+  // El alta del segundo perfil es válida solo si falta alguno.
+  if (enPerfilNuevo && estado.tieneAmbosPerfiles) return redirigir("/perfil");
 
   return response;
 }

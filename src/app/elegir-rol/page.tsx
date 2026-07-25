@@ -26,9 +26,9 @@ export default function ElegirRolPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6 py-10">
       <div className="text-center">
-        <h1 className="text-xl font-bold text-ink-900">¿Cómo querés usar Soliloq?</h1>
+        <h1 className="text-xl font-bold text-ink-900">¿Con cuál querés empezar?</h1>
         <p className="mt-1 text-sm text-ink-500">
-          Podés corregirlo mientras no hayas creado tu perfil. Después queda fijo.
+          Elegí tu primer perfil. Después vas a poder sumar el otro y alternar entre los dos.
         </p>
       </div>
 

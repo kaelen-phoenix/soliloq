@@ -96,7 +96,11 @@ export function FormularioCreador({
     }
 
     if (esAlta) {
-      await supabase.from("perfiles").update({ onboarding_completo: true }).eq("id", userId);
+      // El perfil recién creado pasa a ser el modo en el que se opera.
+      await supabase
+        .from("perfiles")
+        .update({ onboarding_completo: true, modo_activo: "creador" })
+        .eq("id", userId);
       router.replace("/");
     } else {
       router.replace("/perfil");

@@ -1,6 +1,7 @@
-import { createClient } from "@/lib/supabase/server";
-import { FeedTalento } from "@/components/feed/feed-talento";
 import { TableroCreador } from "@/components/convocatorias/tablero-creador";
+import { FeedTalento } from "@/components/feed/feed-talento";
+import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function InicioPage() {
   const supabase = createClient();
@@ -9,9 +10,9 @@ export default async function InicioPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: perfil } = await supabase.from("perfiles").select("rol").eq("id", user.id).single();
+  const estado = await leerEstadoCuenta(supabase, user.id);
 
-  if (perfil?.rol === "talento") {
+  if (estado.modoActivo === "talento") {
     return <FeedTalento talentoId={user.id} />;
   }
 

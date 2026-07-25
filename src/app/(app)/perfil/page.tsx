@@ -1,8 +1,9 @@
-import { createClient } from "@/lib/supabase/server";
-import { FormularioTalento } from "@/components/perfil/formulario-talento";
-import { FormularioCreador } from "@/components/perfil/formulario-creador";
-import { ObrasPrevias } from "@/components/perfil/obras-previas";
 import { CerrarSesionBoton } from "@/components/cerrar-sesion-boton";
+import { FormularioCreador } from "@/components/perfil/formulario-creador";
+import { FormularioTalento } from "@/components/perfil/formulario-talento";
+import { ObrasPrevias } from "@/components/perfil/obras-previas";
+import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function PerfilPage() {
   const supabase = createClient();
@@ -11,9 +12,10 @@ export default async function PerfilPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: perfil } = await supabase.from("perfiles").select("rol").eq("id", user.id).single();
+  // Se edita el perfil del modo activo; el otro se edita conmutando de modo.
+  const estado = await leerEstadoCuenta(supabase, user.id);
 
-  if (perfil?.rol === "talento") {
+  if (estado.modoActivo === "talento") {
     const [{ data: perfilTalento }, { data: fotos }] = await Promise.all([
       supabase.from("perfiles_talento").select("*").eq("id", user.id).single(),
       supabase.from("fotos_talento").select("*").eq("talento_id", user.id).order("orden"),

@@ -16,17 +16,21 @@ export interface Database {
       perfiles: {
         Row: {
           id: string;
+          /** Rol con el que arrancó la cuenta; no determina qué puede hacer. */
           rol: RolUsuario | null;
+          modo_activo: RolUsuario | null;
           onboarding_completo: boolean;
           creado_en: string;
         };
         Insert: {
           id: string;
           rol?: RolUsuario | null;
+          modo_activo?: RolUsuario | null;
           onboarding_completo?: boolean;
         };
         Update: {
           rol?: RolUsuario | null;
+          modo_activo?: RolUsuario | null;
           onboarding_completo?: boolean;
         };
         Relationships: [];

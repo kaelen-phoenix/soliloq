@@ -1,7 +1,9 @@
 import { redirect } from "next/navigation";
-import { createClient } from "@/lib/supabase/server";
 import { BarraNavegacion } from "@/components/layout/barra-navegacion";
 import { Encabezado } from "@/components/layout/encabezado";
+import { rolFaltante } from "@/lib/cuenta";
+import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
+import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
@@ -10,22 +12,22 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   } = await supabase.auth.getUser();
   if (!user) redirect("/ingresar");
 
-  const { data: perfil } = await supabase
-    .from("perfiles")
-    .select("rol, onboarding_completo")
-    .eq("id", user.id)
-    .single();
+  const estado = await leerEstadoCuenta(supabase, user.id);
+  if (!estado.modoActivo) redirect("/completar-perfil");
 
-  if (!perfil?.rol) redirect("/elegir-rol");
-  if (!perfil.onboarding_completo) redirect("/completar-perfil");
-
-  const titulo = perfil.rol === "talento" ? "Convocatorias" : "Tu tablero";
+  const titulo = estado.modoActivo === "talento" ? "Convocatorias" : "Tu tablero";
 
   return (
     <div className="pb-20">
-      <Encabezado titulo={titulo} userId={user.id} />
+      <Encabezado
+        titulo={titulo}
+        userId={user.id}
+        modoActivo={estado.modoActivo}
+        tieneAmbosPerfiles={estado.tieneAmbosPerfiles}
+        rolFaltante={rolFaltante(estado)}
+      />
       <div className="mx-auto max-w-lg">{children}</div>
-      <BarraNavegacion rol={perfil.rol} />
+      <BarraNavegacion rol={estado.modoActivo} />
     </div>
   );
 }
