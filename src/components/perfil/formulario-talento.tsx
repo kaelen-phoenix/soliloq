@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { HABILIDADES, LOCACIONES, PLATAFORMAS_VIDEOREEL_REGEX } from "@/lib/constantes";
-import { SubirFotos, type FotoTalento } from "./subir-fotos";
+import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
 
 interface DatosIniciales {
   nombre: string;
@@ -16,8 +16,6 @@ interface DatosIniciales {
   experiencia: string | null;
   habilidades: string[];
 }
-
-const MIN_FOTOS = 3;
 
 export function FormularioTalento({
   userId,
@@ -98,6 +96,8 @@ export function FormularioTalento({
     }
 
     if (esAlta) {
+      // Recién ahora existe la fila de `perfiles_talento` que exige la FK de las fotos.
+      await persistirFotosPendientes(userId, fotos);
       await supabase.from("perfiles").update({ onboarding_completo: true }).eq("id", userId);
       router.replace("/");
     } else {
@@ -150,7 +150,7 @@ export function FormularioTalento({
 
       <section className="flex flex-col gap-3">
         <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Portfolio de fotos</h2>
-        <SubirFotos talentoId={userId} fotos={fotos} onCambio={setFotos} />
+        <SubirFotos talentoId={userId} fotos={fotos} onCambio={setFotos} persistir={!esAlta} />
         {errores.fotos && <p className="text-xs text-red-600">{errores.fotos}</p>}
       </section>
 

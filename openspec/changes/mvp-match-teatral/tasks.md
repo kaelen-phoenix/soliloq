@@ -34,7 +34,7 @@
 ## 4. Autenticación y onboarding
 
 - [x] 4.1 Implementar la pantalla de ingreso con magic link por email, incluyendo validación de formato y pantalla de "revisá tu correo"
-- [ ] 4.2 Configurar el proveedor de Google en Supabase con las credenciales de Google Cloud Console y agregar el botón de ingreso — botón implementado en el código; **falta que el usuario cree las credenciales OAuth y las cargue en el dashboard de Supabase** (ver README)
+- [x] 4.2 Configurar el proveedor de Google en Supabase con las credenciales de Google Cloud Console y agregar el botón de ingreso
 - [x] 4.3 Implementar la ruta de callback que crea la sesión y maneja el caso de enlace vencido o ya utilizado
 - [x] 4.4 Implementar el middleware que redirige según el estado del onboarding: sin sesión al ingreso, sin rol a la elección de rol, sin perfil al alta de perfil
 - [x] 4.5 Implementar la pantalla de elección de rol, que persiste el rol y deriva al alta del perfil correspondiente
@@ -96,9 +96,9 @@
 
 ## 11. Despliegue
 
-- [ ] 11.1 Publicar el repositorio en GitHub y conectarlo a un proyecto de Vercel en plan Hobby — **acción manual del usuario**
-- [ ] 11.2 Cargar las variables de entorno en Vercel y verificar que el deploy automático por push funciona — **acción manual del usuario**
-- [ ] 11.3 Configurar en Supabase las URLs de redirección de auth apuntando al dominio de Vercel — **acción manual del usuario**
+- [x] 11.1 Publicar el repositorio en GitHub (`kaelen-phoenix/soliloq`) — conectar a Vercel es el próximo paso
+- [x] 11.2 Cargar las variables de entorno en Vercel (production/preview/development) y confirmar el redeploy en `https://soliloq-one.vercel.app`
+- [x] 11.3 Configurar en Supabase las URLs de redirección de auth apuntando al dominio de Vercel
 - [x] 11.4 Aplicar todas las migraciones en el proyecto Supabase de producción y verificar que RLS quedó habilitada en cada tabla
 - [x] 11.5 Escribir el README con el procedimiento de instalación local, las variables requeridas y la advertencia de pausa del proyecto Supabase tras 7 días de inactividad
 

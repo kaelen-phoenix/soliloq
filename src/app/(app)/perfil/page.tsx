@@ -24,6 +24,7 @@ export default async function PerfilPage() {
       storage_path: f.storage_path,
       orden: f.orden,
       url: supabase.storage.from("fotos-perfil").getPublicUrl(f.storage_path).data.publicUrl,
+      enBd: true,
     }));
 
     return (

@@ -13,7 +13,9 @@ export function IngresarFormulario() {
   const [cargando, setCargando] = useState(false);
   const [enviado, setEnviado] = useState(false);
 
-  const siteUrl = process.env.NEXT_PUBLIC_SITE_URL ?? "http://localhost:3000";
+  // El origen real del navegador, no una variable de build: así el redirect es correcto
+  // en producción, en cada deploy de preview y en local, sin depender de configuración.
+  const urlCallback = () => `${window.location.origin}/auth/callback`;
 
   async function enviarMagicLink(e: React.FormEvent) {
     e.preventDefault();
@@ -28,7 +30,7 @@ export function IngresarFormulario() {
     const supabase = createClient();
     const { error: errorEnvio } = await supabase.auth.signInWithOtp({
       email,
-      options: { emailRedirectTo: `${siteUrl}/auth/callback` },
+      options: { emailRedirectTo: urlCallback() },
     });
     setCargando(false);
 
@@ -45,7 +47,7 @@ export function IngresarFormulario() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: `${siteUrl}/auth/callback` },
+      options: { redirectTo: urlCallback() },
     });
   }
 

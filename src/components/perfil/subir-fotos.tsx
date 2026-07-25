@@ -4,28 +4,55 @@ import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export interface FotoTalento {
+  /** Id de la fila en `fotos_talento`, o un id temporal de cliente si todavía no se persistió. */
   id: string;
   storage_path: string;
   orden: number;
   url: string;
+  /** false mientras la foto vive solo en Storage, durante el alta del perfil. */
+  enBd: boolean;
 }
 
 const TIPOS_ADMITIDOS = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_FOTOS = 5;
-const MIN_FOTOS = 3;
+export const MIN_FOTOS = 3;
+
+/**
+ * Persiste en `fotos_talento` las fotos que todavía solo existen en Storage.
+ * Se llama recién después de crear el perfil, porque la FK exige que la fila de
+ * `perfiles_talento` ya exista.
+ */
+export async function persistirFotosPendientes(talentoId: string, fotos: FotoTalento[]) {
+  const pendientes = fotos.filter((f) => !f.enBd);
+  if (pendientes.length === 0) return;
+
+  const supabase = createClient();
+  await supabase.from("fotos_talento").insert(
+    pendientes.map((f) => ({
+      talento_id: talentoId,
+      storage_path: f.storage_path,
+      orden: f.orden,
+    }))
+  );
+}
 
 export function SubirFotos({
   talentoId,
   fotos,
   onCambio,
+  /** Durante el alta el perfil todavía no existe, así que no se puede insertar en la base. */
+  persistir,
 }: {
   talentoId: string;
   fotos: FotoTalento[];
   onCambio: (fotos: FotoTalento[]) => void;
+  persistir: boolean;
 }) {
   const [error, setError] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
+
+  const ordenadas = [...fotos].sort((a, b) => a.orden - b.orden);
 
   async function agregarFoto(e: React.ChangeEvent<HTMLInputElement>) {
     const archivo = e.target.files?.[0];
@@ -51,9 +78,7 @@ export function SubirFotos({
     const extension = archivo.name.split(".").pop();
     const ruta = `${talentoId}/${crypto.randomUUID()}.${extension}`;
 
-    const { error: errorSubida } = await supabase.storage
-      .from("fotos-perfil")
-      .upload(ruta, archivo);
+    const { error: errorSubida } = await supabase.storage.from("fotos-perfil").upload(ruta, archivo);
 
     if (errorSubida) {
       setSubiendo(false);
@@ -61,7 +86,16 @@ export function SubirFotos({
       return;
     }
 
-    const siguienteOrden = fotos.length;
+    // max + 1: evita reusar el orden de una foto borrada del medio.
+    const siguienteOrden = fotos.reduce((max, f) => Math.max(max, f.orden), -1) + 1;
+    const url = supabase.storage.from("fotos-perfil").getPublicUrl(ruta).data.publicUrl;
+
+    if (!persistir) {
+      setSubiendo(false);
+      onCambio([...fotos, { id: crypto.randomUUID(), storage_path: ruta, orden: siguienteOrden, url, enBd: false }]);
+      return;
+    }
+
     const { data: fila, error: errorInsert } = await supabase
       .from("fotos_talento")
       .insert({ talento_id: talentoId, storage_path: ruta, orden: siguienteOrden })
@@ -71,80 +105,75 @@ export function SubirFotos({
     setSubiendo(false);
 
     if (errorInsert || !fila) {
+      await supabase.storage.from("fotos-perfil").remove([ruta]);
       setError("No pudimos guardar la foto. Probá de nuevo.");
       return;
     }
 
-    const { data: publica } = supabase.storage.from("fotos-perfil").getPublicUrl(ruta);
-    onCambio([...fotos, { id: fila.id, storage_path: ruta, orden: siguienteOrden, url: publica.publicUrl }]);
+    onCambio([...fotos, { id: fila.id, storage_path: ruta, orden: siguienteOrden, url, enBd: true }]);
   }
 
   async function eliminarFoto(foto: FotoTalento) {
     const supabase = createClient();
     await supabase.storage.from("fotos-perfil").remove([foto.storage_path]);
-    await supabase.from("fotos_talento").delete().eq("id", foto.id);
+    if (foto.enBd) {
+      await supabase.from("fotos_talento").delete().eq("id", foto.id);
+    }
     onCambio(fotos.filter((f) => f.id !== foto.id));
   }
 
   async function hacerPrincipal(foto: FotoTalento) {
-    if (foto.orden === 0) return;
+    // Reordena poniendo la elegida primera y renumerando de forma contigua.
+    const reordenadas = [foto, ...ordenadas.filter((f) => f.id !== foto.id)].map((f, i) => ({
+      ...f,
+      orden: i,
+    }));
+    onCambio(reordenadas);
+
     const supabase = createClient();
-    const anterior = fotos.find((f) => f.orden === 0);
-
-    await supabase.from("fotos_talento").update({ orden: -1 }).eq("id", foto.id);
-    if (anterior) {
-      await supabase.from("fotos_talento").update({ orden: foto.orden }).eq("id", anterior.id);
-    }
-    await supabase.from("fotos_talento").update({ orden: 0 }).eq("id", foto.id);
-
-    const reordenadas = fotos.map((f) => {
-      if (f.id === foto.id) return { ...f, orden: 0 };
-      if (anterior && f.id === anterior.id) return { ...f, orden: foto.orden };
-      return f;
-    });
-    onCambio(reordenadas.sort((a, b) => a.orden - b.orden));
+    await Promise.all(
+      reordenadas
+        .filter((f) => f.enBd)
+        .map((f) => supabase.from("fotos_talento").update({ orden: f.orden }).eq("id", f.id))
+    );
   }
 
   return (
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-3 gap-2">
-        {[...fotos]
-          .sort((a, b) => a.orden - b.orden)
-          .map((foto) => (
-            <div key={foto.id} className="group relative aspect-[3/4] overflow-hidden rounded-xl bg-ink-100">
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={foto.url} alt="Foto de portfolio" className="h-full w-full object-cover" />
-              {foto.orden === 0 && (
-                <span className="absolute left-1 top-1 rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-bold text-white">
-                  Principal
-                </span>
-              )}
-              <div className="absolute inset-x-0 bottom-0 flex justify-between bg-black/50 p-1">
-                {foto.orden !== 0 && (
-                  <button
-                    type="button"
-                    onClick={() => hacerPrincipal(foto)}
-                    className="text-[10px] font-medium text-white"
-                  >
-                    Hacer principal
-                  </button>
-                )}
-                <button
-                  type="button"
-                  onClick={() => eliminarFoto(foto)}
-                  className="ml-auto text-[10px] font-medium text-white"
-                >
-                  Eliminar
+        {ordenadas.map((foto, indice) => (
+          <div key={foto.id} className="group relative aspect-[3/4] overflow-hidden rounded-xl bg-ink-100">
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img src={foto.url} alt="Foto de portfolio" className="h-full w-full object-cover" />
+            {indice === 0 && (
+              <span className="absolute left-1 top-1 rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-bold text-white">
+                Principal
+              </span>
+            )}
+            <div className="absolute inset-x-0 bottom-0 flex justify-between bg-black/50 p-1">
+              {indice !== 0 && (
+                <button type="button" onClick={() => hacerPrincipal(foto)} className="text-[10px] font-medium text-white">
+                  Hacer principal
                 </button>
-              </div>
+              )}
+              <button type="button" onClick={() => eliminarFoto(foto)} className="ml-auto text-[10px] font-medium text-white">
+                Eliminar
+              </button>
             </div>
-          ))}
+          </div>
+        ))}
 
         {fotos.length < MAX_FOTOS && (
           <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-ink-200 text-ink-500 hover:border-brand-400">
             <span className="text-2xl">＋</span>
             <span className="text-xs">{subiendo ? "Subiendo…" : "Agregar"}</span>
-            <input type="file" accept={TIPOS_ADMITIDOS.join(",")} className="hidden" onChange={agregarFoto} disabled={subiendo} />
+            <input
+              type="file"
+              accept={TIPOS_ADMITIDOS.join(",")}
+              className="hidden"
+              onChange={agregarFoto}
+              disabled={subiendo}
+            />
           </label>
         )}
       </div>
