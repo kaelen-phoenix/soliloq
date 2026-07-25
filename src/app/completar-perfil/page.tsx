@@ -1,3 +1,4 @@
+import Link from "next/link";
 import { redirect } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FormularioTalento } from "@/components/perfil/formulario-talento";
@@ -15,9 +16,16 @@ export default async function CompletarPerfilPage() {
 
   return (
     <main className="mx-auto min-h-screen max-w-lg px-6 py-10">
-      <h1 className="mb-6 text-xl font-bold text-ink-900">
+      <h1 className="text-xl font-bold text-ink-900">
         {perfil.rol === "talento" ? "Contanos sobre vos" : "Contanos sobre tu proyecto"}
       </h1>
+      <p className="mb-6 mt-1 text-sm text-ink-500">
+        Estás creando tu perfil como{" "}
+        <strong>{perfil.rol === "talento" ? "Talento" : "Creador"}</strong>.{" "}
+        <Link href="/elegir-rol" className="font-medium text-brand-600 underline">
+          Me equivoqué de rol
+        </Link>
+      </p>
       {perfil.rol === "talento" ? (
         <FormularioTalento userId={user.id} esAlta fotosIniciales={[]} />
       ) : (

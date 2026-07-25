@@ -27,7 +27,9 @@ export default function ElegirRolPage() {
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-6 px-6 py-10">
       <div className="text-center">
         <h1 className="text-xl font-bold text-ink-900">¿Cómo querés usar Soliloq?</h1>
-        <p className="mt-1 text-sm text-ink-500">Elegí un rol. En este prototipo no se puede cambiar después.</p>
+        <p className="mt-1 text-sm text-ink-500">
+          Podés corregirlo mientras no hayas creado tu perfil. Después queda fijo.
+        </p>
       </div>
 
       <button
@@ -35,7 +37,7 @@ export default function ElegirRolPage() {
         disabled={cargando !== null}
         className="rounded-card border border-ink-100 bg-white p-5 text-left transition-shadow hover:shadow-md disabled:opacity-60"
       >
-        <p className="text-2xl">🎬</p>
+        <p className="text-2xl">🎭</p>
         <h2 className="mt-2 font-semibold text-ink-900">Soy Talento</h2>
         <p className="text-sm text-ink-500">Actor, actriz o técnico. Armá tu perfil y postulate a convocatorias.</p>
       </button>
@@ -45,7 +47,7 @@ export default function ElegirRolPage() {
         disabled={cargando !== null}
         className="rounded-card border border-ink-100 bg-white p-5 text-left transition-shadow hover:shadow-md disabled:opacity-60"
       >
-        <p className="text-2xl">🎬️</p>
+        <p className="text-2xl">🎬</p>
         <h2 className="mt-2 font-semibold text-ink-900">Soy Creador</h2>
         <p className="text-sm text-ink-500">Director o compañía. Publicá tu obra y armá tu elenco.</p>
       </button>

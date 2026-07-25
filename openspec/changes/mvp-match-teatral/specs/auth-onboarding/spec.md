@@ -48,9 +48,17 @@ Tras su primer ingreso, el sistema SHALL requerir que la persona elija un único
 - **WHEN** la persona elige `talento` o `creador` y confirma
 - **THEN** el sistema guarda el rol en su cuenta y la lleva al formulario de alta del perfil correspondiente a ese rol
 
-#### Scenario: El rol es inmutable en el prototipo
-- **WHEN** una persona con rol ya asignado intenta acceder a la pantalla de elección de rol
+#### Scenario: Corrección del rol antes de crear el perfil
+- **WHEN** una persona que ya eligió rol pero todavía no creó su perfil vuelve a la pantalla de elección de rol
+- **THEN** el sistema le permite elegir otro rol y la deriva al formulario de alta del perfil correspondiente
+
+#### Scenario: El rol queda fijo una vez creado el perfil
+- **WHEN** una persona con el perfil de su rol ya creado intenta acceder a la pantalla de elección de rol
 - **THEN** el sistema la redirige a la pantalla principal de su rol y no le ofrece cambiarlo
+
+#### Scenario: Acceso a la corrección de rol desde el alta de perfil
+- **WHEN** una persona está en el formulario de alta de su perfil
+- **THEN** el sistema le ofrece una acción visible para volver a elegir el rol
 
 ### Requirement: Onboarding incompleto hasta completar el perfil
 

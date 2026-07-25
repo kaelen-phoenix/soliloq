@@ -66,7 +66,9 @@ export async function actualizarSesion(request: NextRequest) {
     return response;
   }
 
+  // El rol se puede corregir mientras no exista el perfil; una vez creado queda fijo.
   if (enRol) {
+    if (!perfil.onboarding_completo) return response;
     const url = request.nextUrl.clone();
     url.pathname = "/";
     return NextResponse.redirect(url);
