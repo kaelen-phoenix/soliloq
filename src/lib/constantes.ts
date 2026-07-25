@@ -20,9 +20,6 @@ export const HABILIDADES = [
   "Improvisación",
 ] as const;
 
-export const PLATAFORMAS_VIDEOREEL_REGEX =
-  /^https?:\/\/(www\.)?(youtube\.com\/watch\?v=|youtu\.be\/|vimeo\.com\/)[\w-]+/i;
-
 export function calcularEdad(fechaNacimiento: string): number {
   const nacimiento = new Date(fechaNacimiento);
   const hoy = new Date();

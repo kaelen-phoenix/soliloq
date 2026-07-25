@@ -5,7 +5,8 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
-import { HABILIDADES, LOCACIONES, PLATAFORMAS_VIDEOREEL_REGEX } from "@/lib/constantes";
+import { HABILIDADES, LOCACIONES } from "@/lib/constantes";
+import { esVideoreelValido } from "@/lib/videoreel";
 import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
 
 interface DatosIniciales {
@@ -59,8 +60,9 @@ export function FormularioTalento({
     }
     if (!locacion) nuevos.locacion = "Elegí tu locación.";
     if (fotos.length < MIN_FOTOS) nuevos.fotos = `Cargá al menos ${MIN_FOTOS} fotos.`;
-    if (videoreelUrl && !PLATAFORMAS_VIDEOREEL_REGEX.test(videoreelUrl)) {
-      nuevos.videoreel_url = "Solo se admiten enlaces de YouTube o Vimeo.";
+    if (videoreelUrl && !esVideoreelValido(videoreelUrl)) {
+      nuevos.videoreel_url =
+        "No reconocemos ese enlace. Pegá el link de un video de YouTube o Vimeo.";
     }
     if (experiencia.length > 2000) nuevos.experiencia = "Máximo 2000 caracteres.";
 
@@ -163,11 +165,14 @@ export function FormularioTalento({
         <CampoTexto
           id="videoreel"
           etiqueta="Enlace de YouTube o Vimeo"
-          placeholder="https://youtu.be/..."
+          placeholder="https://youtu.be/... o https://vimeo.com/..."
           value={videoreelUrl}
           onChange={(e) => setVideoreelUrl(e.target.value)}
           error={errores.videoreel_url}
         />
+        <p className="-mt-2 text-xs text-ink-500">
+          Sirve el link normal, el de compartir, Shorts o el de la app del celular.
+        </p>
       </section>
 
       <section className="flex flex-col gap-3">
