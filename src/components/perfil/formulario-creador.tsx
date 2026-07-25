@@ -116,7 +116,7 @@ export function FormularioCreador({
             type="button"
             onClick={() => setTipo("director_independiente")}
             className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium ${
-              tipo === "director_independiente" ? "border-brand-500 bg-brand-50 text-brand-600" : "border-ink-100"
+              tipo === "director_independiente" ? "border-ink-900 bg-ink-900 text-white" : "border-ink-100"
             }`}
           >
             Director/a independiente
@@ -125,7 +125,7 @@ export function FormularioCreador({
             type="button"
             onClick={() => setTipo("compania")}
             className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium ${
-              tipo === "compania" ? "border-brand-500 bg-brand-50 text-brand-600" : "border-ink-100"
+              tipo === "compania" ? "border-ink-900 bg-ink-900 text-white" : "border-ink-100"
             }`}
           >
             Compañía
@@ -141,15 +141,15 @@ export function FormularioCreador({
         />
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="locacion" className="text-sm font-medium text-ink-700">
+          <label htmlFor="locacion" className="text-[13px] font-medium text-ink-700">
             Locación
           </label>
           <select
             id="locacion"
             value={locacion}
             onChange={(e) => setLocacion(e.target.value)}
-            className={`rounded-xl border px-4 py-3 text-base outline-none focus:border-brand-500 ${
-              errores.locacion ? "border-red-400" : "border-ink-100"
+            className={`rounded-xl border bg-white px-3.5 py-2.5 text-[15px] focus:border-ink-900 ${
+              errores.locacion ? "border-red-400" : "border-ink-200"
             }`}
           >
             <option value="">Elegí una locación</option>
@@ -164,13 +164,13 @@ export function FormularioCreador({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Descripción e imagen (opcional)</h2>
+        <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Descripción e imagen (opcional)</h2>
         <textarea
           rows={4}
           maxLength={1000}
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
-          className="rounded-xl border border-ink-100 px-4 py-3 text-base outline-none focus:border-brand-500"
+          className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[15px] outline-none focus:border-ink-900"
           placeholder="Contanos sobre tu trayectoria o la de tu compañía."
         />
         <div className="flex items-center gap-3">
@@ -178,7 +178,7 @@ export function FormularioCreador({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={imagenUrl} alt="Imagen de perfil" className="h-16 w-16 rounded-full object-cover" />
           )}
-          <label className="cursor-pointer rounded-full border border-ink-100 px-4 py-2 text-sm">
+          <label className="cursor-pointer rounded-xl border border-ink-200 px-3.5 py-2 text-[13px] hover:bg-ink-50">
             {subiendoImagen ? "Subiendo…" : "Elegir imagen"}
             <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={subirImagen} />
           </label>

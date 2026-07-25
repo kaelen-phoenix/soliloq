@@ -83,14 +83,14 @@ export function FormularioRol({ obraId }: { obraId: string }) {
         <button
           type="button"
           onClick={() => setTipo("actuacion")}
-          className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "actuacion" ? "border-brand-500 bg-brand-50 text-brand-600" : "border-ink-100"}`}
+          className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "actuacion" ? "border-ink-900 bg-ink-900 text-white" : "border-ink-100"}`}
         >
           Actuación
         </button>
         <button
           type="button"
           onClick={() => setTipo("tecnica")}
-          className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "tecnica" ? "border-brand-500 bg-brand-50 text-brand-600" : "border-ink-100"}`}
+          className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "tecnica" ? "border-ink-900 bg-ink-900 text-white" : "border-ink-100"}`}
         >
           Técnica
         </button>
@@ -107,7 +107,7 @@ export function FormularioRol({ obraId }: { obraId: string }) {
         placeholder="Descripción del rol"
         value={descripcion}
         onChange={(e) => setDescripcion(e.target.value)}
-        className="rounded-xl border border-ink-100 px-4 py-3 text-sm outline-none focus:border-brand-500"
+        className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[14px] outline-none focus:border-ink-900"
       />
 
       {error && <p className="text-xs text-red-600">{error}</p>}

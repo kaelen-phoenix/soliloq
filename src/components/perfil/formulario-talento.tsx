@@ -115,7 +115,7 @@ export function FormularioTalento({
   return (
     <form onSubmit={guardar} className="flex flex-col gap-6">
       <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Ficha básica</h2>
+        <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Ficha básica</h2>
         <CampoTexto
           id="nombre"
           etiqueta="Nombre completo"
@@ -132,15 +132,15 @@ export function FormularioTalento({
           error={errores.fecha_nacimiento}
         />
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="locacion" className="text-sm font-medium text-ink-700">
+          <label htmlFor="locacion" className="text-[13px] font-medium text-ink-700">
             Locación
           </label>
           <select
             id="locacion"
             value={locacion}
             onChange={(e) => setLocacion(e.target.value)}
-            className={`rounded-xl border px-4 py-3 text-base outline-none focus:border-brand-500 ${
-              errores.locacion ? "border-red-400" : "border-ink-100"
+            className={`rounded-xl border bg-white px-3.5 py-2.5 text-[15px] focus:border-ink-900 ${
+              errores.locacion ? "border-red-400" : "border-ink-200"
             }`}
           >
             <option value="">Elegí una locación</option>
@@ -155,13 +155,13 @@ export function FormularioTalento({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Portfolio de fotos</h2>
+        <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Portfolio de fotos</h2>
         <SubirFotos talentoId={userId} fotos={fotos} onCambio={setFotos} persistir={!esAlta} />
         {errores.fotos && <p className="text-xs text-red-600">{errores.fotos}</p>}
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Videoreel (opcional)</h2>
+        <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Videoreel (opcional)</h2>
         <CampoTexto
           id="videoreel"
           etiqueta="Enlace de YouTube o Vimeo"
@@ -176,9 +176,9 @@ export function FormularioTalento({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">CV y habilidades</h2>
+        <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">CV y habilidades</h2>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="experiencia" className="text-sm font-medium text-ink-700">
+          <label htmlFor="experiencia" className="text-[13px] font-medium text-ink-700">
             Experiencia
           </label>
           <textarea
@@ -187,7 +187,7 @@ export function FormularioTalento({
             maxLength={2000}
             value={experiencia}
             onChange={(e) => setExperiencia(e.target.value)}
-            className="rounded-xl border border-ink-100 px-4 py-3 text-base outline-none focus:border-brand-500"
+            className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[15px] outline-none focus:border-ink-900"
             placeholder="Contá tu formación, obras en las que participaste, etc."
           />
           <p className="text-right text-xs text-ink-300">{experiencia.length}/2000</p>
@@ -201,7 +201,7 @@ export function FormularioTalento({
               onClick={() => alternarHabilidad(h)}
               className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                 habilidades.includes(h)
-                  ? "border-brand-500 bg-brand-50 text-brand-600"
+                  ? "border-ink-900 bg-ink-900 text-white"
                   : "border-ink-100 text-ink-500"
               }`}
             >

@@ -30,7 +30,7 @@ export default async function PerfilPage() {
     }));
 
     return (
-      <main className="px-6 py-6">
+      <main className="px-5 py-5">
         <FormularioTalento
           userId={user.id}
           esAlta={false}
@@ -50,10 +50,10 @@ export default async function PerfilPage() {
   ]);
 
   return (
-    <main className="px-6 py-6">
+    <main className="px-5 py-5">
       <FormularioCreador userId={user.id} esAlta={false} datosIniciales={perfilCreador ?? undefined} />
       <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Historial de obras previas</h2>
+        <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Historial de obras previas</h2>
         <ObrasPrevias creadorId={user.id} obras={obrasPrevias ?? []} />
       </section>
       <div className="mt-8">

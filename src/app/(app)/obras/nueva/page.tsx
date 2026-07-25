@@ -56,13 +56,12 @@ export default function NuevaObraPage() {
   }
 
   return (
-    <main className="px-6 py-6">
-      <h1 className="mb-6 text-xl font-bold text-ink-900">Nueva obra</h1>
+    <main className="px-5 py-5">
       <form onSubmit={crear} className="flex flex-col gap-4">
         <CampoTexto id="titulo" etiqueta="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} error={errores.titulo} />
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="sinopsis" className="text-sm font-medium text-ink-700">
+          <label htmlFor="sinopsis" className="text-[13px] font-medium text-ink-700">
             Sinopsis (opcional)
           </label>
           <textarea
@@ -71,7 +70,7 @@ export default function NuevaObraPage() {
             maxLength={2000}
             value={sinopsis}
             onChange={(e) => setSinopsis(e.target.value)}
-            className="rounded-xl border border-ink-100 px-4 py-3 text-base outline-none focus:border-brand-500"
+            className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[15px] outline-none focus:border-ink-900"
           />
         </div>
 

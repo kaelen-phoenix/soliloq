@@ -53,13 +53,13 @@ export function IngresarFormulario() {
 
   if (enviado) {
     return (
-      <div className="rounded-card border border-ink-100 bg-white p-6 text-center">
-        <p className="text-2xl">📬</p>
-        <h2 className="mt-2 text-lg font-semibold">Revisá tu correo</h2>
-        <p className="mt-1 text-sm text-ink-500">
-          Te enviamos un enlace de acceso a <strong>{email}</strong>. Abrilo desde este mismo dispositivo.
+      <div className="rounded-2xl border border-ink-100 p-6">
+        <h2 className="text-[17px] font-semibold text-ink-900">Revisá tu correo</h2>
+        <p className="mt-1.5 text-[13px] leading-relaxed text-ink-500">
+          Te enviamos un enlace de acceso a <span className="text-ink-900">{email}</span>. Abrilo
+          desde este mismo dispositivo.
         </p>
-        <Boton variante="fantasma" className="mt-4" onClick={() => setEnviado(false)}>
+        <Boton variante="fantasma" className="mt-4 -ml-4" onClick={() => setEnviado(false)}>
           Usar otro email
         </Boton>
       </div>
@@ -83,7 +83,7 @@ export function IngresarFormulario() {
         </Boton>
       </form>
 
-      <div className="flex items-center gap-3 text-xs text-ink-300">
+      <div className="flex items-center gap-3 text-[11px] uppercase tracking-wide text-ink-300">
         <div className="h-px flex-1 bg-ink-100" />
         o
         <div className="h-px flex-1 bg-ink-100" />

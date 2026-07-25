@@ -42,9 +42,9 @@ export default async function RolPostulantesPage({ params }: { params: { id: str
   const obra = Array.isArray(rol.obras) ? rol.obras[0] : (rol.obras as any);
 
   return (
-    <main className="px-6 py-6">
-      <p className="text-xs font-medium uppercase tracking-wide text-ink-500">{obra.titulo}</p>
-      <h1 className="mb-4 text-xl font-bold text-ink-900">{rol.nombre}</h1>
+    <main className="px-5 py-5">
+      <p className="text-[11px] font-medium uppercase tracking-wide text-ink-400">{obra.titulo}</p>
+      <h2 className="mb-5 mt-1 text-[20px] font-semibold leading-tight text-ink-900">{rol.nombre}</h2>
       <BandejaPostulantes
         postulantesIniciales={postulantes}
         vacantes={rol.vacantes}

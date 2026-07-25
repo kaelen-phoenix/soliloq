@@ -19,7 +19,7 @@ export default async function PerfilTalentoPage({ params }: { params: { id: stri
   }));
 
   return (
-    <main className="px-6 py-6">
+    <main className="px-5 py-5">
       <PerfilTalentoDetalle talento={{ ...talento, fotos: fotosConUrl }} />
     </main>
   );

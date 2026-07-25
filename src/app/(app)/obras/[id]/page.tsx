@@ -18,20 +18,22 @@ export default async function DetalleObraPage({ params }: { params: { id: string
     .eq("obra_id", params.id);
 
   return (
-    <main className="px-6 py-6">
-      <h1 className="text-xl font-bold text-ink-900">{obra.titulo}</h1>
-      <p className="mt-1 text-sm text-ink-500">{obra.locacion_ensayos}</p>
-      {obra.sinopsis && <p className="mt-3 text-sm text-ink-700">{obra.sinopsis}</p>}
+    <main className="px-5 py-5">
+      <h2 className="text-[20px] font-semibold leading-tight text-ink-900">{obra.titulo}</h2>
+      <p className="mt-1 text-[13px] text-ink-500">{obra.locacion_ensayos}</p>
+      {obra.sinopsis && (
+        <p className="mt-3 text-[14px] leading-relaxed text-ink-600">{obra.sinopsis}</p>
+      )}
 
-      <div className="mt-4">
+      <div className="mt-5">
         <AccionesObra obraId={obra.id} estado={obra.estado} cantidadRoles={roles?.length ?? 0} />
       </div>
 
-      <section className="mt-6 flex flex-col gap-3">
-        <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Roles</h2>
+      <section className="mt-7 flex flex-col gap-2.5">
+        <h3 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Roles</h3>
 
         {roles && roles.length === 0 && (
-          <p className="text-sm text-ink-500">Todavía no definiste roles para esta obra.</p>
+          <p className="text-[13px] text-ink-500">Todavía no definiste roles para esta obra.</p>
         )}
 
         <ul className="flex flex-col gap-2">
@@ -42,19 +44,19 @@ export default async function DetalleObraPage({ params }: { params: { id: string
               <li key={rol.id}>
                 <Link
                   href={`/obras/${obra.id}/roles/${rol.id}`}
-                  className="flex items-center justify-between rounded-card border border-ink-100 bg-white p-4"
+                  className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-4 transition-colors hover:border-ink-200"
                 >
-                  <div>
-                    <p className="font-medium text-ink-900">{rol.nombre}</p>
-                    <p className="text-xs text-ink-500">
+                  <div className="min-w-0 flex-1">
+                    <p className="truncate text-[15px] font-medium text-ink-900">{rol.nombre}</p>
+                    <p className="mt-0.5 text-[12px] text-ink-500">
                       {ETIQUETA_TIPO[rol.tipo]}
-                      {rol.edad_minima && rol.edad_maxima ? ` · ${rol.edad_minima}-${rol.edad_maxima} años` : ""}
+                      {rol.edad_minima && rol.edad_maxima ? ` · ${rol.edad_minima}–${rol.edad_maxima} años` : ""}
                       {" · "}
-                      {aprobados}/{rol.vacantes} vacantes cubiertas
+                      {aprobados}/{rol.vacantes} cubiertas
                     </p>
                   </div>
                   {sinRevisar > 0 && (
-                    <span className="rounded-full bg-brand-500 px-2.5 py-1 text-xs font-bold text-white">
+                    <span className="shrink-0 rounded-full bg-brand-500 px-2 py-0.5 text-[11px] font-semibold text-white">
                       {sinRevisar}
                     </span>
                   )}

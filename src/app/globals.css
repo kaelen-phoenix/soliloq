@@ -2,25 +2,36 @@
 @tailwind components;
 @tailwind utilities;
 
-:root {
-  --font-sans: "Inter", system-ui, sans-serif;
+@layer base {
+  html,
+  body {
+    height: 100%;
+    overscroll-behavior-y: none;
+  }
+
+  body {
+    @apply bg-white text-ink-900 tracking-ajustado antialiased;
+  }
+
+  /* Los títulos ganan peso por tamaño y tracking, no por sombras ni adornos. */
+  h1,
+  h2,
+  h3 {
+    @apply tracking-[-0.02em];
+  }
+
+  /* Un solo anillo de foco, consistente en toda la app. */
+  :focus-visible {
+    @apply outline-none ring-2 ring-brand-500/40 ring-offset-2 ring-offset-white;
+  }
 }
 
-html,
-body {
-  height: 100%;
-  overscroll-behavior-y: none;
-}
+@layer utilities {
+  .safe-bottom {
+    padding-bottom: max(env(safe-area-inset-bottom), 0.25rem);
+  }
 
-body {
-  background-color: theme("colors.ink.100");
-  color: theme("colors.ink.900");
-}
-
-.safe-bottom {
-  padding-bottom: env(safe-area-inset-bottom);
-}
-
-.safe-top {
-  padding-top: env(safe-area-inset-top);
+  .safe-top {
+    padding-top: env(safe-area-inset-top);
+  }
 }

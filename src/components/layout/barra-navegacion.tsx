@@ -2,25 +2,26 @@
 
 import Link from "next/link";
 import { usePathname } from "next/navigation";
+import { Icono } from "@/components/ui/icono";
 import type { RolUsuario } from "@/lib/supabase/types";
 
 interface Item {
   href: string;
   label: string;
-  icono: string;
+  icono: "feed" | "postulaciones" | "salas" | "perfil" | "tablero";
 }
 
 const itemsTalento: Item[] = [
-  { href: "/", label: "Feed", icono: "🎭" },
-  { href: "/postulaciones", label: "Postulaciones", icono: "📋" },
-  { href: "/salas", label: "Salas", icono: "💬" },
-  { href: "/perfil", label: "Perfil", icono: "👤" },
+  { href: "/", label: "Feed", icono: "feed" },
+  { href: "/postulaciones", label: "Postulaciones", icono: "postulaciones" },
+  { href: "/salas", label: "Salas", icono: "salas" },
+  { href: "/perfil", label: "Perfil", icono: "perfil" },
 ];
 
 const itemsCreador: Item[] = [
-  { href: "/", label: "Tablero", icono: "🗂️" },
-  { href: "/salas", label: "Salas", icono: "💬" },
-  { href: "/perfil", label: "Perfil", icono: "👤" },
+  { href: "/", label: "Tablero", icono: "tablero" },
+  { href: "/salas", label: "Salas", icono: "salas" },
+  { href: "/perfil", label: "Perfil", icono: "perfil" },
 ];
 
 export function BarraNavegacion({ rol }: { rol: RolUsuario }) {
@@ -28,19 +29,20 @@ export function BarraNavegacion({ rol }: { rol: RolUsuario }) {
   const items = rol === "talento" ? itemsTalento : itemsCreador;
 
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/95 backdrop-blur">
-      <ul className="mx-auto flex max-w-lg items-stretch justify-around">
+    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/85 backdrop-blur-xl">
+      <ul className="mx-auto flex max-w-lg items-stretch">
         {items.map((item) => {
           const activo = pathname === item.href;
           return (
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
-                className={`flex flex-col items-center gap-0.5 py-2 text-xs font-medium transition-colors ${
-                  activo ? "text-brand-600" : "text-ink-500"
+                aria-current={activo ? "page" : undefined}
+                className={`flex flex-col items-center gap-1 pb-1.5 pt-2.5 text-[10px] font-medium transition-colors ${
+                  activo ? "text-ink-900" : "text-ink-400 hover:text-ink-600"
                 }`}
               >
-                <span className="text-xl">{item.icono}</span>
+                <Icono nombre={item.icono} className="h-[22px] w-[22px]" />
                 {item.label}
               </Link>
             </li>

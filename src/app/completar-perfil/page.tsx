@@ -23,7 +23,7 @@ export default async function CompletarPerfilPage() {
         Estás creando tu perfil como{" "}
         <strong>{perfil.rol === "talento" ? "Talento" : "Creador"}</strong>. Vas a poder sumar el
         otro más adelante.{" "}
-        <Link href="/elegir-rol" className="font-medium text-brand-600 underline">
+        <Link href="/elegir-rol" className="font-medium text-ink-900 underline decoration-ink-300 underline-offset-2">
           Empezar por el otro
         </Link>
       </p>

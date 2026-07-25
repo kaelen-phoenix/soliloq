@@ -137,9 +137,9 @@ export function SalaChat({
       <button
         type="button"
         onClick={() => setMostrarIntegrantes((v) => !v)}
-        className="border-b border-ink-100 px-4 py-2 text-left text-xs font-medium text-brand-600"
+        className="border-b border-ink-100 px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wide text-ink-500 hover:text-ink-900"
       >
-        {integrantes.length} integrantes {mostrarIntegrantes ? "▲" : "▼"}
+        {integrantes.length} integrantes
       </button>
 
       {mostrarIntegrantes && (
@@ -163,8 +163,8 @@ export function SalaChat({
 
       <div className="flex-1 overflow-y-auto px-4 py-3">
         {mensajes.length === 0 && (
-          <p className="mt-8 text-center text-sm text-ink-500">
-            👋 Esta sala se abrió porque hubo match. Coordinen fechas de audición y compartan textos acá.
+          <p className="mx-auto mt-10 max-w-[16rem] text-center text-[13px] leading-relaxed text-ink-400">
+            Esta sala se abrió porque hubo match. Coordinen fechas de audición y compartan textos acá.
           </p>
         )}
 
@@ -174,10 +174,16 @@ export function SalaChat({
             const esPropio = m.autor_id === userId;
             return (
               <li key={m.id} className={`flex ${esPropio ? "justify-end" : "justify-start"}`}>
-                <div className={`max-w-[75%] rounded-2xl px-4 py-2 ${esPropio ? "bg-brand-500 text-white" : "bg-ink-100 text-ink-900"}`}>
-                  {!esPropio && <p className="text-xs font-semibold opacity-70">{autor?.nombre ?? "Integrante"}</p>}
-                  <p className="text-sm">{m.contenido}</p>
-                  <p className="mt-0.5 text-[10px] opacity-70">
+                <div
+                  className={`max-w-[78%] rounded-2xl px-3.5 py-2 ${
+                    esPropio ? "bg-ink-900 text-white" : "bg-ink-100 text-ink-900"
+                  }`}
+                >
+                  {!esPropio && (
+                    <p className="text-[11px] font-medium opacity-60">{autor?.nombre ?? "Integrante"}</p>
+                  )}
+                  <p className="text-[14px] leading-snug">{m.contenido}</p>
+                  <p className="mt-0.5 text-[10px] opacity-50">
                     {new Date(m.creado_en).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
                   </p>
                   {m.noEnviado && (
@@ -193,15 +199,19 @@ export function SalaChat({
         <div ref={finRef} />
       </div>
 
-      <form onSubmit={enviar} className="safe-bottom flex gap-2 border-t border-ink-100 p-3">
+      <form onSubmit={enviar} className="safe-bottom flex gap-2 border-t border-ink-100 bg-white p-3">
         <input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
           maxLength={2000}
           placeholder="Escribí un mensaje…"
-          className="flex-1 rounded-full border border-ink-100 px-4 py-2.5 text-sm outline-none focus:border-brand-500"
+          className="flex-1 rounded-full border border-ink-200 px-4 py-2.5 text-[14px] placeholder:text-ink-400 focus:border-ink-900"
         />
-        <button type="submit" className="rounded-full bg-brand-500 px-5 py-2.5 text-sm font-semibold text-white">
+        <button
+          type="submit"
+          disabled={!texto.trim()}
+          className="rounded-full bg-ink-900 px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-ink-800 disabled:bg-ink-200"
+        >
           Enviar
         </button>
       </form>

@@ -15,12 +15,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const estado = await leerEstadoCuenta(supabase, user.id);
   if (!estado.modoActivo) redirect("/completar-perfil");
 
-  const titulo = estado.modoActivo === "talento" ? "Convocatorias" : "Tu tablero";
-
   return (
     <div className="pb-20">
       <Encabezado
-        titulo={titulo}
         userId={user.id}
         modoActivo={estado.modoActivo}
         tieneAmbosPerfiles={estado.tieneAmbosPerfiles}

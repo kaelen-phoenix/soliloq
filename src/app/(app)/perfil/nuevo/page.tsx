@@ -18,15 +18,15 @@ export default async function NuevoPerfilPage() {
   if (!falta) redirect("/perfil");
 
   return (
-    <main className="px-6 py-6">
-      <h1 className="text-xl font-bold text-ink-900">
+    <main className="px-5 py-5">
+      <h2 className="text-[20px] font-semibold leading-tight text-ink-900">
         {falta === "talento" ? "Sumá tu perfil de Talento" : "Sumá tu perfil de Creador"}
-      </h1>
-      <p className="mb-6 mt-1 text-sm text-ink-500">
+      </h2>
+      <p className="mb-6 mt-1.5 text-[13px] leading-relaxed text-ink-500">
         {falta === "talento"
           ? "Vas a poder postularte a convocatorias sin perder tus obras."
           : "Vas a poder publicar convocatorias sin perder tu perfil de actuación."}{" "}
-        <Link href="/" className="font-medium text-brand-600 underline">
+        <Link href="/" className="font-medium text-ink-900 underline decoration-ink-300 underline-offset-2">
           Ahora no
         </Link>
       </p>

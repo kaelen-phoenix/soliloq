@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
 
 export interface FotoTalento {
@@ -142,21 +143,29 @@ export function SubirFotos({
     <div className="flex flex-col gap-3">
       <div className="grid grid-cols-3 gap-2">
         {ordenadas.map((foto, indice) => (
-          <div key={foto.id} className="group relative aspect-[3/4] overflow-hidden rounded-xl bg-ink-100">
+          <div key={foto.id} className="group relative aspect-[3/4] overflow-hidden rounded-lg bg-ink-100">
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={foto.url} alt="Foto de portfolio" className="h-full w-full object-cover" />
             {indice === 0 && (
-              <span className="absolute left-1 top-1 rounded-full bg-brand-500 px-2 py-0.5 text-[10px] font-bold text-white">
+              <span className="absolute left-1.5 top-1.5 rounded bg-ink-950/75 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-white backdrop-blur-sm">
                 Principal
               </span>
             )}
-            <div className="absolute inset-x-0 bottom-0 flex justify-between bg-black/50 p-1">
+            <div className="absolute inset-x-0 bottom-0 flex justify-between gap-1 bg-gradient-to-t from-ink-950/80 to-transparent px-1.5 pb-1.5 pt-4">
               {indice !== 0 && (
-                <button type="button" onClick={() => hacerPrincipal(foto)} className="text-[10px] font-medium text-white">
-                  Hacer principal
+                <button
+                  type="button"
+                  onClick={() => hacerPrincipal(foto)}
+                  className="text-[10px] font-medium text-white/90 hover:text-white"
+                >
+                  Principal
                 </button>
               )}
-              <button type="button" onClick={() => eliminarFoto(foto)} className="ml-auto text-[10px] font-medium text-white">
+              <button
+                type="button"
+                onClick={() => eliminarFoto(foto)}
+                className="ml-auto text-[10px] font-medium text-white/90 hover:text-white"
+              >
                 Eliminar
               </button>
             </div>
@@ -164,9 +173,9 @@ export function SubirFotos({
         ))}
 
         {fotos.length < MAX_FOTOS && (
-          <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1 rounded-xl border-2 border-dashed border-ink-200 text-ink-500 hover:border-brand-400">
-            <span className="text-2xl">＋</span>
-            <span className="text-xs">{subiendo ? "Subiendo…" : "Agregar"}</span>
+          <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-ink-300 text-ink-400 transition-colors hover:border-ink-900 hover:text-ink-900">
+            <Icono nombre="mas" className="h-5 w-5" />
+            <span className="text-[11px] font-medium">{subiendo ? "Subiendo…" : "Agregar"}</span>
             <input
               type="file"
               accept={TIPOS_ADMITIDOS.join(",")}

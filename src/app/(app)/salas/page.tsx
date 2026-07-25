@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function SalasPage() {
@@ -32,23 +33,31 @@ export default async function SalasPage() {
   );
 
   return (
-    <main className="px-6 py-6">
-      <h1 className="mb-4 text-xl font-bold text-ink-900">Tus salas</h1>
-
+    <main className="px-5 py-5">
       {salas.length === 0 && (
-        <div className="rounded-card border border-dashed border-ink-200 p-8 text-center">
-          <p className="text-3xl">💬</p>
-          <p className="mt-2 font-medium text-ink-900">Todavía no tenés salas</p>
-          <p className="mt-1 text-sm text-ink-500">Las salas se abren automáticamente cuando se concreta un match.</p>
+        <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
+          <Icono nombre="salas" className="h-8 w-8 text-ink-300" />
+          <p className="mt-3 text-[15px] font-medium text-ink-900">Todavía no tenés salas</p>
+          <p className="mt-1 text-[13px] leading-snug text-ink-500">
+            Se abren automáticamente cuando se concreta un match.
+          </p>
         </div>
       )}
 
       <ul className="flex flex-col gap-2">
         {salas.map((s) => (
           <li key={s.salaId}>
-            <Link href={`/salas/${s.salaId}`} className="block rounded-card border border-ink-100 bg-white p-4">
-              <p className="font-medium text-ink-900">{s.titulo}</p>
-              <p className="truncate text-sm text-ink-500">{s.ultimoMensaje ?? "Sala recién creada"}</p>
+            <Link
+              href={`/salas/${s.salaId}`}
+              className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-4 transition-colors hover:border-ink-200"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[15px] font-medium text-ink-900">{s.titulo}</p>
+                <p className="mt-0.5 truncate text-[13px] text-ink-500">
+                  {s.ultimoMensaje ?? "Sala recién creada"}
+                </p>
+              </div>
+              <Icono nombre="chevron" className="h-4 w-4 -rotate-90 shrink-0 text-ink-300" />
             </Link>
           </li>
         ))}

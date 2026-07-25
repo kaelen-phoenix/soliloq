@@ -12,18 +12,18 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
   if (!creador) notFound();
 
   return (
-    <main className="px-6 py-6">
+    <main className="px-5 py-5">
       <div className="flex items-center gap-4">
         {creador.imagen_url ? (
           // eslint-disable-next-line @next/next/no-img-element
           <img src={creador.imagen_url} alt={creador.nombre} className="h-16 w-16 rounded-full object-cover" />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-100 text-xl font-bold text-brand-600">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">
             {creador.nombre[0]}
           </div>
         )}
         <div>
-          <h1 className="text-lg font-bold text-ink-900">{creador.nombre}</h1>
+          <h1 className="text-[18px] font-semibold text-ink-900">{creador.nombre}</h1>
           <p className="text-sm text-ink-500">
             {creador.tipo === "compania" ? "Compañía" : "Director/a independiente"} · {creador.locacion}
           </p>
@@ -34,7 +34,7 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
 
       {obrasPrevias && obrasPrevias.length > 0 && (
         <section className="mt-6">
-          <h2 className="text-sm font-semibold uppercase tracking-wide text-ink-500">Obras previas</h2>
+          <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Obras previas</h2>
           <ul className="mt-2 flex flex-col gap-2">
             {obrasPrevias.map((o) => (
               <li key={o.id} className="rounded-xl border border-ink-100 px-4 py-2">

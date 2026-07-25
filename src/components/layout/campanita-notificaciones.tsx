@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useEffect, useState } from "react";
+import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
 
 export function CampanitaNotificaciones({ userId }: { userId: string }) {
@@ -36,12 +37,14 @@ export function CampanitaNotificaciones({ userId }: { userId: string }) {
   }, [userId]);
 
   return (
-    <Link href="/notificaciones" className="relative inline-flex h-9 w-9 items-center justify-center rounded-full hover:bg-ink-100">
-      <span className="text-xl" aria-hidden>
-        🔔
-      </span>
+    <Link
+      href="/notificaciones"
+      aria-label={noLeidas > 0 ? `Notificaciones, ${noLeidas} sin leer` : "Notificaciones"}
+      className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-600 transition-colors hover:bg-ink-50 hover:text-ink-900"
+    >
+      <Icono nombre="campana" />
       {noLeidas > 0 && (
-        <span className="absolute -right-0.5 -top-0.5 flex h-4 min-w-[1rem] items-center justify-center rounded-full bg-brand-500 px-1 text-[10px] font-bold leading-none text-white">
+        <span className="absolute right-1 top-1 flex h-[15px] min-w-[15px] items-center justify-center rounded-full bg-brand-500 px-1 text-[9px] font-semibold leading-none text-white ring-2 ring-white">
           {noLeidas > 9 ? "9+" : noLeidas}
         </span>
       )}

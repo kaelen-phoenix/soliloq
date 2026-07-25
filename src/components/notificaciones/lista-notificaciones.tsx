@@ -2,8 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
-import { Boton } from "@/components/ui/boton";
 
 interface Notificacion {
   id: string;
@@ -25,8 +25,12 @@ export function ListaNotificaciones({ notificacionesIniciales }: { notificacione
   const [notificaciones, setNotificaciones] = useState(notificacionesIniciales);
   const router = useRouter();
 
+  const hayNoLeidas = notificaciones.some((n) => !n.leida_en);
+
   async function marcarLeida(id: string) {
-    setNotificaciones((prev) => prev.map((n) => (n.id === id ? { ...n, leida_en: n.leida_en ?? new Date().toISOString() } : n)));
+    setNotificaciones((prev) =>
+      prev.map((n) => (n.id === id ? { ...n, leida_en: n.leida_en ?? new Date().toISOString() } : n))
+    );
     const supabase = createClient();
     await supabase.from("notificaciones").update({ leida_en: new Date().toISOString() }).eq("id", id);
   }
@@ -49,10 +53,10 @@ export function ListaNotificaciones({ notificacionesIniciales }: { notificacione
 
   if (notificaciones.length === 0) {
     return (
-      <div className="rounded-card border border-dashed border-ink-200 p-8 text-center">
-        <p className="text-3xl">🔔</p>
-        <p className="mt-2 font-medium text-ink-900">Sin notificaciones por ahora</p>
-        <p className="mt-1 text-sm text-ink-500">
+      <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
+        <Icono nombre="campana" className="h-8 w-8 text-ink-300" />
+        <p className="mt-3 text-[15px] font-medium text-ink-900">Sin notificaciones</p>
+        <p className="mt-1 text-[13px] leading-snug text-ink-500">
           Acá vas a ver los avisos de match y de nuevas salas de proyecto.
         </p>
       </div>
@@ -61,12 +65,15 @@ export function ListaNotificaciones({ notificacionesIniciales }: { notificacione
 
   return (
     <div className="flex flex-col gap-3">
-      <div className="flex items-center justify-between">
-        <h1 className="text-xl font-bold text-ink-900">Notificaciones</h1>
-        <Boton variante="fantasma" onClick={marcarTodasLeidas}>
+      {hayNoLeidas && (
+        <button
+          type="button"
+          onClick={marcarTodasLeidas}
+          className="self-end text-[12px] font-medium text-ink-500 hover:text-ink-900"
+        >
           Marcar todas como leídas
-        </Boton>
-      </div>
+        </button>
+      )}
 
       <ul className="flex flex-col gap-2">
         {notificaciones.map((n) => (
@@ -74,18 +81,31 @@ export function ListaNotificaciones({ notificacionesIniciales }: { notificacione
             <button
               type="button"
               onClick={() => abrir(n)}
-              className={`flex w-full items-start gap-3 rounded-card border p-4 text-left ${
-                n.leida_en ? "border-ink-100 bg-white" : "border-brand-200 bg-brand-50"
+              className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
+                n.leida_en ? "border-ink-100 bg-white" : "border-ink-200 bg-ink-50"
               }`}
             >
-              <span className="text-xl">{n.tipo === "match" ? "🎉" : "💬"}</span>
-              <div>
-                <p className="text-sm font-medium text-ink-900">
-                  {n.tipo === "match"
-                    ? `¡Match! Fuiste aprobado/a para ${tituloObra(n)}`
-                    : `Se abrió la sala de proyecto de ${tituloObra(n)}`}
+              {!n.leida_en && <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />}
+              <div className={n.leida_en ? "pl-[18px]" : ""}>
+                <p className="text-[14px] leading-snug text-ink-900">
+                  {n.tipo === "match" ? (
+                    <>
+                      Te aprobaron para <span className="font-medium">{tituloObra(n)}</span>
+                    </>
+                  ) : (
+                    <>
+                      Se abrió la sala de <span className="font-medium">{tituloObra(n)}</span>
+                    </>
+                  )}
                 </p>
-                <p className="text-xs text-ink-500">{new Date(n.creado_en).toLocaleString("es-AR")}</p>
+                <p className="mt-0.5 text-[11px] text-ink-400">
+                  {new Date(n.creado_en).toLocaleString("es-AR", {
+                    day: "numeric",
+                    month: "short",
+                    hour: "2-digit",
+                    minute: "2-digit",
+                  })}
+                </p>
               </div>
             </button>
           </li>
