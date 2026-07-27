@@ -1,11 +1,17 @@
 # Soliloq — Prototipo de Match Teatral
 
-PWA en Next.js que conecta Talento (actores/actrices/técnicos) con Creadores (directores/compañías) mediante una mecánica de swipe. Ver el detalle funcional completo en `openspec/changes/mvp-match-teatral/`.
+PWA en Next.js que conecta Talento (actores/actrices/técnicos) con Creadores (directores/compañías) mediante una mecánica de swipe.
+
+> **¿Retomando el proyecto o llegando desde otra máquina?** Empezá por
+> **[ESTADO-DEL-PROYECTO.md](./ESTADO-DEL-PROYECTO.md)**: qué se construyó, por qué se
+> decidió así, qué falta verificar y las advertencias operativas.
+
+El detalle funcional completo está en `openspec/changes/`.
 
 ## Stack
 
 - **Frontend**: Next.js (App Router) + TypeScript + Tailwind, desplegado en **Vercel Hobby** (gratis).
-- **Backend**: **Supabase Free** — Postgres, Auth (magic link + Google), Storage y Realtime. Sin servidor propio.
+- **Backend**: **Supabase Free** — Postgres, Auth (email + contraseña, y Google), Storage y Realtime. Sin servidor propio.
 - Toda la autorización vive en políticas **Row Level Security** de Postgres (ver `supabase/migrations/`).
 
 ## Instalación local
@@ -21,12 +27,14 @@ PWA en Next.js que conecta Talento (actores/actrices/técnicos) con Creadores (d
    NEXT_PUBLIC_SUPABASE_URL=
    NEXT_PUBLIC_SUPABASE_ANON_KEY=
    NEXT_PUBLIC_SITE_URL=http://localhost:3000
+   NEXT_PUBLIC_GOOGLE_MAPS_API_KEY=
    ```
-5. Configurar los proveedores de auth en el dashboard de Supabase (*Authentication → Providers*):
-   - **Email**: activado por defecto (magic link / OTP).
+5. Crear la API key de Google Maps Platform en [Google Cloud Console](https://console.cloud.google.com/), con **Places API** y **Geocoding API** habilitadas. Restringirla por HTTP referrer (`localhost:3000`, `*.vercel.app` y tu dominio) y por API, y fijarle una **cuota diaria tope** con alerta de presupuesto: es la única dependencia paga del proyecto.
+6. Configurar los proveedores de auth en el dashboard de Supabase (*Authentication → Providers*):
+   - **Email**: activarlo con **contraseña** habilitada y dejar activada la **confirmación de email**. La app no usa magic link.
    - **Google**: crear credenciales OAuth en [Google Cloud Console](https://console.cloud.google.com/) y cargar Client ID/Secret. Como URI de redirección autorizada, usar la que Supabase muestra en el proveedor (`https://<tu-proyecto>.supabase.co/auth/v1/callback`).
-   - En *Authentication → URL Configuration*, agregar `http://localhost:3000/auth/callback` (y luego la URL de Vercel) a las **Redirect URLs**.
-6. Correr la app:
+   - En *Authentication → URL Configuration*, agregar `http://localhost:3000/auth/callback` (y luego la URL de Vercel) a las **Redirect URLs**. Sin esto, los enlaces de verificación y de recuperación de contraseña no vuelven a la app.
+7. Correr la app:
    ```bash
    npm run dev
    ```
