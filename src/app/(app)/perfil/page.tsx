@@ -1,9 +1,24 @@
+import Link from "next/link";
 import { CerrarSesionBoton } from "@/components/cerrar-sesion-boton";
 import { FormularioCreador } from "@/components/perfil/formulario-creador";
 import { FormularioTalento } from "@/components/perfil/formulario-talento";
 import { ObrasPrevias } from "@/components/perfil/obras-previas";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
+
+function AccionesCuenta() {
+  return (
+    <section className="mt-8 flex flex-col items-start gap-3">
+      <Link
+        href="/cambiar-clave?volver=/perfil"
+        className="text-[13px] text-ink-500 underline underline-offset-4 hover:text-ink-900"
+      >
+        Cambiar contraseña
+      </Link>
+      <CerrarSesionBoton />
+    </section>
+  );
+}
 
 export default async function PerfilPage() {
   const supabase = createClient();
@@ -37,9 +52,7 @@ export default async function PerfilPage() {
           datosIniciales={perfilTalento ?? undefined}
           fotosIniciales={fotosConUrl}
         />
-        <div className="mt-8">
-          <CerrarSesionBoton />
-        </div>
+        <AccionesCuenta />
       </main>
     );
   }
@@ -56,9 +69,7 @@ export default async function PerfilPage() {
         <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Historial de obras previas</h2>
         <ObrasPrevias creadorId={user.id} obras={obrasPrevias ?? []} />
       </section>
-      <div className="mt-8">
-        <CerrarSesionBoton />
-      </div>
+      <AccionesCuenta />
     </main>
   );
 }

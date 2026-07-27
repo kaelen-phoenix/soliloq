@@ -4,7 +4,11 @@ import { destinoSegunEstado } from "../cuenta";
 import { leerEstadoCuenta } from "../cuenta-servidor";
 import type { Database } from "./types";
 
-const RUTAS_PUBLICAS = ["/ingresar", "/auth/callback"];
+const RUTAS_PUBLICAS = ["/ingresar", "/recuperar", "/auth/callback"];
+
+// Elegir contraseña tiene que estar disponible con sesión iniciada aunque el
+// onboarding esté a medias: se llega ahí desde el enlace de recuperación.
+const RUTAS_SIEMPRE_DISPONIBLES = ["/cambiar-clave"];
 
 export async function actualizarSesion(request: NextRequest) {
   let response = NextResponse.next({ request });
@@ -46,6 +50,8 @@ export async function actualizarSesion(request: NextRequest) {
   }
 
   if (esRutaPublica) return redirigir("/");
+
+  if (RUTAS_SIEMPRE_DISPONIBLES.some((r) => path.startsWith(r))) return response;
 
   const estado = await leerEstadoCuenta(supabase, user.id);
   const destino = destinoSegunEstado(estado);

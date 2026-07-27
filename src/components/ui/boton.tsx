@@ -7,6 +7,8 @@ type Variante = "primario" | "secundario" | "fantasma" | "peligro";
 interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
   variante?: Variante;
   cargando?: boolean;
+  /** Texto mientras carga, cuando "Guardando…" no describe la acción. */
+  textoCargando?: string;
 }
 
 const estilosPorVariante: Record<Variante, string> = {
@@ -17,14 +19,25 @@ const estilosPorVariante: Record<Variante, string> = {
 };
 
 export const Boton = forwardRef<HTMLButtonElement, Props>(
-  ({ variante = "primario", cargando, className = "", children, disabled, ...props }, ref) => (
+  (
+    {
+      variante = "primario",
+      cargando,
+      textoCargando = "Guardando…",
+      className = "",
+      children,
+      disabled,
+      ...props
+    },
+    ref
+  ) => (
     <button
       ref={ref}
       disabled={disabled || cargando}
       className={`inline-flex items-center justify-center gap-2 rounded-xl px-4 py-2.5 text-sm font-medium transition-colors disabled:cursor-not-allowed ${estilosPorVariante[variante]} ${className}`}
       {...props}
     >
-      {cargando ? "Guardando…" : children}
+      {cargando ? textoCargando : children}
     </button>
   )
 );

@@ -1,23 +1,31 @@
 "use client";
 
+import Link from "next/link";
+import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { EMAIL_REGEX, mensajeErrorAuth, urlCallback, validarClave } from "@/lib/clave";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 
-const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+type Modo = "ingresar" | "registrarme";
 
 export function IngresarFormulario() {
+  const router = useRouter();
+  const [modo, setModo] = useState<Modo>("ingresar");
   const [email, setEmail] = useState("");
+  const [clave, setClave] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
-  const [enviado, setEnviado] = useState(false);
+  const [verificacionEnviada, setVerificacionEnviada] = useState(false);
 
-  // El origen real del navegador, no una variable de build: así el redirect es correcto
-  // en producción, en cada deploy de preview y en local, sin depender de configuración.
-  const urlCallback = () => `${window.location.origin}/auth/callback`;
+  function cambiarModo(nuevo: Modo) {
+    setModo(nuevo);
+    setError(null);
+    setClave("");
+  }
 
-  async function enviarMagicLink(e: React.FormEvent) {
+  async function enviar(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
 
@@ -26,20 +34,56 @@ export function IngresarFormulario() {
       return;
     }
 
+    if (modo === "registrarme") {
+      const errorClave = validarClave(clave);
+      if (errorClave) {
+        setError(errorClave);
+        return;
+      }
+    } else if (!clave) {
+      setError("Ingresá tu contraseña.");
+      return;
+    }
+
     setCargando(true);
     const supabase = createClient();
-    const { error: errorEnvio } = await supabase.auth.signInWithOtp({
+
+    if (modo === "ingresar") {
+      const { error: errorIngreso } = await supabase.auth.signInWithPassword({
+        email,
+        password: clave,
+      });
+      setCargando(false);
+      if (errorIngreso) {
+        setError(mensajeErrorAuth(errorIngreso.code, errorIngreso.message));
+        return;
+      }
+      // El middleware decide el destino real según el estado de la cuenta.
+      router.replace("/");
+      router.refresh();
+      return;
+    }
+
+    const { data, error: errorAlta } = await supabase.auth.signUp({
       email,
+      password: clave,
       options: { emailRedirectTo: urlCallback() },
     });
     setCargando(false);
 
-    if (errorEnvio) {
-      setError("No pudimos enviar el enlace. Probá de nuevo en unos minutos.");
+    if (errorAlta) {
+      setError(mensajeErrorAuth(errorAlta.code, errorAlta.message));
       return;
     }
 
-    setEnviado(true);
+    // Con confirmación por email activada no hay sesión hasta abrir el enlace.
+    if (data.session) {
+      router.replace("/");
+      router.refresh();
+      return;
+    }
+
+    setVerificacionEnviada(true);
   }
 
   async function ingresarConGoogle() {
@@ -51,16 +95,24 @@ export function IngresarFormulario() {
     });
   }
 
-  if (enviado) {
+  if (verificacionEnviada) {
     return (
       <div className="rounded-2xl border border-ink-100 p-6">
-        <h2 className="text-[17px] font-semibold text-ink-900">Revisá tu correo</h2>
+        <h2 className="text-[17px] font-semibold text-ink-900">Confirmá tu email</h2>
         <p className="mt-1.5 text-[13px] leading-relaxed text-ink-500">
-          Te enviamos un enlace de acceso a <span className="text-ink-900">{email}</span>. Abrilo
-          desde este mismo dispositivo.
+          Te enviamos un enlace de verificación a{" "}
+          <span className="text-ink-900">{email}</span>. Abrilo y vas a entrar con la contraseña
+          que acabás de elegir.
         </p>
-        <Boton variante="fantasma" className="mt-4 -ml-4" onClick={() => setEnviado(false)}>
-          Usar otro email
+        <Boton
+          variante="fantasma"
+          className="mt-4 -ml-4"
+          onClick={() => {
+            setVerificacionEnviada(false);
+            cambiarModo("ingresar");
+          }}
+        >
+          Volver
         </Boton>
       </div>
     );
@@ -68,20 +120,54 @@ export function IngresarFormulario() {
 
   return (
     <div className="flex flex-col gap-4">
-      <form onSubmit={enviarMagicLink} className="flex flex-col gap-4">
+      <div className="flex gap-1 rounded-xl bg-ink-50 p-1">
+        {(["ingresar", "registrarme"] as const).map((m) => (
+          <button
+            key={m}
+            type="button"
+            onClick={() => cambiarModo(m)}
+            className={`flex-1 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors ${
+              modo === m ? "bg-white text-ink-900 shadow-sm" : "text-ink-500 hover:text-ink-800"
+            }`}
+          >
+            {m === "ingresar" ? "Ingresar" : "Crear cuenta"}
+          </button>
+        ))}
+      </div>
+
+      <form onSubmit={enviar} className="flex flex-col gap-4">
         <CampoTexto
           id="email"
           etiqueta="Tu email"
           type="email"
+          autoComplete="email"
           placeholder="vos@ejemplo.com"
           value={email}
           onChange={(e) => setEmail(e.target.value)}
+        />
+        <CampoTexto
+          id="clave"
+          etiqueta="Contraseña"
+          type="password"
+          autoComplete={modo === "ingresar" ? "current-password" : "new-password"}
+          placeholder={modo === "ingresar" ? "Tu contraseña" : "Al menos 8 caracteres"}
+          value={clave}
+          onChange={(e) => setClave(e.target.value)}
           error={error ?? undefined}
         />
-        <Boton type="submit" cargando={cargando}>
-          Enviarme un enlace de acceso
+        <Boton type="submit" cargando={cargando} textoCargando="Un momento…">
+          {modo === "ingresar" ? "Ingresar" : "Crear cuenta"}
         </Boton>
       </form>
+
+      {modo === "ingresar" && (
+        <Link
+          href="/recuperar"
+          className="self-start text-[13px] text-ink-500 underline underline-offset-4 hover:text-ink-900"
+        >
+          Olvidé mi contraseña
+        </Link>
+      )}
 
       <div className="flex items-center gap-3 text-[11px] uppercase tracking-wide text-ink-300">
         <div className="h-px flex-1 bg-ink-100" />
