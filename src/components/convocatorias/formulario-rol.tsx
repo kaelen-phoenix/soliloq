@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
+import { GENEROS_BUSCABLES, type Genero } from "@/lib/constantes";
 import type { TipoRol } from "@/lib/supabase/types";
 
 export function FormularioRol({ obraId }: { obraId: string }) {
@@ -16,6 +17,9 @@ export function FormularioRol({ obraId }: { obraId: string }) {
   const [edadMaxima, setEdadMaxima] = useState("");
   const [vacantes, setVacantes] = useState("1");
   const [descripcion, setDescripcion] = useState("");
+  // Vacío significa abierto a cualquier género, y es el default: un rol al que no se le tocó
+  // nada le llega a todo el mundo.
+  const [generos, setGeneros] = useState<Genero[]>([]);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
 
@@ -49,6 +53,7 @@ export function FormularioRol({ obraId }: { obraId: string }) {
       edad_maxima: max,
       vacantes: vacantesNum,
       descripcion: descripcion || null,
+      generos_buscados: generos,
     });
 
     setCargando(false);
@@ -63,6 +68,7 @@ export function FormularioRol({ obraId }: { obraId: string }) {
     setEdadMaxima("");
     setVacantes("1");
     setDescripcion("");
+    setGeneros([]);
     setAbierto(false);
     router.refresh();
   }
@@ -100,6 +106,37 @@ export function FormularioRol({ obraId }: { obraId: string }) {
         <CampoTexto id="edad_min" etiqueta="Edad mín." type="number" value={edadMinima} onChange={(e) => setEdadMinima(e.target.value)} />
         <CampoTexto id="edad_max" etiqueta="Edad máx." type="number" value={edadMaxima} onChange={(e) => setEdadMaxima(e.target.value)} />
         <CampoTexto id="vacantes" etiqueta="Vacantes" type="number" min={1} value={vacantes} onChange={(e) => setVacantes(e.target.value)} />
+      </div>
+
+      <div className="flex flex-col gap-1.5">
+        <p className="text-[13px] font-medium text-ink-700">Géneros buscados (opcional)</p>
+        <div className="flex flex-wrap gap-2">
+          {GENEROS_BUSCABLES.map((g) => (
+            <button
+              key={g.valor}
+              type="button"
+              onClick={() =>
+                setGeneros((prev) =>
+                  prev.includes(g.valor)
+                    ? prev.filter((x) => x !== g.valor)
+                    : [...prev, g.valor],
+                )
+              }
+              className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                generos.includes(g.valor)
+                  ? "border-ink-900 bg-ink-900 text-white"
+                  : "border-ink-100 text-ink-500"
+              }`}
+            >
+              {g.etiqueta}
+            </button>
+          ))}
+        </div>
+        <p className="text-xs text-ink-500">
+          {generos.length === 0
+            ? "Sin marcar nada, el rol le llega a cualquier persona."
+            : "Solo le llega a quien coincida, y a quien prefirió no declarar su género."}
+        </p>
       </div>
 
       <textarea

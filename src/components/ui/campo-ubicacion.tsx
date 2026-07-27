@@ -1,0 +1,147 @@
+"use client";
+
+import { useEffect, useMemo, useRef, useState } from "react";
+import {
+  ErrorUbicacion,
+  SesionUbicacion,
+  type SugerenciaUbicacion,
+  type Ubicacion,
+} from "@/lib/ubicacion";
+
+interface Props {
+  etiqueta: string;
+  id: string;
+  valor: Ubicacion | null;
+  onCambio: (ubicacion: Ubicacion | null) => void;
+  error?: string;
+  placeholder?: string;
+}
+
+/**
+ * Solo acepta un lugar elegido de la lista. Escribir texto sin elegir sugerencia deja el
+ * campo sin ubicación resuelta a propósito: una ubicación sin coordenadas no sirve para el
+ * filtro por distancia, que es la razón de ser de este campo.
+ */
+export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placeholder }: Props) {
+  const sesion = useMemo(() => new SesionUbicacion(), []);
+  const [texto, setTexto] = useState(valor?.texto ?? "");
+  const [sugerencias, setSugerencias] = useState<SugerenciaUbicacion[]>([]);
+  const [buscando, setBuscando] = useState(false);
+  const [errorBusqueda, setErrorBusqueda] = useState<string | null>(null);
+  const [abierto, setAbierto] = useState(false);
+  const contenedor = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    setTexto(valor?.texto ?? "");
+  }, [valor]);
+
+  // Cierra el desplegable al tocar fuera, sin descartar la ubicación ya elegida.
+  useEffect(() => {
+    const alTocarFuera = (evento: MouseEvent) => {
+      if (!contenedor.current?.contains(evento.target as Node)) setAbierto(false);
+    };
+    document.addEventListener("mousedown", alTocarFuera);
+    return () => document.removeEventListener("mousedown", alTocarFuera);
+  }, []);
+
+  useEffect(() => {
+    if (texto.trim().length < 3 || texto === valor?.texto) {
+      setSugerencias([]);
+      return;
+    }
+
+    let vigente = true;
+    const temporizador = setTimeout(async () => {
+      setBuscando(true);
+      setErrorBusqueda(null);
+      try {
+        const resultado = await sesion.buscar(texto);
+        if (!vigente) return;
+        setSugerencias(resultado);
+        setAbierto(true);
+      } catch (e) {
+        if (!vigente) return;
+        // Un fallo del servicio no borra la ubicación guardada: solo deja de sugerir.
+        setSugerencias([]);
+        setErrorBusqueda(
+          e instanceof ErrorUbicacion ? e.message : "No se pudo buscar lugares. Probá de nuevo.",
+        );
+      } finally {
+        if (vigente) setBuscando(false);
+      }
+    }, 300);
+
+    return () => {
+      vigente = false;
+      clearTimeout(temporizador);
+    };
+  }, [texto, valor?.texto, sesion]);
+
+  const elegir = async (sugerencia: SugerenciaUbicacion) => {
+    setAbierto(false);
+    setBuscando(true);
+    try {
+      const ubicacion = await sesion.resolver(sugerencia.id);
+      onCambio(ubicacion);
+      setTexto(ubicacion.texto);
+      setSugerencias([]);
+      setErrorBusqueda(null);
+    } catch (e) {
+      setErrorBusqueda(
+        e instanceof ErrorUbicacion ? e.message : "No se pudo resolver ese lugar. Probá con otro.",
+      );
+    } finally {
+      setBuscando(false);
+    }
+  };
+
+  const sinResolver = texto.trim().length > 0 && texto !== valor?.texto;
+
+  return (
+    <div className="flex flex-col gap-1.5" ref={contenedor}>
+      <label htmlFor={id} className="text-[13px] font-medium text-ink-700">
+        {etiqueta}
+      </label>
+      <div className="relative">
+        <input
+          id={id}
+          value={texto}
+          autoComplete="off"
+          placeholder={placeholder ?? "Ciudad, país"}
+          onChange={(e) => {
+            setTexto(e.target.value);
+            // Editar el texto invalida la ubicación resuelta: no puede quedar un lugar
+            // guardado que no se corresponde con lo que se lee en el campo.
+            if (valor) onCambio(null);
+          }}
+          onFocus={() => sugerencias.length > 0 && setAbierto(true)}
+          className={`w-full rounded-xl border bg-white px-3.5 py-2.5 text-[15px] text-ink-900 transition-colors placeholder:text-ink-400 focus:border-ink-900 ${
+            error ? "border-red-400" : "border-ink-200"
+          }`}
+        />
+        {abierto && sugerencias.length > 0 && (
+          <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-ink-200 bg-white shadow-lg">
+            {sugerencias.map((sugerencia) => (
+              <li key={sugerencia.id}>
+                <button
+                  type="button"
+                  onClick={() => elegir(sugerencia)}
+                  className="w-full px-3.5 py-2.5 text-left text-[14px] text-ink-800 hover:bg-ink-50"
+                >
+                  {sugerencia.texto}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      {buscando && <p className="text-xs text-ink-500">Buscando lugares…</p>}
+      {errorBusqueda && <p className="text-xs text-red-600">{errorBusqueda}</p>}
+      {!buscando && !errorBusqueda && sinResolver && (
+        <p className="text-xs text-ink-500">Elegí un lugar de la lista para confirmarlo.</p>
+      )}
+      {error && <p className="text-xs text-red-600">{error}</p>}
+    </div>
+  );
+}

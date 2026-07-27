@@ -15,7 +15,7 @@ export interface RolFeed {
   obra_id: string;
   obra_titulo: string;
   obra_sinopsis: string | null;
-  locacion_ensayos: string;
+  obra_ubicacion_texto: string;
   creador_id: string;
   creador_nombre: string;
   creador_imagen_url: string | null;
@@ -35,7 +35,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           <span className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/70">
             {rol.rol_tipo === "tecnica" ? "Técnica" : "Actuación"}
           </span>
-          <span className="text-[11px] text-white/50">{rol.locacion_ensayos}</span>
+          <span className="text-[11px] text-white/50">{rol.obra_ubicacion_texto}</span>
         </div>
 
         <div>

@@ -10,6 +10,10 @@ export type TipoCreador = "director_independiente" | "compania";
 
 export type TipoNotificacion = "match" | "sala_creada";
 
+export type GeneroPersona = "mujer" | "varon" | "no_binarie" | "otro" | "sin_especificar";
+
+export type UnidadDistancia = "km" | "mi";
+
 export interface Database {
   public: {
     Tables: {
@@ -40,7 +44,16 @@ export interface Database {
           id: string;
           nombre: string;
           fecha_nacimiento: string;
-          locacion: string;
+          ubicacion_texto: string;
+          ubicacion_place_id: string | null;
+          ubicacion_lat: number;
+          ubicacion_lng: number;
+          ubicacion_pais: string;
+          genero: GeneroPersona;
+          genero_descripcion: string | null;
+          /** Siempre en metros; `null` significa "todo el mundo". */
+          radio_busqueda_metros: number | null;
+          unidad_distancia: UnidadDistancia;
           videoreel_url: string | null;
           experiencia: string | null;
           habilidades: string[];
@@ -50,7 +63,15 @@ export interface Database {
           id: string;
           nombre: string;
           fecha_nacimiento: string;
-          locacion: string;
+          ubicacion_texto: string;
+          ubicacion_place_id?: string | null;
+          ubicacion_lat: number;
+          ubicacion_lng: number;
+          ubicacion_pais: string;
+          genero: GeneroPersona;
+          genero_descripcion?: string | null;
+          radio_busqueda_metros?: number | null;
+          unidad_distancia?: UnidadDistancia;
           videoreel_url?: string | null;
           experiencia?: string | null;
           habilidades?: string[];
@@ -58,7 +79,15 @@ export interface Database {
         Update: {
           nombre?: string;
           fecha_nacimiento?: string;
-          locacion?: string;
+          ubicacion_texto?: string;
+          ubicacion_place_id?: string | null;
+          ubicacion_lat?: number;
+          ubicacion_lng?: number;
+          ubicacion_pais?: string;
+          genero?: GeneroPersona;
+          genero_descripcion?: string | null;
+          radio_busqueda_metros?: number | null;
+          unidad_distancia?: UnidadDistancia;
           videoreel_url?: string | null;
           experiencia?: string | null;
           habilidades?: string[];
@@ -70,7 +99,11 @@ export interface Database {
           id: string;
           nombre: string;
           tipo: TipoCreador;
-          locacion: string;
+          ubicacion_texto: string;
+          ubicacion_place_id: string | null;
+          ubicacion_lat: number;
+          ubicacion_lng: number;
+          ubicacion_pais: string;
           descripcion: string | null;
           imagen_url: string | null;
           actualizado_en: string;
@@ -79,14 +112,22 @@ export interface Database {
           id: string;
           nombre: string;
           tipo: TipoCreador;
-          locacion: string;
+          ubicacion_texto: string;
+          ubicacion_place_id?: string | null;
+          ubicacion_lat: number;
+          ubicacion_lng: number;
+          ubicacion_pais: string;
           descripcion?: string | null;
           imagen_url?: string | null;
         };
         Update: {
           nombre?: string;
           tipo?: TipoCreador;
-          locacion?: string;
+          ubicacion_texto?: string;
+          ubicacion_place_id?: string | null;
+          ubicacion_lat?: number;
+          ubicacion_lng?: number;
+          ubicacion_pais?: string;
           descripcion?: string | null;
           imagen_url?: string | null;
         };
@@ -154,7 +195,11 @@ export interface Database {
           creador_id: string;
           titulo: string;
           sinopsis: string | null;
-          locacion_ensayos: string;
+          ubicacion_texto: string;
+          ubicacion_place_id: string | null;
+          ubicacion_lat: number;
+          ubicacion_lng: number;
+          ubicacion_pais: string;
           fecha_estreno_estimada: string | null;
           estado: EstadoObra;
           creado_en: string;
@@ -164,14 +209,22 @@ export interface Database {
           creador_id: string;
           titulo: string;
           sinopsis?: string | null;
-          locacion_ensayos: string;
+          ubicacion_texto: string;
+          ubicacion_place_id?: string | null;
+          ubicacion_lat: number;
+          ubicacion_lng: number;
+          ubicacion_pais: string;
           fecha_estreno_estimada?: string | null;
           estado?: EstadoObra;
         };
         Update: {
           titulo?: string;
           sinopsis?: string | null;
-          locacion_ensayos?: string;
+          ubicacion_texto?: string;
+          ubicacion_place_id?: string | null;
+          ubicacion_lat?: number;
+          ubicacion_lng?: number;
+          ubicacion_pais?: string;
           fecha_estreno_estimada?: string | null;
           estado?: EstadoObra;
         };
@@ -195,6 +248,8 @@ export interface Database {
           edad_maxima: number | null;
           vacantes: number;
           descripcion: string | null;
+          /** Vacío significa abierto a cualquier género. */
+          generos_buscados: GeneroPersona[];
           creado_en: string;
         };
         Insert: {
@@ -205,6 +260,7 @@ export interface Database {
           edad_maxima?: number | null;
           vacantes: number;
           descripcion?: string | null;
+          generos_buscados?: GeneroPersona[];
         };
         Update: {
           nombre?: string;
@@ -213,6 +269,7 @@ export interface Database {
           edad_maxima?: number | null;
           vacantes?: number;
           descripcion?: string | null;
+          generos_buscados?: GeneroPersona[];
         };
         Relationships: [
           {
@@ -400,10 +457,14 @@ export interface Database {
           edad_maxima: number | null;
           rol_descripcion: string | null;
           vacantes: number;
+          generos_buscados: GeneroPersona[];
           obra_id: string;
           obra_titulo: string;
           obra_sinopsis: string | null;
-          locacion_ensayos: string;
+          obra_ubicacion_texto: string;
+          obra_ubicacion_lat: number;
+          obra_ubicacion_lng: number;
+          obra_ubicacion_pais: string;
           obra_creado_en: string;
           creador_id: string;
           creador_nombre: string;
@@ -414,7 +475,8 @@ export interface Database {
     };
     Functions: {
       feed_para_talento: {
-        Args: { p_talento_id: string };
+        /** `p_radio_metros` en null trae roles de cualquier locación. */
+        Args: { p_talento_id: string; p_radio_metros?: number | null };
         Returns: Database["public"]["Views"]["feed_talento"]["Row"][];
       };
     };

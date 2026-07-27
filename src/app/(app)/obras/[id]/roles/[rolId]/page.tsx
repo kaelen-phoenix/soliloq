@@ -15,7 +15,9 @@ export default async function RolPostulantesPage({ params }: { params: { id: str
 
   const { data: postulaciones } = await supabase
     .from("postulaciones")
-    .select("id, estado, talento_id, perfiles_talento(id, nombre, fecha_nacimiento, locacion, videoreel_url, experiencia, habilidades)")
+    .select(
+      "id, estado, talento_id, perfiles_talento(id, nombre, fecha_nacimiento, ubicacion_texto, genero, genero_descripcion, videoreel_url, experiencia, habilidades)"
+    )
     .eq("rol_id", params.rolId)
     .order("creado_en", { ascending: false });
 

@@ -5,14 +5,27 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
-import { HABILIDADES, LOCACIONES } from "@/lib/constantes";
+import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
+import {
+  GENEROS,
+  HABILIDADES,
+  MAX_GENERO_DESCRIPCION,
+  type Genero,
+} from "@/lib/constantes";
+import { aColumnas, desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
 import { esVideoreelValido } from "@/lib/videoreel";
 import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
 
 interface DatosIniciales {
   nombre: string;
   fecha_nacimiento: string;
-  locacion: string;
+  ubicacion_texto: string;
+  ubicacion_place_id: string | null;
+  ubicacion_lat: number;
+  ubicacion_lng: number;
+  ubicacion_pais: string;
+  genero: Genero;
+  genero_descripcion: string | null;
   videoreel_url: string | null;
   experiencia: string | null;
   habilidades: string[];
@@ -32,7 +45,13 @@ export function FormularioTalento({
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
   const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales?.fecha_nacimiento ?? "");
-  const [locacion, setLocacion] = useState(datosIniciales?.locacion ?? "");
+  const [ubicacion, setUbicacion] = useState<Ubicacion | null>(
+    desdeColumnas(datosIniciales) ?? null,
+  );
+  const [genero, setGenero] = useState<Genero | "">(datosIniciales?.genero ?? "");
+  const [generoDescripcion, setGeneroDescripcion] = useState(
+    datosIniciales?.genero_descripcion ?? "",
+  );
   const [videoreelUrl, setVideoreelUrl] = useState(datosIniciales?.videoreel_url ?? "");
   const [experiencia, setExperiencia] = useState(datosIniciales?.experiencia ?? "");
   const [habilidades, setHabilidades] = useState<string[]>(datosIniciales?.habilidades ?? []);
@@ -58,7 +77,11 @@ export function FormularioTalento({
         nuevos.fecha_nacimiento = "La plataforma es para mayores de 16 años.";
       }
     }
-    if (!locacion) nuevos.locacion = "Elegí tu locación.";
+    if (!ubicacion) nuevos.ubicacion = "Elegí tu ubicación de la lista de sugerencias.";
+    if (!genero) nuevos.genero = "Elegí una opción.";
+    if (generoDescripcion.length > MAX_GENERO_DESCRIPCION) {
+      nuevos.genero_descripcion = `Máximo ${MAX_GENERO_DESCRIPCION} caracteres.`;
+    }
     if (fotos.length < MIN_FOTOS) nuevos.fotos = `Cargá al menos ${MIN_FOTOS} fotos.`;
     if (videoreelUrl && !esVideoreelValido(videoreelUrl)) {
       nuevos.videoreel_url =
@@ -81,14 +104,22 @@ export function FormularioTalento({
     const campos = {
       nombre: nombre.trim(),
       fecha_nacimiento: fechaNacimiento,
-      locacion,
+      ...aColumnas(ubicacion!),
+      genero: genero as Genero,
+      genero_descripcion: generoDescripcion.trim() || null,
       videoreel_url: videoreelUrl || null,
       experiencia: experiencia || null,
       habilidades,
     };
 
+    // La unidad se deriva del país **solo al crear el perfil**. Al editar no se toca: quien
+    // se mudó de Chicago a Berlín puede seguir pensando en millas.
     const { error } = esAlta
-      ? await supabase.from("perfiles_talento").insert({ id: userId, ...campos })
+      ? await supabase.from("perfiles_talento").insert({
+          id: userId,
+          ...campos,
+          unidad_distancia: unidadPorPais(ubicacion!.pais),
+        })
       : await supabase.from("perfiles_talento").update(campos).eq("id", userId);
 
     if (error) {
@@ -131,27 +162,48 @@ export function FormularioTalento({
           onChange={(e) => setFechaNacimiento(e.target.value)}
           error={errores.fecha_nacimiento}
         />
+        <CampoUbicacion
+          id="ubicacion"
+          etiqueta="Ubicación"
+          valor={ubicacion}
+          onCambio={setUbicacion}
+          error={errores.ubicacion}
+        />
+
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="locacion" className="text-[13px] font-medium text-ink-700">
-            Locación
+          <label htmlFor="genero" className="text-[13px] font-medium text-ink-700">
+            Género
           </label>
           <select
-            id="locacion"
-            value={locacion}
-            onChange={(e) => setLocacion(e.target.value)}
+            id="genero"
+            value={genero}
+            onChange={(e) => setGenero(e.target.value as Genero | "")}
             className={`rounded-xl border bg-white px-3.5 py-2.5 text-[15px] focus:border-ink-900 ${
-              errores.locacion ? "border-red-400" : "border-ink-200"
+              errores.genero ? "border-red-400" : "border-ink-200"
             }`}
           >
-            <option value="">Elegí una locación</option>
-            {LOCACIONES.map((l) => (
-              <option key={l} value={l}>
-                {l}
+            <option value="">Elegí una opción</option>
+            {GENEROS.map((g) => (
+              <option key={g.valor} value={g.valor}>
+                {g.etiqueta}
               </option>
             ))}
           </select>
-          {errores.locacion && <p className="text-xs text-red-600">{errores.locacion}</p>}
+          {errores.genero && <p className="text-xs text-red-600">{errores.genero}</p>}
         </div>
+
+        <CampoTexto
+          id="genero_descripcion"
+          etiqueta="Cómo te identificás (opcional)"
+          placeholder="Con tus palabras"
+          maxLength={MAX_GENERO_DESCRIPCION}
+          value={generoDescripcion}
+          onChange={(e) => setGeneroDescripcion(e.target.value)}
+          error={errores.genero_descripcion}
+        />
+        <p className="-mt-2 text-xs text-ink-500">
+          Se muestra en tu perfil. No se usa para filtrar convocatorias.
+        </p>
       </section>
 
       <section className="flex flex-col gap-3">

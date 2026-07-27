@@ -5,13 +5,18 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
-import { LOCACIONES } from "@/lib/constantes";
+import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
+import { aColumnas, desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
 import type { TipoCreador } from "@/lib/supabase/types";
 
 interface DatosIniciales {
   nombre: string;
   tipo: TipoCreador;
-  locacion: string;
+  ubicacion_texto: string;
+  ubicacion_place_id: string | null;
+  ubicacion_lat: number;
+  ubicacion_lng: number;
+  ubicacion_pais: string;
   descripcion: string | null;
   imagen_url: string | null;
 }
@@ -28,7 +33,9 @@ export function FormularioCreador({
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
   const [tipo, setTipo] = useState<TipoCreador>(datosIniciales?.tipo ?? "director_independiente");
-  const [locacion, setLocacion] = useState(datosIniciales?.locacion ?? "");
+  const [ubicacion, setUbicacion] = useState<Ubicacion | null>(
+    desdeColumnas(datosIniciales) ?? null,
+  );
   const [descripcion, setDescripcion] = useState(datosIniciales?.descripcion ?? "");
   const [imagenUrl, setImagenUrl] = useState(datosIniciales?.imagen_url ?? "");
   const [subiendoImagen, setSubiendoImagen] = useState(false);
@@ -63,7 +70,7 @@ export function FormularioCreador({
   function validar(): boolean {
     const nuevos: Record<string, string> = {};
     if (nombre.trim().length < 2) nuevos.nombre = "Ingresá el nombre.";
-    if (!locacion) nuevos.locacion = "Elegí una locación.";
+    if (!ubicacion) nuevos.ubicacion = "Elegí una ubicación de la lista de sugerencias.";
     if (descripcion.length > 1000) nuevos.descripcion = "Máximo 1000 caracteres.";
     setErrores((prev) => ({ ...prev, ...nuevos }));
     return Object.keys(nuevos).length === 0;
@@ -80,7 +87,7 @@ export function FormularioCreador({
     const campos = {
       nombre: nombre.trim(),
       tipo,
-      locacion,
+      ...aColumnas(ubicacion!),
       descripcion: descripcion || null,
       imagen_url: imagenUrl || null,
     };
@@ -140,27 +147,13 @@ export function FormularioCreador({
           error={errores.nombre}
         />
 
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="locacion" className="text-[13px] font-medium text-ink-700">
-            Locación
-          </label>
-          <select
-            id="locacion"
-            value={locacion}
-            onChange={(e) => setLocacion(e.target.value)}
-            className={`rounded-xl border bg-white px-3.5 py-2.5 text-[15px] focus:border-ink-900 ${
-              errores.locacion ? "border-red-400" : "border-ink-200"
-            }`}
-          >
-            <option value="">Elegí una locación</option>
-            {LOCACIONES.map((l) => (
-              <option key={l} value={l}>
-                {l}
-              </option>
-            ))}
-          </select>
-          {errores.locacion && <p className="text-xs text-red-600">{errores.locacion}</p>}
-        </div>
+        <CampoUbicacion
+          id="ubicacion"
+          etiqueta="Ubicación"
+          valor={ubicacion}
+          onCambio={setUbicacion}
+          error={errores.ubicacion}
+        />
       </section>
 
       <section className="flex flex-col gap-3">

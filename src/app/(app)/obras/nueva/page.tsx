@@ -5,12 +5,14 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
+import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
+import { aColumnas, type Ubicacion } from "@/lib/ubicacion";
 
 export default function NuevaObraPage() {
   const router = useRouter();
   const [titulo, setTitulo] = useState("");
   const [sinopsis, setSinopsis] = useState("");
-  const [locacion, setLocacion] = useState("");
+  const [ubicacion, setUbicacion] = useState<Ubicacion | null>(null);
   const [fechaEstreno, setFechaEstreno] = useState("");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
@@ -22,7 +24,9 @@ export default function NuevaObraPage() {
 
     const nuevos: Record<string, string> = {};
     if (!titulo.trim()) nuevos.titulo = "Ingresá el título de la obra.";
-    if (!locacion.trim()) nuevos.locacion = "Ingresá la locación de ensayos.";
+    if (!ubicacion) {
+      nuevos.ubicacion = "Elegí la locación de ensayos de la lista de sugerencias.";
+    }
     setErrores(nuevos);
     if (Object.keys(nuevos).length > 0) return;
 
@@ -39,7 +43,7 @@ export default function NuevaObraPage() {
         creador_id: user.id,
         titulo: titulo.trim(),
         sinopsis: sinopsis || null,
-        locacion_ensayos: locacion.trim(),
+        ...aColumnas(ubicacion!),
         fecha_estreno_estimada: fechaEstreno || null,
       })
       .select()
@@ -74,12 +78,12 @@ export default function NuevaObraPage() {
           />
         </div>
 
-        <CampoTexto
-          id="locacion"
+        <CampoUbicacion
+          id="ubicacion"
           etiqueta="Locación de ensayos"
-          value={locacion}
-          onChange={(e) => setLocacion(e.target.value)}
-          error={errores.locacion}
+          valor={ubicacion}
+          onCambio={setUbicacion}
+          error={errores.ubicacion}
         />
         <CampoTexto
           id="fecha_estreno"

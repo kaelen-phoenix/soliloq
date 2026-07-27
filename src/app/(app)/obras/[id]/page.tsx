@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FormularioRol } from "@/components/convocatorias/formulario-rol";
 import { AccionesObra } from "@/components/convocatorias/acciones-obra";
+import { etiquetaGenero } from "@/lib/constantes";
 
 const ETIQUETA_TIPO: Record<string, string> = { actuacion: "Actuación", tecnica: "Técnica" };
 
@@ -14,13 +15,15 @@ export default async function DetalleObraPage({ params }: { params: { id: string
 
   const { data: roles } = await supabase
     .from("roles")
-    .select("id, nombre, tipo, edad_minima, edad_maxima, vacantes, postulaciones(id, estado)")
+    .select(
+      "id, nombre, tipo, edad_minima, edad_maxima, vacantes, generos_buscados, postulaciones(id, estado)"
+    )
     .eq("obra_id", params.id);
 
   return (
     <main className="px-5 py-5">
       <h2 className="text-[20px] font-semibold leading-tight text-ink-900">{obra.titulo}</h2>
-      <p className="mt-1 text-[13px] text-ink-500">{obra.locacion_ensayos}</p>
+      <p className="mt-1 text-[13px] text-ink-500">{obra.ubicacion_texto}</p>
       {obra.sinopsis && (
         <p className="mt-3 text-[14px] leading-relaxed text-ink-600">{obra.sinopsis}</p>
       )}
@@ -53,6 +56,11 @@ export default async function DetalleObraPage({ params }: { params: { id: string
                       {rol.edad_minima && rol.edad_maxima ? ` · ${rol.edad_minima}–${rol.edad_maxima} años` : ""}
                       {" · "}
                       {aprobados}/{rol.vacantes} cubiertas
+                    </p>
+                    <p className="mt-0.5 text-[12px] text-ink-400">
+                      {rol.generos_buscados.length === 0
+                        ? "Abierto a cualquier género"
+                        : rol.generos_buscados.map(etiquetaGenero).join(", ")}
                     </p>
                   </div>
                   {sinRevisar > 0 && (
