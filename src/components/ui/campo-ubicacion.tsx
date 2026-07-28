@@ -31,8 +31,12 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
   const [abierto, setAbierto] = useState(false);
   const contenedor = useRef<HTMLDivElement>(null);
 
+  // Sincroniza el input cuando la ubicación cambia desde afuera, pero sólo si hay una
+  // resuelta: al editar, `onCambio(null)` deja `valor` en null a propósito, y pisar el campo
+  // ahí borraría lo que se está tipeando. Ese era el bug de la edición de perfil — el campo
+  // se vaciaba en la primera tecla y por eso nunca llegaba a buscar.
   useEffect(() => {
-    setTexto(valor?.texto ?? "");
+    if (valor) setTexto(valor.texto);
   }, [valor]);
 
   // Cierra el desplegable al tocar fuera, sin descartar la ubicación ya elegida.
@@ -47,6 +51,9 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
   useEffect(() => {
     if (texto.trim().length < 3 || texto === valor?.texto) {
       setSugerencias([]);
+      // Sin esto, borrar el campo mientras había una búsqueda en curso dejaba
+      // "Buscando lugares…" prendido para siempre.
+      setBuscando(false);
       return;
     }
 
@@ -67,7 +74,11 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
           e instanceof ErrorUbicacion ? e.message : "No se pudo buscar lugares. Probá de nuevo.",
         );
       } finally {
-        if (vigente) setBuscando(false);
+        // Se apaga siempre, incluso si la petición quedó superada. Antes estaba guardado
+        // por `vigente` y el cartel se colgaba prendido. El precio de apagarlo siempre es
+        // que puede irse un instante antes de tiempo si justo arrancó otra búsqueda; es
+        // preferible a que quede trabado.
+        setBuscando(false);
       }
     }, 300);
 
