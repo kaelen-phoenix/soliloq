@@ -104,16 +104,26 @@ type PlaceResuelto = {
   addressComponents?: { types: string[]; shortText?: string | null }[] | null;
 };
 
+// El nombre del callback global que le pasamos a Google en la URL. Tiene que ser accesible
+// desde `window` porque el script lo invoca por nombre, no por referencia.
+const CALLBACK = "__soliloqPlacesListo";
+
 declare global {
   interface Window {
-    google?: {
-      maps?: { importLibrary(nombre: string): Promise<unknown> };
-    };
+    google?: { maps?: { places?: PlacesLibrary } };
+    __soliloqPlacesListo?: () => void;
   }
 }
 
 let cargaEnCurso: Promise<PlacesLibrary> | null = null;
 
+/**
+ * Carga la librería `places` esperando el `callback` que dispara Google, no el evento `load`
+ * del script. La diferencia importa: el bootstrap de `maps/api/js` sólo *encola* los módulos
+ * reales (places.js, main.js…) y termina; en `load` todavía no existe `google.maps.places`.
+ * Esperar `load` dejaba la promesa colgada para siempre y el campo se quedaba en
+ * "Buscando lugares…" sin sugerencias ni error.
+ */
 function cargarPlaces(): Promise<PlacesLibrary> {
   if (cargaEnCurso) return cargaEnCurso;
 
@@ -123,31 +133,31 @@ function cargarPlaces(): Promise<PlacesLibrary> {
   }
 
   cargaEnCurso = new Promise<PlacesLibrary>((resolver, rechazar) => {
-    const alCargar = () => {
-      window.google?.maps
-        ?.importLibrary("places")
-        .then((lib) => resolver(lib as PlacesLibrary))
-        .catch(() => rechazar(new ErrorUbicacion("No se pudo cargar el buscador de lugares.")));
+    const fallo = () => rechazar(new ErrorUbicacion("No se pudo cargar el buscador de lugares."));
+
+    const entregar = () => {
+      const places = window.google?.maps?.places;
+      if (places?.AutocompleteSuggestion) resolver(places);
+      else fallo();
     };
 
-    const existente = document.querySelector<HTMLScriptElement>("script[data-google-maps]");
-    if (existente) {
-      existente.addEventListener("load", alCargar);
-      existente.addEventListener("error", () =>
-        rechazar(new ErrorUbicacion("No se pudo cargar el buscador de lugares.")),
-      );
-      if (window.google?.maps) alCargar();
-      return;
-    }
+    // Si ya está cargado de antes (por ejemplo tras un reintento), no volvemos a pedirlo.
+    if (window.google?.maps?.places) return entregar();
+
+    window[CALLBACK] = entregar;
 
     const script = document.createElement("script");
-    script.src = `https://maps.googleapis.com/maps/api/js?key=${apiKey}&libraries=places&loading=async&language=es`;
+    const parametros = new URLSearchParams({
+      key: apiKey,
+      libraries: "places",
+      language: "es",
+      loading: "async",
+      callback: CALLBACK,
+    });
+    script.src = `https://maps.googleapis.com/maps/api/js?${parametros}`;
     script.async = true;
     script.dataset.googleMaps = "true";
-    script.addEventListener("load", alCargar);
-    script.addEventListener("error", () =>
-      rechazar(new ErrorUbicacion("No se pudo cargar el buscador de lugares.")),
-    );
+    script.addEventListener("error", fallo);
     document.head.appendChild(script);
   });
 
