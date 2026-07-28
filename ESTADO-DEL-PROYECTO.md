@@ -254,6 +254,13 @@ Pendiente de verificar (tareas sin marcar en los `tasks.md` de cada change):
   el bloqueo. Sirve para responder a un incidente durante una prueba, no como funcionalidad
   ofrecida. Sigue sin haber moderación ni reportes: riesgo aceptado para el prototipo, que se
   valida con usuarios invitados.
+- **La sala de proyecto también respeta el bloqueo, desde `0023_bloqueos_en_salas.sql`.** La
+  sala es grupal, así que el bloqueo no expulsa a nadie: filtra **por espectador**. Dos
+  bloqueados que quedan en el mismo elenco no se ven en la lista de integrantes ni se leen
+  los mensajes, y para el resto del elenco la sala sigue completa. Caso a tener presente: si
+  alguien bloqueó al creador de la obra, la sala se le sigue mostrando (con el resto del
+  elenco) pero sin título, porque la fila de `obras` ya la esconde `0022`. Se muestra
+  "Proyecto" en su lugar.
 
 ## Supuestos tomados (revisables)
 

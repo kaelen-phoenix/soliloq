@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 
 export interface Mensaje {
@@ -39,6 +39,15 @@ export function SalaChat({
     finRef.current?.scrollIntoView({ block: "end" });
   }, [mensajes]);
 
+  // Quiénes se pueden leer en esta sala. `integrantes` ya viene filtrado por RLS, así que
+  // alguien bloqueado no está en el conjunto. Es el respaldo del filtro real, que vive en
+  // las políticas: si un día Realtime entregara un INSERT sin evaluar RLS, el mensaje de la
+  // persona bloqueada no se pinta igual. Un autor que no sea integrante no existe — sólo los
+  // integrantes pueden insertar (`mensajes_insert_integrante`).
+  const visibles = useMemo(() => new Set(integrantes.map((i) => i.perfil_id)), [integrantes]);
+  const visiblesRef = useRef(visibles);
+  visiblesRef.current = visibles;
+
   useEffect(() => {
     const supabase = createClient();
 
@@ -64,6 +73,7 @@ export function SalaChat({
         { event: "INSERT", schema: "public", table: "mensajes", filter: `sala_id=eq.${salaId}` },
         (payload) => {
           const nuevo = payload.new as Mensaje;
+          if (!visiblesRef.current.has(nuevo.autor_id)) return;
           setMensajes((prev) => (prev.some((m) => m.id === nuevo.id) ? prev : [...prev, nuevo]));
           ultimoIdRef.current = nuevo.id;
         }

@@ -12,7 +12,13 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
   const { data: sala } = await supabase.from("salas").select("id, obra_id, obras(titulo, creador_id)").eq("id", params.id).single();
   if (!sala) notFound();
 
-  const obra = Array.isArray(sala.obras) ? sala.obras[0] : (sala.obras as any);
+  // La obra puede venir vacía aunque la sala exista: si quien mira bloqueó al creador, la
+  // política restrictiva de 0022 esconde la fila de `obras` y el join queda en null. La sala
+  // sigue siendo suya y sigue teniendo al resto del elenco, así que se muestra igual.
+  const obra = (Array.isArray(sala.obras) ? sala.obras[0] : sala.obras) as
+    | { titulo: string; creador_id: string }
+    | null
+    | undefined;
 
   const [{ data: mensajes }, { data: integrantesRaw }, { data: postulacionesAprobadas }] = await Promise.all([
     supabase.from("mensajes").select("*").eq("sala_id", params.id).order("creado_en"),
@@ -30,7 +36,9 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       .from("perfiles_talento")
       .select("id, nombre, fotos_talento(storage_path, orden)")
       .in("id", integrantesIds),
-    supabase.from("perfiles_creador").select("id, nombre, imagen_url").eq("id", obra.creador_id).maybeSingle(),
+    obra
+      ? supabase.from("perfiles_creador").select("id, nombre, imagen_url").eq("id", obra.creador_id).maybeSingle()
+      : Promise.resolve({ data: null }),
   ]);
 
   const integrantes: Integrante[] = integrantesIds.map((id) => {
@@ -54,7 +62,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
     <div>
       <div className="border-b border-ink-100 px-4 py-2">
         <p className="text-xs font-medium uppercase tracking-wide text-ink-500">Sala de proyecto</p>
-        <h1 className="font-semibold text-ink-900">{obra.titulo}</h1>
+        <h1 className="font-semibold text-ink-900">{obra?.titulo ?? "Proyecto"}</h1>
       </div>
       <SalaChat salaId={params.id} userId={user.id} mensajesIniciales={mensajes ?? []} integrantes={integrantes} />
     </div>

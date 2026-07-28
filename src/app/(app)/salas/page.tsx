@@ -26,7 +26,10 @@ export default async function SalasPage() {
 
       return {
         salaId: i.sala_id,
-        titulo: i.salas.obras.titulo,
+        // La obra queda en null si se bloqueó a su creador (política restrictiva de 0022).
+        titulo: i.salas?.obras?.titulo ?? "Proyecto",
+        // Y el último mensaje ya viene filtrado por RLS: si lo escribió alguien bloqueado,
+        // acá aparece el último que sí se puede leer.
         ultimoMensaje: ultimoMensaje?.contenido ?? null,
       };
     })
