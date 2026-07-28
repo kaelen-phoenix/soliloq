@@ -157,8 +157,8 @@ vigentes viven en los deltas de cada change, que hay que leer en orden para sabe
 |---|---|
 | `mvp-match-teatral` | Implementado y desplegado. 8 capacidades, ~130 escenarios. |
 | `perfil-dual-talento-creador` | Implementado y desplegado. Falta verificación en producción. |
-| `ingreso-con-contrasena` | Implementado. Falta configurar Supabase Auth y verificar en producción. |
-| `alcance-global-y-genero` | Código completo. Faltan Google Cloud, aplicar migraciones 0018–0021 y verificar. |
+| `ingreso-con-contrasena` | Implementado y desplegado. Falta recorrer los flujos con cuentas reales. |
+| `alcance-global-y-genero` | Implementado y desplegado. Falta recorrer los flujos con cuentas reales. |
 
 Comandos útiles: `openspec status --change <nombre>`, `openspec validate <nombre> --strict`.
 
@@ -207,15 +207,27 @@ Funciona confirmado en producción:
 - Alta de perfil de Talento con fotos, y de Creador.
 - Migración de cuentas existentes al modelo de perfil dual.
 
+Verificado contra la base de producción (no contra la interfaz):
+
+- Migraciones `0018`–`0022` aplicadas y registradas en `schema_migrations`. Las 15 filas
+  preexistentes quedaron con coordenadas, y las columnas `locacion` / `locacion_ensayos` ya
+  no existen.
+- `feed_para_talento` devuelve tarjetas con radio y sin radio, y el índice GiST se usa cuando
+  el planner lo elige (con 5 obras prefiere seq scan, que a ese tamaño es lo correcto).
+- El bloqueo corta en las dos direcciones, y con una tercera persona da `false`.
+
 Pendiente de verificar (tareas sin marcar en los `tasks.md` de cada change):
 
-- **Todo el ingreso con contraseña**: alta con verificación por correo, ingreso, recuperación
-  y cambio de contraseña. Requiere antes habilitar el proveedor Email con contraseña en
-  Supabase. Ojo con las cuentas viejas creadas por magic link: **no tienen contraseña**, así
-  que entran por "Olvidé mi contraseña" o con Google, no por el formulario.
-- **Todo el alcance global**: ubicación con Google Places, feed filtrado por radio, cambio de
-  unidad y géneros buscados en los roles. Requiere antes la key de Google Maps y aplicar las
-  migraciones `0018`–`0021`.
+- **Todos los flujos de contraseña con cuentas reales**: alta con verificación por correo,
+  ingreso, recuperación y cambio. Ojo con las cuentas viejas creadas por magic link: **no
+  tienen contraseña**, así que entran por "Olvidé mi contraseña" o con Google.
+- **La interfaz del alcance global**: el autocompletado de Places, el control de radio y
+  unidad, y los géneros buscados en el alta de roles. La base está lista; lo que no se probó
+  es la pantalla.
+- **Que las políticas de bloqueo filtren de verdad desde la app.** Se comprobó la función
+  `hay_bloqueo`, no las políticas: las consultas de verificación corren como `postgres`, que
+  saltea RLS. Hace falta una sesión real de una de las dos cuentas.
+- Las plantillas de correo de Supabase siguen en inglés.
 - Crear el segundo perfil y conmutar entre modos.
 - Ciclo completo: obra → roles → publicación → postulación → aprobación → sala de chat.
 - Que una obra propia no aparezca en el feed propio.

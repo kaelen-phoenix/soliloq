@@ -27,7 +27,7 @@
 - [x] 4.1 Migración `0020_vista_feed_geo.sql`: recrear la vista `feed_talento` exponiendo la ubicación de la obra y los `generos_buscados` del rol
 - [x] 4.2 Reescribir `feed_para_talento` con el parámetro `p_radio_metros integer` nullable, sumando el filtro de distancia con `earth_distance` y el cruce de género
 - [x] 4.3 Verificar con `explain` que el filtro de distancia usa el índice GiST
-- [ ] 4.4 Aplicar las migraciones contra la base de Supabase y confirmar que las anteriores siguen corriendo en orden
+- [x] 4.4 Aplicar las migraciones contra la base de Supabase y confirmar que las anteriores siguen corriendo en orden
 
 ## 5. Capa de ubicación en el código
 
