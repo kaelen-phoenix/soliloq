@@ -57,6 +57,8 @@ export interface Database {
           videoreel_url: string | null;
           experiencia: string | null;
           habilidades: string[];
+          /** `null` = todavía no vio las tarjetas de ejemplo del feed (migración 0024). */
+          onboarding_visto_en: string | null;
           actualizado_en: string;
         };
         Insert: {
@@ -91,6 +93,7 @@ export interface Database {
           videoreel_url?: string | null;
           experiencia?: string | null;
           habilidades?: string[];
+          onboarding_visto_en?: string | null;
         };
         Relationships: [];
       };

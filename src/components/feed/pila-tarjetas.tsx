@@ -4,6 +4,7 @@ import { useMemo, useState } from "react";
 import { motion, useAnimation } from "framer-motion";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
+import { ROLES_EJEMPLO } from "@/lib/onboarding-ejemplo";
 import { opcionesDeRadio, radioMasCercano, type UnidadDistancia } from "@/lib/ubicacion";
 import { TarjetaRol, type RolFeed } from "./tarjeta-rol";
 
@@ -14,12 +15,19 @@ export function PilaTarjetas({
   radioInicialMetros,
   unidadInicial,
   rolesIniciales,
+  mostrarEjemplos,
 }: {
   talentoId: string;
   radioInicialMetros: number | null;
   unidadInicial: UnidadDistancia;
   rolesIniciales: RolFeed[];
+  /** Primera vez de esta cuenta: van las tarjetas de ejemplo antes que las reales. */
+  mostrarEjemplos: boolean;
 }) {
+  // Se guardan aparte de `roles` a propósito: `recargar` reemplaza el feed entero al cambiar
+  // la distancia, y si los ejemplos vivieran ahí adentro desaparecerían a mitad del
+  // onboarding por tocar un filtro.
+  const [ejemplos, setEjemplos] = useState<RolFeed[]>(mostrarEjemplos ? ROLES_EJEMPLO : []);
   const [roles, setRoles] = useState(rolesIniciales);
   const [indice, setIndice] = useState(0);
   const [radio, setRadio] = useState<number | null>(radioInicialMetros);
@@ -32,10 +40,11 @@ export function PilaTarjetas({
   const controles = useAnimation();
 
   // El filtro por distancia y por género ya vino resuelto de Postgres; acá solo se avanza.
-  const visibles = useMemo(() => roles.slice(indice), [roles, indice]);
+  // Los ejemplos que queden van adelante, así el onboarding se ve antes que lo real.
+  const pila = useMemo(() => [...ejemplos, ...roles.slice(indice)], [ejemplos, roles, indice]);
 
-  const actual = visibles[0];
-  const siguiente = visibles[1];
+  const actual = pila[0];
+  const siguiente = pila[1];
 
   const opciones = opcionesDeRadio(unidad);
   const opcionActual = radioMasCercano(radio, unidad);
@@ -115,10 +124,37 @@ export function PilaTarjetas({
     }
   }
 
+  /**
+   * Cierra el onboarding para esta cuenta. Se hace al despachar la última tarjeta de
+   * ejemplo, no al mostrarlas: si alguien cierra la app en la primera, la próxima vez las
+   * vuelve a tener, que es lo que se espera de un tutorial a medio hacer.
+   *
+   * Un fallo acá no se le muestra a nadie ni bloquea nada. El peor caso es volver a ver el
+   * ejemplo una vez más — muy por debajo de interrumpir el feed con un cartel de error por
+   * algo que a la persona no le cambia nada.
+   */
+  async function marcarOnboardingVisto() {
+    const supabase = createClient();
+    await supabase
+      .from("perfiles_talento")
+      .update({ onboarding_visto_en: new Date().toISOString() })
+      .eq("id", talentoId);
+  }
+
   function avanzar(rol: RolFeed, decision: "postular" | "descartar") {
     setAvisoError(null);
-    setIndice((i) => i + 1);
     controles.set({ x: 0, rotate: 0 });
+
+    // Un ejemplo no se guarda en ningún lado: no hay obra, no hay creador y no hay quién
+    // apruebe. Postularse acá es parte del tutorial, no una postulación.
+    if (rol.es_ejemplo) {
+      const quedan = ejemplos.filter((e) => e.rol_id !== rol.rol_id);
+      setEjemplos(quedan);
+      if (quedan.length === 0) marcarOnboardingVisto();
+      return;
+    }
+
+    setIndice((i) => i + 1);
     registrarDecision(rol, decision);
   }
 
@@ -173,6 +209,20 @@ export function PilaTarjetas({
       </div>
 
       {avisoError && <p className="mb-3 text-xs text-red-600">{avisoError}</p>}
+
+      {/* Sólo mientras haya ejemplos arriba de la pila. Dice cuántos faltan para que se lea
+          como algo que termina, no como el estado normal de la app. */}
+      {actual?.es_ejemplo && (
+        <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-500/5 px-3.5 py-2.5">
+          <p className="text-[13px] font-medium text-ink-900">Así funciona Soliloq</p>
+          <p className="mt-0.5 text-[12px] leading-snug text-ink-600">
+            Deslizá a la derecha para postularte, a la izquierda para descartar. Cuando alguien
+            te aprueba se abre una sala con el equipo. Estas {ejemplos.length}{" "}
+            {ejemplos.length === 1 ? "tarjeta es un ejemplo" : "tarjetas son ejemplos"} — después
+            siguen las convocatorias reales.
+          </p>
+        </div>
+      )}
 
       <div className="relative mx-auto h-[500px] w-full max-w-sm">
         {siguiente && (

@@ -19,6 +19,8 @@ export interface RolFeed {
   creador_id: string;
   creador_nombre: string;
   creador_imagen_url: string | null;
+  /** Tarjeta del onboarding, no una convocatoria real. Ver `lib/onboarding-ejemplo.ts`. */
+  es_ejemplo?: boolean;
 }
 
 export function TarjetaRol({ rol }: { rol: RolFeed }) {
@@ -32,6 +34,14 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
       {/* Zona "escenario": alto contraste para que la tarjeta se lea de un vistazo. */}
       <div className="flex flex-1 flex-col justify-between bg-ink-950 p-6 text-white">
         <div className="flex items-center gap-2">
+          {/* El distintivo va primero y en color: si alguien mira la tarjeta un segundo, esto
+              es lo único que no se puede perder. Una convocatoria falsa que se confunde con
+              una real es peor que no mostrar nada. */}
+          {rol.es_ejemplo && (
+            <span className="rounded-md bg-brand-500 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
+              Ejemplo
+            </span>
+          )}
           <span className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/70">
             {rol.rol_tipo === "tecnica" ? "Técnica" : "Actuación"}
           </span>
@@ -72,6 +82,12 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
 
       {expandido && (
         <div className="max-h-44 space-y-3 overflow-y-auto px-5 py-4 text-[13px] leading-relaxed text-ink-600">
+          {rol.es_ejemplo && (
+            <p className="rounded-lg bg-ink-50 px-3 py-2 text-[12px] text-ink-600">
+              Esta convocatoria no existe: es un ejemplo para mostrarte cómo funciona Soliloq.
+              Deslizá o usá los botones — no se le avisa a nadie.
+            </p>
+          )}
           {rol.rol_descripcion && (
             <div>
               <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-ink-400">
@@ -88,13 +104,17 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
               <p>{rol.obra_sinopsis}</p>
             </div>
           )}
-          <Link
-            href={`/creadores/${rol.creador_id}`}
-            className="inline-flex items-center gap-1 font-medium text-ink-900 hover:underline"
-          >
-            Ver perfil de {rol.creador_nombre}
-            <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
-          </Link>
+          {/* En un ejemplo no hay perfil que abrir: el `creador_id` es un slug inventado y el
+              link daría 404. */}
+          {!rol.es_ejemplo && (
+            <Link
+              href={`/creadores/${rol.creador_id}`}
+              className="inline-flex items-center gap-1 font-medium text-ink-900 hover:underline"
+            >
+              Ver perfil de {rol.creador_nombre}
+              <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
+            </Link>
+          )}
         </div>
       )}
     </article>

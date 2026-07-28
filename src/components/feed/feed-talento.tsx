@@ -6,7 +6,7 @@ export async function FeedTalento({ talentoId }: { talentoId: string }) {
 
   const { data: perfilTalento } = await supabase
     .from("perfiles_talento")
-    .select("radio_busqueda_metros, unidad_distancia")
+    .select("radio_busqueda_metros, unidad_distancia, onboarding_visto_en")
     .eq("id", talentoId)
     .single();
 
@@ -23,6 +23,10 @@ export async function FeedTalento({ talentoId }: { talentoId: string }) {
       radioInicialMetros={radio}
       unidadInicial={perfilTalento?.unidad_distancia ?? "km"}
       rolesIniciales={roles ?? []}
+      // `null` es "todavía no lo vio", que es el estado de las cuentas que ya existían
+      // antes de esta columna: el ejemplo lo ve todo el mundo una vez, no sólo quien se
+      // registre de ahora en más.
+      mostrarEjemplos={!perfilTalento?.onboarding_visto_en}
     />
   );
 }
