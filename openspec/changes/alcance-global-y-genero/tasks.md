@@ -3,7 +3,7 @@
 - [ ] 1.1 Crear el proyecto en Google Cloud, habilitar Places API y Geocoding API, y generar una API key
 - [ ] 1.2 Restringir la key por HTTP referrer (localhost, `*.vercel.app`, dominio de producción) y por API
 - [ ] 1.3 Fijar cuota diaria tope y alerta de presupuesto en Google Cloud Console
-- [ ] 1.4 Agregar `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` a `.env.example`, a `.env.local` y a Vercel
+- [x] 1.4 Agregar `NEXT_PUBLIC_GOOGLE_MAPS_API_KEY` a `.env.example`, a `.env.local` y a Vercel
 - [x] 1.5 Documentar en `ESTADO-DEL-PROYECTO.md` la nueva dependencia externa y su costo
 
 ## 2. Base de datos: ubicación
@@ -26,7 +26,7 @@
 
 - [x] 4.1 Migración `0020_vista_feed_geo.sql`: recrear la vista `feed_talento` exponiendo la ubicación de la obra y los `generos_buscados` del rol
 - [x] 4.2 Reescribir `feed_para_talento` con el parámetro `p_radio_metros integer` nullable, sumando el filtro de distancia con `earth_distance` y el cruce de género
-- [ ] 4.3 Verificar con `explain` que el filtro de distancia usa el índice GiST
+- [x] 4.3 Verificar con `explain` que el filtro de distancia usa el índice GiST
 - [ ] 4.4 Aplicar las migraciones contra la base de Supabase y confirmar que las anteriores siguen corriendo en orden
 
 ## 5. Capa de ubicación en el código

@@ -23,9 +23,13 @@ create table if not exists bloqueos (
   constraint bloqueo_autor_del_par check (creado_por in (perfil_menor, perfil_mayor))
 );
 
--- Para una base donde este archivo ya corrió en su versión anterior, sin `creado_por`. Es
--- `not null` sin default, así que sólo puede agregarse mientras la tabla esté vacía — que
--- es el caso, porque hasta ahora no había forma de insertar nada.
+-- Para una base donde este archivo ya corrió en su versión anterior, sin `creado_por`.
+--
+-- El backfill de abajo asigna la autoría a `perfil_menor`, que es una elección arbitraria:
+-- el orden del par es por UUID y no dice nada sobre quién bloqueó a quién. Para las filas
+-- anteriores a esta migración esa información no existe en ningún lado, así que no hay nada
+-- mejor que adivinar. La consecuencia concreta de adivinar mal es que quien deshace el
+-- bloqueo termina siendo la persona bloqueada. Revisar a mano las filas preexistentes.
 alter table bloqueos add column if not exists creado_por uuid references perfiles (id) on delete cascade;
 update bloqueos set creado_por = perfil_menor where creado_por is null;
 alter table bloqueos alter column creado_por set not null;

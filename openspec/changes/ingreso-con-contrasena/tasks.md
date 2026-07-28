@@ -1,7 +1,7 @@
 ## 1. Configuración de Supabase Auth
 
-- [ ] 1.1 Habilitar el proveedor Email con contraseña en Supabase → Authentication → Providers, dejando activada la confirmación de email
-- [ ] 1.2 Agregar `/auth/callback` de local, de `*.vercel.app` y de producción a las URL de redirección permitidas
+- [x] 1.1 Habilitar el proveedor Email con contraseña en Supabase → Authentication → Providers, dejando activada la confirmación de email
+- [x] 1.2 Agregar `/auth/callback` de local, de `*.vercel.app` y de producción a las URL de redirección permitidas
 - [ ] 1.3 Revisar las plantillas de correo de verificación y de recuperación en castellano rioplatense
 
 ## 2. Reglas y mensajes compartidos
