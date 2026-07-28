@@ -21,6 +21,7 @@ interface DatosIniciales {
   nombre: string;
   fecha_nacimiento: string;
   ubicacion_texto: string;
+  ubicacion_publica: string;
   ubicacion_place_id: string | null;
   ubicacion_lat: number;
   ubicacion_lng: number;

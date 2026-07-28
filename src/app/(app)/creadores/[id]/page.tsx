@@ -26,7 +26,7 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
           <h1 className="text-[18px] font-semibold text-ink-900">{creador.nombre}</h1>
           <p className="text-sm text-ink-500">
             {creador.tipo === "compania" ? "Compañía" : "Director/a independiente"} ·{" "}
-            {creador.ubicacion_texto}
+            {creador.ubicacion_publica}
           </p>
         </div>
       </div>

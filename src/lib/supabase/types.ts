@@ -45,6 +45,7 @@ export interface Database {
           nombre: string;
           fecha_nacimiento: string;
           ubicacion_texto: string;
+          ubicacion_publica: string;
           ubicacion_place_id: string | null;
           ubicacion_lat: number;
           ubicacion_lng: number;
@@ -66,6 +67,7 @@ export interface Database {
           nombre: string;
           fecha_nacimiento: string;
           ubicacion_texto: string;
+          ubicacion_publica: string;
           ubicacion_place_id?: string | null;
           ubicacion_lat: number;
           ubicacion_lng: number;
@@ -82,6 +84,7 @@ export interface Database {
           nombre?: string;
           fecha_nacimiento?: string;
           ubicacion_texto?: string;
+          ubicacion_publica?: string;
           ubicacion_place_id?: string | null;
           ubicacion_lat?: number;
           ubicacion_lng?: number;
@@ -103,6 +106,7 @@ export interface Database {
           nombre: string;
           tipo: TipoCreador;
           ubicacion_texto: string;
+          ubicacion_publica: string;
           ubicacion_place_id: string | null;
           ubicacion_lat: number;
           ubicacion_lng: number;
@@ -116,6 +120,7 @@ export interface Database {
           nombre: string;
           tipo: TipoCreador;
           ubicacion_texto: string;
+          ubicacion_publica: string;
           ubicacion_place_id?: string | null;
           ubicacion_lat: number;
           ubicacion_lng: number;
@@ -127,6 +132,7 @@ export interface Database {
           nombre?: string;
           tipo?: TipoCreador;
           ubicacion_texto?: string;
+          ubicacion_publica?: string;
           ubicacion_place_id?: string | null;
           ubicacion_lat?: number;
           ubicacion_lng?: number;
@@ -199,6 +205,7 @@ export interface Database {
           titulo: string;
           sinopsis: string | null;
           ubicacion_texto: string;
+          ubicacion_publica: string;
           ubicacion_place_id: string | null;
           ubicacion_lat: number;
           ubicacion_lng: number;
@@ -213,6 +220,7 @@ export interface Database {
           titulo: string;
           sinopsis?: string | null;
           ubicacion_texto: string;
+          ubicacion_publica: string;
           ubicacion_place_id?: string | null;
           ubicacion_lat: number;
           ubicacion_lng: number;
@@ -224,6 +232,7 @@ export interface Database {
           titulo?: string;
           sinopsis?: string | null;
           ubicacion_texto?: string;
+          ubicacion_publica?: string;
           ubicacion_place_id?: string | null;
           ubicacion_lat?: number;
           ubicacion_lng?: number;

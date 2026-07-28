@@ -5,7 +5,8 @@ export interface TalentoDetalle {
   id: string;
   nombre: string;
   fecha_nacimiento: string;
-  ubicacion_texto: string;
+  /** La recortada a barrio/ciudad. Nunca `ubicacion_texto`: puede ser el domicilio. */
+  ubicacion_publica: string;
   genero: Genero;
   genero_descripcion: string | null;
   videoreel_url: string | null;
@@ -29,7 +30,7 @@ export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
       <div>
         <h2 className="text-lg font-bold text-ink-900">{talento.nombre}</h2>
         <p className="text-sm text-ink-500">
-          {calcularEdad(talento.fecha_nacimiento)} años · {talento.ubicacion_texto}
+          {calcularEdad(talento.fecha_nacimiento)} años · {talento.ubicacion_publica}
         </p>
         <p className="text-sm text-ink-500">
           {talento.genero_descripcion || etiquetaGenero(talento.genero)}

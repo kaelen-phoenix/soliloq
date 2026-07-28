@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import {
   ErrorUbicacion,
   SesionUbicacion,
+  ubicacionDesdeCoordenadas,
   type SugerenciaUbicacion,
   type Ubicacion,
 } from "@/lib/ubicacion";
@@ -29,6 +30,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
   const [buscando, setBuscando] = useState(false);
   const [errorBusqueda, setErrorBusqueda] = useState<string | null>(null);
   const [abierto, setAbierto] = useState(false);
+  const [ubicando, setUbicando] = useState(false);
   const contenedor = useRef<HTMLDivElement>(null);
 
   // Sincroniza el input cuando la ubicación cambia desde afuera, pero sólo si hay una
@@ -106,6 +108,53 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
     }
   };
 
+  /**
+   * Pide la ubicación del dispositivo. El navegador muestra su propio permiso, así que no
+   * hay que anticiparlo con un cartel — pero sí hay que distinguir "dijo que no" de "falló",
+   * porque son dos problemas con dos salidas distintas.
+   */
+  async function usarMiUbicacion() {
+    if (!("geolocation" in navigator)) {
+      setErrorBusqueda("Tu navegador no puede darnos tu ubicación. Escribila a mano.");
+      return;
+    }
+
+    setUbicando(true);
+    setErrorBusqueda(null);
+    setAbierto(false);
+
+    navigator.geolocation.getCurrentPosition(
+      async (posicion) => {
+        try {
+          const ubicacion = await ubicacionDesdeCoordenadas(
+            posicion.coords.latitude,
+            posicion.coords.longitude,
+          );
+          onCambio(ubicacion);
+          setTexto(ubicacion.texto);
+          setSugerencias([]);
+        } catch (e) {
+          setErrorBusqueda(
+            e instanceof ErrorUbicacion ? e.message : "No pudimos identificar tu ubicación.",
+          );
+        } finally {
+          setUbicando(false);
+        }
+      },
+      (error) => {
+        setUbicando(false);
+        setErrorBusqueda(
+          error.code === error.PERMISSION_DENIED
+            ? "No nos diste permiso para usar tu ubicación. Podés escribirla igual."
+            : "No pudimos obtener tu ubicación. Probá escribiéndola.",
+        );
+      },
+      // Diez segundos y sin cachear: una ubicación vieja acá es peor que ninguna, porque se
+      // guarda como si fuera dónde está la persona ahora.
+      { timeout: 10_000, maximumAge: 0 },
+    );
+  }
+
   const sinResolver = texto.trim().length > 0 && texto !== valor?.texto;
 
   return (
@@ -118,7 +167,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
           id={id}
           value={texto}
           autoComplete="off"
-          placeholder={placeholder ?? "Ciudad, país"}
+          placeholder={placeholder ?? "Dirección, barrio o ciudad"}
           onChange={(e) => {
             setTexto(e.target.value);
             // Editar el texto invalida la ubicación resuelta: no puede quedar un lugar
@@ -146,6 +195,15 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
           </ul>
         )}
       </div>
+
+      <button
+        type="button"
+        onClick={usarMiUbicacion}
+        disabled={ubicando}
+        className="inline-flex w-fit items-center gap-1.5 text-[12px] font-medium text-ink-600 underline underline-offset-4 hover:text-ink-900 disabled:text-ink-400 disabled:no-underline"
+      >
+        {ubicando ? "Buscando tu ubicación…" : "Usar mi ubicación actual"}
+      </button>
 
       {buscando && <p className="text-xs text-ink-500">Buscando lugares…</p>}
       {errorBusqueda && <p className="text-xs text-red-600">{errorBusqueda}</p>}

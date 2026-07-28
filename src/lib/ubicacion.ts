@@ -3,7 +3,23 @@
 // reemplazar este archivo, no auditar la aplicación.
 
 export type Ubicacion = {
+  /**
+   * Lo que la persona eligió, con la precisión que haya querido: puede ser una calle y
+   * altura. Es lo que ve en su propio formulario, y nunca se le muestra a nadie más.
+   */
   texto: string;
+  /**
+   * La misma ubicación recortada a barrio o ciudad. **Es la única que se publica.**
+   *
+   * Desde que el campo acepta direcciones exactas, `texto` puede ser el domicilio de
+   * alguien, y `perfiles_talento.ubicacion_texto` se le mostraba tal cual a cualquier
+   * creador en la bandeja de postulantes. Publicar la dirección de una actriz porque se
+   * postuló a una obra es un riesgo real, no una imprecisión de diseño.
+   *
+   * El corte es a barrio, no a ciudad: "Caballito" es útil para decidir un casting y no
+   * ubica a nadie en una puerta.
+   */
+  publica: string;
   placeId: string | null;
   lat: number;
   lng: number;
@@ -97,11 +113,17 @@ type PlaceSuggestion = {
   } | null;
 };
 
+type ComponenteDireccion = {
+  types: string[];
+  shortText?: string | null;
+  longText?: string | null;
+};
+
 type PlaceResuelto = {
   id?: string;
   formattedAddress?: string | null;
   location?: { lat(): number; lng(): number } | null;
-  addressComponents?: { types: string[]; shortText?: string | null }[] | null;
+  addressComponents?: ComponenteDireccion[] | null;
 };
 
 // El nombre del callback global que le pasamos a Google en la URL. Tiene que ser accesible
@@ -187,7 +209,11 @@ export class SesionUbicacion {
     const { suggestions } = await places.AutocompleteSuggestion.fetchAutocompleteSuggestions({
       input: texto,
       sessionToken: this.token,
-      includedPrimaryTypes: ["(cities)"],
+      // `geocode` deja pasar direcciones con altura, barrios (`sublocality`) y ciudades
+      // (`locality`), y deja afuera los comercios. Antes decía `(cities)`, que además de no
+      // aceptar direcciones devolvía **cero resultados** para un barrio: buscar "Caballito"
+      // no traía nada, ni siquiera la ciudad que lo contiene.
+      includedPrimaryTypes: ["geocode"],
     });
 
     this.sugerencias.clear();
@@ -221,6 +247,42 @@ export class SesionUbicacion {
   }
 }
 
+/**
+ * Recorta unos componentes de dirección a "barrio, ciudad, país", que es lo máximo que se
+ * publica de una persona. Todo lo que ubique en una puerta —altura, calle, edificio, código
+ * postal— se descarta acá, y por eso este recorte se hace **al guardar** y no al mostrar: si
+ * dependiera de cada pantalla, alcanzaría con una que se olvide para filtrar el domicilio.
+ *
+ * Se piden hasta tres partes de lo más específico a lo más general y se cortan las
+ * repeticiones: en la Ciudad de Buenos Aires la ciudad y la provincia son la misma palabra,
+ * y "Buenos Aires, Buenos Aires, Argentina" se lee como un error.
+ */
+function etiquetaPublica(componentes: ComponenteDireccion[] | null | undefined): string | null {
+  const de = (tipo: string) => {
+    const c = componentes?.find((x) => x.types.includes(tipo));
+    return c?.longText ?? c?.shortText ?? null;
+  };
+
+  const barrio = de("sublocality_level_1") ?? de("sublocality");
+  const ciudad = de("locality");
+  const provincia = de("administrative_area_level_1");
+  const pais = de("country");
+
+  // El barrio y la provincia no conviven: "Caballito, Buenos Aires, Argentina" alcanza para
+  // ubicar a cualquiera, y sumarle la provincia sólo alarga. Pero cuando **no** hay barrio,
+  // la provincia hace falta de verdad: hay un Rosario en Santa Fe y otro en Salta, y un
+  // Caseros en cada provincia del país.
+  const candidatas = barrio
+    ? [barrio, ciudad ?? provincia, pais]
+    : [ciudad ?? provincia, ciudad ? provincia : null, pais];
+
+  const partes: string[] = [];
+  for (const parte of candidatas) {
+    if (parte && !partes.includes(parte)) partes.push(parte);
+  }
+  return partes.length > 0 ? partes.join(", ") : null;
+}
+
 function aUbicacion(place: PlaceResuelto, textoPrediccion: string, placeId: string): Ubicacion {
   const lat = place.location?.lat();
   const lng = place.location?.lng();
@@ -235,7 +297,67 @@ function aUbicacion(place: PlaceResuelto, textoPrediccion: string, placeId: stri
 
   return {
     texto: place.formattedAddress ?? textoPrediccion,
+    // El fallback nunca puede ser el texto completo: sería publicar la dirección justo
+    // cuando falló lo que la iba a recortar. Como acá ya sabemos que hay país, la etiqueta
+    // trae al menos ese componente y en la práctica no se cae — pero si se cayera, que sea
+    // de más a menos preciso, no al revés.
+    publica: etiquetaPublica(place.addressComponents) ?? pais,
     placeId,
+    lat,
+    lng,
+    pais: pais.toUpperCase(),
+  };
+}
+
+// --- Ubicación del dispositivo ----------------------------------------------------------
+
+type ResultadoGeocoding = {
+  formatted_address?: string;
+  address_components?: { types: string[]; long_name?: string; short_name?: string }[];
+};
+
+/**
+ * Traduce las coordenadas del GPS a una ubicación con nombre.
+ *
+ * Va por la Geocoding API y no por Places porque es la que hace geocodificación inversa;
+ * Places resuelve un lugar ya elegido, no responde "qué hay en estas coordenadas".
+ *
+ * Se conservan las coordenadas del dispositivo, no las que devuelve Google: el GPS ya sabe
+ * dónde está la persona con más precisión que el centro de la cuadra que le corresponde a
+ * la dirección. Lo único que se toma de la respuesta es cómo se llama ese lugar.
+ */
+export async function ubicacionDesdeCoordenadas(lat: number, lng: number): Promise<Ubicacion> {
+  const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
+  if (!apiKey) throw new ErrorUbicacion("Falta configurar NEXT_PUBLIC_GOOGLE_MAPS_API_KEY.");
+
+  const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}&language=es`;
+  const respuesta = await fetch(url);
+  if (!respuesta.ok) throw new ErrorUbicacion("No pudimos identificar tu ubicación.");
+
+  const datos = (await respuesta.json()) as { status?: string; results?: ResultadoGeocoding[] };
+  const primero = datos.results?.[0];
+  if (datos.status !== "OK" || !primero) {
+    throw new ErrorUbicacion("No pudimos identificar tu ubicación. Escribila a mano.");
+  }
+
+  // La Geocoding API usa `long_name`/`short_name`; Places usa `longText`/`shortText`. Se
+  // normaliza acá para que `etiquetaPublica` no tenga que conocer los dos formatos.
+  const componentes: ComponenteDireccion[] = (primero.address_components ?? []).map((c) => ({
+    types: c.types,
+    longText: c.long_name ?? null,
+    shortText: c.short_name ?? null,
+  }));
+
+  const pais = componentes.find((c) => c.types.includes("country"))?.shortText;
+  if (!pais) throw new ErrorUbicacion("No pudimos identificar tu país. Escribí tu ubicación.");
+
+  const texto = primero.formatted_address ?? `${lat}, ${lng}`;
+  return {
+    texto,
+    publica: etiquetaPublica(componentes) ?? pais,
+    // Sin `placeId`: esto no salió de una sugerencia de Places, y guardar uno inventado
+    // haría creer que se puede volver a resolver contra Google.
+    placeId: null,
     lat,
     lng,
     pais: pais.toUpperCase(),
@@ -246,6 +368,7 @@ function aUbicacion(place: PlaceResuelto, textoPrediccion: string, placeId: stri
 
 type FilaUbicacion = {
   ubicacion_texto: string;
+  ubicacion_publica: string;
   ubicacion_place_id: string | null;
   ubicacion_lat: number;
   ubicacion_lng: number;
@@ -255,6 +378,7 @@ type FilaUbicacion = {
 export function aColumnas(ubicacion: Ubicacion): FilaUbicacion {
   return {
     ubicacion_texto: ubicacion.texto,
+    ubicacion_publica: ubicacion.publica,
     ubicacion_place_id: ubicacion.placeId,
     ubicacion_lat: ubicacion.lat,
     ubicacion_lng: ubicacion.lng,
@@ -268,6 +392,9 @@ export function desdeColumnas(fila: Partial<FilaUbicacion> | null | undefined): 
   }
   return {
     texto: fila.ubicacion_texto,
+    // Las filas anteriores a la migración 0025 no tienen la columna cargada. Se cae al texto
+    // completo, que en esas filas ya era una ciudad: hasta ahora el campo sólo aceptaba eso.
+    publica: fila.ubicacion_publica ?? fila.ubicacion_texto,
     placeId: fila.ubicacion_place_id ?? null,
     lat: fila.ubicacion_lat,
     lng: fila.ubicacion_lng,
