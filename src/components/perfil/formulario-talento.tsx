@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
+import { AvisoGuardado, useAvisoGuardado } from "@/components/ui/aviso-guardado";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
@@ -58,6 +59,7 @@ export function FormularioTalento({
   const [fotos, setFotos] = useState<FotoTalento[]>(fotosIniciales);
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [cargando, setCargando] = useState(false);
+  const [guardado, setGuardado] = useAvisoGuardado();
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
 
   function alternarHabilidad(h: string) {
@@ -96,6 +98,7 @@ export function FormularioTalento({
   async function guardar(e: React.FormEvent) {
     e.preventDefault();
     setErrorGeneral(null);
+    setGuardado(false);
     if (!validar()) return;
 
     setCargando(true);
@@ -137,10 +140,18 @@ export function FormularioTalento({
         .update({ onboarding_completo: true, modo_activo: "talento" })
         .eq("id", userId);
       router.replace("/");
-    } else {
-      router.replace("/perfil");
+      router.refresh();
+      // No se apaga `cargando`: la navegación desmonta el formulario, y apagarlo acá haría
+      // parpadear el botón a "Guardar" durante el viaje.
+      return;
     }
+
+    // Editar no navega: este formulario ya vive en `/perfil`, así que el `router.replace`
+    // que había acá era a la misma ruta y no desmontaba nada. `cargando` quedaba en `true`
+    // para siempre y el botón se quedaba grisado — no se podía volver a editar sin recargar.
     router.refresh();
+    setCargando(false);
+    setGuardado(true);
   }
 
   return (
@@ -264,6 +275,7 @@ export function FormularioTalento({
       </section>
 
       {errorGeneral && <p className="text-sm text-red-600">{errorGeneral}</p>}
+      <AvisoGuardado visible={guardado} />
 
       <Boton type="submit" cargando={cargando}>
         {esAlta ? "Completar perfil" : "Guardar cambios"}
