@@ -143,7 +143,7 @@ export function SalaChat({
   }
 
   return (
-    <div className="flex h-[calc(100vh-8.5rem)] flex-col">
+    <div className="flex flex-col">
       <button
         type="button"
         onClick={() => setMostrarIntegrantes((v) => !v)}
@@ -171,7 +171,7 @@ export function SalaChat({
         </ul>
       )}
 
-      <div className="flex-1 overflow-y-auto px-4 py-3">
+      <div className="px-4 py-3">
         {mensajes.length === 0 && (
           <p className="mx-auto mt-10 max-w-[16rem] text-center text-[13px] leading-relaxed text-ink-400">
             Esta sala se abrió porque hubo match. Coordinen fechas de audición y compartan textos acá.
@@ -209,7 +209,13 @@ export function SalaChat({
         <div ref={finRef} />
       </div>
 
-      <form onSubmit={enviar} className="safe-bottom flex gap-2 border-t border-ink-100 bg-white p-3">
+      {/* sticky, no fixed: se ancla al final del scroll de la página en lugar de depender de
+          un cálculo de 100vh, que en mobile se desajusta con el teclado. bottom-20 replica el
+          alto reservado para BarraNavegacion (pb-20 en AppLayout) para no quedar tapado por ella. */}
+      <form
+        onSubmit={enviar}
+        className="safe-bottom sticky bottom-20 z-10 flex gap-2 border-t border-ink-100 bg-white p-3"
+      >
         <input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
