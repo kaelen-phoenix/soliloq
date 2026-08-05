@@ -59,7 +59,15 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
   });
 
   return (
-    <div>
+    // Alto fijo = pantalla menos el Encabezado sticky (safe-area + su contenido, ~5.25rem) y
+    // menos el espacio que AppLayout reserva para BarraNavegacion (pb-20 = 5rem). Con esto la
+    // barra de título y el chat se reparten ese alto vía flex, en lugar de que SalaChat adivine
+    // por su cuenta cuánto mide la barra de título: así el input queda anclado al fondo real de
+    // la pantalla sin importar cuántos mensajes haya, y sólo la lista de mensajes scrollea.
+    <div
+      className="flex flex-col"
+      style={{ height: "calc(100dvh - env(safe-area-inset-top) - 5.25rem - 5rem)" }}
+    >
       <div className="border-b border-ink-100 px-4 py-2">
         <p className="text-xs font-medium uppercase tracking-wide text-ink-500">Sala de proyecto</p>
         <h1 className="font-semibold text-ink-900">{obra?.titulo ?? "Proyecto"}</h1>
