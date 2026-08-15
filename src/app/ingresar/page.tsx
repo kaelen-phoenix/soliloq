@@ -1,5 +1,4 @@
-import { FondoTelon } from "@/components/ui/fondo-telon";
-import { Logotipo } from "@/components/ui/logotipo";
+import { MarcoAcceso } from "@/components/layout/marco-acceso";
 import { IngresarFormulario } from "./ingresar-formulario";
 
 export default function IngresarPage({
@@ -8,12 +7,15 @@ export default function IngresarPage({
   searchParams: { error?: string };
 }) {
   return (
-    <main className="relative mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-12">
-      <FondoTelon />
-
-      <div className="mb-10">
-        <Logotipo tamano="lg" />
-        <p className="mt-4 text-base leading-snug text-ink-500">
+    <MarcoAcceso>
+      {/* En móvil el logotipo lo pone el marco justo arriba de esto; en escritorio el nombre
+          ya está en el panel de al lado, así que acá va el título de la acción y no la marca
+          repetida dos veces en la misma pantalla. */}
+      <div className="mb-8 mt-4 lg:mt-0">
+        <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
+          Entrá a Yalope
+        </h1>
+        <p className="mt-1.5 text-base leading-snug text-ink-500">
           Match teatral para talento y creadores.
         </p>
       </div>
@@ -25,6 +27,6 @@ export default function IngresarPage({
       )}
 
       <IngresarFormulario />
-    </main>
+    </MarcoAcceso>
   );
 }

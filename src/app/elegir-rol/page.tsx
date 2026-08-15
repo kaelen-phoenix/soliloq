@@ -37,7 +37,10 @@ export default function ElegirRolPage() {
   }
 
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center gap-3 px-6 py-12">
+    // En escritorio: fondo teñido y la decisión dentro de una tarjeta. En móvil no cambia
+    // nada — ahí la pantalla entera ya es la tarjeta.
+    <main className="flex min-h-screen flex-col justify-center px-6 py-12 sm:bg-ink-50">
+      <div className="mx-auto flex w-full max-w-sm flex-col gap-3 sm:rounded-2xl sm:border sm:border-ink-100 sm:bg-white sm:p-8 sm:shadow-tarjeta">
       <div className="mb-4">
         <h1 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-ink-900">
           ¿Con cuál querés empezar?
@@ -64,6 +67,7 @@ export default function ElegirRolPage() {
           />
         </button>
       ))}
+      </div>
     </main>
   );
 }

@@ -15,7 +15,8 @@ export default async function CompletarPerfilPage() {
   if (!perfil?.rol) redirect("/elegir-rol");
 
   return (
-    <main className="mx-auto min-h-screen max-w-lg px-6 py-10">
+    <main className="min-h-screen px-6 py-10 sm:bg-ink-50 sm:py-14">
+      <div className="mx-auto max-w-lg sm:rounded-2xl sm:border sm:border-ink-100 sm:bg-white sm:p-8 sm:shadow-tarjeta">
       <h1 className="text-xl font-bold text-ink-900">
         {perfil.rol === "talento" ? "Contanos sobre vos" : "Contanos sobre tu proyecto"}
       </h1>
@@ -32,6 +33,7 @@ export default async function CompletarPerfilPage() {
       ) : (
         <FormularioCreador userId={user.id} esAlta />
       )}
+      </div>
     </main>
   );
 }

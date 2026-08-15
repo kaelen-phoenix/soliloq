@@ -273,6 +273,22 @@ entero seguro de JavaScript y viaja como texto — sumar dos de esos en el clien
 vez de sumar, sin fallar. Verificado con sesiones simuladas: el dueño ve sus métricas y un
 tercero recibe cero filas.
 
+### Web en la computadora, app en el teléfono
+
+Dos tratamientos distintos y deliberados, no un diseño estirado:
+
+- **Las pantallas públicas** (ingreso, recuperación, cambio de clave) usan `MarcoAcceso`: en
+  móvil una columna centrada; en escritorio se parten en dos, con un panel de marca oscuro a
+  la izquierda y el formulario a la derecha. El panel oscuro es la misma idea que la tarjeta
+  del feed —la caja negra teatral— para no inventar un segundo lenguaje visual.
+- **Dentro de la app**, el fondo se tiñe en escritorio y la columna queda sobre blanco con
+  bordes, y la barra inferior pasa a ser una píldora flotante en vez de una franja que cruza
+  toda la pantalla.
+
+**El ancho de lectura no cambia entre los dos.** Ensancharlo rompería la tarjeta del feed,
+que está pensada para el pulgar. Lo que cambia es el marco alrededor, que es lo que hace que
+en una pantalla de 1900px no se lea como un teléfono estirado.
+
 ### La escala tipográfica es cerrada
 
 Ocho escalones (`text-2xs` a `text-3xl`), cada uno con su interlineado. Antes había **17
