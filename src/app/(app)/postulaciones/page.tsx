@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/server";
 
@@ -32,17 +33,20 @@ export default async function PostulacionesPage() {
   return (
     <main className="px-5 py-5">
       {(!postulaciones || postulaciones.length === 0) && (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
-          <Icono nombre="postulaciones" className="h-8 w-8 text-ink-300" />
-          <p className="mt-3 text-[15px] font-medium text-ink-900">Todavía no te postulaste</p>
-          <Link
-            href="/"
-            className="mt-2 inline-flex items-center gap-1 text-[13px] font-medium text-ink-900 hover:underline"
-          >
-            Ir al feed
-            <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
-          </Link>
-        </div>
+        <EstadoVacio
+          icono="postulaciones"
+          titulo="Todavía no te postulaste"
+          detalle="Deslizá a la derecha en el feed para postularte a una convocatoria. Acá vas a seguir cómo viene cada una."
+          accion={
+            <Link
+              href="/"
+              className="inline-flex items-center gap-1 text-[13px] font-medium text-ink-900 hover:underline"
+            >
+              Ir al feed
+              <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
+            </Link>
+          }
+        />
       )}
 
       <ul className="flex flex-col gap-2">

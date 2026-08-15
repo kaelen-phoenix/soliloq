@@ -35,6 +35,9 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
+        // Reservada para la marca y los títulos de portada. Si aparece en un botón o
+        // en un label, está mal usada: la interfaz es toda `sans`.
+        display: ["var(--font-display)", "Georgia", "serif"],
       },
       borderRadius: {
         card: "1rem",

@@ -152,10 +152,36 @@ video consumiría el free tier en pocos perfiles. `src/lib/videoreel.ts` es la *
 fuente de verdad — valida y genera el embed con el mismo parser, para que no puedan
 discrepar sobre el mismo enlace.
 
+### Dos tipografías, con fronteras estrictas
+
+Inter es la fuente de **interfaz** y Fraunces la de **marca**. Fraunces (`font-display`) se
+usa solo en el logotipo, los títulos de sección y el título de una obra; si aparece en un
+botón, un label o un campo, está mal usada. Es lo que le da a la app el registro editorial
+de programa de mano sin resignar la legibilidad de Inter donde se lee de verdad.
+
+Va como fuente **variable**, sin `weight` ni ejes decorativos: declarar un peso fijo la
+convierte en estática y ahí `axes` deja de ser válido — el build falla con "Axes can only be
+defined for variable fonts".
+
+La marca vive en un solo lugar, `src/components/ui/logotipo.tsx`. Cualquier pantalla que
+escriba "Yalope" a mano es una segunda versión del logo esperando a desincronizarse.
+
+### Las métricas se calculan en una función, por privacidad
+
+El alcance de un rol sale de `descartes`, y esa tabla solo la puede leer el propio talento.
+Abrirle la política al creador le mostraría **quién** lo descartó, que no es información
+suya. Por eso `metricas_obra` (`0026`, corregida en `0027`) es `SECURITY DEFINER` y devuelve
+únicamente conteos agregados, con chequeo de propiedad adentro.
+
+Los conteos se castean a `int` a propósito: `count(*)` devuelve `bigint`, que no entra en el
+entero seguro de JavaScript y viaja como texto — sumar dos de esos en el cliente concatena en
+vez de sumar, sin fallar. Verificado con sesiones simuladas: el dueño ve sus métricas y un
+tercero recibe cero filas.
+
 ### Diseño: minimalismo por restricción
 
-El acento magenta se usa **solo** en la acción de postularse y en los contadores de
-pendientes. Todo lo demás es una escala neutra con matiz cálido. Los estados seleccionados
+El acento magenta se usa **solo** en la acción de postularse, en los contadores de
+pendientes, en el filete del logotipo y en el segmento "Match" de las métricas. Todo lo demás es una escala neutra con matiz cálido. Los estados seleccionados
 y el foco usan negro. La tarjeta del feed es de alto contraste (tipo caja negra teatral)
 porque es la pieza central del producto.
 

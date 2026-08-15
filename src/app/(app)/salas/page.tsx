@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/server";
 
@@ -38,13 +39,11 @@ export default async function SalasPage() {
   return (
     <main className="px-5 py-5">
       {salas.length === 0 && (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
-          <Icono nombre="salas" className="h-8 w-8 text-ink-300" />
-          <p className="mt-3 text-[15px] font-medium text-ink-900">Todavía no tenés salas</p>
-          <p className="mt-1 text-[13px] leading-snug text-ink-500">
-            Se abren automáticamente cuando se concreta un match.
-          </p>
-        </div>
+        <EstadoVacio
+          icono="salas"
+          titulo="Todavía no tenés salas"
+          detalle="Se abren solas cuando se concreta un match: ahí vas a hablar con el equipo del proyecto."
+        />
       )}
 
       <ul className="flex flex-col gap-2">

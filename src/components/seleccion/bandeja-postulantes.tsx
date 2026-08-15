@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
 import { calcularEdad } from "@/lib/constantes";
@@ -59,13 +60,11 @@ export function BandejaPostulantes({
 
   if (postulantes.length === 0) {
     return (
-      <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
-        <Icono nombre="perfil" className="h-8 w-8 text-ink-300" />
-        <p className="mt-3 text-[15px] font-medium text-ink-900">Todavía no hay postulantes</p>
-        <p className="mt-1 text-[13px] leading-snug text-ink-500">
-          Cuando alguien se postule a este rol, va a aparecer acá.
-        </p>
-      </div>
+      <EstadoVacio
+        icono="perfil"
+        titulo="Todavía no hay postulantes"
+        detalle="Cuando alguien se postule a este rol va a aparecer acá, y vas a poder aprobarlo, dejarlo en duda o descartarlo."
+      />
     );
   }
 

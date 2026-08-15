@@ -491,6 +491,25 @@ export interface Database {
         Args: { p_talento_id: string; p_radio_metros?: number | null };
         Returns: Database["public"]["Views"]["feed_talento"]["Row"][];
       };
+      /**
+       * Métricas por rol de una obra propia. Es una función y no una consulta directa
+       * porque el alcance sale de `descartes`, que solo puede leer el propio talento:
+       * acá se devuelven conteos, nunca identidades.
+       */
+      metricas_obra: {
+        Args: { p_obra_id: string };
+        Returns: {
+          rol_id: string;
+          rol_nombre: string;
+          vacantes: number;
+          alcance: number;
+          postulaciones: number;
+          pendientes: number;
+          en_duda: number;
+          aprobados: number;
+          rechazados: number;
+        }[];
+      };
     };
   };
 }

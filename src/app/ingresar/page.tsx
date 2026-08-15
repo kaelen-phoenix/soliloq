@@ -1,3 +1,5 @@
+import { FondoTelon } from "@/components/ui/fondo-telon";
+import { Logotipo } from "@/components/ui/logotipo";
 import { IngresarFormulario } from "./ingresar-formulario";
 
 export default function IngresarPage({
@@ -6,12 +8,12 @@ export default function IngresarPage({
   searchParams: { error?: string };
 }) {
   return (
-    <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-12">
+    <main className="relative mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-12">
+      <FondoTelon />
+
       <div className="mb-10">
-        <h1 className="text-[32px] font-semibold leading-none tracking-[-0.03em] text-ink-900">
-          Yalope
-        </h1>
-        <p className="mt-2.5 text-[15px] leading-snug text-ink-500">
+        <Logotipo tamano="lg" />
+        <p className="mt-4 text-[15px] leading-snug text-ink-500">
           Match teatral para talento y creadores.
         </p>
       </div>

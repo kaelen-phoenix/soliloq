@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FormularioRol } from "@/components/convocatorias/formulario-rol";
 import { AccionesObra } from "@/components/convocatorias/acciones-obra";
+import { MetricasObra } from "@/components/convocatorias/metricas-obra";
 import { etiquetaGenero } from "@/lib/constantes";
 
 const ETIQUETA_TIPO: Record<string, string> = { actuacion: "Actuación", tecnica: "Técnica" };
@@ -22,7 +23,9 @@ export default async function DetalleObraPage({ params }: { params: { id: string
 
   return (
     <main className="px-5 py-5">
-      <h2 className="text-[20px] font-semibold leading-tight text-ink-900">{obra.titulo}</h2>
+      <h2 className="font-display text-[22px] font-semibold leading-tight tracking-[-0.02em] text-ink-900">
+        {obra.titulo}
+      </h2>
       <p className="mt-1 text-[13px] text-ink-500">{obra.ubicacion_texto}</p>
       {obra.sinopsis && (
         <p className="mt-3 text-[14px] leading-relaxed text-ink-600">{obra.sinopsis}</p>
@@ -75,6 +78,13 @@ export default async function DetalleObraPage({ params }: { params: { id: string
         </ul>
 
         <FormularioRol obraId={obra.id} />
+      </section>
+
+      <section className="mt-8 flex flex-col gap-2.5">
+        <h3 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">
+          Rendimiento
+        </h3>
+        <MetricasObra obraId={obra.id} />
       </section>
     </main>
   );

@@ -23,5 +23,11 @@ export function TituloSeccion({ modoActivo }: { modoActivo: RolUsuario }) {
   const titulo =
     coincidencia?.titulo ?? (modoActivo === "talento" ? "Convocatorias" : "Tu tablero");
 
-  return <h1 className="text-[22px] font-semibold leading-none text-ink-900">{titulo}</h1>;
+  // En `display`: es el título de portada de cada pantalla y lo que le da a la app el
+  // registro editorial de la marca. La interfaz (botones, etiquetas, campos) sigue en sans.
+  return (
+    <h1 className="font-display text-[23px] font-semibold leading-none tracking-[-0.02em] text-ink-900">
+      {titulo}
+    </h1>
+  );
 }

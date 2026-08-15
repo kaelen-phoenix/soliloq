@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/server";
 
@@ -34,13 +35,11 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
       </Link>
 
       {(!obras || obras.length === 0) && (
-        <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
-          <Icono nombre="tablero" className="h-8 w-8 text-ink-300" />
-          <p className="mt-3 text-[15px] font-medium text-ink-900">Todavía no creaste ninguna obra</p>
-          <p className="mt-1 text-[13px] text-ink-500">
-            Creá tu primera convocatoria para empezar a recibir postulantes.
-          </p>
-        </div>
+        <EstadoVacio
+          icono="tablero"
+          titulo="Todavía no creaste ninguna obra"
+          detalle="Creá tu primera obra, definí los roles que buscás y publicala para empezar a recibir postulantes."
+        />
       )}
 
       <ul className="flex flex-col gap-2">
