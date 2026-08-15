@@ -57,7 +57,7 @@ export function BuscarEquipo({
   }
 
   return (
-    <section className="mt-8 rounded-2xl border border-ink-100 p-4">
+    <section className="mt-8 max-w-2xl rounded-2xl border border-ink-100 p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
           <h2 className="text-base font-medium text-ink-900">Armar equipo</h2>

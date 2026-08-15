@@ -61,7 +61,7 @@ export default function NuevaObraPage() {
 
   return (
     <main className="px-5 py-5">
-      <form onSubmit={crear} className="flex flex-col gap-4">
+      <form onSubmit={crear} className="flex max-w-2xl flex-col gap-4">
         <CampoTexto id="titulo" etiqueta="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} error={errores.titulo} />
 
         <div className="flex flex-col gap-1.5">

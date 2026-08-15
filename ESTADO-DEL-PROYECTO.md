@@ -294,10 +294,23 @@ navegaciones distintas según el tamaño de pantalla, que es el bug clásico de 
 `max-w-sm` dentro de `pila-tarjetas.tsx`, así que la columna ancha le da aire a las listas,
 los formularios y el chat sin deformarla.
 
-**El ancho es continuo, no escalonado.** La columna ocupa lo que haya hasta un único tope
-(`max-w-5xl`), sin saltos por breakpoint. La versión anterior subía en `lg` y en `xl`, y eso
-dejaba los tamaños intermedios —una tablet apaisada, una ventana a medio maximizar— con
-espacio libre esperando a cruzar un número elegido a mano.
+**El marco no tiene tope, y no le impone un ancho a nadie.** Cada componente declara el suyo:
+
+| Componente | Tope | Por qué |
+|---|---|---|
+| Tarjeta del feed | `max-w-sm` | Está pensada para el pulgar |
+| Formularios | `max-w-2xl` | Un input de 2000px no es más usable, es peor |
+| Mensajes del chat | `max-w-3xl` | Se leen en columna, no cruzando la pantalla |
+| Párrafos largos | `max-w-prose` | La legibilidad depende de los caracteres por renglón |
+| Listas de tarjetas | ninguno | Suman columnas cuando entran |
+
+Es al revés de como estaba: el contenedor capeaba todo por igual, y eso obligaba a elegir un
+número que a las listas les quedaba chico y a los formularios grande. **Si algo se estira mal
+en una pantalla ancha, el arreglo va en ese componente, no en el layout.**
+
+Antes de esto el ancho subía por saltos (`lg`, `xl`), lo que dejaba los tamaños intermedios
+—una tablet apaisada, una ventana a medio maximizar— con espacio libre esperando a cruzar un
+número elegido a mano.
 
 Las listas de tarjetas usan `repeat(auto-fill, minmax(18rem, 1fr))`: suman columnas **cuando
 entran**, medido sobre el ancho real del contenedor y no del viewport. Es lo que hace que

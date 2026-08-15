@@ -178,7 +178,7 @@ export function SalaChat({
         </ul>
       )}
 
-      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
+      <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 [&>*]:mx-auto [&>*]:max-w-3xl">
         {mensajes.length === 0 && (
           <p className="mx-auto mt-10 max-w-[16rem] text-center text-sm leading-relaxed text-ink-400">
             Esta sala se abrió porque hay equipo. Coordinen fechas de audición y compartan textos acá.

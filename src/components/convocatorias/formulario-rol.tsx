@@ -82,7 +82,7 @@ export function FormularioRol({ obraId }: { obraId: string }) {
   }
 
   return (
-    <form onSubmit={agregar} className="flex flex-col gap-3 rounded-xl border border-dashed border-ink-200 p-4">
+    <form onSubmit={agregar} className="flex max-w-2xl flex-col gap-3 rounded-xl border border-dashed border-ink-200 p-4">
       <CampoTexto id="rol_nombre" etiqueta="Nombre del rol" value={nombre} onChange={(e) => setNombre(e.target.value)} />
 
       <div className="flex gap-3">

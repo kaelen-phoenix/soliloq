@@ -22,10 +22,13 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     // —una tablet apaisada, una ventana a medio maximizar— con espacio libre al costado
     // esperando a cruzar un número arbitrario.
     //
-    // El tope existe igual, y no es negociable: lo que se ensancha es el **marco**, no la
-    // línea de texto. La tarjeta del feed se capea sola en `max-w-sm`, los párrafos largos
-    // llevan `max-w-prose`, y las listas suman columnas cuando entran —no cuando el
-    // viewport cruza un breakpoint— con `auto-fill` sobre el ancho real del contenedor.
+    // Y sin tope: el marco no le impone un ancho a nadie. **Cada componente declara el suyo**
+    // — la tarjeta del feed en `max-w-sm`, los formularios en `max-w-2xl`, los párrafos en
+    // `max-w-prose`, los mensajes del chat en `max-w-3xl`— y las listas suman columnas cuando
+    // entran, con `auto-fill` sobre el ancho real del contenedor.
+    //
+    // Es al revés de como estaba: antes el contenedor capeaba todo por igual, y eso obligaba
+    // a elegir un número que a las listas les quedaba chico y a los formularios grande.
     //
     // Lo único que sigue siendo por breakpoint es la navegación, y ahí corresponde: una
     // barra abajo y una lateral no son la misma forma con otro tamaño.
@@ -39,7 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           tieneAmbosPerfiles={estado.tieneAmbosPerfiles}
           rolFaltante={rolFaltante(estado)}
         />
-        <div className="mx-auto w-full max-w-5xl bg-white sm:min-h-[calc(100vh-9rem)] sm:border-x sm:border-ink-100 lg:border-x-0">
+        <div className="w-full bg-white px-0 sm:min-h-[calc(100vh-9rem)]">
           {children}
         </div>
       </div>

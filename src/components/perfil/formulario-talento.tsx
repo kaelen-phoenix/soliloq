@@ -156,7 +156,7 @@ export function FormularioTalento({
   }
 
   return (
-    <form onSubmit={guardar} className="flex flex-col gap-6">
+    <form onSubmit={guardar} className="flex max-w-2xl flex-col gap-6">
       <section className="flex flex-col gap-4">
         <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Ficha básica</h2>
         <CampoTexto

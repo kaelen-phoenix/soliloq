@@ -139,7 +139,7 @@ export function FormularioCreador({
   }
 
   return (
-    <form onSubmit={guardar} className="flex flex-col gap-6">
+    <form onSubmit={guardar} className="flex max-w-2xl flex-col gap-6">
       <section className="flex flex-col gap-4">
         <CampoTexto
           id="nombre"
