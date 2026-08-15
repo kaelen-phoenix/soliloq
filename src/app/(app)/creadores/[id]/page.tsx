@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { resumenDisciplinas } from "@/lib/constantes";
+import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 
 export default async function PerfilCreadorPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -51,6 +52,10 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
           </ul>
         </section>
       )}
+
+      <div className="mt-8">
+        <BotonDenuncia perfilDenunciadoId={creador.id} queSeDenuncia={`a ${creador.nombre}`} />
+      </div>
     </main>
   );
 }

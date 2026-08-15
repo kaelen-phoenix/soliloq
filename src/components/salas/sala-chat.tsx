@@ -2,6 +2,7 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 
 export interface Mensaje {
   id: string;
@@ -168,6 +169,12 @@ export function SalaChat({
               </div>
             </li>
           ))}
+
+          {/* La denuncia vive acá, dentro de la lista de integrantes, y no en la cabecera:
+              es donde alguien va a mirar cuando quiere reportar a una persona de la sala. */}
+          <li className="pt-1">
+            <BotonDenuncia salaId={salaId} queSeDenuncia="lo que pasa en esta sala" />
+          </li>
         </ul>
       )}
 

@@ -1,20 +1,28 @@
 import Link from "next/link";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
+import { ConfirmarConvocatoria } from "@/components/seleccion/confirmar-convocatoria";
 import { createClient } from "@/lib/supabase/server";
 
+// Lo que ve el talento sobre su propia postulación. `en_duda` no se muestra con esa palabra:
+// enterarte de que alguien "duda" de vos no aporta nada y desalienta. Lo que importa es que
+// sigue en juego.
 const ETIQUETA_ESTADO: Record<string, string> = {
-  pendiente: "Pendiente",
-  en_duda: "En duda",
+  pendiente: "Sin ver",
+  en_duda: "Te tienen en cuenta",
+  esperando_confirmacion: "Te esperan",
   aprobado: "Hay equipo",
   rechazado: "No quedó",
+  vencida: "Sin respuesta",
 };
 
 const COLOR_ESTADO: Record<string, string> = {
   pendiente: "bg-ink-100 text-ink-600",
   en_duda: "bg-amber-100 text-amber-800",
+  esperando_confirmacion: "bg-brand-500 text-white",
   aprobado: "bg-ink-900 text-white",
   rechazado: "bg-ink-50 text-ink-400",
+  vencida: "bg-ink-50 text-ink-400",
 };
 
 export default async function PostulacionesPage() {
@@ -26,7 +34,9 @@ export default async function PostulacionesPage() {
 
   const { data: postulaciones } = await supabase
     .from("postulaciones")
-    .select("id, estado, creado_en, roles(nombre, obras(id, titulo, perfiles_creador(nombre)))")
+    .select(
+      "id, estado, creado_en, roles(nombre, obras(id, titulo, perfiles_creador(nombre)))",
+    )
     .eq("talento_id", user.id)
     .order("creado_en", { ascending: false });
 
@@ -53,19 +63,37 @@ export default async function PostulacionesPage() {
         {postulaciones?.map((p: any) => (
           <li
             key={p.id}
-            className="flex items-start gap-3 rounded-xl border border-ink-100 bg-white p-4"
+            className="rounded-xl border border-ink-100 bg-white p-4"
           >
-            <div className="min-w-0 flex-1">
-              <p className="truncate text-[15px] font-medium text-ink-900">{p.roles.obras.titulo}</p>
-              <p className="mt-0.5 truncate text-[13px] text-ink-500">
-                {p.roles.nombre} · {p.roles.obras.perfiles_creador.nombre}
-              </p>
+            <div className="flex items-start gap-3">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-[15px] font-medium text-ink-900">
+                  {p.roles.obras.titulo}
+                </p>
+                <p className="mt-0.5 truncate text-[13px] text-ink-500">
+                  {p.roles.nombre} · {p.roles.obras.perfiles_creador.nombre}
+                </p>
+              </div>
+              <span
+                className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${COLOR_ESTADO[p.estado]}`}
+              >
+                {ETIQUETA_ESTADO[p.estado]}
+              </span>
             </div>
-            <span
-              className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${COLOR_ESTADO[p.estado]}`}
-            >
-              {ETIQUETA_ESTADO[p.estado]}
-            </span>
+
+            {p.estado === "esperando_confirmacion" && (
+              <ConfirmarConvocatoria
+                postulacionId={p.id}
+                obraTitulo={p.roles.obras.titulo}
+              />
+            )}
+
+            {p.estado === "vencida" && (
+              <p className="mt-2 text-[12px] leading-snug text-ink-400">
+                Pasaron 30 días sin respuesta, así que la cerramos. Podés volver
+                a postularte si la convocatoria sigue abierta.
+              </p>
+            )}
           </li>
         ))}
       </ul>

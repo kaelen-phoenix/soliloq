@@ -131,6 +131,41 @@ join salas s on s.id = si.sala_id
 join obras o on o.id = s.obra_id;
 ```
 
+## Revisar denuncias
+
+La app registra denuncias pero **no modera sola**: la decisión es humana y sale de acá. Nadie
+recibe un aviso automático todavía, así que esta consulta hay que correrla a mano — conviene
+hacerlo cada vez que se abre el proyecto, y sin falta durante una prueba con gente invitada.
+
+```sql
+-- Denuncias sin resolver, con nombres en vez de UUID.
+select d.id, d.motivo, d.detalle, d.creado_en,
+       coalesce(td.nombre, cd.nombre) as denunciante,
+       coalesce(tx.nombre, cx.nombre) as denunciado,
+       o.titulo as obra
+from denuncias d
+left join perfiles_talento td on td.id = d.denunciante_id
+left join perfiles_creador cd on cd.id = d.denunciante_id
+left join perfiles_talento tx on tx.id = d.perfil_denunciado_id
+left join perfiles_creador cx on cx.id = d.perfil_denunciado_id
+left join obras o on o.id = d.obra_id
+where d.estado in ('abierta', 'en_revision')
+order by d.creado_en;
+```
+
+Para actuar sobre una denuncia hay dos herramientas, y son manuales:
+
+```sql
+-- 1. Separar a las dos personas: insertar el par ordenado en `bloqueos` (ver 0022).
+-- 2. Cerrar el caso dejando asentado qué se hizo.
+update denuncias
+set estado = 'resuelta', resolucion = 'Se bloqueó el par y se avisó por mail.', resuelto_en = now()
+where id = '<uuid>';
+```
+
+`estado` y `resolucion` no tienen política de update: solo se tocan con esta conexión, que
+saltea RLS. Es a propósito — nadie edita el resultado de su propia denuncia desde la app.
+
 ## Aplicar migraciones
 
 No correr el SQL a mano si se puede evitar: `schema_migrations` tiene que quedar al día, o la

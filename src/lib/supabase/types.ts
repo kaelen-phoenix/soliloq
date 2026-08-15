@@ -4,7 +4,15 @@ export type EstadoObra = "borrador" | "publicada" | "cerrada";
 
 export type TipoRol = "actuacion" | "tecnica";
 
-export type EstadoPostulacion = "pendiente" | "en_duda" | "aprobado" | "rechazado";
+export type EstadoPostulacion =
+  | "pendiente"
+  | "en_duda"
+  | "aprobado"
+  | "rechazado"
+  /** El creador eligió, pero la postulación era vieja: falta que el talento confirme. */
+  | "esperando_confirmacion"
+  /** Nadie decidió a tiempo y la espera se cerró sola. */
+  | "vencida";
 
 /**
  * Disciplinas que ejerce una persona en el medio. Reemplazó al par director/compañía, que
@@ -30,7 +38,16 @@ export type DisciplinaArtistica =
   | "asistencia_direccion"
   | "otro";
 
-export type TipoNotificacion = "match" | "sala_creada";
+export type TipoNotificacion = "match" | "sala_creada" | "convocado" | "espera_vencida";
+
+export type MotivoDenuncia =
+  | "acoso"
+  | "discriminacion"
+  | "perfil_falso"
+  | "estafa"
+  | "contenido_inapropiado"
+  | "convocatoria_enganosa"
+  | "otro";
 
 export type GeneroPersona = "mujer" | "varon" | "no_binarie" | "otro" | "sin_especificar";
 
@@ -364,6 +381,28 @@ export interface Database {
           talento_id: string;
         };
         Update: Record<string, never>;
+        Relationships: [];
+      };
+      denuncias: {
+        Row: {
+          id: string;
+          denunciante_id: string;
+          perfil_denunciado_id: string | null;
+          obra_id: string | null;
+          sala_id: string | null;
+          motivo: MotivoDenuncia;
+          detalle: string | null;
+          creado_en: string;
+        };
+        Insert: {
+          denunciante_id: string;
+          perfil_denunciado_id?: string | null;
+          obra_id?: string | null;
+          sala_id?: string | null;
+          motivo: MotivoDenuncia;
+          detalle?: string | null;
+        };
+        Update: never;
         Relationships: [];
       };
       notificaciones: {

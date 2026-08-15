@@ -47,14 +47,31 @@ export function BandejaPostulantes({
     setPostulantes((prev) => prev.map((p) => (p.postulacionId === postulacionId ? { ...p, estado } : p)));
 
     const supabase = createClient();
-    const { error: errorUpdate } = await supabase
+    // Se relee el estado en vez de confiar en el que se mandó: aprobar una postulación
+    // vieja no da `aprobado` sino `esperando_confirmacion`, porque el trigger intercala el
+    // pedido de reconfirmación. Sin esto la pantalla diría que hay equipo cuando todavía
+    // falta que la persona conteste.
+    const { data, error: errorUpdate } = await supabase
       .from("postulaciones")
       .update({ estado })
-      .eq("id", postulacionId);
+      .eq("id", postulacionId)
+      .select("estado")
+      .single();
 
     if (errorUpdate) {
       setPostulantes(anterior);
-      setError("No pudimos guardar la clasificación. Probá de nuevo.");
+      setError(
+        errorUpdate.message.includes("vacante")
+          ? "Ese rol ya cubrió sus vacantes."
+          : "No pudimos guardar la clasificación. Probá de nuevo."
+      );
+      return;
+    }
+
+    if (data && data.estado !== estado) {
+      setPostulantes((prev) =>
+        prev.map((p) => (p.postulacionId === postulacionId ? { ...p, estado: data.estado } : p))
+      );
     }
   }
 
@@ -110,6 +127,20 @@ export function BandejaPostulantes({
                 <div className="border-t border-ink-100 p-4">
                   <PerfilTalentoDetalle talento={p.talento} />
                 </div>
+              )}
+
+              {p.estado === "esperando_confirmacion" && (
+                <p className="flex items-center gap-1.5 border-t border-ink-100 bg-brand-500/5 px-4 py-2.5 text-[12px] leading-snug text-ink-600">
+                  <Icono nombre="reloj" className="h-3.5 w-3.5 shrink-0 text-brand-600" />
+                  Le pedimos que confirme: su postulación tenía más de una semana. La vacante
+                  sigue libre hasta que conteste.
+                </p>
+              )}
+
+              {p.estado === "vencida" && (
+                <p className="border-t border-ink-100 px-4 py-2.5 text-[12px] leading-snug text-ink-400">
+                  Se cerró sola por falta de respuesta.
+                </p>
               )}
 
               {!obraCerrada && (

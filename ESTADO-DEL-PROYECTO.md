@@ -166,6 +166,42 @@ defined for variable fonts".
 La marca vive en un solo lugar, `src/components/ui/logotipo.tsx`. Cualquier pantalla que
 escriba "Yalope" a mano es una segunda versión del logo esperando a desincronizarse.
 
+### Denunciar existe; moderar automáticamente, no
+
+`0029` agrega `denuncias`, accesible desde el perfil público, la sala y —vía el perfil del
+creador— las convocatorias. Registra y avisa; **no bloquea ni esconde nada solo**. La
+moderación automática por cantidad de denuncias es un vector de abuso: alcanza con que
+varios se pongan de acuerdo para silenciar a alguien.
+
+Quien denuncia ve lo suyo; **el denunciado no ve nada**, y eso es deliberado: saber quién lo
+denunció es lo que habilita la represalia. No hay política de update ni delete — el estado
+del caso solo se toca con la conexión de servicio. Cómo revisarlas está en el skill
+`consultar-base`.
+
+Falta la pieza humana: nadie recibe un aviso automático, así que hay que mirar la tabla.
+
+### Aprobar una postulación vieja no arma el equipo de una
+
+`0031`: si la postulación tiene más de 7 días (`dias_para_reconfirmar()`), aprobarla no crea
+la sala — la deja en `esperando_confirmacion` y le pregunta al talento si sigue disponible.
+Alguien que se postuló hace semanas puede estar en otra obra, y enterarse por un chat que se
+abrió solo es la forma más rápida de que un elenco arranque con alguien que ya no está.
+
+La vacante **no** se descuenta mientras se espera la confirmación, porque la persona todavía
+puede decir que no. Sí se controla el cupo antes de convocar: no tiene sentido llamar a
+alguien para un rol lleno.
+
+Consecuencia en el cliente: la bandeja de postulantes **relee el estado** que quedó guardado
+en vez de confiar en el que mandó. Es el único lugar donde el optimismo mentiría, porque la
+base puede devolver un estado distinto del que se pidió.
+
+Y a los 30 días (`dias_para_vencer_espera()`), una postulación que nadie decidió se cierra
+sola y se avisa, por `pg_cron`. El silencio indefinido es justamente lo que la app existe
+para no repetir del casting tradicional.
+
+Al talento nunca se le muestra la palabra "en duda": ve **"Te tienen en cuenta"**. Que
+alguien dude de vos no es información accionable, solo desalienta.
+
 ### El perfil de creador son disciplinas, no un tipo
 
 `perfiles_creador.tipo` (director independiente / compañía) se dio de baja en `0028`. No

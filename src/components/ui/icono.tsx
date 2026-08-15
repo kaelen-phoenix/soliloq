@@ -11,7 +11,9 @@ type NombreIcono =
   | "cambiar"
   | "flecha-derecha"
   | "chevron"
-  | "imagen";
+  | "imagen"
+  | "bandera"
+  | "reloj";
 
 const TRAZOS: Record<NombreIcono, React.ReactNode> = {
   feed: (
@@ -55,6 +57,18 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
       <rect x="3" y="3" width="18" height="18" rx="2.5" />
       <circle cx="8.5" cy="8.5" r="1.5" />
       <path d="m21 15-5-5L5 21" />
+    </>
+  ),
+  bandera: (
+    <>
+      <path d="M4 21V4" />
+      <path d="M4 5h11l-1.5 3.5L15 12H4" />
+    </>
+  ),
+  reloj: (
+    <>
+      <circle cx="12" cy="12" r="8.5" />
+      <path d="M12 7.5V12l3 1.8" />
     </>
   ),
 };

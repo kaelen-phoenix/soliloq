@@ -4,13 +4,14 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
+import type { TipoNotificacion } from "@/lib/supabase/types";
 
 type Creador = { nombre: string; imagen_url: string | null };
 type Obra = { titulo: string; perfiles_creador: Creador | Creador[] | null };
 
 interface Notificacion {
   id: string;
-  tipo: "match" | "sala_creada";
+  tipo: TipoNotificacion;
   leida_en: string | null;
   creado_en: string;
   obra_id: string | null;
@@ -90,6 +91,10 @@ export function ListaNotificaciones({
     await marcarLeida(n.id);
     if (n.tipo === "sala_creada" && n.sala_id) {
       router.push(`/salas/${n.sala_id}`);
+    } else if (n.tipo === "convocado" || n.tipo === "espera_vencida") {
+      // A postulaciones y no a la obra: es donde están los botones de confirmar, y donde
+      // se explica por qué la espera se cerró.
+      router.push("/postulaciones");
     } else if (n.tipo === "match" && n.obra_id) {
       router.push(`/obras/${n.obra_id}`);
     }
@@ -147,6 +152,21 @@ export function ListaNotificaciones({
                       Te sumaste a <span className="font-medium">{tituloObra(n)}</span>
                     </p>
                   </>
+                ) : n.tipo === "convocado" ? (
+                  <>
+                    <p className="text-[15px] font-semibold leading-snug text-ink-900">
+                      ¡Fuiste convocado!
+                    </p>
+                    <p className="mt-0.5 text-[13px] leading-snug text-ink-600">
+                      Te quieren sumar a <span className="font-medium">{tituloObra(n)}</span>.
+                      Confirmá que seguís disponible.
+                    </p>
+                  </>
+                ) : n.tipo === "espera_vencida" ? (
+                  <p className="text-[14px] leading-snug text-ink-600">
+                    Tu postulación a <span className="font-medium">{tituloObra(n)}</span> se cerró
+                    sin respuesta.
+                  </p>
                 ) : (
                   <p className="text-[14px] leading-snug text-ink-900">
                     Se abrió la sala de <span className="font-medium">{tituloObra(n)}</span>

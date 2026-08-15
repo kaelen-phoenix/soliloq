@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 
 export default async function PerfilTalentoPage({ params }: { params: { id: string } }) {
@@ -21,6 +22,10 @@ export default async function PerfilTalentoPage({ params }: { params: { id: stri
   return (
     <main className="px-5 py-5">
       <PerfilTalentoDetalle talento={{ ...talento, fotos: fotosConUrl }} />
+
+      <div className="mt-8">
+        <BotonDenuncia perfilDenunciadoId={talento.id} queSeDenuncia={`a ${talento.nombre}`} />
+      </div>
     </main>
   );
 }
