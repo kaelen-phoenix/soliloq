@@ -24,6 +24,27 @@ Si el archivo no existe, la contraseña se saca del dashboard de Supabase
 (Project Settings → Database → Connection string → URI) y se vuelve a crear ahí. No pedírsela
 al usuario por chat si se puede evitar.
 
+### El token de la Management API también
+
+Para lo que no es SQL —configuración de auth, URLs de redirect, ajustes del proyecto— hace
+falta un **personal access token** de Supabase, que vive al lado de la cadena de conexión:
+
+```bash
+TOKEN="$(cat ~/.soliloq-deploy/supabase-token.txt)"
+curl -sS -H "Authorization: Bearer $TOKEN" \
+  "https://api.supabase.com/v1/projects/ydnafjmznntfmzrsijko/config/auth"
+```
+
+Sirve, por ejemplo, para el `site_url` y la lista de *Redirect URLs*, que es lo que rompe
+todo el ingreso si queda apuntando a un dominio viejo. El callback de la app se arma con
+`window.location.origin`, así que **cada dominio nuevo desde el que se entre tiene que estar
+en esa lista**.
+
+Es un token de **cuenta**, no de proyecto: da acceso a todos los proyectos del usuario. Va
+fuera del repo por eso, y por eso mismo no va en `.env.local` — Next.js carga ese archivo en
+el proceso de build y de dev. Si se filtra, se revoca en
+`supabase.com/dashboard/account/tokens` y se genera otro.
+
 ## Requisito único
 
 El cliente `pg` instalado global (una sola vez, ya hecho en esta máquina):
