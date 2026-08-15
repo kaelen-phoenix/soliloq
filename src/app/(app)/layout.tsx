@@ -17,21 +17,18 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!estado.modoActivo) redirect("/completar-perfil");
 
   return (
-    // Tres formas según el ancho:
+    // El ancho del contenido es **continuo**, no escalonado: ocupa lo que haya hasta un
+    // único tope. Antes subía por saltos (`lg`, `xl`) y eso dejaba tamaños intermedios
+    // —una tablet apaisada, una ventana a medio maximizar— con espacio libre al costado
+    // esperando a cruzar un número arbitrario.
     //
-    // - Teléfono: columna a pantalla completa con la barra abajo, al alcance del pulgar.
-    // - Tablet: la columna se centra sobre un fondo teñido.
-    // - Escritorio: navegación lateral fija y la columna de contenido más ancha.
+    // El tope existe igual, y no es negociable: lo que se ensancha es el **marco**, no la
+    // línea de texto. La tarjeta del feed se capea sola en `max-w-sm`, los párrafos largos
+    // llevan `max-w-prose`, y las listas suman columnas cuando entran —no cuando el
+    // viewport cruza un breakpoint— con `auto-fill` sobre el ancho real del contenedor.
     //
-    // Lo ancho es el **marco**, no el texto: la tarjeta del feed se capea sola en `max-w-sm`
-    // (`pila-tarjetas.tsx`), así que ensanchar acá le da aire a las listas, los formularios y
-    // el chat sin deformarla.
-    //
-    // En `xl` sube otro escalón, pero el texto **no** se estira hasta ahí: a partir de ese
-    // ancho las listas de tarjetas pasan a dos columnas (`xl:grid-cols-2`). Un renglón de
-    // 200 caracteres es ilegible, así que el espacio se usa poniendo más cosas al lado, no
-    // alargando la línea. Por eso tampoco hay un escalón para `2xl`: llegado ese punto, el
-    // espacio que sobra es margen y está bien que lo sea.
+    // Lo único que sigue siendo por breakpoint es la navegación, y ahí corresponde: una
+    // barra abajo y una lateral no son la misma forma con otro tamaño.
     <div className="min-h-screen pb-20 sm:bg-ink-50 sm:pb-28 lg:flex lg:gap-0 lg:pb-0">
       <BarraLateral rol={estado.modoActivo} />
 
@@ -42,7 +39,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           tieneAmbosPerfiles={estado.tieneAmbosPerfiles}
           rolFaltante={rolFaltante(estado)}
         />
-        <div className="mx-auto max-w-lg bg-white sm:min-h-[calc(100vh-9rem)] sm:border-x sm:border-ink-100 lg:max-w-3xl lg:border-x-0 xl:max-w-5xl">
+        <div className="mx-auto w-full max-w-5xl bg-white sm:min-h-[calc(100vh-9rem)] sm:border-x sm:border-ink-100 lg:border-x-0">
           {children}
         </div>
       </div>

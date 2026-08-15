@@ -42,7 +42,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
         />
       )}
 
-      <ul className="grid gap-2 xl:grid-cols-2">
+      <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
         {obras?.map((obra) => {
           const pendientes = obra.roles.reduce(
             (acc: number, r: any) => acc + r.postulaciones.filter((p: any) => p.estado === "pendiente").length,

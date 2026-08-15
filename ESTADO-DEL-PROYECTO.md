@@ -294,11 +294,21 @@ navegaciones distintas según el tamaño de pantalla, que es el bug clásico de 
 `max-w-sm` dentro de `pila-tarjetas.tsx`, así que la columna ancha le da aire a las listas,
 los formularios y el chat sin deformarla.
 
-En pantallas muy anchas el espacio se usa **poniendo más cosas al lado, no alargando la
-línea**: a partir de `xl` las listas de tarjetas pasan a dos columnas y los párrafos largos
-—sinopsis, descripción de perfil, experiencia— llevan `max-w-prose`. Un renglón de 200
-caracteres es ilegible; que sobre margen en un monitor de 27 pulgadas está bien y es lo que
-hace cualquier producto serio.
+**El ancho es continuo, no escalonado.** La columna ocupa lo que haya hasta un único tope
+(`max-w-5xl`), sin saltos por breakpoint. La versión anterior subía en `lg` y en `xl`, y eso
+dejaba los tamaños intermedios —una tablet apaisada, una ventana a medio maximizar— con
+espacio libre esperando a cruzar un número elegido a mano.
+
+Las listas de tarjetas usan `repeat(auto-fill, minmax(18rem, 1fr))`: suman columnas **cuando
+entran**, medido sobre el ancho real del contenedor y no del viewport. Es lo que hace que
+también funcione dentro de la columna angosta de un teléfono sin una sola regla extra.
+
+Los párrafos largos —sinopsis, descripción de perfil, experiencia— llevan `max-w-prose`. Un
+renglón de 200 caracteres es ilegible; que sobre margen en un monitor de 27 pulgadas está
+bien y es lo que hace cualquier producto serio.
+
+Lo único que sigue siendo por breakpoint es la **navegación**, y ahí corresponde: una barra
+abajo y una lateral no son la misma forma con otro tamaño.
 
 Quedan fuera de la grilla a propósito el chat (es cronológico), los integrantes de la sala
 (lista corta), las métricas por rol (las barras se comparan mejor apiladas) y la bandeja de

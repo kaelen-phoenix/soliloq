@@ -42,7 +42,7 @@ export default async function DetalleObraPage({ params }: { params: { id: string
           <p className="text-sm text-ink-500">Todavía no definiste roles para esta obra.</p>
         )}
 
-        <ul className="grid gap-2 xl:grid-cols-2">
+        <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
           {roles?.map((rol) => {
             const aprobados = rol.postulaciones.filter((p: any) => p.estado === "aprobado").length;
             const sinRevisar = rol.postulaciones.filter((p: any) => p.estado === "pendiente").length;

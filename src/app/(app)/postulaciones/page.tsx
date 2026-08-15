@@ -59,7 +59,7 @@ export default async function PostulacionesPage() {
         />
       )}
 
-      <ul className="grid gap-2 xl:grid-cols-2">
+      <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
         {postulaciones?.map((p: any) => (
           <li
             key={p.id}

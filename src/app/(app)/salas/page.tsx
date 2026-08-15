@@ -48,7 +48,7 @@ export default async function SalasPage() {
         />
       )}
 
-      <ul className="grid gap-2 xl:grid-cols-2">
+      <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
         {salas.map((s) => (
           <li key={s.salaId}>
             <Link
