@@ -27,7 +27,7 @@ export function ConmutadorModo({
   if (!tieneAmbosPerfiles) {
     return (
       <div className="flex items-center gap-2.5">
-        <span className="text-[11px] font-medium uppercase tracking-wide text-ink-400">
+        <span className="text-2xs font-medium uppercase tracking-wide text-ink-400">
           {ETIQUETA[modoActivo]}
         </span>
         {rolFaltante && (
@@ -35,7 +35,7 @@ export function ConmutadorModo({
             <span className="text-ink-200">·</span>
             <Link
               href="/perfil/nuevo"
-              className="text-[11px] font-medium text-ink-600 underline decoration-ink-300 underline-offset-2 hover:text-ink-900"
+              className="text-2xs font-medium text-ink-600 underline decoration-ink-300 underline-offset-2 hover:text-ink-900"
             >
               Sumar perfil de {ETIQUETA[rolFaltante]}
             </Link>
@@ -50,7 +50,7 @@ export function ConmutadorModo({
       type="button"
       disabled={pendiente}
       onClick={() => iniciarTransicion(() => conmutarModo(otro))}
-      className="group inline-flex items-center gap-1.5 rounded-lg border border-ink-200 py-1 pl-2.5 pr-2 text-[11px] font-medium text-ink-700 transition-colors hover:border-ink-300 hover:bg-ink-50 disabled:opacity-50"
+      className="group inline-flex items-center gap-1.5 rounded-lg border border-ink-200 py-1 pl-2.5 pr-2 text-2xs font-medium text-ink-700 transition-colors hover:border-ink-300 hover:bg-ink-50 disabled:opacity-50"
       title={`Cambiar a modo ${ETIQUETA[otro]}`}
     >
       <span className="uppercase tracking-wide">{ETIQUETA[modoActivo]}</span>

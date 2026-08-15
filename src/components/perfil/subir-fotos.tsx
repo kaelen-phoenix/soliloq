@@ -147,7 +147,7 @@ export function SubirFotos({
             {/* eslint-disable-next-line @next/next/no-img-element */}
             <img src={foto.url} alt="Foto de portfolio" className="h-full w-full object-cover" />
             {indice === 0 && (
-              <span className="absolute left-1.5 top-1.5 rounded bg-ink-950/75 px-1.5 py-0.5 text-[9px] font-medium uppercase tracking-wide text-white backdrop-blur-sm">
+              <span className="absolute left-1.5 top-1.5 rounded bg-ink-950/75 px-1.5 py-0.5 text-2xs font-medium uppercase tracking-wide text-white backdrop-blur-sm">
                 Principal
               </span>
             )}
@@ -156,7 +156,7 @@ export function SubirFotos({
                 <button
                   type="button"
                   onClick={() => hacerPrincipal(foto)}
-                  className="text-[10px] font-medium text-white/90 hover:text-white"
+                  className="text-2xs font-medium text-white/90 hover:text-white"
                 >
                   Principal
                 </button>
@@ -164,7 +164,7 @@ export function SubirFotos({
               <button
                 type="button"
                 onClick={() => eliminarFoto(foto)}
-                className="ml-auto text-[10px] font-medium text-white/90 hover:text-white"
+                className="ml-auto text-2xs font-medium text-white/90 hover:text-white"
               >
                 Eliminar
               </button>
@@ -175,7 +175,7 @@ export function SubirFotos({
         {fotos.length < MAX_FOTOS && (
           <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-ink-300 text-ink-400 transition-colors hover:border-ink-900 hover:text-ink-900">
             <Icono nombre="mas" className="h-5 w-5" />
-            <span className="text-[11px] font-medium">{subiendo ? "Subiendo…" : "Agregar"}</span>
+            <span className="text-2xs font-medium">{subiendo ? "Subiendo…" : "Agregar"}</span>
             <input
               type="file"
               accept={TIPOS_ADMITIDOS.join(",")}
@@ -187,7 +187,7 @@ export function SubirFotos({
         )}
       </div>
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-error-600">{error}</p>}
       <p className="text-xs text-ink-500">
         {fotos.length}/{MAX_FOTOS} fotos — mínimo {MIN_FOTOS} para completar el perfil.
       </p>

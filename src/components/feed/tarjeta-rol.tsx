@@ -38,21 +38,21 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
               es lo único que no se puede perder. Una convocatoria falsa que se confunde con
               una real es peor que no mostrar nada. */}
           {rol.es_ejemplo && (
-            <span className="rounded-md bg-brand-500 px-2 py-1 text-[10px] font-semibold uppercase tracking-wide text-white">
+            <span className="rounded-md bg-brand-500 px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-white">
               Ejemplo
             </span>
           )}
-          <span className="rounded-md bg-white/10 px-2 py-1 text-[10px] font-medium uppercase tracking-wide text-white/70">
+          <span className="rounded-md bg-white/10 px-2 py-1 text-2xs font-medium uppercase tracking-wide text-white/70">
             {rol.rol_tipo === "tecnica" ? "Técnica" : "Actuación"}
           </span>
-          <span className="text-[11px] text-white/50">{rol.obra_ubicacion_texto}</span>
+          <span className="text-2xs text-white/50">{rol.obra_ubicacion_texto}</span>
         </div>
 
         <div>
-          <h2 className="text-[28px] font-semibold leading-[1.1] tracking-[-0.02em]">
+          <h2 className="text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">
             {rol.obra_titulo}
           </h2>
-          <p className="mt-2.5 text-[17px] font-medium text-white/90">{rol.rol_nombre}</p>
+          <p className="mt-2.5 text-lg font-medium text-white/90">{rol.rol_nombre}</p>
           {rango && <p className="mt-1 text-sm text-white/50">{rango}</p>}
         </div>
       </div>
@@ -62,15 +62,15 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           // eslint-disable-next-line @next/next/no-img-element
           <img src={rol.creador_imagen_url} alt="" className="h-7 w-7 rounded-full object-cover" />
         ) : (
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-[11px] font-semibold text-ink-600">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-ink-600">
             {rol.creador_nombre[0]}
           </span>
         )}
-        <span className="flex-1 truncate text-[13px] text-ink-700">{rol.creador_nombre}</span>
+        <span className="flex-1 truncate text-sm text-ink-700">{rol.creador_nombre}</span>
         <button
           type="button"
           onClick={() => setExpandido((v) => !v)}
-          className="inline-flex items-center gap-1 text-[12px] font-medium text-ink-500 hover:text-ink-900"
+          className="inline-flex items-center gap-1 text-xs font-medium text-ink-500 hover:text-ink-900"
         >
           {expandido ? "Menos" : "Detalle"}
           <Icono
@@ -81,16 +81,16 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
       </div>
 
       {expandido && (
-        <div className="max-h-44 space-y-3 overflow-y-auto px-5 py-4 text-[13px] leading-relaxed text-ink-600">
+        <div className="max-h-44 space-y-3 overflow-y-auto px-5 py-4 text-sm leading-relaxed text-ink-600">
           {rol.es_ejemplo && (
-            <p className="rounded-lg bg-ink-50 px-3 py-2 text-[12px] text-ink-600">
+            <p className="rounded-lg bg-ink-50 px-3 py-2 text-xs text-ink-600">
               Esta convocatoria no existe: es un ejemplo para mostrarte cómo funciona Yalope.
               Deslizá o usá los botones — no se le avisa a nadie.
             </p>
           )}
           {rol.rol_descripcion && (
             <div>
-              <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-ink-400">
+              <p className="mb-1 text-2xs font-medium uppercase tracking-wide text-ink-400">
                 Sobre el rol
               </p>
               <p>{rol.rol_descripcion}</p>
@@ -98,7 +98,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           )}
           {rol.obra_sinopsis && (
             <div>
-              <p className="mb-1 text-[11px] font-medium uppercase tracking-wide text-ink-400">
+              <p className="mb-1 text-2xs font-medium uppercase tracking-wide text-ink-400">
                 Sinopsis
               </p>
               <p>{rol.obra_sinopsis}</p>

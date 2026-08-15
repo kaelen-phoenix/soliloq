@@ -39,8 +39,8 @@ export function RecuperarFormulario() {
   if (enviado) {
     return (
       <div className="rounded-2xl border border-ink-100 p-6">
-        <h2 className="text-[17px] font-semibold text-ink-900">Revisá tu correo</h2>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-ink-500">
+        <h2 className="text-lg font-semibold text-ink-900">Revisá tu correo</h2>
+        <p className="mt-1.5 text-sm leading-relaxed text-ink-500">
           Si existe una cuenta con <span className="text-ink-900">{email}</span>, te enviamos un
           enlace para elegir una contraseña nueva.
         </p>

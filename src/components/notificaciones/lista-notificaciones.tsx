@@ -104,8 +104,8 @@ export function ListaNotificaciones({
     return (
       <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
         <Icono nombre="campana" className="h-8 w-8 text-ink-300" />
-        <p className="mt-3 text-[15px] font-medium text-ink-900">Sin notificaciones</p>
-        <p className="mt-1 text-[13px] leading-snug text-ink-500">
+        <p className="mt-3 text-base font-medium text-ink-900">Sin notificaciones</p>
+        <p className="mt-1 text-sm leading-snug text-ink-500">
           Acá vas a ver los avisos cuando se arma un equipo y cuando se abre una sala.
         </p>
       </div>
@@ -118,7 +118,7 @@ export function ListaNotificaciones({
         <button
           type="button"
           onClick={marcarTodasLeidas}
-          className="self-end text-[12px] font-medium text-ink-500 hover:text-ink-900"
+          className="self-end text-xs font-medium text-ink-500 hover:text-ink-900"
         >
           Marcar todas como leídas
         </button>
@@ -145,43 +145,43 @@ export function ListaNotificaciones({
               <div className={n.leida_en && n.tipo !== "match" ? "pl-[18px]" : ""}>
                 {n.tipo === "match" ? (
                   <>
-                    <p className="text-[15px] font-semibold leading-snug text-ink-900">
+                    <p className="text-base font-semibold leading-snug text-ink-900">
                       ¡Hay equipo!
                     </p>
-                    <p className="mt-0.5 text-[13px] leading-snug text-ink-600">
+                    <p className="mt-0.5 text-sm leading-snug text-ink-600">
                       Te sumaste a <span className="font-medium">{tituloObra(n)}</span>
                     </p>
                   </>
                 ) : n.tipo === "convocado" ? (
                   <>
-                    <p className="text-[15px] font-semibold leading-snug text-ink-900">
+                    <p className="text-base font-semibold leading-snug text-ink-900">
                       ¡Fuiste convocado!
                     </p>
-                    <p className="mt-0.5 text-[13px] leading-snug text-ink-600">
+                    <p className="mt-0.5 text-sm leading-snug text-ink-600">
                       Te quieren sumar a <span className="font-medium">{tituloObra(n)}</span>.
                       Confirmá que seguís disponible.
                     </p>
                   </>
                 ) : n.tipo === "equipo_armado" ? (
                   <>
-                    <p className="text-[15px] font-semibold leading-snug text-ink-900">
+                    <p className="text-base font-semibold leading-snug text-ink-900">
                       ¡Hay equipo!
                     </p>
-                    <p className="mt-0.5 text-[13px] leading-snug text-ink-600">
+                    <p className="mt-0.5 text-sm leading-snug text-ink-600">
                       El interés fue mutuo. Ya pueden hablar.
                     </p>
                   </>
                 ) : n.tipo === "espera_vencida" ? (
-                  <p className="text-[14px] leading-snug text-ink-600">
+                  <p className="text-base leading-snug text-ink-600">
                     Tu postulación a <span className="font-medium">{tituloObra(n)}</span> se cerró
                     sin respuesta.
                   </p>
                 ) : (
-                  <p className="text-[14px] leading-snug text-ink-900">
+                  <p className="text-base leading-snug text-ink-900">
                     Se abrió la sala de <span className="font-medium">{tituloObra(n)}</span>
                   </p>
                 )}
-                <p className="mt-0.5 text-[11px] text-ink-400">
+                <p className="mt-0.5 text-2xs text-ink-400">
                   {new Date(n.creado_en).toLocaleString("es-AR", {
                     day: "numeric",
                     month: "short",

@@ -56,8 +56,8 @@ export default async function SalasPage() {
               className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-4 transition-colors hover:border-ink-200"
             >
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] font-medium text-ink-900">{s.titulo}</p>
-                <p className="mt-0.5 truncate text-[13px] text-ink-500">
+                <p className="truncate text-base font-medium text-ink-900">{s.titulo}</p>
+                <p className="mt-0.5 truncate text-sm text-ink-500">
                   {s.ultimoMensaje ?? "Sala recién creada"}
                 </p>
               </div>

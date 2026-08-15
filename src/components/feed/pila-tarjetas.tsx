@@ -174,7 +174,7 @@ export function PilaTarjetas({
   return (
     <main className="flex flex-col px-5 py-4">
       <div className="mb-4 flex items-center gap-2">
-        <label htmlFor="radio" className="text-[11px] font-medium text-ink-400">
+        <label htmlFor="radio" className="text-2xs font-medium text-ink-400">
           Distancia
         </label>
         <select
@@ -182,7 +182,7 @@ export function PilaTarjetas({
           value={opcionActual.metros ?? ""}
           disabled={recargando}
           onChange={(e) => cambiarRadio(e.target.value === "" ? null : Number(e.target.value))}
-          className="rounded-lg border border-ink-200 bg-white px-2 py-1 text-[11px] font-medium text-ink-700 focus:border-ink-900"
+          className="rounded-lg border border-ink-200 bg-white px-2 py-1 text-2xs font-medium text-ink-700 focus:border-ink-900"
         >
           {opciones.map((o) => (
             <option key={o.etiqueta} value={o.metros ?? ""}>
@@ -198,7 +198,7 @@ export function PilaTarjetas({
               type="button"
               disabled={recargando}
               onClick={() => cambiarUnidad(u)}
-              className={`px-2 py-1 text-[11px] font-medium transition-colors ${
+              className={`px-2 py-1 text-2xs font-medium transition-colors ${
                 unidad === u ? "bg-ink-900 text-white" : "text-ink-500 hover:text-ink-900"
               }`}
             >
@@ -208,14 +208,14 @@ export function PilaTarjetas({
         </div>
       </div>
 
-      {avisoError && <p className="mb-3 text-xs text-red-600">{avisoError}</p>}
+      {avisoError && <p className="mb-3 text-xs text-error-600">{avisoError}</p>}
 
       {/* Sólo mientras haya ejemplos arriba de la pila. Dice cuántos faltan para que se lea
           como algo que termina, no como el estado normal de la app. */}
       {actual?.es_ejemplo && (
         <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-500/5 px-3.5 py-2.5">
-          <p className="text-[13px] font-medium text-ink-900">Así funciona Yalope</p>
-          <p className="mt-0.5 text-[12px] leading-snug text-ink-600">
+          <p className="text-sm font-medium text-ink-900">Así funciona Yalope</p>
+          <p className="mt-0.5 text-xs leading-snug text-ink-600">
             Deslizá a la derecha para postularte, a la izquierda para descartar. Cuando alguien
             te aprueba se abre una sala con el equipo. Estas {ejemplos.length}{" "}
             {ejemplos.length === 1 ? "tarjeta es un ejemplo" : "tarjetas son ejemplos"} — después
@@ -246,27 +246,27 @@ export function PilaTarjetas({
             <Icono nombre="feed" className="h-8 w-8 text-ink-300" />
             {hayFueraDelRadio ? (
               <>
-                <p className="mt-3 text-[15px] font-medium text-ink-900">
+                <p className="mt-3 text-base font-medium text-ink-900">
                   No hay convocatorias tan cerca
                 </p>
-                <p className="mt-1 text-[13px] text-ink-500">
+                <p className="mt-1 text-sm text-ink-500">
                   Hay convocatorias más lejos de {opcionActual.etiqueta}. Ampliá la distancia para
                   verlas.
                 </p>
                 <button
                   type="button"
                   onClick={() => cambiarRadio(null)}
-                  className="mt-4 rounded-lg border border-ink-900 px-3 py-1.5 text-[12px] font-medium text-ink-900"
+                  className="mt-4 rounded-lg border border-ink-900 px-3 py-1.5 text-xs font-medium text-ink-900"
                 >
                   Buscar en todo el mundo
                 </button>
               </>
             ) : (
               <>
-                <p className="mt-3 text-[15px] font-medium text-ink-900">
+                <p className="mt-3 text-base font-medium text-ink-900">
                   No hay convocatorias nuevas
                 </p>
-                <p className="mt-1 text-[13px] text-ink-500">
+                <p className="mt-1 text-sm text-ink-500">
                   Volvé más tarde a ver nuevas propuestas.
                 </p>
               </>

@@ -159,7 +159,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
 
   return (
     <div className="flex flex-col gap-1.5" ref={contenedor}>
-      <label htmlFor={id} className="text-[13px] font-medium text-ink-700">
+      <label htmlFor={id} className="text-sm font-medium text-ink-700">
         {etiqueta}
       </label>
       <div className="relative">
@@ -175,8 +175,8 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
             if (valor) onCambio(null);
           }}
           onFocus={() => sugerencias.length > 0 && setAbierto(true)}
-          className={`w-full rounded-xl border bg-white px-3.5 py-2.5 text-[15px] text-ink-900 transition-colors placeholder:text-ink-400 focus:border-ink-900 ${
-            error ? "border-red-400" : "border-ink-200"
+          className={`w-full rounded-xl border bg-white px-3.5 py-2.5 text-base text-ink-900 transition-colors placeholder:text-ink-400 focus:border-ink-900 ${
+            error ? "border-error-400" : "border-ink-200"
           }`}
         />
         {abierto && sugerencias.length > 0 && (
@@ -186,7 +186,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
                 <button
                   type="button"
                   onClick={() => elegir(sugerencia)}
-                  className="w-full px-3.5 py-2.5 text-left text-[14px] text-ink-800 hover:bg-ink-50"
+                  className="w-full px-3.5 py-2.5 text-left text-base text-ink-800 hover:bg-ink-50"
                 >
                   {sugerencia.texto}
                 </button>
@@ -200,17 +200,17 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
         type="button"
         onClick={usarMiUbicacion}
         disabled={ubicando}
-        className="inline-flex w-fit items-center gap-1.5 text-[12px] font-medium text-ink-600 underline underline-offset-4 hover:text-ink-900 disabled:text-ink-400 disabled:no-underline"
+        className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-ink-600 underline underline-offset-4 hover:text-ink-900 disabled:text-ink-400 disabled:no-underline"
       >
         {ubicando ? "Buscando tu ubicación…" : "Usar mi ubicación actual"}
       </button>
 
       {buscando && <p className="text-xs text-ink-500">Buscando lugares…</p>}
-      {errorBusqueda && <p className="text-xs text-red-600">{errorBusqueda}</p>}
+      {errorBusqueda && <p className="text-xs text-error-600">{errorBusqueda}</p>}
       {!buscando && !errorBusqueda && sinResolver && (
         <p className="text-xs text-ink-500">Elegí un lugar de la lista para confirmarlo.</p>
       )}
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-error-600">{error}</p>}
     </div>
   );
 }

@@ -269,6 +269,35 @@ entero seguro de JavaScript y viaja como texto — sumar dos de esos en el clien
 vez de sumar, sin fallar. Verificado con sesiones simuladas: el dueño ve sus métricas y un
 tercero recibe cero filas.
 
+### La escala tipográfica es cerrada
+
+Ocho escalones (`text-2xs` a `text-3xl`), cada uno con su interlineado. Antes había **17
+tamaños sueltos** y ocho se usaban una sola vez: cada pantalla elegía su número, que es el
+delator más visible de una interfaz hecha a mano.
+
+No hay escalón por debajo de 11px **a propósito**: existían textos de 9px y 10px que no se
+leen en un teléfono. Si hace falta algo más chico, el problema es la jerarquía, no el tamaño.
+
+Un `text-[Npx]` suelto en el código es un error, no una excepción.
+
+### Los estados tienen color propio
+
+`error`, `alerta` y `exito` viven en la paleta, con tres pasos cada uno — fondo, borde y
+texto. Antes eran `red-600` y `amber-800` crudos de Tailwind, fuera del sistema: el próximo
+rojo iba a ser otro y nadie lo iba a notar.
+
+### Las pantallas de error son parte del producto
+
+`error.tsx`, `not-found.tsx` y `global-error.tsx`. Antes no había ninguna en 18 rutas y
+cualquier falla caía en la pantalla por defecto de Next.js, en inglés.
+
+El caso más probable no es un bug: **el proyecto Supabase se pausa tras 7 días de
+inactividad**, así que el texto empuja a reintentar en vez de disculparse.
+
+`global-error.tsx` reemplaza el `<html>` entero, así que **no usa Tailwind ni las fuentes**:
+sus estilos van en línea. Tiene que seguir así — cualquier dependencia ahí puede fallar justo
+cuando todo lo demás ya falló.
+
 ### Diseño: minimalismo por restricción
 
 El acento magenta se usa **solo** en la acción de postularse, en los contadores de

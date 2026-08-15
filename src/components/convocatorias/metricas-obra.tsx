@@ -12,7 +12,7 @@ type MetricaRol = Database["public"]["Functions"]["metricas_obra"]["Returns"][nu
  */
 const SEGMENTOS = [
   { clave: "aprobados", etiqueta: "Hay equipo", color: "bg-brand-500", texto: "text-brand-600" },
-  { clave: "en_duda", etiqueta: "En duda", color: "bg-amber-700", texto: "text-amber-800" },
+  { clave: "en_duda", etiqueta: "En duda", color: "bg-alerta-600", texto: "text-alerta-800" },
   { clave: "pendientes", etiqueta: "Sin ver", color: "bg-ink-300", texto: "text-ink-600" },
   { clave: "rechazados", etiqueta: "Descartados", color: "bg-ink-200", texto: "text-ink-500" },
 ] as const;
@@ -58,7 +58,7 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
           ruido, y el orden de los segmentos es siempre el mismo. */}
       <ul className="flex flex-wrap gap-x-4 gap-y-1.5 px-1">
         {SEGMENTOS.map((s) => (
-          <li key={s.clave} className="flex items-center gap-1.5 text-[11px] text-ink-500">
+          <li key={s.clave} className="flex items-center gap-1.5 text-2xs text-ink-500">
             <span className={`h-2 w-2 rounded-full ${s.color}`} aria-hidden="true" />
             {s.etiqueta}
           </li>
@@ -77,8 +77,8 @@ function FilaRol({ metrica: m }: { metrica: MetricaRol }) {
   return (
     <>
       <div className="flex items-baseline justify-between gap-3">
-        <p className="min-w-0 truncate text-[15px] font-medium text-ink-900">{m.rol_nombre}</p>
-        <p className="shrink-0 text-[12px] text-ink-500">
+        <p className="min-w-0 truncate text-base font-medium text-ink-900">{m.rol_nombre}</p>
+        <p className="shrink-0 text-xs text-ink-500">
           {cubierto} de {m.vacantes} {m.vacantes === 1 ? "vacante" : "vacantes"}
         </p>
       </div>
@@ -86,12 +86,12 @@ function FilaRol({ metrica: m }: { metrica: MetricaRol }) {
       <div className="mt-3 flex items-end gap-5">
         {/* Número protagonista: para un dato único, un gráfico no agrega nada. */}
         <p className="flex items-baseline gap-1">
-          <span className="text-[28px] font-semibold leading-none tracking-[-0.02em] text-ink-900">
+          <span className="text-2xl font-semibold leading-none tracking-[-0.02em] text-ink-900">
             {tasa}
           </span>
-          <span className="text-[13px] text-ink-500">%</span>
+          <span className="text-sm text-ink-500">%</span>
         </p>
-        <p className="pb-0.5 text-[12px] leading-snug text-ink-500">
+        <p className="pb-0.5 text-xs leading-snug text-ink-500">
           se postuló
           <br />
           de {m.alcance} {m.alcance === 1 ? "persona" : "personas"}
@@ -122,7 +122,7 @@ function FilaRol({ metrica: m }: { metrica: MetricaRol }) {
               const valor = m[s.clave];
               if (valor === 0) return null;
               return (
-                <li key={s.clave} className="text-[12px] text-ink-500">
+                <li key={s.clave} className="text-xs text-ink-500">
                   <span className={`font-medium ${s.texto}`}>{valor}</span> {s.etiqueta.toLowerCase()}
                 </li>
               );

@@ -30,8 +30,8 @@ export function EstadoVacio({
         />
       </span>
 
-      <p className="mt-5 text-[15px] font-medium text-ink-900">{titulo}</p>
-      <p className="mt-1.5 max-w-[34ch] text-[13px] leading-relaxed text-ink-500">{detalle}</p>
+      <p className="mt-5 text-base font-medium text-ink-900">{titulo}</p>
+      <p className="mt-1.5 max-w-[34ch] text-sm leading-relaxed text-ink-500">{detalle}</p>
 
       {accion && <div className="mt-5">{accion}</div>}
     </div>

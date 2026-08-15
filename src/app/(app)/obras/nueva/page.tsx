@@ -65,7 +65,7 @@ export default function NuevaObraPage() {
         <CampoTexto id="titulo" etiqueta="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} error={errores.titulo} />
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="sinopsis" className="text-[13px] font-medium text-ink-700">
+          <label htmlFor="sinopsis" className="text-sm font-medium text-ink-700">
             Sinopsis (opcional)
           </label>
           <textarea
@@ -74,7 +74,7 @@ export default function NuevaObraPage() {
             maxLength={2000}
             value={sinopsis}
             onChange={(e) => setSinopsis(e.target.value)}
-            className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[15px] outline-none focus:border-ink-900"
+            className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
           />
         </div>
 
@@ -93,7 +93,7 @@ export default function NuevaObraPage() {
           onChange={(e) => setFechaEstreno(e.target.value)}
         />
 
-        {errorGeneral && <p className="text-sm text-red-600">{errorGeneral}</p>}
+        {errorGeneral && <p className="text-sm text-error-600">{errorGeneral}</p>}
 
         <Boton type="submit" cargando={cargando}>
           Crear y definir roles

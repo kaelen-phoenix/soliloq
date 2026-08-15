@@ -54,13 +54,13 @@ export function ConfirmarConvocatoria({
 
   return (
     <div className="mt-3 rounded-xl border border-brand-500/30 bg-brand-500/5 p-3.5">
-      <p className="text-[14px] font-medium text-ink-900">¡Fuiste convocado!</p>
-      <p className="mt-1 text-[13px] leading-relaxed text-ink-600">
+      <p className="text-base font-medium text-ink-900">¡Fuiste convocado!</p>
+      <p className="mt-1 text-sm leading-relaxed text-ink-600">
         Te quieren sumar al equipo de <span className="font-medium">{obraTitulo}</span>. Como tu
         postulación tiene más de una semana, necesitamos confirmar que seguís disponible.
       </p>
 
-      {error && <p className="mt-2 text-[12px] text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-error-600">{error}</p>}
 
       <div className="mt-3 flex gap-2">
         <Boton
@@ -75,7 +75,7 @@ export function ConfirmarConvocatoria({
           type="button"
           onClick={() => responder("rechazado")}
           disabled={enviando !== null}
-          className="rounded-xl border border-ink-200 px-4 text-[13px] font-medium text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900 disabled:opacity-50"
+          className="rounded-xl border border-ink-200 px-4 text-sm font-medium text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900 disabled:opacity-50"
         >
           Ya no puedo
         </button>

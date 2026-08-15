@@ -109,7 +109,7 @@ export function FormularioRol({ obraId }: { obraId: string }) {
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <p className="text-[13px] font-medium text-ink-700">Géneros buscados (opcional)</p>
+        <p className="text-sm font-medium text-ink-700">Géneros buscados (opcional)</p>
         <div className="flex flex-wrap gap-2">
           {GENEROS_BUSCABLES.map((g) => (
             <button
@@ -144,10 +144,10 @@ export function FormularioRol({ obraId }: { obraId: string }) {
         placeholder="Descripción del rol"
         value={descripcion}
         onChange={(e) => setDescripcion(e.target.value)}
-        className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[14px] outline-none focus:border-ink-900"
+        className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
       />
 
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-error-600">{error}</p>}
 
       <div className="flex gap-2">
         <Boton type="submit" cargando={cargando}>

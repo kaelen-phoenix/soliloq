@@ -34,7 +34,7 @@ export function AccionesObra({ obraId, estado, cantidadRoles }: { obraId: string
 
   return (
     <div className="flex flex-col gap-2">
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-error-600">{error}</p>}
       <div className="flex gap-2">
         {estado === "borrador" && (
           <Boton onClick={publicar} cargando={cargando}>

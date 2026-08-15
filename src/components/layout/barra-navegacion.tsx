@@ -33,7 +33,14 @@ export function BarraNavegacion({ rol }: { rol: RolUsuario }) {
   const items = rol === "talento" ? itemsTalento : itemsCreador;
 
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/85 backdrop-blur-xl">
+    // En escritorio deja de ser una barra pegada al borde inferior —idioma de teléfono, y
+    // en una pantalla ancha una franja que cruza los 1900px de punta a punta— y pasa a ser
+    // una píldora flotante del ancho de la columna.
+    <nav
+      className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/85 backdrop-blur-xl
+                 sm:inset-x-auto sm:bottom-6 sm:left-1/2 sm:w-[26rem] sm:-translate-x-1/2 sm:rounded-2xl
+                 sm:border sm:bg-white/90 sm:shadow-tarjeta"
+    >
       <ul className="mx-auto flex max-w-lg items-stretch">
         {items.map((item) => {
           const activo = pathname === item.href;
@@ -42,7 +49,7 @@ export function BarraNavegacion({ rol }: { rol: RolUsuario }) {
               <Link
                 href={item.href}
                 aria-current={activo ? "page" : undefined}
-                className={`flex flex-col items-center gap-1 pb-1.5 pt-2.5 text-[10px] font-medium transition-colors ${
+                className={`flex flex-col items-center gap-1 pb-1.5 pt-2.5 text-2xs font-medium transition-colors ${
                   activo ? "text-ink-900" : "text-ink-400 hover:text-ink-600"
                 }`}
               >

@@ -98,8 +98,8 @@ export function IngresarFormulario() {
   if (verificacionEnviada) {
     return (
       <div className="rounded-2xl border border-ink-100 p-6">
-        <h2 className="text-[17px] font-semibold text-ink-900">Confirmá tu email</h2>
-        <p className="mt-1.5 text-[13px] leading-relaxed text-ink-500">
+        <h2 className="text-lg font-semibold text-ink-900">Confirmá tu email</h2>
+        <p className="mt-1.5 text-sm leading-relaxed text-ink-500">
           Te enviamos un enlace de verificación a{" "}
           <span className="text-ink-900">{email}</span>. Abrilo y vas a entrar con la contraseña
           que acabás de elegir.
@@ -126,7 +126,7 @@ export function IngresarFormulario() {
             key={m}
             type="button"
             onClick={() => cambiarModo(m)}
-            className={`flex-1 rounded-lg px-3 py-2 text-[13px] font-medium transition-colors ${
+            className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
               modo === m ? "bg-white text-ink-900 shadow-sm" : "text-ink-500 hover:text-ink-800"
             }`}
           >
@@ -163,13 +163,13 @@ export function IngresarFormulario() {
       {modo === "ingresar" && (
         <Link
           href="/recuperar"
-          className="self-start text-[13px] text-ink-500 underline underline-offset-4 hover:text-ink-900"
+          className="self-start text-sm text-ink-500 underline underline-offset-4 hover:text-ink-900"
         >
           Olvidé mi contraseña
         </Link>
       )}
 
-      <div className="flex items-center gap-3 text-[11px] uppercase tracking-wide text-ink-300">
+      <div className="flex items-center gap-3 text-2xs uppercase tracking-wide text-ink-300">
         <div className="h-px flex-1 bg-ink-100" />
         o
         <div className="h-px flex-1 bg-ink-100" />

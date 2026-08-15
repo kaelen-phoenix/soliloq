@@ -13,13 +13,13 @@ export default function IngresarPage({
 
       <div className="mb-10">
         <Logotipo tamano="lg" />
-        <p className="mt-4 text-[15px] leading-snug text-ink-500">
+        <p className="mt-4 text-base leading-snug text-ink-500">
           Match teatral para talento y creadores.
         </p>
       </div>
 
       {searchParams.error === "enlace_invalido" && (
-        <p className="mb-5 rounded-xl bg-red-50 px-4 py-3 text-[13px] text-red-700">
+        <p className="mb-5 rounded-xl bg-error-50 px-4 py-3 text-sm text-error-800">
           Ese enlace venció o ya fue usado. Pedí uno nuevo.
         </p>
       )}

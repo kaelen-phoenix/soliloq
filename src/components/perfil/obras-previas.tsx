@@ -72,7 +72,7 @@ export function ObrasPrevias({ creadorId, obras }: { creadorId: string; obras: O
                 {o.anio} · {o.rol_desempenado}
               </p>
             </div>
-            <button type="button" onClick={() => eliminar(o.id)} className="text-xs text-red-600">
+            <button type="button" onClick={() => eliminar(o.id)} className="text-xs text-error-600">
               Eliminar
             </button>
           </li>
@@ -86,7 +86,7 @@ export function ObrasPrevias({ creadorId, obras }: { creadorId: string; obras: O
           <CampoTexto id="anio_obra" etiqueta="Año" type="number" value={anio} onChange={(e) => setAnio(e.target.value)} />
           <CampoTexto id="rol_obra" etiqueta="Tu rol" value={rol} onChange={(e) => setRol(e.target.value)} />
         </div>
-        {error && <p className="text-xs text-red-600">{error}</p>}
+        {error && <p className="text-xs text-error-600">{error}</p>}
         <Boton type="submit" variante="secundario">
           Agregar obra previa
         </Boton>

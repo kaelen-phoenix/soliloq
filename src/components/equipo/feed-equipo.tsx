@@ -82,7 +82,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
 
   return (
     <div className="flex flex-col">
-      {error && <p className="mb-3 text-[12px] text-red-600">{error}</p>}
+      {error && <p className="mb-3 text-xs text-error-600">{error}</p>}
 
       <article className="rounded-2xl border border-ink-100 bg-white p-5 shadow-tarjeta">
         <div className="flex items-center gap-3.5">
@@ -90,15 +90,15 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
             // eslint-disable-next-line @next/next/no-img-element
             <img src={actual.imagen_url} alt="" className="h-14 w-14 rounded-full object-cover" />
           ) : (
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ink-100 text-[17px] font-semibold text-ink-500">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-500">
               {actual.nombre[0]}
             </span>
           )}
           <div className="min-w-0">
-            <h2 className="font-display text-[21px] font-semibold leading-tight tracking-[-0.02em] text-ink-900">
+            <h2 className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-ink-900">
               {actual.nombre}
             </h2>
-            <p className="text-[13px] text-ink-500">
+            <p className="text-sm text-ink-500">
               {actual.ubicacion_publica}
               {actual.distancia_metros !== null &&
                 ` · a ${Math.max(1, Math.round(actual.distancia_metros / 1000))} km`}
@@ -107,7 +107,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
         </div>
 
         {actual.pitch && (
-          <p className="mt-4 text-[15px] leading-relaxed text-ink-800">{actual.pitch}</p>
+          <p className="mt-4 text-base leading-relaxed text-ink-800">{actual.pitch}</p>
         )}
 
         {oficios.length > 0 && (
@@ -115,7 +115,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
             {oficios.map((o) => (
               <li
                 key={o}
-                className="rounded-full bg-ink-50 px-2.5 py-1 text-[12px] text-ink-600"
+                className="rounded-full bg-ink-50 px-2.5 py-1 text-xs text-ink-600"
               >
                 {o}
               </li>
@@ -143,7 +143,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
         </button>
       </div>
 
-      <p className="mt-3 text-center text-[12px] text-ink-400">
+      <p className="mt-3 text-center text-xs text-ink-400">
         {personas.length} {personas.length === 1 ? "persona" : "personas"} por ver
       </p>
     </div>

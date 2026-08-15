@@ -23,10 +23,10 @@ export default async function CambiarClavePage({
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-12">
       <div className="mb-10">
-        <h1 className="text-[32px] font-semibold leading-none tracking-[-0.03em] text-ink-900">
+        <h1 className="text-2xl font-semibold leading-none tracking-[-0.03em] text-ink-900">
           Tu contraseña
         </h1>
-        <p className="mt-2.5 text-[15px] leading-snug text-ink-500">
+        <p className="mt-2.5 text-base leading-snug text-ink-500">
           Elegí una contraseña nueva para {user.email}.
         </p>
       </div>
@@ -35,7 +35,7 @@ export default async function CambiarClavePage({
 
       <Link
         href={volver}
-        className="mt-5 self-start text-[13px] text-ink-500 underline underline-offset-4 hover:text-ink-900"
+        className="mt-5 self-start text-sm text-ink-500 underline underline-offset-4 hover:text-ink-900"
       >
         Cancelar
       </Link>

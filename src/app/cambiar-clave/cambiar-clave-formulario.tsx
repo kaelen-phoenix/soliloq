@@ -46,7 +46,7 @@ export function CambiarClaveFormulario({ destinoAlTerminar }: { destinoAlTermina
 
   if (listo) {
     return (
-      <p className="rounded-xl bg-green-50 px-4 py-3 text-[13px] text-green-800">
+      <p className="rounded-xl bg-exito-50 px-4 py-3 text-sm text-exito-800">
         Listo, tu contraseña quedó actualizada.
       </p>
     );

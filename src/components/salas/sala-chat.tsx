@@ -148,7 +148,7 @@ export function SalaChat({
       <button
         type="button"
         onClick={() => setMostrarIntegrantes((v) => !v)}
-        className="border-b border-ink-100 px-4 py-2 text-left text-[11px] font-medium uppercase tracking-wide text-ink-500 hover:text-ink-900"
+        className="border-b border-ink-100 px-4 py-2 text-left text-2xs font-medium uppercase tracking-wide text-ink-500 hover:text-ink-900"
       >
         {integrantes.length} integrantes
       </button>
@@ -180,7 +180,7 @@ export function SalaChat({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3">
         {mensajes.length === 0 && (
-          <p className="mx-auto mt-10 max-w-[16rem] text-center text-[13px] leading-relaxed text-ink-400">
+          <p className="mx-auto mt-10 max-w-[16rem] text-center text-sm leading-relaxed text-ink-400">
             Esta sala se abrió porque hay equipo. Coordinen fechas de audición y compartan textos acá.
           </p>
         )}
@@ -197,14 +197,14 @@ export function SalaChat({
                   }`}
                 >
                   {!esPropio && (
-                    <p className="text-[11px] font-medium opacity-60">{autor?.nombre ?? "Integrante"}</p>
+                    <p className="text-2xs font-medium opacity-60">{autor?.nombre ?? "Integrante"}</p>
                   )}
-                  <p className="text-[14px] leading-snug">{m.contenido}</p>
-                  <p className="mt-0.5 text-[10px] opacity-50">
+                  <p className="text-base leading-snug">{m.contenido}</p>
+                  <p className="mt-0.5 text-2xs opacity-50">
                     {new Date(m.creado_en).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
                   </p>
                   {m.noEnviado && (
-                    <button type="button" onClick={() => reintentar(m)} className="mt-1 block text-[10px] underline">
+                    <button type="button" onClick={() => reintentar(m)} className="mt-1 block text-2xs underline">
                       No se envió — reintentar
                     </button>
                   )}
@@ -222,12 +222,12 @@ export function SalaChat({
           onChange={(e) => setTexto(e.target.value)}
           maxLength={2000}
           placeholder="Escribí un mensaje…"
-          className="flex-1 rounded-full border border-ink-200 px-4 py-2.5 text-[14px] placeholder:text-ink-400 focus:border-ink-900"
+          className="flex-1 rounded-full border border-ink-200 px-4 py-2.5 text-base placeholder:text-ink-400 focus:border-ink-900"
         />
         <button
           type="submit"
           disabled={!texto.trim()}
-          className="rounded-full bg-ink-900 px-4 py-2.5 text-[13px] font-medium text-white transition-colors hover:bg-ink-800 disabled:bg-ink-200"
+          className="rounded-full bg-ink-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ink-800 disabled:bg-ink-200"
         >
           Enviar
         </button>

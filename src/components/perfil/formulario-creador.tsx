@@ -152,7 +152,7 @@ export function FormularioCreador({
         {/* Perfil artístico. Es múltiple porque en el medio se hace más de una cosa: quien
             dirige también actúa, y obligar a elegir una sola falsea el perfil. */}
         <fieldset className="flex flex-col gap-2.5">
-          <legend className="text-[13px] font-medium text-ink-700">
+          <legend className="text-sm font-medium text-ink-700">
             Perfil artístico
             <span className="ml-1.5 font-normal text-ink-400">Elegí todo lo que hagas</span>
           </legend>
@@ -170,7 +170,7 @@ export function FormularioCreador({
                       elegida ? prev.filter((v) => v !== d.valor) : [...prev, d.valor]
                     )
                   }
-                  className={`rounded-full border px-3.5 py-1.5 text-[13px] transition-colors ${
+                  className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
                     elegida
                       ? "border-ink-900 bg-ink-900 text-white"
                       : "border-ink-200 text-ink-600 hover:border-ink-300"
@@ -183,7 +183,7 @@ export function FormularioCreador({
           </div>
 
           {errores.disciplinas && (
-            <p className="text-[12px] text-red-600">{errores.disciplinas}</p>
+            <p className="text-xs text-error-600">{errores.disciplinas}</p>
           )}
 
           {disciplinas.includes("otro") && (
@@ -209,13 +209,13 @@ export function FormularioCreador({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Descripción e imagen (opcional)</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Descripción e imagen (opcional)</h2>
         <textarea
           rows={4}
           maxLength={1000}
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
-          className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[15px] outline-none focus:border-ink-900"
+          className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
           placeholder="Contanos sobre tu trayectoria o la de tu compañía."
         />
         <div className="flex items-center gap-3">
@@ -223,15 +223,15 @@ export function FormularioCreador({
             // eslint-disable-next-line @next/next/no-img-element
             <img src={imagenUrl} alt="Imagen de perfil" className="h-16 w-16 rounded-full object-cover" />
           )}
-          <label className="cursor-pointer rounded-xl border border-ink-200 px-3.5 py-2 text-[13px] hover:bg-ink-50">
+          <label className="cursor-pointer rounded-xl border border-ink-200 px-3.5 py-2 text-sm hover:bg-ink-50">
             {subiendoImagen ? "Subiendo…" : "Elegir imagen"}
             <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={subirImagen} />
           </label>
         </div>
-        {errores.imagen && <p className="text-xs text-red-600">{errores.imagen}</p>}
+        {errores.imagen && <p className="text-xs text-error-600">{errores.imagen}</p>}
       </section>
 
-      {errorGeneral && <p className="text-sm text-red-600">{errorGeneral}</p>}
+      {errorGeneral && <p className="text-sm text-error-600">{errorGeneral}</p>}
 
       <AvisoGuardado visible={guardado} />
 

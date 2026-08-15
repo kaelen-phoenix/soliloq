@@ -8,9 +8,9 @@
  */
 
 const TAMANOS = {
-  sm: { texto: "text-[19px]", filete: "h-[2px] w-4", espacio: "gap-1.5" },
-  md: { texto: "text-[28px]", filete: "h-[2.5px] w-6", espacio: "gap-2" },
-  lg: { texto: "text-[40px]", filete: "h-[3px] w-9", espacio: "gap-2.5" },
+  sm: { texto: "text-lg", filete: "h-[2px] w-4", espacio: "gap-1.5" },
+  md: { texto: "text-2xl", filete: "h-[2.5px] w-6", espacio: "gap-2" },
+  lg: { texto: "text-3xl", filete: "h-[3px] w-9", espacio: "gap-2.5" },
 } as const;
 
 export function Logotipo({
@@ -42,7 +42,7 @@ export function Logotipo({
 export function LogotipoInline({ className = "" }: { className?: string }) {
   return (
     <span
-      className={`font-display text-[17px] font-semibold leading-none tracking-[-0.02em] text-ink-900 ${className}`}
+      className={`font-display text-lg font-semibold leading-none tracking-[-0.02em] text-ink-900 ${className}`}
     >
       Yalope
       <span className="text-brand-500" aria-hidden="true">

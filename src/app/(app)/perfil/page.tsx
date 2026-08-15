@@ -16,7 +16,7 @@ function AccionesCuenta() {
     <section className="mt-8 flex flex-col items-start gap-3">
       <Link
         href="/cambiar-clave?volver=/perfil"
-        className="text-[13px] text-ink-500 underline underline-offset-4 hover:text-ink-900"
+        className="text-sm text-ink-500 underline underline-offset-4 hover:text-ink-900"
       >
         Cambiar contraseña
       </Link>
@@ -46,7 +46,7 @@ export default async function PerfilPage({
   const volverAVista = (
     <Link
       href="/perfil"
-      className="mb-4 inline-flex items-center gap-1.5 text-[13px] font-medium text-ink-500 hover:text-ink-900"
+      className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 hover:text-ink-900"
     >
       <Icono nombre="chevron" className="h-3.5 w-3.5 rotate-90" />
       Ver mi perfil
@@ -143,13 +143,13 @@ export default async function PerfilPage({
               </span>
             )}
             <div className="min-w-0">
-              <h2 className="font-display text-[20px] font-semibold tracking-[-0.02em] text-ink-900">
+              <h2 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
                 {perfilCreador.nombre}
               </h2>
               <p className="text-sm text-ink-500">
                 {resumenDisciplinas(perfilCreador.disciplinas, perfilCreador.otro_detalle)}
               </p>
-              <p className="text-[13px] text-ink-400">{perfilCreador.ubicacion_publica}</p>
+              <p className="text-sm text-ink-400">{perfilCreador.ubicacion_publica}</p>
             </div>
           </div>
 
@@ -160,7 +160,7 @@ export default async function PerfilPage({
       )}
 
       <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">
           Historial de obras previas
         </h2>
         <ObrasPrevias creadorId={user.id} obras={obrasPrevias ?? []} />

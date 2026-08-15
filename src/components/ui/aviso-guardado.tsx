@@ -29,7 +29,7 @@ export function AvisoGuardado({ visible }: { visible: boolean }) {
   return (
     // `role="status"` y `aria-live` para que un lector de pantalla lo anuncie: si el cambio
     // es sólo visual, quien no ve la pantalla se queda sin la confirmación.
-    <p role="status" aria-live="polite" className="text-[13px] font-medium text-green-700">
+    <p role="status" aria-live="polite" className="text-sm font-medium text-exito-600">
       Cambios guardados.
     </p>
   );

@@ -55,15 +55,15 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
                 className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-4 transition-colors hover:border-ink-200"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-medium text-ink-900">{obra.titulo}</p>
+                  <p className="truncate text-base font-medium text-ink-900">{obra.titulo}</p>
                   <span
-                    className={`mt-1.5 inline-block rounded-md px-1.5 py-0.5 text-[10px] font-medium uppercase tracking-wide ${COLOR_ESTADO[obra.estado]}`}
+                    className={`mt-1.5 inline-block rounded-md px-1.5 py-0.5 text-2xs font-medium uppercase tracking-wide ${COLOR_ESTADO[obra.estado]}`}
                   >
                     {ETIQUETA_ESTADO[obra.estado]}
                   </span>
                 </div>
                 {pendientes > 0 && (
-                  <span className="shrink-0 rounded-full bg-brand-500 px-2 py-0.5 text-[11px] font-semibold text-white">
+                  <span className="shrink-0 rounded-full bg-brand-500 px-2 py-0.5 text-2xs font-semibold text-white">
                     {pendientes}
                   </span>
                 )}

@@ -41,7 +41,7 @@ export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
 
       {talento.experiencia && (
         <div>
-          <h3 className="text-[11px] font-medium uppercase tracking-wide text-ink-400">Experiencia</h3>
+          <h3 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Experiencia</h3>
           <p className="mt-1 whitespace-pre-line text-sm text-ink-700">{talento.experiencia}</p>
         </div>
       )}
@@ -49,7 +49,7 @@ export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
       {talento.habilidades.length > 0 && (
         <div className="flex flex-wrap gap-2">
           {talento.habilidades.map((h) => (
-            <span key={h} className="rounded-md bg-ink-100 px-2.5 py-1 text-[12px] font-medium text-ink-700">
+            <span key={h} className="rounded-md bg-ink-100 px-2.5 py-1 text-xs font-medium text-ink-700">
               {h}
             </span>
           ))}

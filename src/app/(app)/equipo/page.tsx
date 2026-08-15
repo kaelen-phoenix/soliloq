@@ -28,7 +28,7 @@ export default async function EquipoPage() {
           accion={
             <Link
               href="/perfil"
-              className="inline-flex items-center gap-1 text-[13px] font-medium text-ink-900 hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-medium text-ink-900 hover:underline"
             >
               Activar en mi perfil
             </Link>

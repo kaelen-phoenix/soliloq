@@ -16,7 +16,7 @@ export interface PostulanteConTalento {
 
 const ETIQUETAS: { valor: EstadoPostulacion; label: string; estilo: string }[] = [
   { valor: "rechazado", label: "Rechazar", estilo: "bg-ink-100 text-ink-700" },
-  { valor: "en_duda", label: "En duda", estilo: "bg-amber-100 text-amber-800" },
+  { valor: "en_duda", label: "En duda", estilo: "bg-alerta-50 text-alerta-800" },
   { valor: "aprobado", label: "Aprobar", estilo: "bg-ink-900 text-white" },
 ];
 
@@ -87,10 +87,10 @@ export function BandejaPostulantes({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-[12px] text-ink-500">
+      <p className="text-xs text-ink-500">
         {aprobados}/{vacantes} vacantes cubiertas
       </p>
-      {error && <p className="text-xs text-red-600">{error}</p>}
+      {error && <p className="text-xs text-error-600">{error}</p>}
 
       <ul className="flex flex-col gap-2.5">
         {postulantes.map((p) => {
@@ -112,8 +112,8 @@ export function BandejaPostulantes({
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-[15px] font-medium text-ink-900">{p.talento.nombre}</p>
-                  <p className="mt-0.5 text-[12px] text-ink-500">
+                  <p className="truncate text-base font-medium text-ink-900">{p.talento.nombre}</p>
+                  <p className="mt-0.5 text-xs text-ink-500">
                     {calcularEdad(p.talento.fecha_nacimiento)} años · {p.talento.ubicacion_publica}
                   </p>
                 </div>
@@ -130,7 +130,7 @@ export function BandejaPostulantes({
               )}
 
               {p.estado === "esperando_confirmacion" && (
-                <p className="flex items-center gap-1.5 border-t border-ink-100 bg-brand-500/5 px-4 py-2.5 text-[12px] leading-snug text-ink-600">
+                <p className="flex items-center gap-1.5 border-t border-ink-100 bg-brand-500/5 px-4 py-2.5 text-xs leading-snug text-ink-600">
                   <Icono nombre="reloj" className="h-3.5 w-3.5 shrink-0 text-brand-600" />
                   Le pedimos que confirme: su postulación tenía más de una semana. La vacante
                   sigue libre hasta que conteste.
@@ -138,7 +138,7 @@ export function BandejaPostulantes({
               )}
 
               {p.estado === "vencida" && (
-                <p className="border-t border-ink-100 px-4 py-2.5 text-[12px] leading-snug text-ink-400">
+                <p className="border-t border-ink-100 px-4 py-2.5 text-xs leading-snug text-ink-400">
                   Se cerró sola por falta de respuesta.
                 </p>
               )}
@@ -150,7 +150,7 @@ export function BandejaPostulantes({
                       key={e.valor}
                       type="button"
                       onClick={() => clasificar(p.postulacionId, e.valor)}
-                      className={`flex-1 py-2.5 text-[13px] font-medium transition-colors ${
+                      className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
                         p.estado === e.valor ? e.estilo : "bg-white text-ink-500 hover:bg-ink-50"
                       }`}
                     >

@@ -19,10 +19,10 @@ export default async function NuevoPerfilPage() {
 
   return (
     <main className="px-5 py-5">
-      <h2 className="text-[20px] font-semibold leading-tight text-ink-900">
+      <h2 className="text-xl font-semibold leading-tight text-ink-900">
         {falta === "talento" ? "Sumá tu perfil de Talento" : "Sumá tu perfil de Creador"}
       </h2>
-      <p className="mb-6 mt-1.5 text-[13px] leading-relaxed text-ink-500">
+      <p className="mb-6 mt-1.5 text-sm leading-relaxed text-ink-500">
         {falta === "talento"
           ? "Vas a poder postularte a convocatorias sin perder tus obras."
           : "Vas a poder publicar convocatorias sin perder tu perfil de actuación."}{" "}

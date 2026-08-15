@@ -18,7 +18,7 @@ const ETIQUETA_ESTADO: Record<string, string> = {
 
 const COLOR_ESTADO: Record<string, string> = {
   pendiente: "bg-ink-100 text-ink-600",
-  en_duda: "bg-amber-100 text-amber-800",
+  en_duda: "bg-alerta-50 text-alerta-800",
   esperando_confirmacion: "bg-brand-500 text-white",
   aprobado: "bg-ink-900 text-white",
   rechazado: "bg-ink-50 text-ink-400",
@@ -50,7 +50,7 @@ export default async function PostulacionesPage() {
           accion={
             <Link
               href="/"
-              className="inline-flex items-center gap-1 text-[13px] font-medium text-ink-900 hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-medium text-ink-900 hover:underline"
             >
               Ir al feed
               <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
@@ -67,15 +67,15 @@ export default async function PostulacionesPage() {
           >
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
-                <p className="truncate text-[15px] font-medium text-ink-900">
+                <p className="truncate text-base font-medium text-ink-900">
                   {p.roles.obras.titulo}
                 </p>
-                <p className="mt-0.5 truncate text-[13px] text-ink-500">
+                <p className="mt-0.5 truncate text-sm text-ink-500">
                   {p.roles.nombre} · {p.roles.obras.perfiles_creador.nombre}
                 </p>
               </div>
               <span
-                className={`shrink-0 rounded-md px-2 py-0.5 text-[10px] font-medium uppercase tracking-wide ${COLOR_ESTADO[p.estado]}`}
+                className={`shrink-0 rounded-md px-2 py-0.5 text-2xs font-medium uppercase tracking-wide ${COLOR_ESTADO[p.estado]}`}
               >
                 {ETIQUETA_ESTADO[p.estado]}
               </span>
@@ -89,7 +89,7 @@ export default async function PostulacionesPage() {
             )}
 
             {p.estado === "vencida" && (
-              <p className="mt-2 text-[12px] leading-snug text-ink-400">
+              <p className="mt-2 text-xs leading-snug text-ink-400">
                 Pasaron 30 días sin respuesta, así que la cerramos. Podés volver
                 a postularte si la convocatoria sigue abierta.
               </p>

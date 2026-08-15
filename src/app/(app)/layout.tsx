@@ -16,14 +16,20 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!estado.modoActivo) redirect("/completar-perfil");
 
   return (
-    <div className="pb-20">
+    // En escritorio el fondo se tiñe y la columna queda sobre blanco: sin eso, una columna
+    // angosta sobre una pantalla toda blanca se lee como una app de teléfono estirada, que
+    // es exactamente lo que pasaba. El ancho de lectura no cambia — cambiarlo rompería la
+    // tarjeta del feed, que está pensada para el pulgar.
+    <div className="min-h-screen pb-20 sm:bg-ink-50 sm:pb-28">
       <Encabezado
         userId={user.id}
         modoActivo={estado.modoActivo}
         tieneAmbosPerfiles={estado.tieneAmbosPerfiles}
         rolFaltante={rolFaltante(estado)}
       />
-      <div className="mx-auto max-w-lg">{children}</div>
+      <div className="mx-auto max-w-lg bg-white sm:min-h-[calc(100vh-9rem)] sm:border-x sm:border-ink-100">
+        {children}
+      </div>
       <BarraNavegacion rol={estado.modoActivo} />
     </div>
   );

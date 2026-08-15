@@ -91,7 +91,7 @@ export function BotonDenuncia({
       <button
         type="button"
         onClick={() => setAbierto(true)}
-        className="inline-flex items-center gap-1.5 text-[12px] text-ink-400 underline underline-offset-4 hover:text-ink-700"
+        className="inline-flex items-center gap-1.5 text-xs text-ink-400 underline underline-offset-4 hover:text-ink-700"
       >
         <Icono nombre="bandera" className="h-3.5 w-3.5" />
         Denunciar
@@ -102,8 +102,8 @@ export function BotonDenuncia({
   if (enviada) {
     return (
       <div className="rounded-xl border border-ink-200 bg-ink-50 p-4">
-        <p className="text-[14px] font-medium text-ink-900">Recibimos tu denuncia</p>
-        <p className="mt-1 text-[13px] leading-relaxed text-ink-600">
+        <p className="text-base font-medium text-ink-900">Recibimos tu denuncia</p>
+        <p className="mt-1 text-sm leading-relaxed text-ink-600">
           La vamos a revisar. Si necesitás dejar de ver a esta persona ahora mismo, escribinos
           y lo resolvemos.
         </p>
@@ -114,7 +114,7 @@ export function BotonDenuncia({
   return (
     <form onSubmit={enviar} className="flex flex-col gap-3 rounded-xl border border-ink-200 p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-[14px] font-medium text-ink-900">Denunciar {queSeDenuncia}</p>
+        <p className="text-base font-medium text-ink-900">Denunciar {queSeDenuncia}</p>
         <button
           type="button"
           onClick={() => setAbierto(false)}
@@ -130,7 +130,7 @@ export function BotonDenuncia({
         {MOTIVOS.map((m) => (
           <label
             key={m.valor}
-            className="flex cursor-pointer items-center gap-2.5 text-[13px] text-ink-700"
+            className="flex cursor-pointer items-center gap-2.5 text-sm text-ink-700"
           >
             <input
               type="radio"
@@ -151,10 +151,10 @@ export function BotonDenuncia({
         value={detalle}
         onChange={(e) => setDetalle(e.target.value)}
         placeholder="Contanos qué pasó (opcional pero ayuda mucho)."
-        className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[14px] outline-none focus:border-ink-900"
+        className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
       />
 
-      {error && <p className="text-[12px] text-red-600">{error}</p>}
+      {error && <p className="text-xs text-error-600">{error}</p>}
 
       <Boton type="submit" disabled={!motivo} cargando={enviando} textoCargando="Enviando…">
         Enviar denuncia

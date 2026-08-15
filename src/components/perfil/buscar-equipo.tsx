@@ -60,8 +60,8 @@ export function BuscarEquipo({
     <section className="mt-8 rounded-2xl border border-ink-100 p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-[15px] font-medium text-ink-900">Armar equipo</h2>
-          <p className="mt-1 text-[13px] leading-relaxed text-ink-500">
+          <h2 className="text-base font-medium text-ink-900">Armar equipo</h2>
+          <p className="mt-1 text-sm leading-relaxed text-ink-500">
             Para conocer gente sin tener un proyecto todavía. Si lo activás, aparecés en el
             feed de personas con tu nombre, tu ciudad y lo que escribas acá abajo.
           </p>
@@ -88,7 +88,7 @@ export function BuscarEquipo({
 
       {activo && (
         <div className="mt-4 flex flex-col gap-2">
-          <label htmlFor="pitch" className="text-[13px] font-medium text-ink-700">
+          <label htmlFor="pitch" className="text-sm font-medium text-ink-700">
             ¿Qué querés hacer?
           </label>
           <textarea
@@ -98,10 +98,10 @@ export function BuscarEquipo({
             value={pitch}
             onChange={(e) => setPitch(e.target.value)}
             placeholder="Soy iluminador, tengo tiempo libre y ganas de armar algo con gente que recién empieza."
-            className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-[14px] outline-none focus:border-ink-900"
+            className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
           />
           <div className="flex items-center justify-between gap-3">
-            <span className="text-[11px] text-ink-400">
+            <span className="text-2xs text-ink-400">
               {pitch.length}/{MAX_PITCH}
             </span>
             <Boton onClick={() => guardar(true)} cargando={guardando} textoCargando="Guardando…">
@@ -111,7 +111,7 @@ export function BuscarEquipo({
         </div>
       )}
 
-      {error && <p className="mt-2 text-[12px] text-red-600">{error}</p>}
+      {error && <p className="mt-2 text-xs text-error-600">{error}</p>}
       <AvisoGuardado visible={guardado} />
     </section>
   );
