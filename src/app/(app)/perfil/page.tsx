@@ -7,7 +7,7 @@ import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle
 import { Icono } from "@/components/ui/icono";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BuscarEquipo } from "@/components/perfil/buscar-equipo";
-import { resumenDisciplinas } from "@/lib/constantes";
+import { EtiquetasDisciplina } from "@/components/perfil/etiquetas-disciplina";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
 
@@ -146,9 +146,11 @@ export default async function PerfilPage({
               <h2 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
                 {perfilCreador.nombre}
               </h2>
-              <p className="text-sm text-ink-500">
-                {resumenDisciplinas(perfilCreador.disciplinas, perfilCreador.otro_detalle)}
-              </p>
+              <EtiquetasDisciplina
+                disciplinas={perfilCreador.disciplinas}
+                otroDetalle={perfilCreador.otro_detalle}
+                className="mt-1.5"
+              />
               <p className="text-sm text-ink-400">{perfilCreador.ubicacion_publica}</p>
             </div>
           </div>

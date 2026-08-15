@@ -8,7 +8,7 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { aColumnas, desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
-import { DISCIPLINAS, MAX_OTRO_DETALLE } from "@/lib/constantes";
+import { clasesDisciplina, DISCIPLINAS, MAX_OTRO_DETALLE } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 interface DatosIniciales {
@@ -170,9 +170,12 @@ export function FormularioCreador({
                       elegida ? prev.filter((v) => v !== d.valor) : [...prev, d.valor]
                     )
                   }
+                  // Elegida toma el color de su familia de oficio, no el negro genérico:
+                  // así se ve desde el alta a qué grupo pertenece lo que estás marcando, y
+                  // el color no aparece recién en el perfil ya publicado.
                   className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
                     elegida
-                      ? "border-ink-900 bg-ink-900 text-white"
+                      ? `border-transparent font-medium ${clasesDisciplina(d.valor)}`
                       : "border-ink-200 text-ink-600 hover:border-ink-300"
                   }`}
                 >

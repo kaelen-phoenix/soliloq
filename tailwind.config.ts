@@ -52,6 +52,21 @@ const config: Config = {
           600: "#2f7d4f",
           800: "#1f5636",
         },
+        // Familias de oficio. Son cuatro y no diecisiete a propósito: ninguna paleta
+        // categórica distingue diecisiete tonos, y arriba de ocho la gente ya no los
+        // diferencia — menos todavía con daltonismo.
+        //
+        // Los cuatro pasaron el validador comparando **todos** los pares, no solo los
+        // contiguos, porque en la app aparecen mezclados en cualquier orden. Un violeta y
+        // un índigo que probamos antes daban ΔE 0.7 en visión protán: el mismo color.
+        //
+        // La separación en visión tritán queda en 6.0, dentro de la banda que exige
+        // codificación secundaria. Está cubierta: la etiqueta siempre muestra el nombre del
+        // oficio, así que el color acompaña pero nunca es el único dato.
+        escena: { 50: "#fdf3ee", 600: "#c2410c" },
+        direccion: { 50: "#f1f2fd", 600: "#4338ca" },
+        diseno: { 50: "#f5f8ec", 600: "#65a30d" },
+        tecnica: { 50: "#ecf7fa", 600: "#0891b2" },
       },
       // Escala tipográfica. Antes había 17 tamaños sueltos y ocho se usaban una sola vez:
       // cada pantalla elegía su número. Ocho escalones cubren todo, y el más chico es 11px

@@ -49,22 +49,64 @@ export const DISCIPLINAS: { valor: DisciplinaArtistica; etiqueta: string }[] = [
 
 export const MAX_OTRO_DETALLE = 80;
 
-export function etiquetaDisciplina(valor: DisciplinaArtistica): string {
-  return DISCIPLINAS.find((d) => d.valor === valor)?.etiqueta ?? "";
+/**
+ * A qué familia de oficio pertenece cada disciplina.
+ *
+ * El agrupamiento no es estético: son diecisiete disciplinas y ninguna paleta categórica
+ * distingue diecisiete colores. Cuatro familias sí se distinguen, y de paso dicen algo que
+ * la lista plana no decía — que iluminación y sonido son parientes, y que dirigir y escribir
+ * están más cerca entre sí que de actuar.
+ *
+ * `otro` queda deliberadamente sin color: es la disciplina que no entra en ninguna familia,
+ * y pintarla obligaría a inventarle una.
+ */
+export type FamiliaOficio = "escena" | "direccion" | "diseno" | "tecnica" | "otro";
+
+const FAMILIA_POR_DISCIPLINA: Record<DisciplinaArtistica, FamiliaOficio> = {
+  actuacion: "escena",
+  danza: "escena",
+  musica: "escena",
+  coreografia: "escena",
+
+  direccion: "direccion",
+  dramaturgia: "direccion",
+  guion: "direccion",
+  asistencia_direccion: "direccion",
+  produccion: "direccion",
+
+  vestuario: "diseno",
+  escenografia: "diseno",
+  maquillaje: "diseno",
+
+  iluminacion: "tecnica",
+  sonido: "tecnica",
+  fotografia: "tecnica",
+  edicion: "tecnica",
+
+  otro: "otro",
+};
+
+/** Clases de la etiqueta. Van completas y no armadas por interpolación: Tailwind lee el
+ *  código fuente para decidir qué CSS genera, y un nombre construido en runtime no existe
+ *  para él — la clase simplemente no se emite. */
+const CLASES_FAMILIA: Record<FamiliaOficio, string> = {
+  escena: "bg-escena-50 text-escena-600",
+  direccion: "bg-direccion-50 text-direccion-600",
+  diseno: "bg-diseno-50 text-diseno-600",
+  tecnica: "bg-tecnica-50 text-tecnica-600",
+  otro: "bg-ink-100 text-ink-600",
+};
+
+export function familiaDeDisciplina(valor: DisciplinaArtistica): FamiliaOficio {
+  return FAMILIA_POR_DISCIPLINA[valor] ?? "otro";
 }
 
-/**
- * Cómo se presenta el perfil artístico en una línea. `otro` se reemplaza por lo que la
- * persona escribió: mostrar la palabra "Otro" en un perfil público no le dice nada a nadie.
- */
-export function resumenDisciplinas(
-  disciplinas: DisciplinaArtistica[],
-  otroDetalle?: string | null
-): string {
-  if (disciplinas.length === 0) return "Perfil artístico sin completar";
-  return disciplinas
-    .map((d) => (d === "otro" && otroDetalle ? otroDetalle : etiquetaDisciplina(d)))
-    .join(" · ");
+export function clasesDisciplina(valor: DisciplinaArtistica): string {
+  return CLASES_FAMILIA[familiaDeDisciplina(valor)];
+}
+
+export function etiquetaDisciplina(valor: DisciplinaArtistica): string {
+  return DISCIPLINAS.find((d) => d.valor === valor)?.etiqueta ?? "";
 }
 
 export const HABILIDADES = [

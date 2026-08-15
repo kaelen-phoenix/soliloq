@@ -341,6 +341,29 @@ leen en un teléfono. Si hace falta algo más chico, el problema es la jerarquí
 
 Un `text-[Npx]` suelto en el código es un error, no una excepción.
 
+### El color de las disciplinas agrupa, no decora
+
+Las diecisiete disciplinas se pintan por **familia de oficio**, no una por una: escena,
+dirección, diseño y técnica. Diecisiete colores no se distinguen —arriba de ocho ya no— y
+agrupar además dice algo que la lista plana no decía: que iluminación y sonido son parientes,
+y que dirigir y escribir están más cerca entre sí que de actuar.
+
+Los cuatro tonos pasaron el validador comparando **todos** los pares, no solo los contiguos,
+porque en la app aparecen mezclados en cualquier orden. Un violeta y un índigo que se
+probaron antes daban ΔE 0.7 en visión protán: literalmente el mismo color.
+
+La separación en visión tritán queda en 6.0, dentro de la banda que exige codificación
+secundaria, y está cubierta: **la etiqueta siempre muestra el nombre del oficio**. El color
+acompaña; nunca es el único dato.
+
+Las habilidades del talento siguen en neutro a propósito. No son oficios, y pintarlas igual
+diluiría lo que el color significa.
+
+Cuidado al tocar esto: las clases se escriben completas en `CLASES_FAMILIA`
+(`src/lib/constantes.ts`) y no armadas por interpolación. Tailwind lee el código fuente para
+decidir qué CSS genera, así que un nombre construido en runtime no se emite y la etiqueta
+sale sin color, sin ningún error que lo avise.
+
 ### Los estados tienen color propio
 
 `error`, `alerta` y `exito` viven en la paleta, con tres pasos cada uno — fondo, borde y

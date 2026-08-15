@@ -1,6 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { resumenDisciplinas } from "@/lib/constantes";
+import { EtiquetasDisciplina } from "@/components/perfil/etiquetas-disciplina";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 
 export default async function PerfilCreadorPage({ params }: { params: { id: string } }) {
@@ -28,9 +28,11 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
           <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
             {creador.nombre}
           </h1>
-          <p className="text-sm text-ink-500">
-            {resumenDisciplinas(creador.disciplinas, creador.otro_detalle)}
-          </p>
+          <EtiquetasDisciplina
+            disciplinas={creador.disciplinas}
+            otroDetalle={creador.otro_detalle}
+            className="mt-1.5"
+          />
           <p className="text-sm text-ink-400">{creador.ubicacion_publica}</p>
         </div>
       </div>

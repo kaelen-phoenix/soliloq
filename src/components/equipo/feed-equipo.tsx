@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
-import { etiquetaDisciplina } from "@/lib/constantes";
+import { EtiquetasDisciplina } from "@/components/perfil/etiquetas-disciplina";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 export interface PersonaEquipo {
@@ -75,10 +75,6 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
     );
   }
 
-  const oficios = [
-    ...actual.disciplinas.map((d) => (d === "otro" ? actual.otro_detalle : etiquetaDisciplina(d))),
-    ...actual.habilidades,
-  ].filter(Boolean);
 
   return (
     <div className="flex flex-col">
@@ -110,14 +106,21 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
           <p className="mt-4 text-base leading-relaxed text-ink-800">{actual.pitch}</p>
         )}
 
-        {oficios.length > 0 && (
-          <ul className="mt-4 flex flex-wrap gap-1.5">
-            {oficios.map((o) => (
-              <li
-                key={o}
-                className="rounded-full bg-ink-50 px-2.5 py-1 text-xs text-ink-600"
-              >
-                {o}
+        {actual.disciplinas.length > 0 && (
+          <EtiquetasDisciplina
+            disciplinas={actual.disciplinas}
+            otroDetalle={actual.otro_detalle}
+            className="mt-4"
+          />
+        )}
+
+        {/* Las habilidades van en neutro: no son oficios, son cosas que la persona sabe
+            hacer. Pintarlas del mismo modo diluiría el significado del color. */}
+        {actual.habilidades.length > 0 && (
+          <ul className="mt-2 flex flex-wrap gap-1.5">
+            {actual.habilidades.map((h) => (
+              <li key={h} className="rounded-full bg-ink-50 px-2.5 py-1 text-xs text-ink-600">
+                {h}
               </li>
             ))}
           </ul>
