@@ -21,7 +21,7 @@ export function TituloSeccion({ modoActivo }: { modoActivo: RolUsuario }) {
   const pathname = usePathname();
   const coincidencia = TITULOS.find((t) => t.patron.test(pathname));
   const titulo =
-    coincidencia?.titulo ?? (modoActivo === "talento" ? "Convocatorias" : "Tu tablero");
+    coincidencia?.titulo ?? (modoActivo === "talento" ? "Convocatorias" : "Mis proyectos");
 
   // En `display`: es el título de portada de cada pantalla y lo que le da a la app el
   // registro editorial de la marca. La interfaz (botones, etiquetas, campos) sigue en sans.

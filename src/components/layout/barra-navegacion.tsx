@@ -19,7 +19,9 @@ const itemsTalento: Item[] = [
 ];
 
 const itemsCreador: Item[] = [
-  { href: "/", label: "Tablero", icono: "tablero" },
+  // "Proyectos" y no "Mis proyectos": en la barra inferior el rótulo compite con otros dos
+  // y se corta. El título completo va en el encabezado, donde sí hay lugar.
+  { href: "/", label: "Proyectos", icono: "tablero" },
   { href: "/salas", label: "Salas", icono: "salas" },
   { href: "/perfil", label: "Perfil", icono: "perfil" },
 ];

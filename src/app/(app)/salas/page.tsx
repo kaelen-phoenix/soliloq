@@ -42,7 +42,7 @@ export default async function SalasPage() {
         <EstadoVacio
           icono="salas"
           titulo="Todavía no tenés salas"
-          detalle="Se abren solas cuando se concreta un match: ahí vas a hablar con el equipo del proyecto."
+          detalle="Se abren solas cuando se arma un equipo: ahí vas a hablar con el resto del proyecto."
         />
       )}
 

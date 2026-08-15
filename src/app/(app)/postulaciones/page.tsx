@@ -6,7 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 const ETIQUETA_ESTADO: Record<string, string> = {
   pendiente: "Pendiente",
   en_duda: "En duda",
-  aprobado: "Match",
+  aprobado: "Hay equipo",
   rechazado: "No quedó",
 };
 

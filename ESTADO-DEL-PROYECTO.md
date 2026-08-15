@@ -166,6 +166,25 @@ defined for variable fonts".
 La marca vive en un solo lugar, `src/components/ui/logotipo.tsx`. Cualquier pantalla que
 escriba "Yalope" a mano es una segunda versión del logo esperando a desincronizarse.
 
+### El perfil de creador son disciplinas, no un tipo
+
+`perfiles_creador.tipo` (director independiente / compañía) se dio de baja en `0028`. No
+gobernaba nada —solo cambiaba una etiqueta— y obligaba a encasillarse en dos casilleros que
+dejan afuera a casi todo el oficio: un vestuarista que quiere convocar gente no es ninguno
+de los dos.
+
+Lo reemplaza `disciplinas`, un array del enum `disciplina_artistica`, más `otro_detalle`
+para lo que la lista cerrada no contempla. Es **lista y no valor único** porque en el medio
+se hace más de una cosa a la vez: dirigir y actuar es la norma, no la excepción.
+
+### El perfil propio se ve como lo ven los demás
+
+`/perfil` muestra la vista pública; el formulario vive detrás de `?editar=1`. Entrar directo
+al formulario hacía que nadie viera nunca cómo se presenta ante el resto, que es justamente
+lo que decide si lo eligen para un proyecto. El modo edición tiene salida propia sin
+guardar: sin eso, la única forma de volver era guardar o irse a otra sección, que es cuando
+se pierden los cambios.
+
 ### Las métricas se calculan en una función, por privacidad
 
 El alcance de un rol sale de `descartes`, y esa tabla solo la puede leer el propio talento.

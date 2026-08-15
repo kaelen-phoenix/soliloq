@@ -11,7 +11,7 @@ type MetricaRol = Database["public"]["Functions"]["metricas_obra"]["Returns"][nu
  * cada segmento lleva etiqueta directa: el color nunca es el único portador del dato.
  */
 const SEGMENTOS = [
-  { clave: "aprobados", etiqueta: "Match", color: "bg-brand-500", texto: "text-brand-600" },
+  { clave: "aprobados", etiqueta: "Hay equipo", color: "bg-brand-500", texto: "text-brand-600" },
   { clave: "en_duda", etiqueta: "En duda", color: "bg-amber-700", texto: "text-amber-800" },
   { clave: "pendientes", etiqueta: "Sin ver", color: "bg-ink-300", texto: "text-ink-600" },
   { clave: "rechazados", etiqueta: "Descartados", color: "bg-ink-200", texto: "text-ink-500" },

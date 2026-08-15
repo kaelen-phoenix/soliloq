@@ -8,11 +8,13 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { aColumnas, desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
-import type { TipoCreador } from "@/lib/supabase/types";
+import { DISCIPLINAS, MAX_OTRO_DETALLE } from "@/lib/constantes";
+import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 interface DatosIniciales {
   nombre: string;
-  tipo: TipoCreador;
+  disciplinas: DisciplinaArtistica[];
+  otro_detalle: string | null;
   ubicacion_texto: string;
   ubicacion_publica: string;
   ubicacion_place_id: string | null;
@@ -34,7 +36,10 @@ export function FormularioCreador({
 }) {
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
-  const [tipo, setTipo] = useState<TipoCreador>(datosIniciales?.tipo ?? "director_independiente");
+  const [disciplinas, setDisciplinas] = useState<DisciplinaArtistica[]>(
+    datosIniciales?.disciplinas ?? []
+  );
+  const [otroDetalle, setOtroDetalle] = useState(datosIniciales?.otro_detalle ?? "");
   const [ubicacion, setUbicacion] = useState<Ubicacion | null>(
     desdeColumnas(datosIniciales) ?? null,
   );
@@ -73,6 +78,10 @@ export function FormularioCreador({
   function validar(): boolean {
     const nuevos: Record<string, string> = {};
     if (nombre.trim().length < 2) nuevos.nombre = "Ingresá el nombre.";
+    if (disciplinas.length === 0) nuevos.disciplinas = "Elegí al menos una.";
+    if (disciplinas.includes("otro") && otroDetalle.trim().length < 2) {
+      nuevos.otroDetalle = "Contanos qué hacés.";
+    }
     if (!ubicacion) nuevos.ubicacion = "Elegí una ubicación de la lista de sugerencias.";
     if (descripcion.length > 1000) nuevos.descripcion = "Máximo 1000 caracteres.";
     setErrores((prev) => ({ ...prev, ...nuevos }));
@@ -90,7 +99,10 @@ export function FormularioCreador({
 
     const campos = {
       nombre: nombre.trim(),
-      tipo,
+      disciplinas,
+      // El detalle solo se guarda si "Otro" sigue elegido: si la persona lo desmarca, el
+      // texto tiene que irse con él en vez de quedar colgado sin nada que lo explique.
+      otro_detalle: disciplinas.includes("otro") ? otroDetalle.trim() : null,
       ...aColumnas(ubicacion!),
       descripcion: descripcion || null,
       imagen_url: imagenUrl || null,
@@ -129,34 +141,63 @@ export function FormularioCreador({
   return (
     <form onSubmit={guardar} className="flex flex-col gap-6">
       <section className="flex flex-col gap-4">
-        <div className="flex gap-3">
-          <button
-            type="button"
-            onClick={() => setTipo("director_independiente")}
-            className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium ${
-              tipo === "director_independiente" ? "border-ink-900 bg-ink-900 text-white" : "border-ink-100"
-            }`}
-          >
-            Director/a independiente
-          </button>
-          <button
-            type="button"
-            onClick={() => setTipo("compania")}
-            className={`flex-1 rounded-xl border px-4 py-3 text-sm font-medium ${
-              tipo === "compania" ? "border-ink-900 bg-ink-900 text-white" : "border-ink-100"
-            }`}
-          >
-            Compañía
-          </button>
-        </div>
-
         <CampoTexto
           id="nombre"
-          etiqueta={tipo === "compania" ? "Nombre de la compañía" : "Tu nombre"}
+          etiqueta="Tu nombre o el de tu compañía"
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           error={errores.nombre}
         />
+
+        {/* Perfil artístico. Es múltiple porque en el medio se hace más de una cosa: quien
+            dirige también actúa, y obligar a elegir una sola falsea el perfil. */}
+        <fieldset className="flex flex-col gap-2.5">
+          <legend className="text-[13px] font-medium text-ink-700">
+            Perfil artístico
+            <span className="ml-1.5 font-normal text-ink-400">Elegí todo lo que hagas</span>
+          </legend>
+
+          <div className="flex flex-wrap gap-2">
+            {DISCIPLINAS.map((d) => {
+              const elegida = disciplinas.includes(d.valor);
+              return (
+                <button
+                  key={d.valor}
+                  type="button"
+                  aria-pressed={elegida}
+                  onClick={() =>
+                    setDisciplinas((prev) =>
+                      elegida ? prev.filter((v) => v !== d.valor) : [...prev, d.valor]
+                    )
+                  }
+                  className={`rounded-full border px-3.5 py-1.5 text-[13px] transition-colors ${
+                    elegida
+                      ? "border-ink-900 bg-ink-900 text-white"
+                      : "border-ink-200 text-ink-600 hover:border-ink-300"
+                  }`}
+                >
+                  {d.etiqueta}
+                </button>
+              );
+            })}
+          </div>
+
+          {errores.disciplinas && (
+            <p className="text-[12px] text-red-600">{errores.disciplinas}</p>
+          )}
+
+          {disciplinas.includes("otro") && (
+            <CampoTexto
+              id="otro-detalle"
+              etiqueta="¿Qué hacés?"
+              value={otroDetalle}
+              maxLength={MAX_OTRO_DETALLE}
+              placeholder="Por ejemplo: titiritera, técnica de vuelo"
+              onChange={(e) => setOtroDetalle(e.target.value)}
+              error={errores.otroDetalle}
+            />
+          )}
+        </fieldset>
 
         <CampoUbicacion
           id="ubicacion"

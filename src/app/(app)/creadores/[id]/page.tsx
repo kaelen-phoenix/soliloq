@@ -1,5 +1,6 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { resumenDisciplinas } from "@/lib/constantes";
 
 export default async function PerfilCreadorPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -23,11 +24,13 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
           </div>
         )}
         <div>
-          <h1 className="text-[18px] font-semibold text-ink-900">{creador.nombre}</h1>
+          <h1 className="font-display text-[20px] font-semibold tracking-[-0.02em] text-ink-900">
+            {creador.nombre}
+          </h1>
           <p className="text-sm text-ink-500">
-            {creador.tipo === "compania" ? "Compañía" : "Director/a independiente"} ·{" "}
-            {creador.ubicacion_publica}
+            {resumenDisciplinas(creador.disciplinas, creador.otro_detalle)}
           </p>
+          <p className="text-[13px] text-ink-400">{creador.ubicacion_publica}</p>
         </div>
       </div>
 

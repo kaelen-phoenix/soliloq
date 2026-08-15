@@ -6,7 +6,29 @@ export type TipoRol = "actuacion" | "tecnica";
 
 export type EstadoPostulacion = "pendiente" | "en_duda" | "aprobado" | "rechazado";
 
-export type TipoCreador = "director_independiente" | "compania";
+/**
+ * Disciplinas que ejerce una persona en el medio. Reemplazó al par director/compañía, que
+ * no gobernaba nada y dejaba afuera a casi todo el oficio. Es lista y no valor único porque
+ * dirigir y actuar a la vez es la norma.
+ */
+export type DisciplinaArtistica =
+  | "actuacion"
+  | "direccion"
+  | "guion"
+  | "produccion"
+  | "dramaturgia"
+  | "vestuario"
+  | "escenografia"
+  | "iluminacion"
+  | "sonido"
+  | "coreografia"
+  | "danza"
+  | "musica"
+  | "fotografia"
+  | "edicion"
+  | "maquillaje"
+  | "asistencia_direccion"
+  | "otro";
 
 export type TipoNotificacion = "match" | "sala_creada";
 
@@ -104,7 +126,8 @@ export interface Database {
         Row: {
           id: string;
           nombre: string;
-          tipo: TipoCreador;
+          disciplinas: DisciplinaArtistica[];
+          otro_detalle: string | null;
           ubicacion_texto: string;
           ubicacion_publica: string;
           ubicacion_place_id: string | null;
@@ -118,7 +141,8 @@ export interface Database {
         Insert: {
           id: string;
           nombre: string;
-          tipo: TipoCreador;
+          disciplinas: DisciplinaArtistica[];
+          otro_detalle?: string | null;
           ubicacion_texto: string;
           ubicacion_publica: string;
           ubicacion_place_id?: string | null;
@@ -130,7 +154,8 @@ export interface Database {
         };
         Update: {
           nombre?: string;
-          tipo?: TipoCreador;
+          disciplinas?: DisciplinaArtistica[];
+          otro_detalle?: string | null;
           ubicacion_texto?: string;
           ubicacion_publica?: string;
           ubicacion_place_id?: string | null;
