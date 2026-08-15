@@ -89,7 +89,7 @@ export function ListaNotificaciones({
 
   async function abrir(n: Notificacion) {
     await marcarLeida(n.id);
-    if (n.tipo === "sala_creada" && n.sala_id) {
+    if ((n.tipo === "sala_creada" || n.tipo === "equipo_armado") && n.sala_id) {
       router.push(`/salas/${n.sala_id}`);
     } else if (n.tipo === "convocado" || n.tipo === "espera_vencida") {
       // A postulaciones y no a la obra: es donde están los botones de confirmar, y donde
@@ -160,6 +160,15 @@ export function ListaNotificaciones({
                     <p className="mt-0.5 text-[13px] leading-snug text-ink-600">
                       Te quieren sumar a <span className="font-medium">{tituloObra(n)}</span>.
                       Confirmá que seguís disponible.
+                    </p>
+                  </>
+                ) : n.tipo === "equipo_armado" ? (
+                  <>
+                    <p className="text-[15px] font-semibold leading-snug text-ink-900">
+                      ¡Hay equipo!
+                    </p>
+                    <p className="mt-0.5 text-[13px] leading-snug text-ink-600">
+                      El interés fue mutuo. Ya pueden hablar.
                     </p>
                   </>
                 ) : n.tipo === "espera_vencida" ? (

@@ -8,12 +8,13 @@ import type { RolUsuario } from "@/lib/supabase/types";
 interface Item {
   href: string;
   label: string;
-  icono: "feed" | "postulaciones" | "salas" | "perfil" | "tablero";
+  icono: "feed" | "postulaciones" | "salas" | "perfil" | "tablero" | "corazon";
 }
 
 const itemsTalento: Item[] = [
   { href: "/", label: "Feed", icono: "feed" },
   { href: "/postulaciones", label: "Postulaciones", icono: "postulaciones" },
+  { href: "/equipo", label: "Equipo", icono: "corazon" },
   { href: "/salas", label: "Salas", icono: "salas" },
   { href: "/perfil", label: "Perfil", icono: "perfil" },
 ];
@@ -22,6 +23,7 @@ const itemsCreador: Item[] = [
   // "Proyectos" y no "Mis proyectos": en la barra inferior el rótulo compite con otros dos
   // y se corta. El título completo va en el encabezado, donde sí hay lugar.
   { href: "/", label: "Proyectos", icono: "tablero" },
+  { href: "/equipo", label: "Equipo", icono: "corazon" },
   { href: "/salas", label: "Salas", icono: "salas" },
   { href: "/perfil", label: "Perfil", icono: "perfil" },
 ];

@@ -14,8 +14,16 @@ desde otra máquina. Complementa al `README.md`, que cubre la instalación.
 de swipe. El objetivo del prototipo es **validar si los actores se crean perfiles y si los
 directores publican convocatorias**, no ser un producto terminado.
 
+Desde agosto de 2026 hace dos cosas, no una: **postularse a convocatorias** (obra → roles →
+match) y **armar equipo sin proyecto**, que conecta personas que todavía no tienen obra pero
+quieren hacer algo. La segunda es la que el estudio de mercado pone como el corazón de la
+propuesta: la app opera antes del casting.
+
 Fuera de alcance deliberado: pagos, planes premium, B2B, blockchain, perfiles de "grandes
-ligas", push notifications y notificaciones por email.
+ligas", push notifications y notificaciones por email. Existe un documento de producto con
+tres niveles de suscripción; **no se implementó nada de eso a propósito**, porque diseñar
+precios antes de saber si la gente se crea el perfil es optimizar lo que todavía no se sabe
+si funciona.
 
 ### El nombre comercial y el identificador técnico son distintos a propósito
 
@@ -165,6 +173,34 @@ defined for variable fonts".
 
 La marca vive en un solo lugar, `src/components/ui/logotipo.tsx`. Cualquier pantalla que
 escriba "Yalope" a mano es una segunda versión del logo esperando a desincronizarse.
+
+### Armar equipo: una sala ya no necesita una obra
+
+Hasta `0033`, para cruzarte con alguien había que inventar una obra con roles. Quien dice
+"tengo tiempo y ganas de armar algo" no tenía puerta de entrada, que es justo el caso que el
+estudio de mercado pone en el centro: la app opera *antes* del casting.
+
+`salas.obra_id` pasa a ser nullable y aparece `salas.titulo` para las que no tienen obra que
+se lo preste. `intereses_equipo` es el espejo de `postulaciones` + `descartes` pero de
+persona a persona; cuando el interés es mutuo, un trigger crea la sala y avisa a los dos.
+
+**Nadie ve quién lo marcó a él.** Enterarte de que alguien te eligió antes de elegirlo
+cambia la decisión, y ahí se pierde el sentido del match mutuo.
+
+Dos decisiones de privacidad que conviene no revertir sin entenderlas:
+
+- **Esto no abrió los perfiles de talento.** Un feed de personas resuelto con una vista
+  `security_invoker` habría exigido que `perfiles_talento` fuera legible por cualquiera con
+  sesión, y ahí viven fotos y fecha de nacimiento. En su lugar `feed_equipo()` es
+  `SECURITY DEFINER` y devuelve una **proyección acotada** —nombre, pitch, disciplinas,
+  ciudad— y solo de quienes se anotaron. Sin fotos de talento, sin edad, sin ubicación exacta.
+- **Compartir sala sí habilita ver el perfil completo** (`0034`). Sin eso, dos personas que
+  se eligieron entraban a un chat donde la otra figuraba como "Integrante", sin nombre ni
+  cara. La política es angosta a propósito: alcanza a quien ya está en la misma sala, es
+  decir a quien la otra persona ya aceptó. El bloqueo sigue mandando por encima.
+
+Aparecer es **opt-in** (`perfiles.busca_equipo`), y ver exige aparecer: un feed de personas
+donde se puede mirar sin exponerse convierte a la otra mitad en catálogo.
 
 ### Denunciar existe; moderar automáticamente, no
 

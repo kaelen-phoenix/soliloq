@@ -5,6 +5,7 @@ import type { RolUsuario } from "@/lib/supabase/types";
 
 const TITULOS: { patron: RegExp; titulo: string }[] = [
   { patron: /^\/postulaciones/, titulo: "Postulaciones" },
+  { patron: /^\/equipo/, titulo: "Armar equipo" },
   { patron: /^\/salas\/.+/, titulo: "Sala" },
   { patron: /^\/salas$/, titulo: "Salas" },
   { patron: /^\/notificaciones/, titulo: "Notificaciones" },

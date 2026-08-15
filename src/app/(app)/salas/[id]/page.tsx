@@ -9,7 +9,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: sala } = await supabase.from("salas").select("id, obra_id, obras(titulo, creador_id)").eq("id", params.id).single();
+  const { data: sala } = await supabase.from("salas").select("id, obra_id, titulo, obras(titulo, creador_id)").eq("id", params.id).single();
   if (!sala) notFound();
 
   // La obra puede venir vacía aunque la sala exista: si quien mira bloqueó al creador, la
@@ -54,7 +54,8 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       perfil_id: id,
       nombre: talento?.nombre ?? "Integrante",
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
-      rol_en_obra: rolNombre ?? "Elenco",
+      // Sin obra no hay rol que mostrar: la sala nació de un interés mutuo, no de un casting.
+      rol_en_obra: rolNombre ?? (sala.obra_id ? "Elenco" : "Armando equipo"),
     };
   });
 
@@ -69,8 +70,14 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       style={{ height: "calc(100dvh - env(safe-area-inset-top) - 5.25rem - 5rem)" }}
     >
       <div className="border-b border-ink-100 px-4 py-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-ink-500">Sala de proyecto</p>
-        <h1 className="font-semibold text-ink-900">{obra?.titulo ?? "Proyecto"}</h1>
+        <p className="text-xs font-medium uppercase tracking-wide text-ink-500">
+          {sala.obra_id ? "Sala de proyecto" : "Armar equipo"}
+        </p>
+        {/* Tres títulos posibles: el de la obra, el de una sala sin obra, o el genérico
+            cuando la fila de `obras` está escondida por bloqueo (0022). */}
+        <h1 className="font-display font-semibold tracking-[-0.02em] text-ink-900">
+          {obra?.titulo ?? sala.titulo ?? "Proyecto"}
+        </h1>
       </div>
       <SalaChat salaId={params.id} userId={user.id} mensajesIniciales={mensajes ?? []} integrantes={integrantes} />
     </div>

@@ -12,7 +12,7 @@ export default async function SalasPage() {
 
   const { data: integraciones } = await supabase
     .from("sala_integrantes")
-    .select("sala_id, salas(id, obra_id, obras(titulo))")
+    .select("sala_id, salas(id, obra_id, titulo, obras(titulo))")
     .eq("perfil_id", user.id);
 
   const salas = await Promise.all(
@@ -28,7 +28,9 @@ export default async function SalasPage() {
       return {
         salaId: i.sala_id,
         // La obra queda en null si se bloqueó a su creador (política restrictiva de 0022).
-        titulo: i.salas?.obras?.titulo ?? "Proyecto",
+        // Tres casos: la obra presta su título; una sala sin obra trae el suyo; o la fila
+        // de `obras` está escondida por bloqueo (0022) y no queda nada que mostrar.
+        titulo: i.salas?.obras?.titulo ?? i.salas?.titulo ?? "Proyecto",
         // Y el último mensaje ya viene filtrado por RLS: si lo escribió alguien bloqueado,
         // acá aparece el último que sí se puede leer.
         ultimoMensaje: ultimoMensaje?.contenido ?? null,

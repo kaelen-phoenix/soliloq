@@ -6,6 +6,7 @@ import { ObrasPrevias } from "@/components/perfil/obras-previas";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 import { Icono } from "@/components/ui/icono";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
+import { BuscarEquipo } from "@/components/perfil/buscar-equipo";
 import { resumenDisciplinas } from "@/lib/constantes";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
@@ -55,6 +56,18 @@ export default async function PerfilPage({
   // Se edita el perfil del modo activo; el otro se edita conmutando de modo.
   const estado = await leerEstadoCuenta(supabase, user.id);
 
+  const { data: cuenta } = await supabase
+    .from("perfiles")
+    .select("busca_equipo, pitch")
+    .eq("id", user.id)
+    .single();
+
+  // Vive fuera de los dos formularios porque es de la cuenta, no del perfil de talento ni
+  // del de creador: quien tiene los dos se anota una sola vez.
+  const armarEquipo = (
+    <BuscarEquipo buscaEquipo={cuenta?.busca_equipo ?? false} pitchInicial={cuenta?.pitch ?? null} />
+  );
+
   if (estado.modoActivo === "talento") {
     const [{ data: perfilTalento }, { data: fotos }] = await Promise.all([
       supabase.from("perfiles_talento").select("*").eq("id", user.id).single(),
@@ -89,6 +102,7 @@ export default async function PerfilPage({
             <PerfilTalentoDetalle talento={{ ...perfilTalento, fotos: fotosConUrl }} />
           </VistaPerfilPropio>
         )}
+        {!editando && armarEquipo}
         <AccionesCuenta />
       </main>
     );
@@ -151,6 +165,7 @@ export default async function PerfilPage({
         </h2>
         <ObrasPrevias creadorId={user.id} obras={obrasPrevias ?? []} />
       </section>
+      {!editando && armarEquipo}
       <AccionesCuenta />
     </main>
   );

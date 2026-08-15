@@ -38,7 +38,13 @@ export type DisciplinaArtistica =
   | "asistencia_direccion"
   | "otro";
 
-export type TipoNotificacion = "match" | "sala_creada" | "convocado" | "espera_vencida";
+export type TipoNotificacion =
+  | "match"
+  | "sala_creada"
+  | "convocado"
+  | "espera_vencida"
+  /** Interés mutuo entre dos personas, sin proyecto de por medio (0033). */
+  | "equipo_armado";
 
 export type MotivoDenuncia =
   | "acoso"
@@ -63,6 +69,9 @@ export interface Database {
           rol: RolUsuario | null;
           modo_activo: RolUsuario | null;
           onboarding_completo: boolean;
+          /** Opt-in explícito para aparecer en el feed de personas (0033). */
+          busca_equipo: boolean;
+          pitch: string | null;
           creado_en: string;
         };
         Insert: {
@@ -75,6 +84,8 @@ export interface Database {
           rol?: RolUsuario | null;
           modo_activo?: RolUsuario | null;
           onboarding_completo?: boolean;
+          busca_equipo?: boolean;
+          pitch?: string | null;
         };
         Relationships: [];
       };
@@ -383,6 +394,21 @@ export interface Database {
         Update: Record<string, never>;
         Relationships: [];
       };
+      intereses_equipo: {
+        Row: {
+          de_perfil: string;
+          a_perfil: string;
+          interesa: boolean;
+          creado_en: string;
+        };
+        Insert: {
+          de_perfil: string;
+          a_perfil: string;
+          interesa: boolean;
+        };
+        Update: { interesa?: boolean };
+        Relationships: [];
+      };
       denuncias: {
         Row: {
           id: string;
@@ -446,11 +472,15 @@ export interface Database {
       salas: {
         Row: {
           id: string;
-          obra_id: string;
+          /** `null` en las salas de "armar equipo": nacen de un interés mutuo, sin obra. */
+          obra_id: string | null;
+          /** Solo para salas sin obra; con obra, el título lo presta ella. */
+          titulo: string | null;
           creado_en: string;
         };
         Insert: {
-          obra_id: string;
+          obra_id?: string | null;
+          titulo?: string | null;
         };
         Update: Record<string, never>;
         Relationships: [
@@ -560,6 +590,24 @@ export interface Database {
        * porque el alcance sale de `descartes`, que solo puede leer el propio talento:
        * acá se devuelven conteos, nunca identidades.
        */
+      /** Personas anotadas para armar equipo. Proyección acotada: sin fotos de talento,
+       *  sin edad y sin ubicación exacta — ver 0033. */
+      feed_equipo: {
+        Args: { p_radio_metros?: number | null };
+        Returns: {
+          perfil_id: string;
+          nombre: string;
+          pitch: string | null;
+          ubicacion_publica: string | null;
+          disciplinas: DisciplinaArtistica[];
+          otro_detalle: string | null;
+          habilidades: string[];
+          imagen_url: string | null;
+          es_talento: boolean;
+          es_creador: boolean;
+          distancia_metros: number | null;
+        }[];
+      };
       metricas_obra: {
         Args: { p_obra_id: string };
         Returns: {
