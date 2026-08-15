@@ -214,7 +214,7 @@ export function PilaTarjetas({
           como algo que termina, no como el estado normal de la app. */}
       {actual?.es_ejemplo && (
         <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-500/5 px-3.5 py-2.5">
-          <p className="text-[13px] font-medium text-ink-900">Así funciona Soliloq</p>
+          <p className="text-[13px] font-medium text-ink-900">Así funciona Yalope</p>
           <p className="mt-0.5 text-[12px] leading-snug text-ink-600">
             Deslizá a la derecha para postularte, a la izquierda para descartar. Cuando alguien
             te aprueba se abre una sala con el equipo. Estas {ejemplos.length}{" "}

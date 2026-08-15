@@ -9,7 +9,7 @@ desde otra máquina. Complementa al `README.md`, que cubre la instalación.
 
 ## Qué es
 
-**Soliloq** — prototipo (MVP) de plataforma de match teatral que conecta Talento
+**Yalope** — prototipo (MVP) de plataforma de match teatral que conecta Talento
 (actores, actrices, técnicos) con Creadores (directores, compañías) mediante una mecánica
 de swipe. El objetivo del prototipo es **validar si los actores se crean perfiles y si los
 directores publican convocatorias**, no ser un producto terminado.
@@ -17,11 +17,37 @@ directores publican convocatorias**, no ser un producto terminado.
 Fuera de alcance deliberado: pagos, planes premium, B2B, blockchain, perfiles de "grandes
 ligas", push notifications y notificaciones por email.
 
+### El nombre comercial y el identificador técnico son distintos a propósito
+
+La app se llama **Yalope** de cara al usuario. Por dentro, todo lo técnico sigue llamándose
+**soliloq**: el proyecto de Supabase y su ref, el proyecto de Vercel, el repositorio, el
+`name` de `package.json` y el callback `__soliloqPlacesListo` de `ubicacion.ts`.
+
+No es una migración a medias, es la separación deliberada: el nombre comercial es una
+hipótesis que puede cambiar, y el identificador técnico es una dependencia de la que cuelgan
+la base, el deploy y las migraciones ya aplicadas. Atarlos convierte cualquier cambio de
+marca en una migración de infraestructura.
+
+Regla al tocar esto: si lo lee un usuario, va **Yalope**; si lo lee una máquina, queda
+**soliloq**. La URL era la única filtración entre los dos mundos, y se resolvió con el
+dominio propio `yalope.com` — no renombrando el proyecto de Vercel.
+
+El redirect del dominio viejo vive en `next.config.mjs`, con un `has` sobre el host, y no en
+el middleware: el middleware es el que refresca la sesión de Supabase y es donde nacen los
+bucles de redirección. Matchea el alias **exacto** de producción, no `.vercel.app` en
+general, para no romper los deploys de preview.
+
+El callback de auth **no** sale de `NEXT_PUBLIC_SITE_URL` (esa variable no se usa en el
+código): se arma con `window.location.origin` en `src/lib/clave.ts`. Por eso cada dominio
+nuevo desde el que se entre tiene que estar en la lista de *Redirect URLs* de Supabase, o el
+ingreso falla entero.
+
 ## Dónde vive
 
 | Recurso | Ubicación |
 |---|---|
-| App en producción | https://soliloq-one.vercel.app |
+| App en producción | https://yalope.com (el viejo `soliloq-one.vercel.app` redirige con 308) |
+| Dominio | `yalope.com`, registrado y administrado en Vercel |
 | Repositorio | `github.com/kaelen-phoenix/soliloq` |
 | Hosting | Vercel, proyecto `kaelen-dev/soliloq` (plan Hobby, gratis) |
 | Base de datos y auth | Supabase, proyecto `soliloq` — ref `ydnafjmznntfmzrsijko` (plan Free) |

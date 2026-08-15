@@ -10,14 +10,14 @@ const inter = Inter({
 });
 
 export const metadata: Metadata = {
-  title: "Soliloq — Match Teatral",
+  title: "Yalope — Match Teatral",
   description:
     "Conectá talento y creadores de teatro. Postulate a convocatorias y armá elenco con un match rápido y visual.",
   manifest: "/manifest.json",
   appleWebApp: {
     capable: true,
     statusBarStyle: "default",
-    title: "Soliloq",
+    title: "Yalope",
   },
 };
 

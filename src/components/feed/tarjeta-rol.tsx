@@ -84,7 +84,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
         <div className="max-h-44 space-y-3 overflow-y-auto px-5 py-4 text-[13px] leading-relaxed text-ink-600">
           {rol.es_ejemplo && (
             <p className="rounded-lg bg-ink-50 px-3 py-2 text-[12px] text-ink-600">
-              Esta convocatoria no existe: es un ejemplo para mostrarte cómo funciona Soliloq.
+              Esta convocatoria no existe: es un ejemplo para mostrarte cómo funciona Yalope.
               Deslizá o usá los botones — no se le avisa a nadie.
             </p>
           )}
