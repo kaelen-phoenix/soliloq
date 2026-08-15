@@ -1,0 +1,54 @@
+"use client";
+
+import Link from "next/link";
+import { usePathname } from "next/navigation";
+import { Icono } from "@/components/ui/icono";
+import { LogotipoInline } from "@/components/ui/logotipo";
+import { ITEMS_NAVEGACION } from "./items-navegacion";
+import type { RolUsuario } from "@/lib/supabase/types";
+
+/**
+ * Navegación de escritorio. Es un componente aparte de `BarraNavegacion` en vez de un
+ * mismo componente con clases para los dos casos: son dos formas distintas —una fila de
+ * íconos abajo contra una lista vertical con el logo arriba— y meterlas en el mismo JSX
+ * termina en un enredo de `hidden` que nadie puede leer.
+ *
+ * Los ítems sí son compartidos: si divergieran, la app tendría dos navegaciones distintas
+ * según el tamaño de pantalla, que es el bug clásico de este patrón.
+ */
+export function BarraLateral({ rol }: { rol: RolUsuario }) {
+  const pathname = usePathname();
+  const items = ITEMS_NAVEGACION[rol];
+
+  return (
+    <aside className="hidden shrink-0 lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-60 lg:flex-col lg:border-r lg:border-ink-100 lg:bg-white lg:px-4 lg:py-6">
+      <Link href="/" className="mb-8 px-3">
+        <LogotipoInline />
+      </Link>
+
+      <nav>
+        <ul className="flex flex-col gap-1">
+          {items.map((item) => {
+            const activo = pathname === item.href;
+            return (
+              <li key={item.href}>
+                <Link
+                  href={item.href}
+                  aria-current={activo ? "page" : undefined}
+                  className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+                    activo
+                      ? "bg-ink-50 text-ink-900"
+                      : "text-ink-500 hover:bg-ink-50/60 hover:text-ink-800"
+                  }`}
+                >
+                  <Icono nombre={item.icono} className="h-[18px] w-[18px]" />
+                  {item.label}
+                </Link>
+              </li>
+            );
+          })}
+        </ul>
+      </nav>
+    </aside>
+  );
+}

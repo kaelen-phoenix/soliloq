@@ -281,13 +281,21 @@ Dos tratamientos distintos y deliberados, no un diseño estirado:
   móvil una columna centrada; en escritorio se parten en dos, con un panel de marca oscuro a
   la izquierda y el formulario a la derecha. El panel oscuro es la misma idea que la tarjeta
   del feed —la caja negra teatral— para no inventar un segundo lenguaje visual.
-- **Dentro de la app**, el fondo se tiñe en escritorio y la columna queda sobre blanco con
-  bordes, y la barra inferior pasa a ser una píldora flotante en vez de una franja que cruza
-  toda la pantalla.
+- **Dentro de la app** hay tres formas según el ancho: teléfono con barra abajo al alcance
+  del pulgar; tablet con la columna centrada sobre fondo teñido; y escritorio con
+  **navegación lateral fija** (`BarraLateral`) y la columna de contenido más ancha.
 
-**El ancho de lectura no cambia entre los dos.** Ensancharlo rompería la tarjeta del feed,
-que está pensada para el pulgar. Lo que cambia es el marco alrededor, que es lo que hace que
-en una pantalla de 1900px no se lea como un teléfono estirado.
+`BarraNavegacion` y `BarraLateral` son dos componentes distintos a propósito —una fila de
+íconos abajo y una lista vertical con logo no son la misma forma con otras clases— pero leen
+los ítems de `items-navegacion.tsx`. Si cada una tuviera su lista, la app terminaría con dos
+navegaciones distintas según el tamaño de pantalla, que es el bug clásico de este patrón.
+
+**Lo que se ensancha es el marco, no el texto.** La tarjeta del feed se capea sola en
+`max-w-sm` dentro de `pila-tarjetas.tsx`, así que la columna ancha le da aire a las listas,
+los formularios y el chat sin deformarla.
+
+Ojo con la sala de chat: calcula su alto restando la barra inferior, que en escritorio no
+existe. Ese descuento vive en la variable CSS `--alto-barra`, que en `lg` pasa a cero.
 
 ### La escala tipográfica es cerrada
 

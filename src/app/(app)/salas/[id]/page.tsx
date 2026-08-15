@@ -65,9 +65,12 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
     // barra de título y el chat se reparten ese alto vía flex, en lugar de que SalaChat adivine
     // por su cuenta cuánto mide la barra de título: así el input queda anclado al fondo real de
     // la pantalla sin importar cuántos mensajes haya, y sólo la lista de mensajes scrollea.
+    //
+    // En escritorio la barra inferior no existe —la reemplaza la lateral— así que ese
+    // descuento de 5rem sobra y el chat quedaría corto. La variable lo absorbe.
     <div
-      className="flex flex-col"
-      style={{ height: "calc(100dvh - env(safe-area-inset-top) - 5.25rem - 5rem)" }}
+      className="flex flex-col [--alto-barra:5rem] lg:[--alto-barra:0rem]"
+      style={{ height: "calc(100dvh - env(safe-area-inset-top) - 5.25rem - var(--alto-barra))" }}
     >
       <div className="border-b border-ink-100 px-4 py-2">
         <p className="text-xs font-medium uppercase tracking-wide text-ink-500">
