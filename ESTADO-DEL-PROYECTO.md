@@ -40,10 +40,14 @@ Regla al tocar esto: si lo lee un usuario, va **Yalope**; si lo lee una máquina
 **soliloq**. La URL era la única filtración entre los dos mundos, y se resolvió con el
 dominio propio `yalope.com` — no renombrando el proyecto de Vercel.
 
-El redirect del dominio viejo vive en `next.config.mjs`, con un `has` sobre el host, y no en
-el middleware: el middleware es el que refresca la sesión de Supabase y es donde nacen los
-bucles de redirección. Matchea el alias **exacto** de producción, no `.vercel.app` en
-general, para no romper los deploys de preview.
+El alias viejo `soliloq-one.vercel.app` **se eliminó**. Se intentó primero redirigirlo desde
+`next.config.mjs`, y no funciona: con Deployment Protection activa, esa URL cuenta como
+preview y Vercel la manda al login antes de que la petición llegue a la app. Como el
+proyecto nunca se lanzó bajo ese nombre, no hay enlaces viejos que preservar y borrarlo es
+más limpio que dejar un muro de autenticación.
+
+Los dominios `soliloq-kaelen-dev.vercel.app` y `soliloq-git-main-kaelen-dev.vercel.app` los
+asigna Vercel solo y siguen la producción: no se tocan.
 
 El callback de auth **no** sale de `NEXT_PUBLIC_SITE_URL` (esa variable no se usa en el
 código): se arma con `window.location.origin` en `src/lib/clave.ts`. Por eso cada dominio
@@ -54,7 +58,7 @@ ingreso falla entero.
 
 | Recurso | Ubicación |
 |---|---|
-| App en producción | https://yalope.com (el viejo `soliloq-one.vercel.app` redirige con 308) |
+| App en producción | https://yalope.com |
 | Dominio | `yalope.com`, registrado y administrado en Vercel |
 | Repositorio | `github.com/kaelen-phoenix/soliloq` |
 | Hosting | Vercel, proyecto `kaelen-dev/soliloq` (plan Hobby, gratis) |
