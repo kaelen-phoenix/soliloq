@@ -48,7 +48,7 @@ export default async function SalasPage() {
         />
       )}
 
-      <ul className="flex flex-col gap-2">
+      <ul className="grid gap-2 xl:grid-cols-2">
         {salas.map((s) => (
           <li key={s.salaId}>
             <Link

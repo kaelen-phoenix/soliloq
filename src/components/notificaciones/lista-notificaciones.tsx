@@ -124,7 +124,7 @@ export function ListaNotificaciones({
         </button>
       )}
 
-      <ul className="flex flex-col gap-2">
+      <ul className="grid gap-2 xl:grid-cols-2">
         {notificaciones.map((n) => (
           <li key={n.id}>
             <button

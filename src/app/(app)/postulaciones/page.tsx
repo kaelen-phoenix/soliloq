@@ -59,7 +59,7 @@ export default async function PostulacionesPage() {
         />
       )}
 
-      <ul className="flex flex-col gap-2">
+      <ul className="grid gap-2 xl:grid-cols-2">
         {postulaciones?.map((p: any) => (
           <li
             key={p.id}

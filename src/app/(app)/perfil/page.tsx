@@ -154,7 +154,7 @@ export default async function PerfilPage({
           </div>
 
           {perfilCreador.descripcion && (
-            <p className="text-sm leading-relaxed text-ink-700">{perfilCreador.descripcion}</p>
+            <p className="max-w-prose text-sm leading-relaxed text-ink-700">{perfilCreador.descripcion}</p>
           )}
         </VistaPerfilPropio>
       )}

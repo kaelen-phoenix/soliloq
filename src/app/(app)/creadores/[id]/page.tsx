@@ -35,7 +35,7 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
         </div>
       </div>
 
-      {creador.descripcion && <p className="mt-4 text-sm text-ink-700">{creador.descripcion}</p>}
+      {creador.descripcion && <p className="mt-4 max-w-prose text-sm text-ink-700">{creador.descripcion}</p>}
 
       {obrasPrevias && obrasPrevias.length > 0 && (
         <section className="mt-6">

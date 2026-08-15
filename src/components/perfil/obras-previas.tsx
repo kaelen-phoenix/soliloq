@@ -63,7 +63,7 @@ export function ObrasPrevias({ creadorId, obras }: { creadorId: string; obras: O
 
   return (
     <div className="flex flex-col gap-4">
-      <ul className="flex flex-col gap-2">
+      <ul className="grid gap-2 xl:grid-cols-2">
         {lista.map((o) => (
           <li key={o.id} className="flex items-center justify-between rounded-xl border border-ink-100 px-4 py-2">
             <div>

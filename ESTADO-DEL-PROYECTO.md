@@ -294,6 +294,16 @@ navegaciones distintas según el tamaño de pantalla, que es el bug clásico de 
 `max-w-sm` dentro de `pila-tarjetas.tsx`, así que la columna ancha le da aire a las listas,
 los formularios y el chat sin deformarla.
 
+En pantallas muy anchas el espacio se usa **poniendo más cosas al lado, no alargando la
+línea**: a partir de `xl` las listas de tarjetas pasan a dos columnas y los párrafos largos
+—sinopsis, descripción de perfil, experiencia— llevan `max-w-prose`. Un renglón de 200
+caracteres es ilegible; que sobre margen en un monitor de 27 pulgadas está bien y es lo que
+hace cualquier producto serio.
+
+Quedan fuera de la grilla a propósito el chat (es cronológico), los integrantes de la sala
+(lista corta), las métricas por rol (las barras se comparan mejor apiladas) y la bandeja de
+postulantes (las filas se expanden y romperían la grilla).
+
 Ojo con la sala de chat: calcula su alto restando la barra inferior, que en escritorio no
 existe. Ese descuento vive en la variable CSS `--alto-barra`, que en `lg` pasa a cero.
 

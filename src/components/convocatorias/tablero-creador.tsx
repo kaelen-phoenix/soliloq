@@ -42,7 +42,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
         />
       )}
 
-      <ul className="flex flex-col gap-2">
+      <ul className="grid gap-2 xl:grid-cols-2">
         {obras?.map((obra) => {
           const pendientes = obra.roles.reduce(
             (acc: number, r: any) => acc + r.postulaciones.filter((p: any) => p.estado === "pendiente").length,

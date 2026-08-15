@@ -28,7 +28,7 @@ export default async function DetalleObraPage({ params }: { params: { id: string
       </h2>
       <p className="mt-1 text-sm text-ink-500">{obra.ubicacion_texto}</p>
       {obra.sinopsis && (
-        <p className="mt-3 text-base leading-relaxed text-ink-600">{obra.sinopsis}</p>
+        <p className="mt-3 max-w-prose text-base leading-relaxed text-ink-600">{obra.sinopsis}</p>
       )}
 
       <div className="mt-5">
@@ -42,7 +42,7 @@ export default async function DetalleObraPage({ params }: { params: { id: string
           <p className="text-sm text-ink-500">Todavía no definiste roles para esta obra.</p>
         )}
 
-        <ul className="flex flex-col gap-2">
+        <ul className="grid gap-2 xl:grid-cols-2">
           {roles?.map((rol) => {
             const aprobados = rol.postulaciones.filter((p: any) => p.estado === "aprobado").length;
             const sinRevisar = rol.postulaciones.filter((p: any) => p.estado === "pendiente").length;

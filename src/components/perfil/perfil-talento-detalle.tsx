@@ -42,7 +42,7 @@ export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
       {talento.experiencia && (
         <div>
           <h3 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Experiencia</h3>
-          <p className="mt-1 whitespace-pre-line text-sm text-ink-700">{talento.experiencia}</p>
+          <p className="mt-1 max-w-prose whitespace-pre-line text-sm text-ink-700">{talento.experiencia}</p>
         </div>
       )}
 
