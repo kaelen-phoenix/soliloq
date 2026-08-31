@@ -24,5 +24,5 @@
 ## 5. Verificación integral
 
 - [x] 5.1 `npm run lint && npm run typecheck && npm run build` en verde.
-- [ ] 5.2 Con la migración aplicada en local o en una base de prueba: alta de talento cargando 3 redes (una por `@handle`, una por URL con `www.`, una inválida), confirmar que la inválida bloquea el guardado, corregirla, guardar, y ver los 3 iconos enlazados en el perfil abriendo en pestaña nueva. Editar: borrar una red y confirmar que desaparece del perfil.
-- [ ] 5.3 Aplicar `0035_redes_talento.sql` en producción con `supabase db push` (requiere password de la base) y confirmar la columna en `perfiles_talento`. Merge del PR a `main` y verificar el deploy en Vercel (perfil de talento existente se ve igual; se pueden cargar redes).
+- [x] 5.2 Con la migración aplicada en local o en una base de prueba: alta de talento cargando 3 redes (una por `@handle`, una por URL con `www.`, una inválida), confirmar que la inválida bloquea el guardado, corregirla, guardar, y ver los 3 iconos enlazados en el perfil abriendo en pestaña nueva. Editar: borrar una red y confirmar que desaparece del perfil.
+- [x] 5.3 Aplicar `0035_redes_talento.sql` en producción con `supabase db push` (requiere password de la base) y confirmar la columna en `perfiles_talento`. Merge del PR a `main` y verificar el deploy en Vercel (perfil de talento existente se ve igual; se pueden cargar redes).
