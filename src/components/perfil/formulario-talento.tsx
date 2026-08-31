@@ -11,8 +11,11 @@ import {
   GENEROS,
   HABILIDADES,
   MAX_GENERO_DESCRIPCION,
+  REDES,
+  type ClaveRed,
   type Genero,
 } from "@/lib/constantes";
+import { validarRedes } from "@/lib/redes";
 import { aColumnas, desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
 import { esVideoreelValido } from "@/lib/videoreel";
 import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
@@ -31,6 +34,7 @@ interface DatosIniciales {
   videoreel_url: string | null;
   experiencia: string | null;
   habilidades: string[];
+  redes: Record<string, string>;
 }
 
 export function FormularioTalento({
@@ -57,6 +61,8 @@ export function FormularioTalento({
   const [videoreelUrl, setVideoreelUrl] = useState(datosIniciales?.videoreel_url ?? "");
   const [experiencia, setExperiencia] = useState(datosIniciales?.experiencia ?? "");
   const [habilidades, setHabilidades] = useState<string[]>(datosIniciales?.habilidades ?? []);
+  // Lo que la persona tipeó, tal cual. Se normaliza recién en `validar()` / `guardar()`.
+  const [redes, setRedes] = useState<Record<string, string>>(datosIniciales?.redes ?? {});
   const [fotos, setFotos] = useState<FotoTalento[]>(fotosIniciales);
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [cargando, setCargando] = useState(false);
@@ -65,6 +71,10 @@ export function FormularioTalento({
 
   function alternarHabilidad(h: string) {
     setHabilidades((prev) => (prev.includes(h) ? prev.filter((x) => x !== h) : [...prev, h]));
+  }
+
+  function cambiarRed(clave: ClaveRed, valor: string) {
+    setRedes((prev) => ({ ...prev, [clave]: valor }));
   }
 
   function validar(): boolean {
@@ -92,6 +102,11 @@ export function FormularioTalento({
     }
     if (experiencia.length > 2000) nuevos.experiencia = "Máximo 2000 caracteres.";
 
+    const { errores: erroresRedes } = validarRedes(redes);
+    for (const [clave, mensaje] of Object.entries(erroresRedes)) {
+      nuevos[`redes_${clave}`] = mensaje;
+    }
+
     setErrores(nuevos);
     return Object.keys(nuevos).length === 0;
   }
@@ -114,6 +129,7 @@ export function FormularioTalento({
       videoreel_url: videoreelUrl || null,
       experiencia: experiencia || null,
       habilidades,
+      redes: validarRedes(redes).redes,
     };
 
     // La unidad se deriva del país **solo al crear el perfil**. Al editar no se toca: quien
@@ -273,6 +289,24 @@ export function FormularioTalento({
             </button>
           ))}
         </div>
+      </section>
+
+      <section className="flex flex-col gap-4">
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Redes sociales (opcional)</h2>
+        {REDES.map((red) => (
+          <CampoTexto
+            key={red.clave}
+            id={`red_${red.clave}`}
+            etiqueta={red.etiqueta}
+            placeholder={red.clave === "sitio" ? "https://tusitio.com" : "@usuario o https://…"}
+            value={redes[red.clave] ?? ""}
+            onChange={(e) => cambiarRed(red.clave, e.target.value)}
+            error={errores[`redes_${red.clave}`]}
+          />
+        ))}
+        <p className="-mt-2 text-xs text-ink-500">
+          Solo se valida el formato del enlace, no que la cuenta exista o sea tuya.
+        </p>
       </section>
 
       {errorGeneral && <p className="text-sm text-error-600">{errorGeneral}</p>}

@@ -108,6 +108,8 @@ export interface Database {
           videoreel_url: string | null;
           experiencia: string | null;
           habilidades: string[];
+          /** Objeto `{ [claveRed]: urlCanonica }` con claves del catálogo `REDES`. `{}` = sin redes. */
+          redes: Record<string, string>;
           /** `null` = todavía no vio las tarjetas de ejemplo del feed (migración 0024). */
           onboarding_visto_en: string | null;
           actualizado_en: string;
@@ -129,6 +131,7 @@ export interface Database {
           videoreel_url?: string | null;
           experiencia?: string | null;
           habilidades?: string[];
+          redes?: Record<string, string>;
         };
         Update: {
           nombre?: string;
@@ -146,6 +149,7 @@ export interface Database {
           videoreel_url?: string | null;
           experiencia?: string | null;
           habilidades?: string[];
+          redes?: Record<string, string>;
           onboarding_visto_en?: string | null;
         };
         Relationships: [];
