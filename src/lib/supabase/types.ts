@@ -110,6 +110,8 @@ export interface Database {
           habilidades: string[];
           /** Objeto `{ [claveRed]: urlCanonica }` con claves del catálogo `REDES`. `{}` = sin redes. */
           redes: Record<string, string>;
+          /** Opt-in del buscador de creadores (migración 0036). `true` por defecto. */
+          aparece_en_buscador: boolean;
           /** `null` = todavía no vio las tarjetas de ejemplo del feed (migración 0024). */
           onboarding_visto_en: string | null;
           actualizado_en: string;
@@ -132,6 +134,7 @@ export interface Database {
           experiencia?: string | null;
           habilidades?: string[];
           redes?: Record<string, string>;
+          aparece_en_buscador?: boolean;
         };
         Update: {
           nombre?: string;
@@ -150,6 +153,7 @@ export interface Database {
           experiencia?: string | null;
           habilidades?: string[];
           redes?: Record<string, string>;
+          aparece_en_buscador?: boolean;
           onboarding_visto_en?: string | null;
         };
         Relationships: [];
@@ -588,6 +592,32 @@ export interface Database {
         /** `p_radio_metros` en null trae roles de cualquier locación. */
         Args: { p_talento_id: string; p_radio_metros?: number | null };
         Returns: Database["public"]["Views"]["feed_talento"]["Row"][];
+      };
+      /**
+       * Grilla del buscador de talento (modo creador). Proyección acotada: nunca
+       * `fecha_nacimiento` ni ubicación exacta. Filtra y pagina en Postgres (0036).
+       */
+      buscar_talento: {
+        Args: {
+          p_texto?: string | null;
+          p_edad_min?: number | null;
+          p_edad_max?: number | null;
+          p_generos?: GeneroPersona[];
+          p_habilidades?: string[];
+          p_lat?: number | null;
+          p_lng?: number | null;
+          p_radio_metros?: number | null;
+          p_limite?: number;
+          p_offset?: number;
+        };
+        Returns: {
+          id: string;
+          nombre: string;
+          edad: number;
+          ubicacion_publica: string;
+          habilidades: string[];
+          foto_principal_path: string;
+        }[];
       };
       /**
        * Métricas por rol de una obra propia. Es una función y no una consulta directa
