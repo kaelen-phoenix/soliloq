@@ -13,7 +13,14 @@ type NombreIcono =
   | "chevron"
   | "imagen"
   | "bandera"
-  | "reloj";
+  | "reloj"
+  | "instagram"
+  | "youtube"
+  | "tiktok"
+  | "x"
+  | "linkedin"
+  | "vimeo"
+  | "sitio";
 
 const TRAZOS: Record<NombreIcono, React.ReactNode> = {
   feed: (
@@ -69,6 +76,40 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
     <>
       <circle cx="12" cy="12" r="8.5" />
       <path d="M12 7.5V12l3 1.8" />
+    </>
+  ),
+  instagram: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="5" />
+      <circle cx="12" cy="12" r="4" />
+      <path d="M16.5 7.5h.01" />
+    </>
+  ),
+  youtube: (
+    <>
+      <rect x="2.5" y="5.5" width="19" height="13" rx="4" />
+      <path d="m10 9.5 5 2.5-5 2.5z" />
+    </>
+  ),
+  tiktok: <path d="M10 20a3 3 0 1 0-3-3v0M10 17V4c.5 3 3 5 6 5" />,
+  x: <path d="M5 5l14 14M19 5 5 19" />,
+  linkedin: (
+    <>
+      <rect x="3" y="3" width="18" height="18" rx="3" />
+      <path d="M8 10v7M8 7v.01M12 17v-3.5a1.5 1.5 0 0 1 3 0V17M12 17v-7" />
+    </>
+  ),
+  vimeo: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M10 8.5v7l6-3.5z" />
+    </>
+  ),
+  sitio: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M3.5 9h17M3.5 15h17" />
+      <path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
     </>
   ),
 };

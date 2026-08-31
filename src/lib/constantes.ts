@@ -120,6 +120,79 @@ export const HABILIDADES = [
   "Improvisación",
 ] as const;
 
+// Redes sociales del perfil de talento. El conjunto es chico y estable, así que vive acá
+// como lista cerrada (igual que `GENEROS` o `DISCIPLINAS`). La lógica de normalizar un
+// `@handle` o una URL a la forma canónica está en `src/lib/redes.ts`, no acá: esto es solo
+// el dato.
+//
+// `hosts`: dominios que se aceptan como "de esta red" al pegar una URL. El primero es el
+// canónico (el que queda guardado). `prefijoCanonico`: a qué URL se antepone un `@usuario`.
+// `conservarQuery`: si al canonizar una URL hay que preservar el query string (YouTube lo
+// necesita para `/watch?v=`).
+export type ClaveRed = "instagram" | "youtube" | "tiktok" | "x" | "linkedin" | "vimeo" | "sitio";
+
+export interface Red {
+  clave: ClaveRed;
+  etiqueta: string;
+  hosts: string[];
+  prefijoCanonico: string;
+  icono: "instagram" | "youtube" | "tiktok" | "x" | "linkedin" | "vimeo" | "sitio";
+  conservarQuery?: boolean;
+}
+
+export const REDES: Red[] = [
+  {
+    clave: "instagram",
+    etiqueta: "Instagram",
+    hosts: ["instagram.com", "www.instagram.com"],
+    prefijoCanonico: "https://instagram.com/",
+    icono: "instagram",
+  },
+  {
+    clave: "youtube",
+    etiqueta: "YouTube",
+    hosts: ["youtube.com", "www.youtube.com", "m.youtube.com"],
+    prefijoCanonico: "https://youtube.com/@",
+    icono: "youtube",
+    conservarQuery: true,
+  },
+  {
+    clave: "tiktok",
+    etiqueta: "TikTok",
+    hosts: ["tiktok.com", "www.tiktok.com"],
+    prefijoCanonico: "https://tiktok.com/@",
+    icono: "tiktok",
+  },
+  {
+    clave: "x",
+    etiqueta: "X",
+    hosts: ["x.com", "www.x.com", "twitter.com", "www.twitter.com"],
+    prefijoCanonico: "https://x.com/",
+    icono: "x",
+  },
+  {
+    clave: "linkedin",
+    etiqueta: "LinkedIn",
+    hosts: ["linkedin.com", "www.linkedin.com"],
+    prefijoCanonico: "https://linkedin.com/in/",
+    icono: "linkedin",
+  },
+  {
+    clave: "vimeo",
+    etiqueta: "Vimeo",
+    hosts: ["vimeo.com", "www.vimeo.com"],
+    prefijoCanonico: "https://vimeo.com/",
+    icono: "vimeo",
+  },
+  {
+    clave: "sitio",
+    etiqueta: "Sitio web",
+    hosts: [],
+    prefijoCanonico: "",
+    icono: "sitio",
+  },
+];
+
 export function calcularEdad(fechaNacimiento: string): number {
   const nacimiento = new Date(fechaNacimiento);
   const hoy = new Date();
