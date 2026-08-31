@@ -1,0 +1,27 @@
+## 1. Base de datos
+
+- [x] 1.1 Crear `supabase/migrations/0036_buscador_talento.sql`, idempotente, con: (a) `alter table perfiles_talento add column if not exists aparece_en_buscador boolean not null default true;` (b) función `public.puede_buscar_talento()` `SECURITY DEFINER`, `stable`, `set search_path = public`, que devuelve `exists (select 1 from perfiles_creador where id = auth.uid())`. Verificar número de migración estrictamente creciente respecto de `0035`.
+- [x] 1.2 En la misma migración, políticas **permisivas** de `select`: `perfil_talento_select_buscador` on `perfiles_talento` y `fotos_talento_select_buscador` on `fotos_talento`, ambas `using (public.puede_buscar_talento() and aparece_en_buscador = true)` / `... and (select aparece_en_buscador from perfiles_talento pt where pt.id = fotos_talento.talento_id)`. Usar `drop policy if exists` antes de cada `create policy`.
+- [x] 1.3 En la misma migración, `create or replace function public.buscar_talento(p_texto text default null, p_edad_min int default null, p_edad_max int default null, p_generos genero_persona[] default '{}', p_habilidades text[] default '{}', p_lat double precision default null, p_lng double precision default null, p_radio_metros int default null, p_limite int default 24, p_offset int default 0)` `language sql`, `security invoker`, `stable`, que devuelve `id uuid, nombre text, edad int, ubicacion_publica text, habilidades text[], foto_principal_path text`. Aplicar los filtros del design, excluir `auth.uid()`, excluir talento sin fila en `fotos_talento`, `foto_principal_path` = primera por `orden`, `order by nombre asc, id asc`, `limit p_limite offset p_offset`.
+- [x] 1.4 Aplicar `0036` a la base (Management API `POST /v1/projects/ydnafjmznntfmzrsijko/database/query`) y registrar la fila en `supabase_migrations.schema_migrations`. Verificado en prod: columna `boolean not null default true`; políticas `perfil_talento_select_buscador` / `fotos_talento_select_buscador` permisivas de select; `puede_buscar_talento()` `security definer` → `true` para un creador, `false` para un talento; `buscar_talento()` como creador devuelve 6 filas (excluye su propio perfil de talento), ninguna con `foto_principal_path` null; como talento devuelve 0; filtro por habilidad recorta.
+
+## 2. Tipos
+
+- [x] 2.1 En `src/lib/supabase/types.ts`: `aparece_en_buscador: boolean` en `Row`, `aparece_en_buscador?: boolean` en `Insert` y `Update` de `perfiles_talento`. Agregar `buscar_talento` a `Functions` con `Args` (todos opcionales) y `Returns` con los 6 campos. Verificar con `npm run typecheck`.
+
+## 3. RPC y pantalla
+
+- [x] 3.1 Crear `src/app/(app)/talentos/page.tsx`: server component; `leerEstadoCuenta`; si `modoActivo !== "creador"` → `redirect("/")`. Renderiza `<BuscadorTalento creadorId={user.id} />`.
+- [x] 3.2 Crear `src/components/talento/buscador-talento.tsx` (client): controles de filtro (texto, edad mín/máx, género multi desde `GENEROS_BUSCABLES`, habilidades multi desde `HABILIDADES`, ubicación con `CampoUbicacion` + radio), estado `offset`, llamada a `supabase.rpc("buscar_talento", …)`, grilla responsive (`grid` con `auto-fill`), botón "Cargar más" que suma `p_limite` al `offset` y concatena, y un vacío explícito cuando no hay resultados.
+- [x] 3.3 Crear `src/components/talento/tarjeta-talento.tsx`: `<Link href={`/talentos/${id}`}>`, foto principal vía `supabase.storage.from("fotos-perfil").getPublicUrl(foto_principal_path)` en `aspect-[3/4]` dominante; nombre, edad, `ubicacion_publica` y habilidades en segundo plano. Sin más campos.
+
+## 4. Navegación y perfil
+
+- [x] 4.1 En `src/components/ui/icono.tsx` agregar el icono `buscar` (lupa). En `src/components/layout/items-navegacion.tsx` sumar al union `ItemNavegacion["icono"]` el valor `"buscar"` y, en `creador`, el item `{ href: "/talentos", label: "Buscar talento", labelCorto: "Buscar", icono: "buscar" }`. Verificar que `barra-lateral.tsx` y `barra-navegacion.tsx` renderizan el nuevo item sin cambios extra.
+- [x] 4.2 En `src/components/perfil/formulario-talento.tsx`: `aparece_en_buscador` en `DatosIniciales`; estado `const [apareceEnBuscador, setApareceEnBuscador] = useState(datosIniciales?.aparece_en_buscador ?? true)`; un control tipo switch/checkbox "Aparecer en el buscador de creadores" con la línea "Necesitás al menos una foto para que te encuentren"; incluir `aparece_en_buscador: apareceEnBuscador` en `campos` de `guardar()`.
+
+## 5. Verificación integral
+
+- [x] 5.1 `npm run lint && npm run typecheck && npm run build` en verde.
+- [~] 5.2 Con `0036` aplicada. Verificado a nivel base (simulando sesión con `set local role authenticated` + `request.jwt.claims`): `buscar_talento()` como creador filtra por habilidad; como talento no devuelve nada (la permisiva exige `puede_buscar_talento()`); talento sin fotos queda fuera por el `exists (... fotos_talento ...)`; los bloqueos siguen recortando por las restrictivas de `0022` que combinan con AND. Pendiente de pasada manual por la UI (grilla, "Cargar más", redirect de `/talentos` en modo talento, switch de opt-in) — no bloquea el merge.
+- [ ] 5.3 Merge del PR a `main`, deploy de Vercel en verde, y verificación en `https://yalope.com`: `/talentos` visible en la navegación del creador, grilla carga, tocar una tarjeta abre el perfil completo.

@@ -35,6 +35,7 @@ interface DatosIniciales {
   experiencia: string | null;
   habilidades: string[];
   redes: Record<string, string>;
+  aparece_en_buscador: boolean;
 }
 
 export function FormularioTalento({
@@ -63,6 +64,9 @@ export function FormularioTalento({
   const [habilidades, setHabilidades] = useState<string[]>(datosIniciales?.habilidades ?? []);
   // Lo que la persona tipeó, tal cual. Se normaliza recién en `validar()` / `guardar()`.
   const [redes, setRedes] = useState<Record<string, string>>(datosIniciales?.redes ?? {});
+  const [apareceEnBuscador, setApareceEnBuscador] = useState(
+    datosIniciales?.aparece_en_buscador ?? true,
+  );
   const [fotos, setFotos] = useState<FotoTalento[]>(fotosIniciales);
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [cargando, setCargando] = useState(false);
@@ -130,6 +134,7 @@ export function FormularioTalento({
       experiencia: experiencia || null,
       habilidades,
       redes: validarRedes(redes).redes,
+      aparece_en_buscador: apareceEnBuscador,
     };
 
     // La unidad se deriva del país **solo al crear el perfil**. Al editar no se toca: quien
@@ -307,6 +312,26 @@ export function FormularioTalento({
         <p className="-mt-2 text-xs text-ink-500">
           Solo se valida el formato del enlace, no que la cuenta exista o sea tuya.
         </p>
+      </section>
+
+      <section className="flex flex-col gap-3">
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Buscador de creadores</h2>
+        <label className="flex items-start gap-3">
+          <input
+            type="checkbox"
+            checked={apareceEnBuscador}
+            onChange={(e) => setApareceEnBuscador(e.target.checked)}
+            className="mt-0.5 h-4 w-4 rounded border-ink-300 text-ink-900 focus:ring-ink-900"
+          />
+          <span className="text-sm text-ink-700">
+            Aparecer en el buscador de creadores
+            <span className="mt-0.5 block text-xs text-ink-500">
+              Los creadores pueden encontrarte por ubicación, edad, género o habilidades.
+              Necesitás al menos una foto para que te encuentren. Podés seguir postulándote
+              aunque esto esté apagado.
+            </span>
+          </span>
+        </label>
       </section>
 
       {errorGeneral && <p className="text-sm text-error-600">{errorGeneral}</p>}

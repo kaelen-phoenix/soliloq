@@ -3,7 +3,7 @@ import type { RolUsuario } from "@/lib/supabase/types";
 export interface ItemNavegacion {
   href: string;
   label: string;
-  icono: "feed" | "postulaciones" | "salas" | "perfil" | "tablero" | "corazon";
+  icono: "feed" | "postulaciones" | "salas" | "perfil" | "tablero" | "corazon" | "buscar";
   /** Rótulo corto para la barra inferior, donde compite con otros tres y se corta. */
   labelCorto?: string;
 }
@@ -23,6 +23,7 @@ export const ITEMS_NAVEGACION: Record<RolUsuario, ItemNavegacion[]> = {
   ],
   creador: [
     { href: "/", label: "Mis proyectos", labelCorto: "Proyectos", icono: "tablero" },
+    { href: "/talentos", label: "Buscar talento", labelCorto: "Buscar", icono: "buscar" },
     { href: "/equipo", label: "Armar equipo", labelCorto: "Equipo", icono: "corazon" },
     { href: "/salas", label: "Salas", icono: "salas" },
     { href: "/perfil", label: "Perfil", icono: "perfil" },

@@ -14,6 +14,7 @@ type NombreIcono =
   | "imagen"
   | "bandera"
   | "reloj"
+  | "buscar"
   | "instagram"
   | "youtube"
   | "tiktok"
@@ -76,6 +77,12 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
     <>
       <circle cx="12" cy="12" r="8.5" />
       <path d="M12 7.5V12l3 1.8" />
+    </>
+  ),
+  buscar: (
+    <>
+      <circle cx="11" cy="11" r="7" />
+      <path d="m20 20-4.3-4.3" />
     </>
   ),
   instagram: (
