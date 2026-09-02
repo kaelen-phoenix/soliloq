@@ -6,7 +6,7 @@ import { FormularioContacto } from "@/components/apoyar/formulario-contacto";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo, MarcaProscenio } from "@/components/ui/logotipo";
 
-// Plataforma de donación. Cambiar por la URL real (Cafecito, MercadoPago, Ko-fi…).
+// Plataforma de donación: el Cafecito de Yalope.
 const DONACION_URL = "https://cafecito.app/yalope";
 
 export async function generateMetadata(): Promise<Metadata> {
@@ -26,7 +26,7 @@ export default async function ApoyarPage() {
   const destinos = [t("destino1"), t("destino2"), t("destino3")];
 
   return (
-    <div className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
+    <div data-tema="light" className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
       {/* Cabecera: el mismo escenario oscuro que la portada. */}
       <section className="relative overflow-hidden bg-telon-900 text-white">
         <div
