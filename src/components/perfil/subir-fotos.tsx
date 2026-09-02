@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
+import { comprimirImagen } from "@/lib/comprimir-imagen";
 import { createClient } from "@/lib/supabase/client";
 
 export interface FotoTalento {
@@ -70,17 +71,26 @@ export function SubirFotos({
       setError("Solo se admiten imágenes JPEG, PNG o WebP.");
       return;
     }
-    if (archivo.size > MAX_BYTES) {
-      setError("La imagen no puede superar los 5 MB.");
+
+    setSubiendo(true);
+
+    // Si la foto pesa o mide de más, se comprime acá en vez de rechazarla.
+    let foto: File;
+    try {
+      foto = await comprimirImagen(archivo, { maxBytes: MAX_BYTES });
+    } catch (e) {
+      setSubiendo(false);
+      setError(e instanceof Error ? e.message : "No pudimos procesar la imagen.");
       return;
     }
 
-    setSubiendo(true);
     const supabase = createClient();
-    const extension = archivo.name.split(".").pop();
+    const extension = (foto.type.split("/")[1] ?? "jpg").replace("jpeg", "jpg");
     const ruta = `${talentoId}/${crypto.randomUUID()}.${extension}`;
 
-    const { error: errorSubida } = await supabase.storage.from("fotos-perfil").upload(ruta, archivo);
+    const { error: errorSubida } = await supabase.storage
+      .from("fotos-perfil")
+      .upload(ruta, foto, { contentType: foto.type });
 
     if (errorSubida) {
       setSubiendo(false);
