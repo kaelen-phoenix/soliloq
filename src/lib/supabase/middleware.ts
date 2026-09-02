@@ -4,7 +4,7 @@ import { destinoSegunEstado } from "../cuenta";
 import { leerEstadoCuenta } from "../cuenta-servidor";
 import type { Database } from "./types";
 
-const RUTAS_PUBLICAS = ["/ingresar", "/recuperar", "/auth/callback"];
+const RUTAS_PUBLICAS = ["/ingresar", "/recuperar", "/auth/callback", "/bienvenida"];
 
 // Elegir contraseña tiene que estar disponible con sesión iniciada aunque el
 // onboarding esté a medias: se llega ahí desde el enlace de recuperación.
@@ -64,7 +64,9 @@ export async function actualizarSesion(request: NextRequest) {
   if (esRutaAbierta) return response;
 
   if (!user) {
-    return esRutaPublica ? response : redirigir("/ingresar");
+    if (esRutaPublica) return response;
+    // Sin sesión, la raíz muestra la landing; el resto pide entrar.
+    return redirigir(path === "/" ? "/bienvenida" : "/ingresar");
   }
 
   if (esRutaPublica) return redirigir("/");
