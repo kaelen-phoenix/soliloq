@@ -25,7 +25,8 @@ type NombreIcono =
   | "whatsapp"
   | "facebook"
   | "enlace"
-  | "compartir";
+  | "compartir"
+  | "qr";
 
 const TRAZOS: Record<NombreIcono, React.ReactNode> = {
   feed: (
@@ -147,6 +148,14 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
       <circle cx="6" cy="12" r="2.5" />
       <circle cx="18" cy="18" r="2.5" />
       <path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6" />
+    </>
+  ),
+  qr: (
+    <>
+      <rect x="3" y="3" width="7" height="7" rx="1" />
+      <rect x="14" y="3" width="7" height="7" rx="1" />
+      <rect x="3" y="14" width="7" height="7" rx="1" />
+      <path d="M14 14h3v3M21 14v.01M14 21h.01M21 21v.01M17.5 17.5h.01M21 17.5h.01M17.5 21h.01" />
     </>
   ),
 };
