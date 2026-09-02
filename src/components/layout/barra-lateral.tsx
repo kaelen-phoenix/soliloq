@@ -40,7 +40,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                     activo
                       ? "acento-fondo acento-texto"
-                      : "text-texto-tenue hover:bg-fondo-sutil/60 hover:text-ink-800"
+                      : "text-texto-tenue hover:bg-fondo-sutil/60 hover:text-texto"
                   }`}
                 >
                   <Icono nombre={item.icono} className="h-[18px] w-[18px]" />
@@ -58,7 +58,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
         className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
           pathname === "/ajustes"
             ? "acento-fondo acento-texto"
-            : "text-texto-tenue hover:bg-fondo-sutil/60 hover:text-ink-800"
+            : "text-texto-tenue hover:bg-fondo-sutil/60 hover:text-texto"
         }`}
       >
         <Icono nombre="ajustes" className="h-[18px] w-[18px]" />

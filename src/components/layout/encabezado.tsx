@@ -34,7 +34,7 @@ export async function Encabezado({
           <Link
             href="/ajustes"
             aria-label={t("ajustes")}
-            className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-fondo-sutil hover:text-ink-700"
+            className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-fondo-sutil hover:text-texto"
           >
             <Icono nombre="ajustes" className="h-5 w-5" />
           </Link>

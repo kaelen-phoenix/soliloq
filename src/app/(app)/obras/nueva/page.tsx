@@ -65,7 +65,7 @@ export default function NuevaObraPage() {
         <CampoTexto id="titulo" etiqueta="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} error={errores.titulo} />
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="sinopsis" className="text-sm font-medium text-ink-700">
+          <label htmlFor="sinopsis" className="text-sm font-medium text-texto">
             Sinopsis (opcional)
           </label>
           <textarea

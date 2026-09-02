@@ -70,7 +70,7 @@ export function ResponderInteres({ persona }: { persona: PersonaParaResponder })
         )}
 
         {persona.pitch && (
-          <p className="mt-4 text-base leading-relaxed text-ink-800">{persona.pitch}</p>
+          <p className="mt-4 text-base leading-relaxed text-texto">{persona.pitch}</p>
         )}
 
         {persona.disciplinas.length > 0 && (

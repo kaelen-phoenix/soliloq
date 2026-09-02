@@ -12,8 +12,8 @@ interface Props extends React.ButtonHTMLAttributes<HTMLButtonElement> {
 }
 
 const estilosPorVariante: Record<Variante, string> = {
-  primario: "bg-ink-900 text-white hover:bg-ink-800 disabled:bg-ink-300",
-  secundario: "border border-borde bg-superficie text-ink-800 hover:bg-fondo-sutil disabled:opacity-50",
+  primario: "bg-accion text-accion-texto hover:opacity-90 disabled:opacity-40",
+  secundario: "border border-borde bg-superficie text-texto hover:bg-fondo-sutil disabled:opacity-50",
   fantasma: "text-texto-tenue hover:bg-fondo-sutil disabled:opacity-50",
   peligro: "text-error-600 hover:bg-error-50 disabled:opacity-50",
 };

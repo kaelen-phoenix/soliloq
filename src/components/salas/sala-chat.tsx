@@ -200,7 +200,7 @@ export function SalaChat({
               <li key={m.id} className={`flex ${esPropio ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[78%] rounded-2xl px-3.5 py-2 ${
-                    esPropio ? "bg-ink-900 text-white" : "bg-ink-100 text-texto"
+                    esPropio ? "bg-accion text-accion-texto" : "bg-ink-100 text-texto"
                   }`}
                 >
                   {!esPropio && (
@@ -234,7 +234,7 @@ export function SalaChat({
         <button
           type="submit"
           disabled={!texto.trim()}
-          className="rounded-full bg-ink-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ink-800 disabled:bg-ink-200"
+          className="rounded-full bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto transition-colors hover:opacity-90 disabled:opacity-40"
         >
           Enviar
         </button>

@@ -88,7 +88,7 @@ export function BuscarEquipo({
 
       {activo && (
         <div className="mt-4 flex flex-col gap-2">
-          <label htmlFor="pitch" className="text-sm font-medium text-ink-700">
+          <label htmlFor="pitch" className="text-sm font-medium text-texto">
             ¿Qué querés hacer?
           </label>
           <textarea

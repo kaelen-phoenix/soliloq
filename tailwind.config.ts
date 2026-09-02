@@ -15,17 +15,21 @@ const config: Config = {
         texto: "rgb(var(--texto) / <alpha-value>)",
         "texto-tenue": "rgb(var(--texto-tenue) / <alpha-value>)",
         borde: "rgb(var(--borde) / <alpha-value>)",
-        // Acento: se usa solo en acciones primarias y estados activos.
+        accion: "rgb(var(--accion) / <alpha-value>)",
+        "accion-texto": "rgb(var(--accion-texto) / <alpha-value>)",
+        // Acento: se usa solo en acciones primarias y estados activos. Frambuesa cálida —
+        // más rica y teatral que el magenta plano de antes, y bien distinta del rojo de
+        // `error`.
         brand: {
-          50: "#fdf2f7",
-          100: "#fce7f0",
-          200: "#fbcfe1",
-          300: "#f9a8c9",
-          400: "#f472a6",
-          500: "#d81b7a",
-          600: "#be1367",
-          700: "#9d1054",
-          900: "#5c0a31",
+          50: "#fdf1f4",
+          100: "#fce0e8",
+          200: "#f8c1d1",
+          300: "#f191ac",
+          400: "#e65a82",
+          500: "#cf1f57",
+          600: "#b01449",
+          700: "#8f0f3c",
+          900: "#500722",
         },
         // Acento por rol. No es un color nuevo suelto: `talento` es la rampa de `brand`
         // (el rosa que la app ya usaba por defecto) y `creador` es su complementario en
@@ -34,26 +38,26 @@ const config: Config = {
         // reforzar en qué modo estás. Nunca reemplazan a `brand` en las acciones
         // primarias ni conviven con las etiquetas de familia de oficio en la misma zona.
         talento: {
-          50: "#fdf2f7",
-          100: "#fce7f0",
-          200: "#fbcfe1",
-          300: "#f9a8c9",
-          400: "#f472a6",
-          500: "#d81b7a",
-          600: "#be1367",
-          700: "#9d1054",
-          900: "#5c0a31",
+          50: "#fdf1f4",
+          100: "#fce0e8",
+          200: "#f8c1d1",
+          300: "#f191ac",
+          400: "#e65a82",
+          500: "#cf1f57",
+          600: "#b01449",
+          700: "#8f0f3c",
+          900: "#500722",
         },
         creador: {
-          50: "#f1f0fd",
-          100: "#e5e2fb",
-          200: "#cdc7f6",
-          300: "#a99eef",
-          400: "#7d6be4",
-          500: "#5b45d8",
-          600: "#4a37b8",
-          700: "#3c2d95",
-          900: "#241a58",
+          50: "#eef0fb",
+          100: "#dde1f6",
+          200: "#bcc3ee",
+          300: "#8f9ce2",
+          400: "#6070cf",
+          500: "#3f4fb8",
+          600: "#323f97",
+          700: "#293378",
+          900: "#181d45",
         },
         // Escala neutra con un matiz cálido apenas perceptible: evita el gris
         // clínico sin introducir un segundo color.

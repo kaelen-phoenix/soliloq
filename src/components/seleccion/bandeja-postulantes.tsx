@@ -16,9 +16,9 @@ export interface PostulanteConTalento {
 }
 
 const ETIQUETAS: { valor: EstadoPostulacion; label: string; estilo: string }[] = [
-  { valor: "rechazado", label: "Rechazar", estilo: "bg-ink-100 text-ink-700" },
+  { valor: "rechazado", label: "Rechazar", estilo: "bg-ink-100 text-texto" },
   { valor: "en_duda", label: "En duda", estilo: "bg-alerta-50 text-alerta-800" },
-  { valor: "aprobado", label: "Aprobar", estilo: "bg-ink-900 text-white" },
+  { valor: "aprobado", label: "Aprobar", estilo: "bg-accion text-accion-texto" },
 ];
 
 export function BandejaPostulantes({

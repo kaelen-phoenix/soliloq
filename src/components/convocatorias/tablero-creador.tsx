@@ -11,7 +11,7 @@ const ETIQUETA_ESTADO: Record<string, string> = {
 
 const COLOR_ESTADO: Record<string, string> = {
   borrador: "bg-ink-100 text-texto-tenue",
-  publicada: "bg-ink-900 text-white",
+  publicada: "bg-accion text-accion-texto",
   cerrada: "bg-fondo-sutil text-ink-400",
 };
 
@@ -28,7 +28,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
     <main className="px-5 py-5">
       <Link
         href="/obras/nueva"
-        className="mb-5 flex items-center justify-center gap-1.5 rounded-xl bg-ink-900 px-4 py-3 text-sm font-medium text-white transition-colors hover:bg-ink-800"
+        className="mb-5 flex items-center justify-center gap-1.5 rounded-xl bg-accion px-4 py-3 text-sm font-medium text-accion-texto transition-colors hover:opacity-90"
       >
         <Icono nombre="mas" className="h-4 w-4" />
         Crear nueva obra

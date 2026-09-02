@@ -184,7 +184,7 @@ export function FormularioCreador({
         {/* Perfil artístico. Es múltiple porque en el medio se hace más de una cosa: quien
             dirige también actúa, y obligar a elegir una sola falsea el perfil. */}
         <fieldset className="flex flex-col gap-2.5">
-          <legend className="text-sm font-medium text-ink-700">
+          <legend className="text-sm font-medium text-texto">
             Perfil artístico
             <span className="ml-1.5 font-normal text-ink-400">Elegí todo lo que hagas</span>
           </legend>

@@ -94,7 +94,7 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
 
       {esDueño ? (
         <footer className="mt-12 border-t border-borde pt-5 text-sm">
-          <Link href="/perfil" className="font-medium text-ink-700 hover:text-texto">
+          <Link href="/perfil" className="font-medium text-texto hover:text-texto">
             Volver a mi perfil
           </Link>
         </footer>
@@ -102,7 +102,7 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
         <div className="mt-10">
           <Link
             href="/"
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-borde py-3 text-sm font-semibold text-ink-800 transition-colors hover:bg-fondo-sutil"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-borde py-3 text-sm font-semibold text-texto transition-colors hover:bg-fondo-sutil"
           >
             Ir a Yalope
           </Link>

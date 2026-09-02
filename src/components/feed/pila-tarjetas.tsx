@@ -182,7 +182,7 @@ export function PilaTarjetas({
           value={opcionActual.metros ?? ""}
           disabled={recargando}
           onChange={(e) => cambiarRadio(e.target.value === "" ? null : Number(e.target.value))}
-          className="rounded-lg border border-borde bg-superficie px-2 py-1 text-2xs font-medium text-ink-700 focus:border-ink-900"
+          className="rounded-lg border border-borde bg-superficie px-2 py-1 text-2xs font-medium text-texto focus:border-ink-900"
         >
           {opciones.map((o) => (
             <option key={o.etiqueta} value={o.metros ?? ""}>
@@ -199,7 +199,7 @@ export function PilaTarjetas({
               disabled={recargando}
               onClick={() => cambiarUnidad(u)}
               className={`px-2 py-1 text-2xs font-medium transition-colors ${
-                unidad === u ? "bg-ink-900 text-white" : "text-texto-tenue hover:text-texto"
+                unidad === u ? "bg-accion text-accion-texto" : "text-texto-tenue hover:text-texto"
               }`}
             >
               {u}

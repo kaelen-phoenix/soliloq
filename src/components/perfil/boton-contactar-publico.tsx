@@ -23,7 +23,7 @@ export function BotonContactarPublico({
     return (
       <Link
         href={`/ingresar?next=${encodeURIComponent(`/p/${token}`)}`}
-        className="inline-flex items-center justify-center gap-2 rounded-xl bg-ink-900 px-4 py-2.5 text-sm font-medium text-white transition-colors hover:bg-ink-800"
+        className="inline-flex items-center justify-center gap-2 rounded-xl bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto transition-colors hover:opacity-90"
       >
         Contactar
       </Link>
