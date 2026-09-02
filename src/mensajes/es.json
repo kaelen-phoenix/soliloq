@@ -1,0 +1,99 @@
+{
+  "comun": {
+    "guardar": "Guardar",
+    "guardando": "Guardando…",
+    "cancelar": "Cancelar",
+    "cargando": "Cargando…",
+    "cargarMas": "Cargar más",
+    "buscar": "Buscar",
+    "volver": "Volver",
+    "reintentar": "Probá de nuevo",
+    "guardado": "Guardado"
+  },
+  "nav": {
+    "convocatorias": "Convocatorias",
+    "convocatoriasCorto": "Feed",
+    "postulaciones": "Postulaciones",
+    "armarEquipo": "Armar equipo",
+    "armarEquipoCorto": "Equipo",
+    "salas": "Salas",
+    "perfil": "Perfil",
+    "misProyectos": "Mis proyectos",
+    "misProyectosCorto": "Proyectos",
+    "buscarTalento": "Buscar talento",
+    "buscarTalentoCorto": "Buscar",
+    "admin": "Admin",
+    "ajustes": "Ajustes"
+  },
+  "titulos": {
+    "postulaciones": "Postulaciones",
+    "armarEquipo": "Armar equipo",
+    "sala": "Sala",
+    "salas": "Salas",
+    "notificaciones": "Notificaciones",
+    "nuevoPerfil": "Nuevo perfil",
+    "tuPerfil": "Tu perfil",
+    "nuevaObra": "Nueva obra",
+    "postulantes": "Postulantes",
+    "obra": "Obra",
+    "perfil": "Perfil",
+    "buscarTalento": "Buscar talento",
+    "ajustes": "Ajustes",
+    "admin": "Administración",
+    "convocatorias": "Convocatorias",
+    "misProyectos": "Mis proyectos"
+  },
+  "modo": {
+    "talento": "Talento",
+    "creador": "Creador",
+    "estasEn": "Estás en {rol}",
+    "cambiarA": "Cambiar a {rol}",
+    "sumarPerfil": "Sumar perfil de {rol}",
+    "cambiarAModo": "Cambiar a modo {rol}"
+  },
+  "landing": {
+    "entrar": "Entrar",
+    "crearPerfil": "Crear mi perfil",
+    "heroTitulo": "El casting teatral, en tu teléfono.",
+    "heroTexto": "Yalope conecta talento y creadores de teatro. Postulate a convocatorias, compartí tu perfil como booking y armá elenco con un match rápido y visual.",
+    "verComoFunciona": "Ver cómo funciona",
+    "paraArtistasTitulo": "Si actuás, dirigís o hacés que la obra pase",
+    "paraArtistasTexto": "Un perfil que se comparte como booking: fotos, videoreel, experiencia y un enlace para pasarle a cualquier casting, sin que tengan que crear cuenta.",
+    "paraCreadoresTitulo": "Si estás armando un proyecto",
+    "paraCreadoresTexto": "Publicá la convocatoria y recibí postulaciones con la foto primero. O salí a buscar talento por edad, zona y habilidades.",
+    "publicarConvocatoria": "Publicar una convocatoria",
+    "comoFunciona": "Cómo funciona",
+    "paso1Titulo": "Armá tu perfil",
+    "paso1Texto": "Fotos, experiencia, habilidades y redes. Diez minutos y queda listo para compartir.",
+    "paso2Titulo": "Encontrá o publicá",
+    "paso2Texto": "Deslizá convocatorias que te sirven, o publicá la tuya y mirá quién se anota. También podés buscar gente para armar equipo sin una obra de por medio.",
+    "paso3Titulo": "Cuando hay match, hablan",
+    "paso3Texto": "El interés es mutuo y a ciegas: recién cuando los dos dicen que sí se abre una sala para escribirse.",
+    "cierreTitulo": "Tu próximo elenco, o tu próximo papel, está a un match.",
+    "sumate": "Sumate a Yalope",
+    "pieLema": "Match teatral · Hecho en Argentina"
+  },
+  "ajustes": {
+    "titulo": "Ajustes",
+    "bajada": "Idioma y tema de la aplicación.",
+    "idioma": "Idioma",
+    "idiomaAyuda": "El contenido que escriben otras personas se muestra en el idioma en que lo escribieron.",
+    "español": "Español",
+    "ingles": "English",
+    "tema": "Tema",
+    "temaAyuda": "«Sistema» sigue la preferencia de tu dispositivo.",
+    "sistema": "Sistema",
+    "claro": "Claro",
+    "oscuro": "Oscuro"
+  },
+  "auth": {
+    "titulo": "Entrá a Yalope",
+    "bajada": "Match teatral para talento y creadores.",
+    "enlaceInvalido": "Ese enlace venció o ya fue usado. Pedí uno nuevo."
+  },
+  "suspendido": {
+    "titulo": "Tu cuenta está suspendida",
+    "texto": "Un administrador suspendió el acceso a esta cuenta. Si creés que es un error, escribinos y lo revisamos.",
+    "cerrarSesion": "Cerrar sesión"
+  }
+}

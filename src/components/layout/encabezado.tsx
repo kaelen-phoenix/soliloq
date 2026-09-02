@@ -1,9 +1,12 @@
+import { getTranslations } from "next-intl/server";
+import Link from "next/link";
+import { Icono } from "@/components/ui/icono";
 import type { RolUsuario } from "@/lib/supabase/types";
 import { CampanitaNotificaciones } from "./campanita-notificaciones";
 import { ConmutadorModo } from "./conmutador-modo";
 import { TituloSeccion } from "./titulo-seccion";
 
-export function Encabezado({
+export async function Encabezado({
   userId,
   modoActivo,
   tieneAmbosPerfiles,
@@ -14,6 +17,7 @@ export function Encabezado({
   tieneAmbosPerfiles: boolean;
   rolFaltante: RolUsuario | null;
 }) {
+  const t = await getTranslations("nav");
   return (
     <header className="superficie-portada safe-top sticky top-0 z-20 border-b border-ink-100 bg-white/75 backdrop-blur-xl">
       <div className="flex w-full items-end justify-between px-5 pb-3 pt-4">
@@ -25,7 +29,16 @@ export function Encabezado({
           />
           <TituloSeccion modoActivo={modoActivo} />
         </div>
-        <CampanitaNotificaciones userId={userId} />
+        <div className="flex items-center gap-1">
+          <CampanitaNotificaciones userId={userId} />
+          <Link
+            href="/ajustes"
+            aria-label={t("ajustes")}
+            className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-ink-50 hover:text-ink-700"
+          >
+            <Icono nombre="ajustes" className="h-5 w-5" />
+          </Link>
+        </div>
       </div>
     </header>
   );

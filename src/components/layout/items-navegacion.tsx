@@ -2,7 +2,10 @@ import type { RolUsuario } from "@/lib/supabase/types";
 
 export interface ItemNavegacion {
   href: string;
-  label: string;
+  /** Clave en el namespace `nav` de los mensajes. */
+  clave: string;
+  /** Clave del rótulo corto para la barra inferior, donde compite con otros y se corta. */
+  claveCorto?: string;
   icono:
     | "feed"
     | "postulaciones"
@@ -12,36 +15,35 @@ export interface ItemNavegacion {
     | "corazon"
     | "buscar"
     | "admin";
-  /** Rótulo corto para la barra inferior, donde compite con otros tres y se corta. */
-  labelCorto?: string;
 }
 
 /**
  * Única definición de la navegación. La barra inferior (móvil) y la lateral (escritorio)
  * son componentes distintos porque son formas distintas, pero leen de acá: si cada una
  * tuviera su lista, la app terminaría con dos navegaciones según el tamaño de pantalla.
+ * El rótulo visible sale del namespace `nav` de i18n con `clave` / `claveCorto`.
  */
 export const ITEMS_NAVEGACION: Record<RolUsuario, ItemNavegacion[]> = {
   talento: [
-    { href: "/", label: "Convocatorias", labelCorto: "Feed", icono: "feed" },
-    { href: "/postulaciones", label: "Postulaciones", icono: "postulaciones" },
-    { href: "/equipo", label: "Armar equipo", labelCorto: "Equipo", icono: "corazon" },
-    { href: "/salas", label: "Salas", icono: "salas" },
-    { href: "/perfil", label: "Perfil", icono: "perfil" },
+    { href: "/", clave: "convocatorias", claveCorto: "convocatoriasCorto", icono: "feed" },
+    { href: "/postulaciones", clave: "postulaciones", icono: "postulaciones" },
+    { href: "/equipo", clave: "armarEquipo", claveCorto: "armarEquipoCorto", icono: "corazon" },
+    { href: "/salas", clave: "salas", icono: "salas" },
+    { href: "/perfil", clave: "perfil", icono: "perfil" },
   ],
   creador: [
-    { href: "/", label: "Mis proyectos", labelCorto: "Proyectos", icono: "tablero" },
-    { href: "/talentos", label: "Buscar talento", labelCorto: "Buscar", icono: "buscar" },
-    { href: "/equipo", label: "Armar equipo", labelCorto: "Equipo", icono: "corazon" },
-    { href: "/salas", label: "Salas", icono: "salas" },
-    { href: "/perfil", label: "Perfil", icono: "perfil" },
+    { href: "/", clave: "misProyectos", claveCorto: "misProyectosCorto", icono: "tablero" },
+    { href: "/talentos", clave: "buscarTalento", claveCorto: "buscarTalentoCorto", icono: "buscar" },
+    { href: "/equipo", clave: "armarEquipo", claveCorto: "armarEquipoCorto", icono: "corazon" },
+    { href: "/salas", clave: "salas", icono: "salas" },
+    { href: "/perfil", clave: "perfil", icono: "perfil" },
   ],
 };
 
 const ITEM_ADMIN: ItemNavegacion = {
   href: "/admin",
-  label: "Admin",
-  labelCorto: "Admin",
+  clave: "admin",
+  claveCorto: "admin",
   icono: "admin",
 };
 

@@ -1,7 +1,11 @@
+import createNextIntlPlugin from "next-intl/plugin";
+
 // Cookie de sesión de Supabase (`sb-<ref>-auth-token`, más los chunks `.0`/`.1` cuando el
 // token es largo). Si NINGUNA está, quien pide `/` es anónimo y se le sirve la landing sin
 // redirect: `yalope.com/` responde 200 con contenido indexable en vez de un 307.
 const COOKIE_SESION = "sb-ydnafjmznntfmzrsijko-auth-token";
+
+const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 
 /** @type {import('next').NextConfig} */
 const nextConfig = {
@@ -35,4 +39,4 @@ const nextConfig = {
   },
 };
 
-export default nextConfig;
+export default withNextIntl(nextConfig);

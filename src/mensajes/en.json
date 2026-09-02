@@ -1,0 +1,99 @@
+{
+  "comun": {
+    "guardar": "Save",
+    "guardando": "Saving…",
+    "cancelar": "Cancel",
+    "cargando": "Loading…",
+    "cargarMas": "Load more",
+    "buscar": "Search",
+    "volver": "Back",
+    "reintentar": "Try again",
+    "guardado": "Saved"
+  },
+  "nav": {
+    "convocatorias": "Casting calls",
+    "convocatoriasCorto": "Feed",
+    "postulaciones": "Applications",
+    "armarEquipo": "Build a team",
+    "armarEquipoCorto": "Team",
+    "salas": "Rooms",
+    "perfil": "Profile",
+    "misProyectos": "My projects",
+    "misProyectosCorto": "Projects",
+    "buscarTalento": "Find talent",
+    "buscarTalentoCorto": "Search",
+    "admin": "Admin",
+    "ajustes": "Settings"
+  },
+  "titulos": {
+    "postulaciones": "Applications",
+    "armarEquipo": "Build a team",
+    "sala": "Room",
+    "salas": "Rooms",
+    "notificaciones": "Notifications",
+    "nuevoPerfil": "New profile",
+    "tuPerfil": "Your profile",
+    "nuevaObra": "New production",
+    "postulantes": "Applicants",
+    "obra": "Production",
+    "perfil": "Profile",
+    "buscarTalento": "Find talent",
+    "ajustes": "Settings",
+    "admin": "Administration",
+    "convocatorias": "Casting calls",
+    "misProyectos": "My projects"
+  },
+  "modo": {
+    "talento": "Talent",
+    "creador": "Creator",
+    "estasEn": "You're in {rol}",
+    "cambiarA": "Switch to {rol}",
+    "sumarPerfil": "Add a {rol} profile",
+    "cambiarAModo": "Switch to {rol} mode"
+  },
+  "landing": {
+    "entrar": "Log in",
+    "crearPerfil": "Create my profile",
+    "heroTitulo": "Theatre casting, on your phone.",
+    "heroTexto": "Yalope connects theatre talent and creators. Apply to casting calls, share your profile as a booking, and build a cast with a fast, visual match.",
+    "verComoFunciona": "See how it works",
+    "paraArtistasTitulo": "If you act, direct, or make the show happen",
+    "paraArtistasTexto": "A profile you share like a booking: photos, showreel, experience, and a link to send any casting director — no account needed on their end.",
+    "paraCreadoresTitulo": "If you're putting a project together",
+    "paraCreadoresTexto": "Post your casting call and get applications with the photo first. Or go find talent by age, area, and skills.",
+    "publicarConvocatoria": "Post a casting call",
+    "comoFunciona": "How it works",
+    "paso1Titulo": "Build your profile",
+    "paso1Texto": "Photos, experience, skills, and links. Ten minutes and it's ready to share.",
+    "paso2Titulo": "Find or post",
+    "paso2Texto": "Swipe through calls that fit, or post your own and see who signs up. You can also look for people to team up with, no production required.",
+    "paso3Titulo": "When there's a match, you talk",
+    "paso3Texto": "Interest is mutual and blind: only when you both say yes does a room open so you can message.",
+    "cierreTitulo": "Your next cast, or your next role, is one match away.",
+    "sumate": "Join Yalope",
+    "pieLema": "Theatre match · Made in Argentina"
+  },
+  "ajustes": {
+    "titulo": "Settings",
+    "bajada": "App language and theme.",
+    "idioma": "Language",
+    "idiomaAyuda": "Content other people write is shown in the language they wrote it in.",
+    "español": "Español",
+    "ingles": "English",
+    "tema": "Theme",
+    "temaAyuda": "“System” follows your device's preference.",
+    "sistema": "System",
+    "claro": "Light",
+    "oscuro": "Dark"
+  },
+  "auth": {
+    "titulo": "Log in to Yalope",
+    "bajada": "Theatre match for talent and creators.",
+    "enlaceInvalido": "That link expired or was already used. Request a new one."
+  },
+  "suspendido": {
+    "titulo": "Your account is suspended",
+    "texto": "An administrator suspended access to this account. If you think this is a mistake, get in touch and we'll review it.",
+    "cerrarSesion": "Log out"
+  }
+}

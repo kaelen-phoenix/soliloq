@@ -81,6 +81,10 @@ export interface Database {
           es_admin: boolean;
           /** Timestamp de suspensión por un admin, o null si está activa (0040). */
           suspendido_en: string | null;
+          /** Idioma de la interfaz (0041): 'es' | 'en'. */
+          idioma: string;
+          /** Tema (0041): 'sistema' | 'claro' | 'oscuro'. */
+          tema: string;
           creado_en: string;
         };
         Insert: {
@@ -101,6 +105,8 @@ export interface Database {
           enlace_publico_activo?: boolean;
           es_admin?: boolean;
           suspendido_en?: string | null;
+          idioma?: string;
+          tema?: string;
         };
         Relationships: [];
       };

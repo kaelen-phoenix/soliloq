@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo } from "@/components/ui/logotipo";
@@ -64,44 +65,8 @@ const JSON_LD = {
   ],
 };
 
-const PARA = [
-  {
-    icono: "corazon" as const,
-    titulo: "Si actuás, dirigís o hacés que la obra pase",
-    texto:
-      "Un perfil que se comparte como booking: fotos, videoreel, experiencia y un enlace para pasarle a cualquier casting, sin que tengan que crear cuenta.",
-    cta: "Crear mi perfil",
-  },
-  {
-    icono: "buscar" as const,
-    titulo: "Si estás armando un proyecto",
-    texto:
-      "Publicá la convocatoria y recibí postulaciones con la foto primero. O salí a buscar talento por edad, zona y habilidades.",
-    cta: "Publicar una convocatoria",
-  },
-];
-
-const PASOS = [
-  {
-    n: "01",
-    titulo: "Armá tu perfil",
-    texto: "Fotos, experiencia, habilidades y redes. Diez minutos y queda listo para compartir.",
-  },
-  {
-    n: "02",
-    titulo: "Encontrá o publicá",
-    texto:
-      "Deslizá convocatorias que te sirven, o publicá la tuya y mirá quién se anota. También podés buscar gente para armar equipo sin una obra de por medio.",
-  },
-  {
-    n: "03",
-    titulo: "Cuando hay match, hablan",
-    texto:
-      "El interés es mutuo y a ciegas: recién cuando los dos dicen que sí se abre una sala para escribirse.",
-  },
-];
-
-export default function BienvenidaPage() {
+export default async function BienvenidaPage() {
+  const t = await getTranslations("landing");
   return (
     <div className="flex min-h-screen flex-col bg-[#faf5ec] text-ink-900">
       <script
@@ -143,13 +108,13 @@ export default function BienvenidaPage() {
                   href="/ingresar"
                   className="rounded-xl px-3.5 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                 >
-                  Entrar
+                  {t("entrar")}
                 </Link>
                 <Link
                   href="/ingresar"
                   className="rounded-xl bg-candileja-400 px-3.5 py-2 text-sm font-semibold text-telon-900 transition-colors hover:bg-candileja-300"
                 >
-                  Crear mi perfil
+                  {t("crearPerfil")}
                 </Link>
               </nav>
             </header>
@@ -158,25 +123,24 @@ export default function BienvenidaPage() {
               <div>
                 <MascarasTeatro className="h-10 w-12 text-candileja-300" />
                 <h1 className="mt-5 font-display text-[2.6rem] font-semibold leading-[1.03] tracking-[-0.02em] md:text-[3.4rem]">
-                  El casting teatral, en tu teléfono.
+                  {t("heroTitulo")}
                 </h1>
                 <p className="mt-5 max-w-prose text-lg leading-relaxed text-white/75">
-                  Yalope conecta talento y creadores de teatro. Postulate a convocatorias,
-                  compartí tu perfil como booking y armá elenco con un match rápido y visual.
+                  {t("heroTexto")}
                 </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href="/ingresar"
                     className="inline-flex items-center gap-2 rounded-xl bg-candileja-400 px-5 py-3 text-sm font-semibold text-telon-900 transition-colors hover:bg-candileja-300"
                   >
-                    Crear mi perfil
+                    {t("crearPerfil")}
                     <Icono nombre="flecha-derecha" className="h-4 w-4" />
                   </Link>
                   <a
                     href="#como-funciona"
                     className="inline-flex items-center rounded-xl border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
                   >
-                    Ver cómo funciona
+                    {t("verComoFunciona")}
                   </a>
                 </div>
               </div>
@@ -204,47 +168,57 @@ export default function BienvenidaPage() {
         {/* Para quién */}
         <section className="mx-auto w-full max-w-5xl px-5 py-16">
           <div className="grid gap-4 md:grid-cols-2">
-            {PARA.map((b, i) => {
-              const paleta =
-                i === 0
-                  ? "bg-telon-50 text-telon-600"
-                  : "bg-candileja-50 text-candileja-600";
-              const enlace = i === 0 ? "text-telon-600 hover:text-telon-700" : "text-candileja-600 hover:text-candileja-700";
-              return (
-                <div
-                  key={b.titulo}
-                  className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-tarjeta"
-                >
-                  <span className={`flex h-11 w-11 items-center justify-center rounded-xl ${paleta}`}>
-                    <Icono nombre={b.icono} className="h-5 w-5" />
-                  </span>
-                  <h2 className="mt-4 font-display text-xl font-semibold tracking-[-0.02em]">
-                    {b.titulo}
-                  </h2>
-                  <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">{b.texto}</p>
-                  <Link
-                    href="/ingresar"
-                    className={`mt-4 inline-flex items-center gap-1.5 text-sm font-medium ${enlace}`}
-                  >
-                    {b.cta}
-                    <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
-                  </Link>
-                </div>
-              );
-            })}
+            <div className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-tarjeta">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-telon-50 text-telon-600">
+                <Icono nombre="corazon" className="h-5 w-5" />
+              </span>
+              <h2 className="mt-4 font-display text-xl font-semibold tracking-[-0.02em]">
+                {t("paraArtistasTitulo")}
+              </h2>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">
+                {t("paraArtistasTexto")}
+              </p>
+              <Link
+                href="/ingresar"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-telon-600 hover:text-telon-700"
+              >
+                {t("crearPerfil")}
+                <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
+              </Link>
+            </div>
+            <div className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-tarjeta">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-candileja-50 text-candileja-600">
+                <Icono nombre="buscar" className="h-5 w-5" />
+              </span>
+              <h2 className="mt-4 font-display text-xl font-semibold tracking-[-0.02em]">
+                {t("paraCreadoresTitulo")}
+              </h2>
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">
+                {t("paraCreadoresTexto")}
+              </p>
+              <Link
+                href="/ingresar"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-candileja-600 hover:text-candileja-700"
+              >
+                {t("publicarConvocatoria")}
+                <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
+              </Link>
+            </div>
           </div>
         </section>
 
         {/* Cómo funciona: banda cálida, con los números en rojo de marquesina. */}
         <section id="como-funciona" className="border-y border-candileja-200/60 bg-candileja-50/70">
           <div className="mx-auto w-full max-w-5xl px-5 py-16">
-            <h2 className="font-display text-2xl font-semibold tracking-[-0.02em]">Cómo funciona</h2>
+            <h2 className="font-display text-2xl font-semibold tracking-[-0.02em]">
+              {t("comoFunciona")}
+            </h2>
             <div className="mt-8 grid gap-8 md:grid-cols-3">
-              {PASOS.map((p) => (
-                <div key={p.n}>
-                  <span className="font-display text-2xl font-semibold text-telon-500">{p.n}</span>
-                  <h3 className="mt-1 text-base font-semibold text-ink-900">{p.titulo}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-600">{p.texto}</p>
+              {(["1", "2", "3"] as const).map((n) => (
+                <div key={n}>
+                  <span className="font-display text-2xl font-semibold text-telon-500">0{n}</span>
+                  <h3 className="mt-1 text-base font-semibold text-ink-900">{t(`paso${n}Titulo`)}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-600">{t(`paso${n}Texto`)}</p>
                 </div>
               ))}
             </div>
@@ -264,13 +238,13 @@ export default function BienvenidaPage() {
           <div className="relative mx-auto w-full max-w-5xl px-5 py-20 text-center">
             <MascarasTeatro className="mx-auto h-9 w-11 text-candileja-300" />
             <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.02em]">
-              Tu próximo elenco, o tu próximo papel, está a un match.
+              {t("cierreTitulo")}
             </h2>
             <Link
               href="/ingresar"
               className="mt-7 inline-flex items-center gap-2 rounded-xl bg-candileja-400 px-6 py-3 text-sm font-semibold text-telon-900 transition-colors hover:bg-candileja-300"
             >
-              Sumate a Yalope
+              {t("sumate")}
               <Icono nombre="flecha-derecha" className="h-4 w-4" />
             </Link>
           </div>
@@ -280,9 +254,9 @@ export default function BienvenidaPage() {
       <footer className="border-t border-ink-100 bg-[#faf5ec]">
         <div className="mx-auto flex w-full max-w-5xl flex-col items-start gap-3 px-5 py-8 text-sm text-ink-500 sm:flex-row sm:items-center sm:justify-between">
           <Logotipo tamano="sm" />
-          <p>Match teatral · Hecho en Argentina</p>
+          <p>{t("pieLema")}</p>
           <Link href="/ingresar" className="font-medium text-ink-700 hover:text-ink-900">
-            Entrar
+            {t("entrar")}
           </Link>
         </div>
       </footer>
