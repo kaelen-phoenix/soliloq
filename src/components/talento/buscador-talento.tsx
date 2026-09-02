@@ -7,6 +7,7 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Esqueleto } from "@/components/ui/esqueleto";
+import { Icono } from "@/components/ui/icono";
 import { toque, usePrefiereReduccion, variantesSeguras } from "@/components/ui/movimiento";
 import { GENEROS_BUSCABLES, HABILIDADES, type Genero } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
@@ -27,6 +28,8 @@ export function BuscadorTalento() {
   const [habilidades, setHabilidades] = useState<string[]>([]);
   const [ubicacion, setUbicacion] = useState<Ubicacion | null>(null);
   const [radioMetros, setRadioMetros] = useState<number | null>(RADIO_INICIAL_METROS);
+
+  const [verFiltros, setVerFiltros] = useState(false);
 
   const [resultados, setResultados] = useState<ResultadoTalento[]>([]);
   const [offset, setOffset] = useState(0);
@@ -114,13 +117,41 @@ export function BuscadorTalento() {
     ? `${resultados.length}+ resultados`
     : `${resultados.length} ${resultados.length === 1 ? "resultado" : "resultados"}`;
 
+  const nAvanzados =
+    (edadMin !== "" || edadMax !== "" ? 1 : 0) +
+    (generos.length > 0 ? 1 : 0) +
+    (habilidades.length > 0 ? 1 : 0) +
+    (ubicacion !== null ? 1 : 0);
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-ink-100 bg-ink-50/50 p-4">
-        <div className="flex items-end justify-between gap-3">
-          <span className="text-2xs font-medium uppercase tracking-wide text-ink-400">
+        <CampoTexto
+          id="buscar-nombre"
+          etiqueta="Buscar"
+          placeholder="Nombre, habilidad o experiencia"
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+        />
+
+        <div className="flex items-center justify-between gap-3">
+          <button
+            type="button"
+            onClick={() => setVerFiltros((v) => !v)}
+            aria-expanded={verFiltros}
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-600 hover:text-ink-900"
+          >
             Filtros
-          </span>
+            {nAvanzados > 0 && (
+              <span className="rounded-full bg-ink-900 px-1.5 text-2xs font-semibold text-white">
+                {nAvanzados}
+              </span>
+            )}
+            <Icono
+              nombre="chevron"
+              className={`h-3.5 w-3.5 text-ink-400 transition-transform ${verFiltros ? "rotate-180" : ""}`}
+            />
+          </button>
           {hayFiltros && (
             <button
               type="button"
@@ -132,14 +163,7 @@ export function BuscadorTalento() {
           )}
         </div>
 
-        <CampoTexto
-          id="buscar-nombre"
-          etiqueta="Buscar"
-          placeholder="Nombre, habilidad o experiencia"
-          value={texto}
-          onChange={(e) => setTexto(e.target.value)}
-        />
-
+        <div className={verFiltros ? "flex flex-col gap-4" : "hidden"}>
         <div className="flex gap-3">
           <CampoTexto
             id="edad-min"
@@ -227,6 +251,7 @@ export function BuscadorTalento() {
             </select>
           </div>
         )}
+        </div>
       </div>
 
       {cargando && resultados.length === 0 ? (

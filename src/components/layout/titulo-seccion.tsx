@@ -15,6 +15,7 @@ const TITULOS: { patron: RegExp; titulo: string }[] = [
   { patron: /^\/obras\/.+\/roles\/.+/, titulo: "Postulantes" },
   { patron: /^\/obras\/.+/, titulo: "Obra" },
   { patron: /^\/talentos\/.+/, titulo: "Perfil" },
+  { patron: /^\/talentos$/, titulo: "Buscar talento" },
   { patron: /^\/creadores\/.+/, titulo: "Perfil" },
 ];
 
