@@ -3,6 +3,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
+import { Imagen } from "@/components/ui/imagen";
 
 export interface Mensaje {
   id: string;
@@ -158,8 +159,14 @@ export function SalaChat({
           {integrantes.map((i) => (
             <li key={i.perfil_id} className="flex items-center gap-2">
               {i.foto_url ? (
-                // eslint-disable-next-line @next/next/no-img-element
-                <img src={i.foto_url} alt={i.nombre} className="h-8 w-8 rounded-full object-cover" />
+                <Imagen
+                  src={i.foto_url}
+                  alt={i.nombre}
+                  width={32}
+                  height={32}
+                  contenedorClassName="shrink-0 rounded-full"
+                  fallback={<div className="h-8 w-8 rounded-full bg-ink-100" />}
+                />
               ) : (
                 <div className="h-8 w-8 rounded-full bg-ink-100" />
               )}

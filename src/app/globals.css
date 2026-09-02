@@ -13,6 +13,25 @@
     @apply bg-white text-ink-900 tracking-ajustado antialiased;
   }
 
+  /* Acento por rol. Un único punto de verdad: el layout de `(app)` pone
+     `data-rol` en su contenedor y todo lo que quiera acento lee estas variables
+     (utilidades `acento-*` más abajo, y el anillo de foco). Por defecto es `brand`,
+     así las pantallas fuera del área autenticada no cambian. */
+  :root {
+    --acento: theme("colors.brand.500");
+    --acento-suave: theme("colors.brand.50");
+  }
+
+  [data-rol="talento"] {
+    --acento: theme("colors.talento.500");
+    --acento-suave: theme("colors.talento.50");
+  }
+
+  [data-rol="creador"] {
+    --acento: theme("colors.creador.500");
+    --acento-suave: theme("colors.creador.50");
+  }
+
   /* Los títulos ganan peso por tamaño y tracking, no por sombras ni adornos. */
   h1,
   h2,
@@ -20,9 +39,12 @@
     @apply tracking-[-0.02em];
   }
 
-  /* Un solo anillo de foco, consistente en toda la app. */
+  /* Un solo anillo de foco, consistente en toda la app: sigue al acento del rol. */
   :focus-visible {
-    @apply outline-none ring-2 ring-brand-500/40 ring-offset-2 ring-offset-white;
+    outline: none;
+    box-shadow:
+      0 0 0 2px theme("colors.white"),
+      0 0 0 4px color-mix(in srgb, var(--acento) 45%, transparent);
   }
 }
 
@@ -33,5 +55,43 @@
 
   .safe-top {
     padding-top: env(safe-area-inset-top);
+  }
+
+  /* Acento por rol: leen `--acento` / `--acento-suave` de `globals.css`. */
+  .acento-texto {
+    color: var(--acento);
+  }
+
+  .acento-fondo {
+    background-color: var(--acento-suave);
+  }
+
+  .borde-acento {
+    border-color: var(--acento);
+  }
+
+  /* Degradé sutil, solo para superficies grandes (encabezado de portada). Nunca en
+     botones: las acciones primarias siguen sólidas en `brand`. */
+  .superficie-portada {
+    background-image: linear-gradient(
+      180deg,
+      var(--acento-suave),
+      transparent 85%
+    );
+  }
+}
+
+/* Red de seguridad para `prefers-reduced-motion`: aunque un componente se olvide del
+   hook `usePrefiereReduccion`, la preferencia del sistema se respeta igual. Las
+   variantes de `framer-motion` además nunca dejan contenido en `opacity: 0` cuando
+   hay reducción, así nada queda oculto esperando una animación que no corre. */
+@media (prefers-reduced-motion: reduce) {
+  *,
+  *::before,
+  *::after {
+    animation-duration: 0.01ms !important;
+    animation-iteration-count: 1 !important;
+    transition-duration: 0.01ms !important;
+    scroll-behavior: auto !important;
   }
 }

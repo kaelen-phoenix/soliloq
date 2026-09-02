@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
+import { Imagen } from "@/components/ui/imagen";
 import { createClient } from "@/lib/supabase/client";
 import type { TipoNotificacion } from "@/lib/supabase/types";
 
@@ -48,8 +49,14 @@ function ParDeCaras({ propia, proyecto }: { propia: string | null; proyecto: str
   // tenga imagen. Decorativo, así que va sin texto alternativo.
   const Cara = ({ url, extra = "" }: { url: string | null; extra?: string }) =>
     url ? (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={url} alt="" className={`${base} ${extra}`} />
+      <Imagen
+        src={url}
+        alt=""
+        width={36}
+        height={36}
+        contenedorClassName={`shrink-0 rounded-full border-2 border-white ${extra}`}
+        fallback={<span className={`${base} ${extra}`} aria-hidden="true" />}
+      />
     ) : (
       <span className={`${base} ${extra}`} aria-hidden="true" />
     );

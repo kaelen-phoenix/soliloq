@@ -15,7 +15,7 @@ export function Encabezado({
   rolFaltante: RolUsuario | null;
 }) {
   return (
-    <header className="safe-top sticky top-0 z-20 border-b border-ink-100 bg-white/85 backdrop-blur-xl">
+    <header className="superficie-portada safe-top sticky top-0 z-20 border-b border-ink-100 bg-white/75 backdrop-blur-xl">
       <div className="flex w-full items-end justify-between px-5 pb-3 pt-4">
         <div className="flex min-w-0 flex-col gap-1.5">
           <ConmutadorModo

@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
+import { Imagen } from "@/components/ui/imagen";
 import { createClient } from "@/lib/supabase/client";
 import { calcularEdad } from "@/lib/constantes";
 import { PerfilTalentoDetalle, type TalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
@@ -104,8 +105,18 @@ export function BandejaPostulantes({
                 className="flex w-full items-center gap-3 p-3.5 text-left"
               >
                 {foto ? (
-                  // eslint-disable-next-line @next/next/no-img-element
-                  <img src={foto.url} alt="" className="h-14 w-14 rounded-lg object-cover" />
+                  <Imagen
+                    src={foto.url}
+                    alt=""
+                    width={56}
+                    height={56}
+                    contenedorClassName="shrink-0 rounded-lg"
+                    fallback={
+                      <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-ink-100">
+                        <Icono nombre="imagen" className="h-5 w-5 text-ink-300" />
+                      </div>
+                    }
+                  />
                 ) : (
                   <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-ink-100">
                     <Icono nombre="imagen" className="h-5 w-5 text-ink-300" />

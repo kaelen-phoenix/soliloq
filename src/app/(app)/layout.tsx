@@ -2,6 +2,7 @@ import { redirect } from "next/navigation";
 import { BarraLateral } from "@/components/layout/barra-lateral";
 import { BarraNavegacion } from "@/components/layout/barra-navegacion";
 import { Encabezado } from "@/components/layout/encabezado";
+import { TransicionPagina } from "@/components/ui/transicion-pagina";
 import { rolFaltante } from "@/lib/cuenta";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
@@ -32,7 +33,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     //
     // Lo único que sigue siendo por breakpoint es la navegación, y ahí corresponde: una
     // barra abajo y una lateral no son la misma forma con otro tamaño.
-    <div className="min-h-screen pb-20 sm:bg-ink-50 sm:pb-28 lg:flex lg:gap-0 lg:pb-0">
+    // `data-rol` fija el acento de color de toda el área autenticada: encabezado, ítem
+    // de navegación activo y anillo de foco leen `--acento` (ver `globals.css`).
+    <div
+      data-rol={estado.modoActivo}
+      className="min-h-screen pb-20 sm:bg-ink-50 sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
+    >
       <BarraLateral rol={estado.modoActivo} />
 
       <div className="min-w-0 flex-1">
@@ -43,7 +49,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           rolFaltante={rolFaltante(estado)}
         />
         <div className="w-full bg-white px-0 sm:min-h-[calc(100vh-9rem)]">
-          {children}
+          <TransicionPagina>{children}</TransicionPagina>
         </div>
       </div>
 

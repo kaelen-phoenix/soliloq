@@ -17,6 +17,34 @@ const config: Config = {
           700: "#9d1054",
           900: "#5c0a31",
         },
+        // Acento por rol. No es un color nuevo suelto: `talento` es la rampa de `brand`
+        // (el rosa que la app ya usaba por defecto) y `creador` es su complementario en
+        // índigo, con el mismo peso visual. Solo tiñen encabezado, ítem de navegación
+        // activo y anillo de foco —vía la variable `--acento` en `globals.css`— para
+        // reforzar en qué modo estás. Nunca reemplazan a `brand` en las acciones
+        // primarias ni conviven con las etiquetas de familia de oficio en la misma zona.
+        talento: {
+          50: "#fdf2f7",
+          100: "#fce7f0",
+          200: "#fbcfe1",
+          300: "#f9a8c9",
+          400: "#f472a6",
+          500: "#d81b7a",
+          600: "#be1367",
+          700: "#9d1054",
+          900: "#5c0a31",
+        },
+        creador: {
+          50: "#f1f0fd",
+          100: "#e5e2fb",
+          200: "#cdc7f6",
+          300: "#a99eef",
+          400: "#7d6be4",
+          500: "#5b45d8",
+          600: "#4a37b8",
+          700: "#3c2d95",
+          900: "#241a58",
+        },
         // Escala neutra con un matiz cálido apenas perceptible: evita el gris
         // clínico sin introducir un segundo color.
         ink: {
