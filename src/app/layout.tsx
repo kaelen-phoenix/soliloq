@@ -34,22 +34,20 @@ export const metadata: Metadata = {
   metadataBase: new URL("https://yalope.com"),
   title: "Yalope — Match Teatral",
   description: DESCRIPCION,
-  manifest: "/manifest.json",
+  // El `<link rel="manifest">` lo inyecta Next desde `app/manifest.ts`.
+  // La imagen para compartir la genera `app/opengraph-image.tsx` (y Next la usa también
+  // para Twitter), así que no se declara acá.
   openGraph: {
     type: "website",
     locale: "es_AR",
     siteName: "Yalope",
     title: "Yalope — Match Teatral",
     description: DESCRIPCION,
-    // La imagen es solo la marca: el nombre y la descripción los muestra la plataforma al
-    // lado, así que repetirlos adentro sería redundante.
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Yalope" }],
   },
   twitter: {
     card: "summary_large_image",
     title: "Yalope — Match Teatral",
     description: DESCRIPCION,
-    images: ["/og.png"],
   },
   appleWebApp: {
     capable: true,

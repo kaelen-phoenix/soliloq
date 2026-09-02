@@ -32,13 +32,11 @@ export const metadata: Metadata = {
     locale: "es_AR",
     title: TITULO,
     description: DESCRIPCION,
-    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Yalope" }],
   },
   twitter: {
     card: "summary_large_image",
     title: TITULO,
     description: DESCRIPCION,
-    images: ["/og.png"],
   },
 };
 
@@ -51,7 +49,7 @@ const JSON_LD = {
       "@id": "https://yalope.com/#organizacion",
       name: "Yalope",
       url: "https://yalope.com",
-      logo: "https://yalope.com/og.png",
+      logo: "https://yalope.com/icons/icon-512.png",
       description: DESCRIPCION,
     },
     {

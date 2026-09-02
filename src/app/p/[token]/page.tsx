@@ -18,7 +18,7 @@ const obtenerPerfil = cache(async (token: string) => {
 function urlPrimeraFoto(
   perfil: NonNullable<Awaited<ReturnType<typeof obtenerPerfil>>>
 ): string {
-  if (!perfil.fotos[0]) return "/og.png";
+  if (!perfil.fotos[0]) return "/icons/icon-512.png";
   if (perfil.tipo === "creador") return perfil.fotos[0];
   const supabase = createClient();
   return supabase.storage.from("fotos-perfil").getPublicUrl(perfil.fotos[0]).data.publicUrl;
