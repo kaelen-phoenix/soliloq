@@ -3,6 +3,7 @@
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
+import { CodigoQr } from "@/components/ui/codigo-qr";
 import { Icono } from "@/components/ui/icono";
 
 /**
@@ -24,6 +25,7 @@ export function BotonCompartir({
   const [token, setToken] = useState(tokenInicial);
   const [activo, setActivo] = useState(activoInicial);
   const [mostrarMenu, setMostrarMenu] = useState(false);
+  const [urlQr, setUrlQr] = useState<string | null>(null);
   const [copiado, setCopiado] = useState(false);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -75,6 +77,18 @@ export function BotonCompartir({
     setTimeout(() => setCopiado(false), 2500);
   }
 
+  async function alternarQr() {
+    if (urlQr) {
+      setUrlQr(null);
+      return;
+    }
+    setError(null);
+    setCargando(true);
+    const ok = await activarSiHaceFalta();
+    setCargando(false);
+    if (ok) setUrlQr(urlActual());
+  }
+
   async function desactivar() {
     setError(null);
     const supabase = createClient();
@@ -103,6 +117,8 @@ export function BotonCompartir({
       return;
     }
     setToken(nuevoToken);
+    // El QR abierto apuntaba al token viejo: se refresca o se cierra.
+    setUrlQr((prev) => (prev ? `${window.location.origin}/p/${nuevoToken}` : null));
   }
 
   const url = mostrarMenu ? urlActual() : "";
@@ -126,12 +142,33 @@ export function BotonCompartir({
         <Boton onClick={compartir} cargando={cargando} textoCargando="Un momento…">
           Compartir
         </Boton>
+        <button
+          type="button"
+          onClick={alternarQr}
+          aria-pressed={urlQr !== null}
+          className="inline-flex h-10 items-center gap-2 rounded-xl border border-ink-200 px-4 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50"
+        >
+          <Icono nombre="qr" className="h-4 w-4" />
+          {urlQr ? "Ocultar QR" : "Código QR"}
+        </button>
         {copiado && (
           <span role="status" className="text-sm font-medium text-exito-600">
             Enlace copiado
           </span>
         )}
       </div>
+
+      {urlQr && (
+        <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-ink-100 bg-ink-50/50 p-5 text-center">
+          <div className="rounded-xl bg-white p-3 shadow-tarjeta">
+            <CodigoQr valor={urlQr} tam={176} />
+          </div>
+          <p className="max-w-[36ch] text-xs leading-relaxed text-ink-500">
+            Mostralo para que lo escaneen y abran tu perfil, sin cuenta. Es el mismo enlace:{" "}
+            <span className="break-all font-medium text-ink-700">{urlQr}</span>
+          </p>
+        </div>
+      )}
 
       {mostrarMenu && (
         <div className="mt-3 flex flex-wrap items-center gap-2">
