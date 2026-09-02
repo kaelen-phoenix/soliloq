@@ -1,5 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Fraunces, Inter } from "next/font/google";
+import { NextIntlClientProvider } from "next-intl";
+import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
 
 // Se auto-hospeda en el build: sin request a un dominio externo en runtime.
@@ -64,10 +66,15 @@ export const viewport: Viewport = {
   viewportFit: "cover",
 };
 
-export default function RootLayout({ children }: { children: React.ReactNode }) {
+export default async function RootLayout({ children }: { children: React.ReactNode }) {
+  const locale = await getLocale();
+  const messages = await getMessages();
+
   return (
-    <html lang="es-AR" className={`${inter.variable} ${fraunces.variable}`}>
-      <body className="min-h-screen">{children}</body>
+    <html lang={locale} className={`${inter.variable} ${fraunces.variable}`}>
+      <body className="min-h-screen">
+        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+      </body>
     </html>
   );
 }

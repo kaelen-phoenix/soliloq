@@ -1,11 +1,13 @@
+import { getTranslations } from "next-intl/server";
 import { MarcoAcceso } from "@/components/layout/marco-acceso";
 import { IngresarFormulario } from "./ingresar-formulario";
 
-export default function IngresarPage({
+export default async function IngresarPage({
   searchParams,
 }: {
   searchParams: { error?: string; next?: string };
 }) {
+  const t = await getTranslations("auth");
   // Solo destinos internos: sin esto, `next` sería un redirect abierto.
   const next =
     searchParams.next?.startsWith("/") && !searchParams.next.startsWith("//")
@@ -19,16 +21,14 @@ export default function IngresarPage({
           repetida dos veces en la misma pantalla. */}
       <div className="mb-8 mt-4 lg:mt-0">
         <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
-          Entrá a Yalope
+          {t("titulo")}
         </h1>
-        <p className="mt-1.5 text-base leading-snug text-ink-500">
-          Match teatral para talento y creadores.
-        </p>
+        <p className="mt-1.5 text-base leading-snug text-ink-500">{t("bajada")}</p>
       </div>
 
       {searchParams.error === "enlace_invalido" && (
         <p className="mb-5 rounded-xl bg-error-50 px-4 py-3 text-sm text-error-800">
-          Ese enlace venció o ya fue usado. Pedí uno nuevo.
+          {t("enlaceInvalido")}
         </p>
       )}
 

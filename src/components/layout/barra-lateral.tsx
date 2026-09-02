@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
@@ -18,6 +19,7 @@ import type { RolUsuario } from "@/lib/supabase/types";
  */
 export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmin?: boolean }) {
   const pathname = usePathname();
+  const t = useTranslations("nav");
   const items = itemsParaNavegacion(rol, { esAdmin });
 
   return (
@@ -26,7 +28,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
         <LogotipoInline />
       </Link>
 
-      <nav>
+      <nav className="flex-1">
         <ul className="flex flex-col gap-1">
           {items.map((item) => {
             const activo = pathname === item.href;
@@ -42,13 +44,26 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
                   }`}
                 >
                   <Icono nombre={item.icono} className="h-[18px] w-[18px]" />
-                  {item.label}
+                  {t(item.clave)}
                 </Link>
               </li>
             );
           })}
         </ul>
       </nav>
+
+      <Link
+        href="/ajustes"
+        aria-current={pathname === "/ajustes" ? "page" : undefined}
+        className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
+          pathname === "/ajustes"
+            ? "acento-fondo acento-texto"
+            : "text-ink-500 hover:bg-ink-50/60 hover:text-ink-800"
+        }`}
+      >
+        <Icono nombre="ajustes" className="h-[18px] w-[18px]" />
+        {t("ajustes")}
+      </Link>
     </aside>
   );
 }

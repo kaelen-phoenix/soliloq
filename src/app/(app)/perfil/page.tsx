@@ -17,6 +17,12 @@ function AccionesCuenta() {
   return (
     <section className="mt-8 flex flex-col items-start gap-3">
       <Link
+        href="/ajustes"
+        className="text-sm text-ink-500 underline underline-offset-4 hover:text-ink-900"
+      >
+        Ajustes
+      </Link>
+      <Link
         href="/cambiar-clave?volver=/perfil"
         className="text-sm text-ink-500 underline underline-offset-4 hover:text-ink-900"
       >

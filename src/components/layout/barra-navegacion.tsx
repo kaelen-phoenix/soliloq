@@ -1,5 +1,6 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
@@ -20,6 +21,7 @@ export function BarraNavegacion({
   esAdmin?: boolean;
 }) {
   const pathname = usePathname();
+  const t = useTranslations("nav");
   const items = itemsParaNavegacion(rol, { esAdmin });
 
   return (
@@ -37,7 +39,7 @@ export function BarraNavegacion({
                 }`}
               >
                 <Icono nombre={item.icono} className="h-[22px] w-[22px]" />
-                {item.labelCorto ?? item.label}
+                {t(item.claveCorto ?? item.clave)}
               </Link>
             </li>
           );
