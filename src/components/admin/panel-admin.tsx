@@ -40,7 +40,7 @@ export function PanelAdmin({
             type="button"
             onClick={() => setPestana(p)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium capitalize transition-colors ${
-              pestana === p ? "bg-ink-900 text-white" : "text-ink-500 hover:bg-ink-50"
+              pestana === p ? "bg-ink-900 text-white" : "text-texto-tenue hover:bg-fondo-sutil"
             }`}
           >
             {p}
@@ -76,9 +76,9 @@ function Resumen({ metricas }: { metricas: Metricas | null }) {
   return (
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
       {tarjetas.map((t) => (
-        <li key={t.etiqueta} className="rounded-2xl border border-ink-100 bg-white p-4">
-          <p className="font-display text-2xl font-semibold text-ink-900">{t.valor}</p>
-          <p className="mt-0.5 text-xs text-ink-500">{t.etiqueta}</p>
+        <li key={t.etiqueta} className="rounded-2xl border border-borde bg-superficie p-4">
+          <p className="font-display text-2xl font-semibold text-texto">{t.valor}</p>
+          <p className="mt-0.5 text-xs text-texto-tenue">{t.etiqueta}</p>
         </li>
       ))}
     </ul>
@@ -174,11 +174,11 @@ function Usuarios({
       {filas.length === 0 ? (
         <EstadoVacio icono="perfil" titulo="Sin usuarios" detalle="No hay resultados para esa búsqueda." />
       ) : (
-        <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-ink-100">
+        <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
           {filas.map((u) => (
             <li key={u.id} className="flex items-center gap-3 p-3.5">
               <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-ink-900">
+                <p className="truncate text-sm font-medium text-texto">
                   {u.nombre ?? "(sin nombre)"}
                   {u.es_admin && (
                     <span className="ml-1.5 rounded bg-brand-50 px-1.5 py-0.5 text-2xs font-semibold text-brand-600">
@@ -191,7 +191,7 @@ function Usuarios({
                     </span>
                   )}
                 </p>
-                <p className="truncate text-xs text-ink-500">
+                <p className="truncate text-xs text-texto-tenue">
                   {u.email} · {u.roles.join(" + ") || "sin perfil"} · alta {fecha(u.creado_en)}
                 </p>
               </div>
@@ -201,7 +201,7 @@ function Usuarios({
                   onClick={() => alternarSuspension(u)}
                   className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
                     u.suspendido
-                      ? "border-ink-200 text-ink-700 hover:bg-ink-50"
+                      ? "border-borde text-ink-700 hover:bg-fondo-sutil"
                       : "border-error-400 text-error-600 hover:bg-error-50"
                   }`}
                 >
@@ -271,13 +271,13 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
   return (
     <ul className="flex flex-col gap-3">
       {(filas ?? []).map((d) => (
-        <li key={d.id} className="rounded-2xl border border-ink-100 bg-white p-4">
+        <li key={d.id} className="rounded-2xl border border-borde bg-superficie p-4">
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
-              <p className="text-sm font-medium text-ink-900">
-                {d.motivo} · <span className="text-ink-500">{d.estado}</span>
+              <p className="text-sm font-medium text-texto">
+                {d.motivo} · <span className="text-texto-tenue">{d.estado}</span>
               </p>
-              <p className="mt-0.5 text-xs text-ink-500">
+              <p className="mt-0.5 text-xs text-texto-tenue">
                 {d.denunciante ?? "?"} → {d.denunciado ?? d.obra_titulo ?? "?"} · {fecha(d.creado_en)}
               </p>
               {d.detalle && <p className="mt-2 text-sm leading-relaxed text-ink-700">{d.detalle}</p>}
@@ -292,7 +292,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
                 key={e}
                 type="button"
                 onClick={() => resolver(d, e)}
-                className="rounded-lg border border-ink-200 px-2.5 py-1 text-xs font-medium text-ink-600 transition-colors hover:bg-ink-50"
+                className="rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto-tenue transition-colors hover:bg-fondo-sutil"
               >
                 {e.replace("_", " ")}
               </button>
@@ -367,14 +367,14 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       {(filas ?? []).length === 0 ? (
         <EstadoVacio icono="perfil" titulo="Sin bloqueos" detalle="No hay bloqueos entre usuarios." />
       ) : (
-        <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-ink-100">
+        <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
           {(filas ?? []).map((b) => (
             <li key={`${b.perfil_menor}-${b.perfil_mayor}`} className="flex items-center gap-3 p-3.5">
               <div className="min-w-0 flex-1 text-sm">
-                <p className="truncate text-ink-900">
+                <p className="truncate text-texto">
                   {b.nombre_menor ?? b.perfil_menor.slice(0, 8)} ↔ {b.nombre_mayor ?? b.perfil_mayor.slice(0, 8)}
                 </p>
-                <p className="truncate text-xs text-ink-500">
+                <p className="truncate text-xs text-texto-tenue">
                   puso {b.nombre_autor ?? "?"} · {fecha(b.creado_en)}
                   {b.motivo ? ` · ${b.motivo}` : ""}
                 </p>
@@ -382,7 +382,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
               <button
                 type="button"
                 onClick={() => levantar(b)}
-                className="shrink-0 rounded-lg border border-ink-200 px-2.5 py-1 text-xs font-medium text-ink-700 transition-colors hover:bg-ink-50"
+                className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-ink-700 transition-colors hover:bg-fondo-sutil"
               >
                 Levantar
               </button>
@@ -391,7 +391,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
         </ul>
       )}
 
-      <form onSubmit={crear} className="rounded-2xl border border-dashed border-ink-200 p-4">
+      <form onSubmit={crear} className="rounded-2xl border border-dashed border-borde p-4">
         <p className="mb-3 text-2xs font-medium uppercase tracking-wide text-ink-400">
           Imponer un bloqueo (por id de perfil)
         </p>

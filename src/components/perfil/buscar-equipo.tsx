@@ -57,11 +57,11 @@ export function BuscarEquipo({
   }
 
   return (
-    <section className="mt-8 max-w-2xl rounded-2xl border border-ink-100 p-4">
+    <section className="mt-8 max-w-2xl rounded-2xl border border-borde p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-base font-medium text-ink-900">Armar equipo</h2>
-          <p className="mt-1 text-sm leading-relaxed text-ink-500">
+          <h2 className="text-base font-medium text-texto">Armar equipo</h2>
+          <p className="mt-1 text-sm leading-relaxed text-texto-tenue">
             Para conocer gente sin tener un proyecto todavía. Si lo activás, aparecés en el
             feed de personas con tu nombre, tu ciudad y lo que escribas acá abajo.
           </p>
@@ -79,7 +79,7 @@ export function BuscarEquipo({
         >
           <span className="sr-only">Aparecer en el feed de personas</span>
           <span
-            className={`absolute top-0.5 h-5 w-5 rounded-full bg-white transition-transform ${
+            className={`absolute top-0.5 h-5 w-5 rounded-full bg-superficie transition-transform ${
               activo ? "translate-x-[1.375rem]" : "translate-x-0.5"
             }`}
           />
@@ -98,7 +98,7 @@ export function BuscarEquipo({
             value={pitch}
             onChange={(e) => setPitch(e.target.value)}
             placeholder="Soy iluminador, tengo tiempo libre y ganas de armar algo con gente que recién empieza."
-            className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
+            className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
           />
           <div className="flex items-center justify-between gap-3">
             <span className="text-2xs text-ink-400">

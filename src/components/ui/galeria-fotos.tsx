@@ -59,7 +59,7 @@ export function GaleriaFotos({
   if (fotos.length === 0) return null;
 
   const btnRedondo =
-    "absolute z-10 flex h-10 w-10 items-center justify-center rounded-full bg-white/10 text-white transition-colors hover:bg-white/20";
+    "absolute z-10 flex h-10 w-10 items-center justify-center rounded-full bg-superficie/10 text-white transition-colors hover:bg-superficie/20";
 
   return (
     <>

@@ -59,12 +59,20 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: "#ffffff",
+  themeColor: [
+    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
+    { media: "(prefers-color-scheme: dark)", color: "#18161a" },
+  ],
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
 };
+
+// Fija `data-tema` antes del primer paint según la cookie, para que el override manual
+// (Ajustes) no muestre un flash del tema del sistema. Sin cookie o con 'sistema', no pone
+// el atributo y manda `prefers-color-scheme`.
+const SCRIPT_TEMA = `(function(){try{var m=document.cookie.match(/(?:^|; )tema=([^;]+)/);var t=m&&m[1];if(t==='oscuro')document.documentElement.dataset.tema='dark';else if(t==='claro')document.documentElement.dataset.tema='light';}catch(e){}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
@@ -72,6 +80,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
 
   return (
     <html lang={locale} className={`${inter.variable} ${fraunces.variable}`}>
+      <head>
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
+      </head>
       <body className="min-h-screen">
         <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
       </body>

@@ -19,7 +19,7 @@ export async function Encabezado({
 }) {
   const t = await getTranslations("nav");
   return (
-    <header className="superficie-portada safe-top sticky top-0 z-20 border-b border-ink-100 bg-white/75 backdrop-blur-xl">
+    <header className="superficie-portada safe-top sticky top-0 z-20 border-b border-borde bg-superficie/75 backdrop-blur-xl">
       <div className="flex w-full items-end justify-between px-5 pb-3 pt-4">
         <div className="flex min-w-0 flex-col gap-1.5">
           <ConmutadorModo
@@ -34,7 +34,7 @@ export async function Encabezado({
           <Link
             href="/ajustes"
             aria-label={t("ajustes")}
-            className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-ink-50 hover:text-ink-700"
+            className="rounded-lg p-1.5 text-ink-400 transition-colors hover:bg-fondo-sutil hover:text-ink-700"
           >
             <Icono nombre="ajustes" className="h-5 w-5" />
           </Link>

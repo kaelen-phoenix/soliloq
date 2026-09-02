@@ -17,12 +17,12 @@ const ETIQUETA_ESTADO: Record<string, string> = {
 };
 
 const COLOR_ESTADO: Record<string, string> = {
-  pendiente: "bg-ink-100 text-ink-600",
+  pendiente: "bg-ink-100 text-texto-tenue",
   en_duda: "bg-alerta-50 text-alerta-800",
   esperando_confirmacion: "bg-brand-500 text-white",
   aprobado: "bg-ink-900 text-white",
-  rechazado: "bg-ink-50 text-ink-400",
-  vencida: "bg-ink-50 text-ink-400",
+  rechazado: "bg-fondo-sutil text-ink-400",
+  vencida: "bg-fondo-sutil text-ink-400",
 };
 
 export default async function PostulacionesPage() {
@@ -50,7 +50,7 @@ export default async function PostulacionesPage() {
           accion={
             <Link
               href="/"
-              className="inline-flex items-center gap-1 text-sm font-medium text-ink-900 hover:underline"
+              className="inline-flex items-center gap-1 text-sm font-medium text-texto hover:underline"
             >
               Ir al feed
               <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
@@ -63,14 +63,14 @@ export default async function PostulacionesPage() {
         {postulaciones?.map((p: any) => (
           <li
             key={p.id}
-            className="rounded-xl border border-ink-100 bg-white p-4"
+            className="rounded-xl border border-borde bg-superficie p-4"
           >
             <div className="flex items-start gap-3">
               <div className="min-w-0 flex-1">
-                <p className="truncate text-base font-medium text-ink-900">
+                <p className="truncate text-base font-medium text-texto">
                   {p.roles.obras.titulo}
                 </p>
-                <p className="mt-0.5 truncate text-sm text-ink-500">
+                <p className="mt-0.5 truncate text-sm text-texto-tenue">
                   {p.roles.nombre} · {p.roles.obras.perfiles_creador.nombre}
                 </p>
               </div>

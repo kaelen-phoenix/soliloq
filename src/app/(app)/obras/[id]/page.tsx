@@ -23,12 +23,12 @@ export default async function DetalleObraPage({ params }: { params: { id: string
 
   return (
     <main className="px-5 py-5">
-      <h2 className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-ink-900">
+      <h2 className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-texto">
         {obra.titulo}
       </h2>
-      <p className="mt-1 text-sm text-ink-500">{obra.ubicacion_texto}</p>
+      <p className="mt-1 text-sm text-texto-tenue">{obra.ubicacion_texto}</p>
       {obra.sinopsis && (
-        <p className="mt-3 max-w-prose text-base leading-relaxed text-ink-600">{obra.sinopsis}</p>
+        <p className="mt-3 max-w-prose text-base leading-relaxed text-texto-tenue">{obra.sinopsis}</p>
       )}
 
       <div className="mt-5">
@@ -39,7 +39,7 @@ export default async function DetalleObraPage({ params }: { params: { id: string
         <h3 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Roles</h3>
 
         {roles && roles.length === 0 && (
-          <p className="text-sm text-ink-500">Todavía no definiste roles para esta obra.</p>
+          <p className="text-sm text-texto-tenue">Todavía no definiste roles para esta obra.</p>
         )}
 
         <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
@@ -50,11 +50,11 @@ export default async function DetalleObraPage({ params }: { params: { id: string
               <li key={rol.id}>
                 <Link
                   href={`/obras/${obra.id}/roles/${rol.id}`}
-                  className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-4 transition-colors hover:border-ink-200"
+                  className="flex items-center gap-3 rounded-xl border border-borde bg-superficie p-4 transition-colors hover:border-borde"
                 >
                   <div className="min-w-0 flex-1">
-                    <p className="truncate text-base font-medium text-ink-900">{rol.nombre}</p>
-                    <p className="mt-0.5 text-xs text-ink-500">
+                    <p className="truncate text-base font-medium text-texto">{rol.nombre}</p>
+                    <p className="mt-0.5 text-xs text-texto-tenue">
                       {ETIQUETA_TIPO[rol.tipo]}
                       {rol.edad_minima && rol.edad_maxima ? ` · ${rol.edad_minima}–${rol.edad_maxima} años` : ""}
                       {" · "}

@@ -25,7 +25,7 @@ export function BarraNavegacion({
   const items = itemsParaNavegacion(rol, { esAdmin });
 
   return (
-    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/85 backdrop-blur-xl lg:hidden">
+    <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-borde bg-superficie/85 backdrop-blur-xl lg:hidden">
       <ul className="mx-auto flex max-w-lg items-stretch">
         {items.map((item) => {
           const activo = pathname === item.href;
@@ -35,7 +35,7 @@ export function BarraNavegacion({
                 href={item.href}
                 aria-current={activo ? "page" : undefined}
                 className={`flex flex-col items-center gap-1 pb-1.5 pt-2.5 text-2xs font-medium transition-colors ${
-                  activo ? "acento-texto" : "text-ink-400 hover:text-ink-600"
+                  activo ? "acento-texto" : "text-ink-400 hover:text-texto-tenue"
                 }`}
               >
                 <Icono nombre={item.icono} className="h-[22px] w-[22px]" />

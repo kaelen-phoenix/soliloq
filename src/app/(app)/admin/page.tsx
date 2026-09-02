@@ -23,10 +23,10 @@ export default async function AdminPage() {
 
   return (
     <main className="px-5 py-5">
-      <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900 sm:text-2xl">
+      <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto sm:text-2xl">
         Administración
       </h1>
-      <p className="mb-5 mt-1 text-sm text-ink-500">
+      <p className="mb-5 mt-1 text-sm text-texto-tenue">
         Métricas, usuarios, denuncias y bloqueos de la plataforma.
       </p>
       <PanelAdmin

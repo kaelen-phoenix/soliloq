@@ -88,7 +88,7 @@ export function BandejaPostulantes({
 
   return (
     <div className="flex flex-col gap-3">
-      <p className="text-xs text-ink-500">
+      <p className="text-xs text-texto-tenue">
         {aprobados}/{vacantes} vacantes cubiertas
       </p>
       {error && <p className="text-xs text-error-600">{error}</p>}
@@ -98,7 +98,7 @@ export function BandejaPostulantes({
           const foto = [...p.talento.fotos].sort((a, b) => a.orden - b.orden)[0];
           const expandido = expandidoId === p.postulacionId;
           return (
-            <li key={p.postulacionId} className="overflow-hidden rounded-xl border border-ink-100 bg-white">
+            <li key={p.postulacionId} className="overflow-hidden rounded-xl border border-borde bg-superficie">
               <button
                 type="button"
                 onClick={() => setExpandidoId(expandido ? null : p.postulacionId)}
@@ -123,8 +123,8 @@ export function BandejaPostulantes({
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-medium text-ink-900">{p.talento.nombre}</p>
-                  <p className="mt-0.5 text-xs text-ink-500">
+                  <p className="truncate text-base font-medium text-texto">{p.talento.nombre}</p>
+                  <p className="mt-0.5 text-xs text-texto-tenue">
                     {calcularEdad(p.talento.fecha_nacimiento)} años · {p.talento.ubicacion_publica}
                   </p>
                 </div>
@@ -135,13 +135,13 @@ export function BandejaPostulantes({
               </button>
 
               {expandido && (
-                <div className="border-t border-ink-100 p-4">
+                <div className="border-t border-borde p-4">
                   <PerfilTalentoDetalle talento={p.talento} />
                 </div>
               )}
 
               {p.estado === "esperando_confirmacion" && (
-                <p className="flex items-center gap-1.5 border-t border-ink-100 bg-brand-500/5 px-4 py-2.5 text-xs leading-snug text-ink-600">
+                <p className="flex items-center gap-1.5 border-t border-borde bg-brand-500/5 px-4 py-2.5 text-xs leading-snug text-texto-tenue">
                   <Icono nombre="reloj" className="h-3.5 w-3.5 shrink-0 text-brand-600" />
                   Le pedimos que confirme: su postulación tenía más de una semana. La vacante
                   sigue libre hasta que conteste.
@@ -149,20 +149,20 @@ export function BandejaPostulantes({
               )}
 
               {p.estado === "vencida" && (
-                <p className="border-t border-ink-100 px-4 py-2.5 text-xs leading-snug text-ink-400">
+                <p className="border-t border-borde px-4 py-2.5 text-xs leading-snug text-ink-400">
                   Se cerró sola por falta de respuesta.
                 </p>
               )}
 
               {!obraCerrada && (
-                <div className="flex gap-px border-t border-ink-100 bg-ink-100">
+                <div className="flex gap-px border-t border-borde bg-ink-100">
                   {ETIQUETAS.map((e) => (
                     <button
                       key={e.valor}
                       type="button"
                       onClick={() => clasificar(p.postulacionId, e.valor)}
                       className={`flex-1 py-2.5 text-sm font-medium transition-colors ${
-                        p.estado === e.valor ? e.estilo : "bg-white text-ink-500 hover:bg-ink-50"
+                        p.estado === e.valor ? e.estilo : "bg-superficie text-texto-tenue hover:bg-fondo-sutil"
                       }`}
                     >
                       {e.label}

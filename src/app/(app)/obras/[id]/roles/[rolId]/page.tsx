@@ -46,7 +46,7 @@ export default async function RolPostulantesPage({ params }: { params: { id: str
   return (
     <main className="px-5 py-5">
       <p className="text-2xs font-medium uppercase tracking-wide text-ink-400">{obra.titulo}</p>
-      <h2 className="mb-5 mt-1 text-xl font-semibold leading-tight text-ink-900">{rol.nombre}</h2>
+      <h2 className="mb-5 mt-1 text-xl font-semibold leading-tight text-texto">{rol.nombre}</h2>
       <BandejaPostulantes
         postulantesIniciales={postulantes}
         vacantes={rol.vacantes}

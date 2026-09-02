@@ -25,10 +25,10 @@ export default async function AjustesPage() {
 
   return (
     <main className="px-5 py-5">
-      <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900 sm:text-2xl">
+      <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto sm:text-2xl">
         {t("titulo")}
       </h1>
-      <p className="mb-6 mt-1 text-sm text-ink-500">{t("bajada")}</p>
+      <p className="mb-6 mt-1 text-sm text-texto-tenue">{t("bajada")}</p>
       <FormularioAjustes
         idiomaInicial={(perfil?.idioma as "es" | "en") ?? resolverIdioma()}
         temaInicial={(perfil?.tema as "sistema" | "claro" | "oscuro") ?? "sistema"}

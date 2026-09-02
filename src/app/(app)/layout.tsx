@@ -42,7 +42,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     // de navegación activo y anillo de foco leen `--acento` (ver `globals.css`).
     <div
       data-rol={estado.modoActivo}
-      className="min-h-screen pb-20 sm:bg-ink-50 sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
+      className="min-h-screen pb-20 sm:bg-fondo-sutil sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
     >
       <BarraLateral rol={estado.modoActivo} esAdmin={estado.esAdmin} />
 
@@ -53,7 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           tieneAmbosPerfiles={estado.tieneAmbosPerfiles}
           rolFaltante={rolFaltante(estado)}
         />
-        <div className="w-full bg-white px-0 sm:min-h-[calc(100vh-9rem)]">
+        <div className="w-full bg-superficie px-0 sm:min-h-[calc(100vh-9rem)]">
           <TransicionPagina>{children}</TransicionPagina>
         </div>
       </div>

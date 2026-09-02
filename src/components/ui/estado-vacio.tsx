@@ -21,8 +21,8 @@ export function EstadoVacio({
   accion?: React.ReactNode;
 }) {
   return (
-    <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
-      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-ink-50">
+    <div className="flex flex-col items-center rounded-2xl border border-dashed border-borde px-8 py-12 text-center">
+      <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-fondo-sutil">
         <Icono nombre={icono} className="h-6 w-6 text-ink-400" />
         <span
           className="absolute -bottom-1 h-[2.5px] w-5 rounded-full bg-brand-500/70"
@@ -30,8 +30,8 @@ export function EstadoVacio({
         />
       </span>
 
-      <p className="mt-5 text-base font-medium text-ink-900">{titulo}</p>
-      <p className="mt-1.5 max-w-[34ch] text-sm leading-relaxed text-ink-500">{detalle}</p>
+      <p className="mt-5 text-base font-medium text-texto">{titulo}</p>
+      <p className="mt-1.5 max-w-[34ch] text-sm leading-relaxed text-texto-tenue">{detalle}</p>
 
       {accion && <div className="mt-5">{accion}</div>}
     </div>

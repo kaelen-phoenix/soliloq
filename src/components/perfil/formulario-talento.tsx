@@ -214,8 +214,8 @@ export function FormularioTalento({
             id="genero"
             value={genero}
             onChange={(e) => setGenero(e.target.value as Genero | "")}
-            className={`rounded-xl border bg-white px-3.5 py-2.5 text-base focus:border-ink-900 ${
-              errores.genero ? "border-error-400" : "border-ink-200"
+            className={`rounded-xl border bg-superficie px-3.5 py-2.5 text-base focus:border-ink-900 ${
+              errores.genero ? "border-error-400" : "border-borde"
             }`}
           >
             <option value="">Elegí una opción</option>
@@ -237,7 +237,7 @@ export function FormularioTalento({
           onChange={(e) => setGeneroDescripcion(e.target.value)}
           error={errores.genero_descripcion}
         />
-        <p className="-mt-2 text-xs text-ink-500">
+        <p className="-mt-2 text-xs text-texto-tenue">
           Se muestra en tu perfil. No se usa para filtrar convocatorias.
         </p>
       </section>
@@ -258,7 +258,7 @@ export function FormularioTalento({
           onChange={(e) => setVideoreelUrl(e.target.value)}
           error={errores.videoreel_url}
         />
-        <p className="-mt-2 text-xs text-ink-500">
+        <p className="-mt-2 text-xs text-texto-tenue">
           Sirve el link normal, el de compartir, Shorts o el de la app del celular.
         </p>
       </section>
@@ -275,7 +275,7 @@ export function FormularioTalento({
             maxLength={2000}
             value={experiencia}
             onChange={(e) => setExperiencia(e.target.value)}
-            className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
+            className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
             placeholder="Contá tu formación, obras en las que participaste, etc."
           />
           <p className="text-right text-xs text-ink-300">{experiencia.length}/2000</p>
@@ -290,7 +290,7 @@ export function FormularioTalento({
               className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                 habilidades.includes(h)
                   ? "border-ink-900 bg-ink-900 text-white"
-                  : "border-ink-100 text-ink-500"
+                  : "border-borde text-texto-tenue"
               }`}
             >
               {h}
@@ -312,7 +312,7 @@ export function FormularioTalento({
             error={errores[`redes_${red.clave}`]}
           />
         ))}
-        <p className="-mt-2 text-xs text-ink-500">
+        <p className="-mt-2 text-xs text-texto-tenue">
           Solo se valida el formato del enlace, no que la cuenta exista o sea tuya.
         </p>
       </section>
@@ -324,11 +324,11 @@ export function FormularioTalento({
             type="checkbox"
             checked={apareceEnBuscador}
             onChange={(e) => setApareceEnBuscador(e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-ink-300 text-ink-900 focus:ring-ink-900"
+            className="mt-0.5 h-4 w-4 rounded border-ink-300 text-texto focus:ring-ink-900"
           />
           <span className="text-sm text-ink-700">
             Aparecer en el buscador de creadores
-            <span className="mt-0.5 block text-xs text-ink-500">
+            <span className="mt-0.5 block text-xs text-texto-tenue">
               Los creadores pueden encontrarte por ubicación, edad, género o habilidades.
               Necesitás al menos una foto para que te encuentren. Podés seguir postulándote
               aunque esto esté apagado.

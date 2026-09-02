@@ -52,21 +52,21 @@ export function ResponderInteres({ persona }: { persona: PersonaParaResponder })
 
   if (estado === "hecho") {
     return (
-      <div className="rounded-2xl border border-ink-100 p-5 text-center">
-        <p className="text-base font-medium text-ink-900">¡Hay equipo!</p>
-        <p className="mt-1 text-sm text-ink-500">Ya se abrió una sala para hablar.</p>
+      <div className="rounded-2xl border border-borde p-5 text-center">
+        <p className="text-base font-medium text-texto">¡Hay equipo!</p>
+        <p className="mt-1 text-sm text-texto-tenue">Ya se abrió una sala para hablar.</p>
       </div>
     );
   }
 
   return (
     <div className="flex flex-col gap-4">
-      <article className="rounded-2xl border border-ink-100 bg-white p-5 shadow-tarjeta">
-        <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
+      <article className="rounded-2xl border border-borde bg-superficie p-5 shadow-tarjeta">
+        <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto">
           {persona.nombre}
         </h1>
         {persona.ubicacion_publica && (
-          <p className="text-sm text-ink-500">{persona.ubicacion_publica}</p>
+          <p className="text-sm text-texto-tenue">{persona.ubicacion_publica}</p>
         )}
 
         {persona.pitch && (
@@ -84,7 +84,7 @@ export function ResponderInteres({ persona }: { persona: PersonaParaResponder })
         {persona.habilidades.length > 0 && (
           <ul className="mt-2 flex flex-wrap gap-1.5">
             {persona.habilidades.map((h) => (
-              <li key={h} className="rounded-full bg-ink-50 px-2.5 py-1 text-xs text-ink-600">
+              <li key={h} className="rounded-full bg-fondo-sutil px-2.5 py-1 text-xs text-texto-tenue">
                 {h}
               </li>
             ))}

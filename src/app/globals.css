@@ -10,7 +10,52 @@
   }
 
   body {
-    @apply bg-white text-ink-900 tracking-ajustado antialiased;
+    background-color: rgb(var(--superficie));
+    color: rgb(var(--texto));
+    @apply tracking-ajustado antialiased;
+  }
+
+  /* Tema claro/oscuro. Colores **semánticos** como variables (canal RGB, para poder
+     usar `/ <alpha-value>` en Tailwind). Tres estados, igual que `--acento`:
+       - `:root` = claro por defecto.
+       - `@media (prefers-color-scheme: dark)` (salvo override manual a claro) = sigue al
+         sistema.
+       - `:root[data-tema="dark"]` / `[data-tema="light"]` = override desde Ajustes.
+     Solo se redefinen acá; los componentes usan `bg-superficie`, `text-texto`,
+     `border-borde`, `bg-fondo-sutil` (y `ink-50/100/200`, que también son variables). */
+  :root {
+    --superficie: 255 255 255;
+    --fondo-sutil: 247 246 248;
+    --texto: 24 22 26;
+    --texto-tenue: 122 116 126;
+    --borde: 224 221 226;
+    --ink-50: 247 246 248;
+    --ink-100: 238 236 240;
+    --ink-200: 224 221 226;
+  }
+
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-tema="light"]) {
+      --superficie: 24 22 26;
+      --fondo-sutil: 33 31 36;
+      --texto: 238 236 240;
+      --texto-tenue: 157 151 160;
+      --borde: 55 51 59;
+      --ink-50: 33 31 36;
+      --ink-100: 44 41 48;
+      --ink-200: 63 59 67;
+    }
+  }
+
+  :root[data-tema="dark"] {
+    --superficie: 24 22 26;
+    --fondo-sutil: 33 31 36;
+    --texto: 238 236 240;
+    --texto-tenue: 157 151 160;
+    --borde: 55 51 59;
+    --ink-50: 33 31 36;
+    --ink-100: 44 41 48;
+    --ink-200: 63 59 67;
   }
 
   /* Acento por rol. Un único punto de verdad: el layout de `(app)` pone
@@ -43,7 +88,7 @@
   :focus-visible {
     outline: none;
     box-shadow:
-      0 0 0 2px theme("colors.white"),
+      0 0 0 2px rgb(var(--superficie)),
       0 0 0 4px color-mix(in srgb, var(--acento) 45%, transparent);
   }
 }

@@ -38,7 +38,7 @@ export function CodigoQr({
 
   return (
     <div
-      className={`text-ink-900 [&>svg]:block [&>svg]:h-full [&>svg]:w-full ${className}`}
+      className={`text-texto [&>svg]:block [&>svg]:h-full [&>svg]:w-full ${className}`}
       style={{ width: tam, height: tam }}
       role="img"
       aria-label="Código QR del enlace del perfil"

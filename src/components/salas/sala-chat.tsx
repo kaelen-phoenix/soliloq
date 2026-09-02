@@ -149,13 +149,13 @@ export function SalaChat({
       <button
         type="button"
         onClick={() => setMostrarIntegrantes((v) => !v)}
-        className="border-b border-ink-100 px-4 py-2 text-left text-2xs font-medium uppercase tracking-wide text-ink-500 hover:text-ink-900"
+        className="border-b border-borde px-4 py-2 text-left text-2xs font-medium uppercase tracking-wide text-texto-tenue hover:text-texto"
       >
         {integrantes.length} integrantes
       </button>
 
       {mostrarIntegrantes && (
-        <ul className="flex flex-col gap-2 border-b border-ink-100 p-4">
+        <ul className="flex flex-col gap-2 border-b border-borde p-4">
           {integrantes.map((i) => (
             <li key={i.perfil_id} className="flex items-center gap-2">
               {i.foto_url ? (
@@ -171,8 +171,8 @@ export function SalaChat({
                 <div className="h-8 w-8 rounded-full bg-ink-100" />
               )}
               <div>
-                <p className="text-sm font-medium text-ink-900">{i.nombre}</p>
-                <p className="text-xs text-ink-500">{i.rol_en_obra}</p>
+                <p className="text-sm font-medium text-texto">{i.nombre}</p>
+                <p className="text-xs text-texto-tenue">{i.rol_en_obra}</p>
               </div>
             </li>
           ))}
@@ -200,7 +200,7 @@ export function SalaChat({
               <li key={m.id} className={`flex ${esPropio ? "justify-end" : "justify-start"}`}>
                 <div
                   className={`max-w-[78%] rounded-2xl px-3.5 py-2 ${
-                    esPropio ? "bg-ink-900 text-white" : "bg-ink-100 text-ink-900"
+                    esPropio ? "bg-ink-900 text-white" : "bg-ink-100 text-texto"
                   }`}
                 >
                   {!esPropio && (
@@ -223,13 +223,13 @@ export function SalaChat({
         <div ref={finRef} />
       </div>
 
-      <form onSubmit={enviar} className="safe-bottom flex gap-2 border-t border-ink-100 bg-white p-3">
+      <form onSubmit={enviar} className="safe-bottom flex gap-2 border-t border-borde bg-superficie p-3">
         <input
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
           maxLength={2000}
           placeholder="Escribí un mensaje…"
-          className="flex-1 rounded-full border border-ink-200 px-4 py-2.5 text-base placeholder:text-ink-400 focus:border-ink-900"
+          className="flex-1 rounded-full border border-borde px-4 py-2.5 text-base placeholder:text-ink-400 focus:border-ink-900"
         />
         <button
           type="submit"

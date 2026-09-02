@@ -38,10 +38,10 @@ export function RecuperarFormulario() {
 
   if (enviado) {
     return (
-      <div className="rounded-2xl border border-ink-100 p-6">
-        <h2 className="text-lg font-semibold text-ink-900">Revisá tu correo</h2>
-        <p className="mt-1.5 text-sm leading-relaxed text-ink-500">
-          Si existe una cuenta con <span className="text-ink-900">{email}</span>, te enviamos un
+      <div className="rounded-2xl border border-borde p-6">
+        <h2 className="text-lg font-semibold text-texto">Revisá tu correo</h2>
+        <p className="mt-1.5 text-sm leading-relaxed text-texto-tenue">
+          Si existe una cuenta con <span className="text-texto">{email}</span>, te enviamos un
           enlace para elegir una contraseña nueva.
         </p>
       </div>

@@ -182,7 +182,7 @@ export function PilaTarjetas({
           value={opcionActual.metros ?? ""}
           disabled={recargando}
           onChange={(e) => cambiarRadio(e.target.value === "" ? null : Number(e.target.value))}
-          className="rounded-lg border border-ink-200 bg-white px-2 py-1 text-2xs font-medium text-ink-700 focus:border-ink-900"
+          className="rounded-lg border border-borde bg-superficie px-2 py-1 text-2xs font-medium text-ink-700 focus:border-ink-900"
         >
           {opciones.map((o) => (
             <option key={o.etiqueta} value={o.metros ?? ""}>
@@ -191,7 +191,7 @@ export function PilaTarjetas({
           ))}
         </select>
 
-        <div className="flex overflow-hidden rounded-lg border border-ink-200">
+        <div className="flex overflow-hidden rounded-lg border border-borde">
           {(["km", "mi"] as const).map((u) => (
             <button
               key={u}
@@ -199,7 +199,7 @@ export function PilaTarjetas({
               disabled={recargando}
               onClick={() => cambiarUnidad(u)}
               className={`px-2 py-1 text-2xs font-medium transition-colors ${
-                unidad === u ? "bg-ink-900 text-white" : "text-ink-500 hover:text-ink-900"
+                unidad === u ? "bg-ink-900 text-white" : "text-texto-tenue hover:text-texto"
               }`}
             >
               {u}
@@ -214,8 +214,8 @@ export function PilaTarjetas({
           como algo que termina, no como el estado normal de la app. */}
       {actual?.es_ejemplo && (
         <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-500/5 px-3.5 py-2.5">
-          <p className="text-sm font-medium text-ink-900">Así funciona Yalope</p>
-          <p className="mt-0.5 text-xs leading-snug text-ink-600">
+          <p className="text-sm font-medium text-texto">Así funciona Yalope</p>
+          <p className="mt-0.5 text-xs leading-snug text-texto-tenue">
             Deslizá a la derecha para postularte, a la izquierda para descartar. Cuando alguien
             te aprueba se abre una sala con el equipo. Estas {ejemplos.length}{" "}
             {ejemplos.length === 1 ? "tarjeta es un ejemplo" : "tarjetas son ejemplos"} — después
@@ -242,31 +242,31 @@ export function PilaTarjetas({
             <TarjetaRol rol={actual} />
           </motion.div>
         ) : (
-          <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-ink-200 px-10 text-center">
+          <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-borde px-10 text-center">
             <Icono nombre="feed" className="h-8 w-8 text-ink-300" />
             {hayFueraDelRadio ? (
               <>
-                <p className="mt-3 text-base font-medium text-ink-900">
+                <p className="mt-3 text-base font-medium text-texto">
                   No hay convocatorias tan cerca
                 </p>
-                <p className="mt-1 text-sm text-ink-500">
+                <p className="mt-1 text-sm text-texto-tenue">
                   Hay convocatorias más lejos de {opcionActual.etiqueta}. Ampliá la distancia para
                   verlas.
                 </p>
                 <button
                   type="button"
                   onClick={() => cambiarRadio(null)}
-                  className="mt-4 rounded-lg border border-ink-900 px-3 py-1.5 text-xs font-medium text-ink-900"
+                  className="mt-4 rounded-lg border border-ink-900 px-3 py-1.5 text-xs font-medium text-texto"
                 >
                   Buscar en todo el mundo
                 </button>
               </>
             ) : (
               <>
-                <p className="mt-3 text-base font-medium text-ink-900">
+                <p className="mt-3 text-base font-medium text-texto">
                   No hay convocatorias nuevas
                 </p>
-                <p className="mt-1 text-sm text-ink-500">
+                <p className="mt-1 text-sm text-texto-tenue">
                   Volvé más tarde a ver nuevas propuestas.
                 </p>
               </>
@@ -280,7 +280,7 @@ export function PilaTarjetas({
           <button
             type="button"
             onClick={() => avanzar(actual, "descartar")}
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-500 transition-colors hover:border-ink-300 hover:text-ink-900"
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-borde bg-superficie text-texto-tenue transition-colors hover:border-ink-300 hover:text-texto"
             aria-label="Descartar"
           >
             <Icono nombre="cruz" className="h-6 w-6" />

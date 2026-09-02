@@ -23,7 +23,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
   const items = itemsParaNavegacion(rol, { esAdmin });
 
   return (
-    <aside className="hidden shrink-0 lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-60 lg:flex-col lg:border-r lg:border-ink-100 lg:bg-white lg:px-4 lg:py-6">
+    <aside className="hidden shrink-0 lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-60 lg:flex-col lg:border-r lg:border-borde lg:bg-superficie lg:px-4 lg:py-6">
       <Link href="/" className="mb-8 px-3">
         <LogotipoInline />
       </Link>
@@ -40,7 +40,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                     activo
                       ? "acento-fondo acento-texto"
-                      : "text-ink-500 hover:bg-ink-50/60 hover:text-ink-800"
+                      : "text-texto-tenue hover:bg-fondo-sutil/60 hover:text-ink-800"
                   }`}
                 >
                   <Icono nombre={item.icono} className="h-[18px] w-[18px]" />
@@ -58,7 +58,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
         className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
           pathname === "/ajustes"
             ? "acento-fondo acento-texto"
-            : "text-ink-500 hover:bg-ink-50/60 hover:text-ink-800"
+            : "text-texto-tenue hover:bg-fondo-sutil/60 hover:text-ink-800"
         }`}
       >
         <Icono nombre="ajustes" className="h-[18px] w-[18px]" />

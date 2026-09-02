@@ -87,7 +87,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
       <AnimatePresence mode="wait" initial={false}>
       <motion.article
         key={actual.perfil_id}
-        className="rounded-2xl border border-ink-100 bg-white p-5 shadow-tarjeta"
+        className="rounded-2xl border border-borde bg-superficie p-5 shadow-tarjeta"
         initial={prefiereReduccion ? false : { opacity: 0, y: 10 }}
         animate={{ opacity: 1, y: 0 }}
         exit={prefiereReduccion ? undefined : { opacity: 0, y: -10 }}
@@ -102,21 +102,21 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
               height={56}
               contenedorClassName="shrink-0 rounded-full"
               fallback={
-                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-500">
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-texto-tenue">
                   {actual.nombre[0]}
                 </span>
               }
             />
           ) : (
-            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-500">
+            <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-texto-tenue">
               {actual.nombre[0]}
             </span>
           )}
           <div className="min-w-0">
-            <h2 className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-ink-900">
+            <h2 className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-texto">
               {actual.nombre}
             </h2>
-            <p className="text-sm text-ink-500">
+            <p className="text-sm text-texto-tenue">
               {actual.ubicacion_publica}
               {actual.distancia_metros !== null &&
                 ` · a ${Math.max(1, Math.round(actual.distancia_metros / 1000))} km`}
@@ -141,7 +141,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
         {actual.habilidades.length > 0 && (
           <ul className="mt-2 flex flex-wrap gap-1.5">
             {actual.habilidades.map((h) => (
-              <li key={h} className="rounded-full bg-ink-50 px-2.5 py-1 text-xs text-ink-600">
+              <li key={h} className="rounded-full bg-fondo-sutil px-2.5 py-1 text-xs text-texto-tenue">
                 {h}
               </li>
             ))}
@@ -154,7 +154,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
         <button
           type="button"
           onClick={() => decidir(actual, false)}
-          className="flex h-14 w-14 items-center justify-center rounded-full border border-ink-200 bg-white text-ink-500 transition-colors hover:border-ink-300 hover:text-ink-900"
+          className="flex h-14 w-14 items-center justify-center rounded-full border border-borde bg-superficie text-texto-tenue transition-colors hover:border-ink-300 hover:text-texto"
           aria-label="Paso"
         >
           <Icono nombre="cruz" className="h-6 w-6" />

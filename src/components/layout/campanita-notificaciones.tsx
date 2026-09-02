@@ -40,7 +40,7 @@ export function CampanitaNotificaciones({ userId }: { userId: string }) {
     <Link
       href="/notificaciones"
       aria-label={noLeidas > 0 ? `Notificaciones, ${noLeidas} sin leer` : "Notificaciones"}
-      className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-ink-600 transition-colors hover:bg-ink-50 hover:text-ink-900"
+      className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-texto-tenue transition-colors hover:bg-fondo-sutil hover:text-texto"
     >
       <Icono nombre="campana" />
       {noLeidas > 0 && (

@@ -82,21 +82,21 @@ export function FormularioRol({ obraId }: { obraId: string }) {
   }
 
   return (
-    <form onSubmit={agregar} className="flex max-w-2xl flex-col gap-3 rounded-xl border border-dashed border-ink-200 p-4">
+    <form onSubmit={agregar} className="flex max-w-2xl flex-col gap-3 rounded-xl border border-dashed border-borde p-4">
       <CampoTexto id="rol_nombre" etiqueta="Nombre del rol" value={nombre} onChange={(e) => setNombre(e.target.value)} />
 
       <div className="flex gap-3">
         <button
           type="button"
           onClick={() => setTipo("actuacion")}
-          className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "actuacion" ? "border-ink-900 bg-ink-900 text-white" : "border-ink-100"}`}
+          className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "actuacion" ? "border-ink-900 bg-ink-900 text-white" : "border-borde"}`}
         >
           Actuación
         </button>
         <button
           type="button"
           onClick={() => setTipo("tecnica")}
-          className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "tecnica" ? "border-ink-900 bg-ink-900 text-white" : "border-ink-100"}`}
+          className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "tecnica" ? "border-ink-900 bg-ink-900 text-white" : "border-borde"}`}
         >
           Técnica
         </button>
@@ -125,14 +125,14 @@ export function FormularioRol({ obraId }: { obraId: string }) {
               className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                 generos.includes(g.valor)
                   ? "border-ink-900 bg-ink-900 text-white"
-                  : "border-ink-100 text-ink-500"
+                  : "border-borde text-texto-tenue"
               }`}
             >
               {g.etiqueta}
             </button>
           ))}
         </div>
-        <p className="text-xs text-ink-500">
+        <p className="text-xs text-texto-tenue">
           {generos.length === 0
             ? "Sin marcar nada, el rol le llega a cualquier persona."
             : "Solo le llega a quien coincida, y a quien prefirió no declarar su género."}
@@ -144,7 +144,7 @@ export function FormularioRol({ obraId }: { obraId: string }) {
         placeholder="Descripción del rol"
         value={descripcion}
         onChange={(e) => setDescripcion(e.target.value)}
-        className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
+        className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
       />
 
       {error && <p className="text-xs text-error-600">{error}</p>}

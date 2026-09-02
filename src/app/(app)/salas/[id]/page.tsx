@@ -72,13 +72,13 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       className="flex flex-col [--alto-barra:5rem] lg:[--alto-barra:0rem]"
       style={{ height: "calc(100dvh - env(safe-area-inset-top) - 5.25rem - var(--alto-barra))" }}
     >
-      <div className="border-b border-ink-100 px-4 py-2">
-        <p className="text-xs font-medium uppercase tracking-wide text-ink-500">
+      <div className="border-b border-borde px-4 py-2">
+        <p className="text-xs font-medium uppercase tracking-wide text-texto-tenue">
           {sala.obra_id ? "Sala de proyecto" : "Armar equipo"}
         </p>
         {/* Tres títulos posibles: el de la obra, el de una sala sin obra, o el genérico
             cuando la fila de `obras` está escondida por bloqueo (0022). */}
-        <h1 className="font-display font-semibold tracking-[-0.02em] text-ink-900">
+        <h1 className="font-display font-semibold tracking-[-0.02em] text-texto">
           {obra?.titulo ?? sala.titulo ?? "Proyecto"}
         </h1>
       </div>

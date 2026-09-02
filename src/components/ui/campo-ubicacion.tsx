@@ -175,18 +175,18 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
             if (valor) onCambio(null);
           }}
           onFocus={() => sugerencias.length > 0 && setAbierto(true)}
-          className={`w-full rounded-xl border bg-white px-3.5 py-2.5 text-base text-ink-900 transition-colors placeholder:text-ink-400 focus:border-ink-900 ${
-            error ? "border-error-400" : "border-ink-200"
+          className={`w-full rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto transition-colors placeholder:text-ink-400 focus:border-ink-900 ${
+            error ? "border-error-400" : "border-borde"
           }`}
         />
         {abierto && sugerencias.length > 0 && (
-          <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-ink-200 bg-white shadow-lg">
+          <ul className="absolute z-20 mt-1 w-full overflow-hidden rounded-xl border border-borde bg-superficie shadow-lg">
             {sugerencias.map((sugerencia) => (
               <li key={sugerencia.id}>
                 <button
                   type="button"
                   onClick={() => elegir(sugerencia)}
-                  className="w-full px-3.5 py-2.5 text-left text-base text-ink-800 hover:bg-ink-50"
+                  className="w-full px-3.5 py-2.5 text-left text-base text-ink-800 hover:bg-fondo-sutil"
                 >
                   {sugerencia.texto}
                 </button>
@@ -200,15 +200,15 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
         type="button"
         onClick={usarMiUbicacion}
         disabled={ubicando}
-        className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-ink-600 underline underline-offset-4 hover:text-ink-900 disabled:text-ink-400 disabled:no-underline"
+        className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-texto-tenue underline underline-offset-4 hover:text-texto disabled:text-ink-400 disabled:no-underline"
       >
         {ubicando ? "Buscando tu ubicación…" : "Usar mi ubicación actual"}
       </button>
 
-      {buscando && <p className="text-xs text-ink-500">Buscando lugares…</p>}
+      {buscando && <p className="text-xs text-texto-tenue">Buscando lugares…</p>}
       {errorBusqueda && <p className="text-xs text-error-600">{errorBusqueda}</p>}
       {!buscando && !errorBusqueda && sinResolver && (
-        <p className="text-xs text-ink-500">Elegí un lugar de la lista para confirmarlo.</p>
+        <p className="text-xs text-texto-tenue">Elegí un lugar de la lista para confirmarlo.</p>
       )}
       {error && <p className="text-xs text-error-600">{error}</p>}
     </div>

@@ -127,7 +127,7 @@ export function ListaNotificaciones({
         <button
           type="button"
           onClick={marcarTodasLeidas}
-          className="self-end text-xs font-medium text-ink-500 hover:text-ink-900"
+          className="self-end text-xs font-medium text-texto-tenue hover:text-texto"
         >
           Marcar todas como leídas
         </button>
@@ -140,7 +140,7 @@ export function ListaNotificaciones({
               type="button"
               onClick={() => abrir(n)}
               className={`flex w-full items-start gap-3 rounded-xl border p-4 text-left transition-colors ${
-                n.leida_en ? "border-ink-100 bg-white" : "border-ink-200 bg-ink-50"
+                n.leida_en ? "border-borde bg-superficie" : "border-borde bg-fondo-sutil"
               }`}
             >
               {!n.leida_en && <span className="mt-1.5 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500" />}
@@ -154,43 +154,43 @@ export function ListaNotificaciones({
               <div className={n.leida_en && n.tipo !== "match" ? "pl-[18px]" : ""}>
                 {n.tipo === "match" ? (
                   <>
-                    <p className="text-base font-semibold leading-snug text-ink-900">
+                    <p className="text-base font-semibold leading-snug text-texto">
                       ¡Hay equipo!
                     </p>
-                    <p className="mt-0.5 text-sm leading-snug text-ink-600">
+                    <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
                       Te sumaste a <span className="font-medium">{tituloObra(n)}</span>
                     </p>
                   </>
                 ) : n.tipo === "convocado" ? (
                   <>
-                    <p className="text-base font-semibold leading-snug text-ink-900">
+                    <p className="text-base font-semibold leading-snug text-texto">
                       ¡Fuiste convocado!
                     </p>
-                    <p className="mt-0.5 text-sm leading-snug text-ink-600">
+                    <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
                       Te quieren sumar a <span className="font-medium">{tituloObra(n)}</span>.
                       Confirmá que seguís disponible.
                     </p>
                   </>
                 ) : n.tipo === "equipo_armado" ? (
                   <>
-                    <p className="text-base font-semibold leading-snug text-ink-900">
+                    <p className="text-base font-semibold leading-snug text-texto">
                       ¡Hay equipo!
                     </p>
-                    <p className="mt-0.5 text-sm leading-snug text-ink-600">
+                    <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
                       El interés fue mutuo. Ya pueden hablar.
                     </p>
                   </>
                 ) : n.tipo === "interes_recibido" ? (
-                  <p className="text-base leading-snug text-ink-900">
+                  <p className="text-base leading-snug text-texto">
                     Alguien quiere contactarte desde tu perfil
                   </p>
                 ) : n.tipo === "espera_vencida" ? (
-                  <p className="text-base leading-snug text-ink-600">
+                  <p className="text-base leading-snug text-texto-tenue">
                     Tu postulación a <span className="font-medium">{tituloObra(n)}</span> se cerró
                     sin respuesta.
                   </p>
                 ) : (
-                  <p className="text-base leading-snug text-ink-900">
+                  <p className="text-base leading-snug text-texto">
                     Se abrió la sala de <span className="font-medium">{tituloObra(n)}</span>
                   </p>
                 )}

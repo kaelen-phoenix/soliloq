@@ -25,18 +25,18 @@ export default async function CompletarPerfilPage({
       : undefined;
 
   return (
-    <main className="min-h-screen px-6 py-10 sm:bg-ink-50 sm:py-14">
-      <div className="mx-auto max-w-lg sm:rounded-2xl sm:border sm:border-ink-100 sm:bg-white sm:p-8 sm:shadow-tarjeta">
-      <h1 className="text-xl font-bold text-ink-900">
+    <main className="min-h-screen px-6 py-10 sm:bg-fondo-sutil sm:py-14">
+      <div className="mx-auto max-w-lg sm:rounded-2xl sm:border sm:border-borde sm:bg-superficie sm:p-8 sm:shadow-tarjeta">
+      <h1 className="text-xl font-bold text-texto">
         {perfil.rol === "talento" ? "Contanos sobre vos" : "Contanos sobre tu proyecto"}
       </h1>
-      <p className="mb-6 mt-1 text-sm text-ink-500">
+      <p className="mb-6 mt-1 text-sm text-texto-tenue">
         Estás creando tu perfil como{" "}
         <strong>{perfil.rol === "talento" ? "Talento" : "Creador"}</strong>. Vas a poder sumar el
         otro más adelante.{" "}
         <Link
           href={next ? `/elegir-rol?next=${encodeURIComponent(next)}` : "/elegir-rol"}
-          className="font-medium text-ink-900 underline decoration-ink-300 underline-offset-2"
+          className="font-medium text-texto underline decoration-ink-300 underline-offset-2"
         >
           Empezar por el otro
         </Link>
