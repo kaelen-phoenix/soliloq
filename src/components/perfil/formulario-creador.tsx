@@ -8,6 +8,7 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { Imagen } from "@/components/ui/imagen";
+import { comprimirImagen } from "@/lib/comprimir-imagen";
 import { aColumnas, desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
 import { clasesDisciplina, DISCIPLINAS, MAX_OTRO_DETALLE } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
@@ -64,16 +65,43 @@ export function FormularioCreador({
       setErrores((p) => ({ ...p, imagen: "Solo se admiten imágenes JPEG, PNG o WebP." }));
       return;
     }
-    if (archivo.size > 5 * 1024 * 1024) {
-      setErrores((p) => ({ ...p, imagen: "La imagen no puede superar los 5 MB." }));
+
+    setSubiendoImagen(true);
+    setErrores((p) => ({ ...p, imagen: "" }));
+
+    // Si la imagen pesa o mide de más, se comprime acá en vez de rechazarla.
+    let imagen: File;
+    try {
+      imagen = await comprimirImagen(archivo, { maxBytes: 5 * 1024 * 1024 });
+    } catch (err) {
+      setSubiendoImagen(false);
+      setErrores((p) => ({
+        ...p,
+        imagen: err instanceof Error ? err.message : "No pudimos procesar la imagen.",
+      }));
       return;
     }
 
-    setSubiendoImagen(true);
     const supabase = createClient();
-    const extension = archivo.name.split(".").pop();
-    const ruta = `${userId}/perfil.${extension}`;
-    await supabase.storage.from("fotos-perfil").upload(ruta, archivo, { upsert: true });
+    const extension = (imagen.type.split("/")[1] ?? "jpg").replace("jpeg", "jpg");
+    // Nombre único por subida: evita servir la versión vieja desde la caché del CDN y no
+    // deja huérfano un `perfil.png` cuando la nueva sale `.webp`.
+    const ruta = `${userId}/perfil-${crypto.randomUUID()}.${extension}`;
+
+    const { error: errorSubida } = await supabase.storage
+      .from("fotos-perfil")
+      .upload(ruta, imagen, { contentType: imagen.type });
+
+    if (errorSubida) {
+      setSubiendoImagen(false);
+      setErrores((p) => ({ ...p, imagen: "No pudimos subir la imagen. Probá de nuevo." }));
+      return;
+    }
+
+    // Borra la anterior (best-effort): su path es todo lo que va después de `.../public/fotos-perfil/`.
+    const anterior = imagenUrl.split("/fotos-perfil/")[1];
+    if (anterior) await supabase.storage.from("fotos-perfil").remove([anterior]);
+
     const { data: publica } = supabase.storage.from("fotos-perfil").getPublicUrl(ruta);
     setImagenUrl(publica.publicUrl);
     setSubiendoImagen(false);
