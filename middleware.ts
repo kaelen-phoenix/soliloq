@@ -15,10 +15,6 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    // La raíz va explícita: el patrón con lookahead de abajo no matchea `/` (gotcha
-    // conocido de Next), y sin esto un anónimo en `yalope.com` nunca pasa por el
-    // middleware y lo rebota el layout de `(app)` a `/ingresar` en vez de a la landing.
-    "/",
     "/((?!_next/static|_next/image|favicon.ico|manifest.json|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
