@@ -46,7 +46,7 @@ export function AccionesObra({ obraId, estado, cantidadRoles }: { obraId: string
             Cerrar convocatoria
           </Boton>
         )}
-        {estado === "cerrada" && <p className="text-sm text-ink-500">Esta convocatoria está cerrada.</p>}
+        {estado === "cerrada" && <p className="text-sm text-texto-tenue">Esta convocatoria está cerrada.</p>}
       </div>
     </div>
   );

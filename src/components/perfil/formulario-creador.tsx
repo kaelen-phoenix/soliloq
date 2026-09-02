@@ -208,7 +208,7 @@ export function FormularioCreador({
                   className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
                     elegida
                       ? `border-transparent font-medium ${clasesDisciplina(d.valor)}`
-                      : "border-ink-200 text-ink-600 hover:border-ink-300"
+                      : "border-borde text-texto-tenue hover:border-ink-300"
                   }`}
                 >
                   {d.etiqueta}
@@ -250,7 +250,7 @@ export function FormularioCreador({
           maxLength={1000}
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
-          className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
+          className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
           placeholder="Contanos sobre tu trayectoria o la de tu compañía."
         />
         <div className="flex items-center gap-3">
@@ -263,7 +263,7 @@ export function FormularioCreador({
               contenedorClassName="shrink-0 rounded-full"
             />
           )}
-          <label className="cursor-pointer rounded-xl border border-ink-200 px-3.5 py-2 text-sm hover:bg-ink-50">
+          <label className="cursor-pointer rounded-xl border border-borde px-3.5 py-2 text-sm hover:bg-fondo-sutil">
             {subiendoImagen ? "Subiendo…" : "Elegir imagen"}
             <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={subirImagen} />
           </label>

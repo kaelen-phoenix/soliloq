@@ -31,7 +31,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
     rol.edad_minima && rol.edad_maxima ? `${rol.edad_minima}–${rol.edad_maxima} años` : null;
 
   return (
-    <article className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-white shadow-tarjeta ring-1 ring-ink-900/5">
+    <article className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-superficie shadow-tarjeta ring-1 ring-ink-900/5">
       {/* Zona "escenario": alto contraste para que la tarjeta se lea de un vistazo. */}
       <div className="flex flex-1 flex-col justify-between bg-ink-950 p-6 text-white">
         <div className="flex items-center gap-2">
@@ -43,7 +43,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
               Ejemplo
             </span>
           )}
-          <span className="rounded-md bg-white/10 px-2 py-1 text-2xs font-medium uppercase tracking-wide text-white/70">
+          <span className="rounded-md bg-superficie/10 px-2 py-1 text-2xs font-medium uppercase tracking-wide text-white/70">
             {rol.rol_tipo === "tecnica" ? "Técnica" : "Actuación"}
           </span>
           <span className="text-2xs text-white/50">{rol.obra_ubicacion_texto}</span>
@@ -58,7 +58,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
         </div>
       </div>
 
-      <div className="flex items-center gap-2.5 border-b border-ink-100 px-5 py-3">
+      <div className="flex items-center gap-2.5 border-b border-borde px-5 py-3">
         {rol.creador_imagen_url ? (
           <Imagen
             src={rol.creador_imagen_url}
@@ -67,13 +67,13 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
             height={28}
             contenedorClassName="shrink-0 rounded-full"
             fallback={
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-ink-600">
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
                 {rol.creador_nombre[0]}
               </span>
             }
           />
         ) : (
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-ink-600">
+          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
             {rol.creador_nombre[0]}
           </span>
         )}
@@ -81,7 +81,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
         <button
           type="button"
           onClick={() => setExpandido((v) => !v)}
-          className="inline-flex items-center gap-1 text-xs font-medium text-ink-500 hover:text-ink-900"
+          className="inline-flex items-center gap-1 text-xs font-medium text-texto-tenue hover:text-texto"
         >
           {expandido ? "Menos" : "Detalle"}
           <Icono
@@ -92,9 +92,9 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
       </div>
 
       {expandido && (
-        <div className="max-h-44 space-y-3 overflow-y-auto px-5 py-4 text-sm leading-relaxed text-ink-600">
+        <div className="max-h-44 space-y-3 overflow-y-auto px-5 py-4 text-sm leading-relaxed text-texto-tenue">
           {rol.es_ejemplo && (
-            <p className="rounded-lg bg-ink-50 px-3 py-2 text-xs text-ink-600">
+            <p className="rounded-lg bg-fondo-sutil px-3 py-2 text-xs text-texto-tenue">
               Esta convocatoria no existe: es un ejemplo para mostrarte cómo funciona Yalope.
               Deslizá o usá los botones — no se le avisa a nadie.
             </p>
@@ -120,7 +120,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           {!rol.es_ejemplo && (
             <Link
               href={`/creadores/${rol.creador_id}`}
-              className="inline-flex items-center gap-1 font-medium text-ink-900 hover:underline"
+              className="inline-flex items-center gap-1 font-medium text-texto hover:underline"
             >
               Ver perfil de {rol.creador_nombre}
               <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />

@@ -125,7 +125,7 @@ export function BuscadorTalento() {
 
   return (
     <div className="flex flex-col gap-6">
-      <div className="flex flex-col gap-4 rounded-2xl border border-ink-100 bg-ink-50/50 p-4">
+      <div className="flex flex-col gap-4 rounded-2xl border border-borde bg-fondo-sutil/50 p-4">
         <CampoTexto
           id="buscar-nombre"
           etiqueta="Buscar"
@@ -139,7 +139,7 @@ export function BuscadorTalento() {
             type="button"
             onClick={() => setVerFiltros((v) => !v)}
             aria-expanded={verFiltros}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-ink-600 hover:text-ink-900"
+            className="inline-flex items-center gap-1.5 text-sm font-medium text-texto-tenue hover:text-texto"
           >
             Filtros
             {nAvanzados > 0 && (
@@ -156,7 +156,7 @@ export function BuscadorTalento() {
             <button
               type="button"
               onClick={limpiarFiltros}
-              className="text-xs font-medium text-ink-500 underline decoration-ink-300 underline-offset-2 hover:text-ink-900"
+              className="text-xs font-medium text-texto-tenue underline decoration-ink-300 underline-offset-2 hover:text-texto"
             >
               Limpiar
             </button>
@@ -196,7 +196,7 @@ export function BuscadorTalento() {
                 className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                   generos.includes(g.valor)
                     ? "border-ink-900 bg-ink-900 text-white"
-                    : "border-ink-100 text-ink-500"
+                    : "border-borde text-texto-tenue"
                 }`}
               >
                 {g.etiqueta}
@@ -216,7 +216,7 @@ export function BuscadorTalento() {
                 className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                   habilidades.includes(h)
                     ? "border-ink-900 bg-ink-900 text-white"
-                    : "border-ink-100 text-ink-500"
+                    : "border-borde text-texto-tenue"
                 }`}
               >
                 {h}
@@ -241,7 +241,7 @@ export function BuscadorTalento() {
               id="buscar-radio"
               value={radioMetros ?? ""}
               onChange={(e) => setRadioMetros(e.target.value === "" ? null : Number(e.target.value))}
-              className="rounded-xl border border-ink-200 bg-white px-3 py-2 text-sm"
+              className="rounded-xl border border-borde bg-superficie px-3 py-2 text-sm"
             >
               {opcionesRadio.map((o) => (
                 <option key={o.etiqueta} value={o.metros ?? ""}>

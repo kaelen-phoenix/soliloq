@@ -18,13 +18,13 @@ function AccionesCuenta() {
     <section className="mt-8 flex flex-col items-start gap-3">
       <Link
         href="/ajustes"
-        className="text-sm text-ink-500 underline underline-offset-4 hover:text-ink-900"
+        className="text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
       >
         Ajustes
       </Link>
       <Link
         href="/cambiar-clave?volver=/perfil"
-        className="text-sm text-ink-500 underline underline-offset-4 hover:text-ink-900"
+        className="text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
       >
         Cambiar contraseña
       </Link>
@@ -54,7 +54,7 @@ export default async function PerfilPage({
   const volverAVista = (
     <Link
       href="/perfil"
-      className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-ink-500 hover:text-ink-900"
+      className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-texto-tenue hover:text-texto"
     >
       <Icono nombre="chevron" className="h-3.5 w-3.5 rotate-90" />
       Ver mi perfil
@@ -159,18 +159,18 @@ export default async function PerfilPage({
                 height={64}
                 contenedorClassName="shrink-0 rounded-full"
                 fallback={
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-texto-tenue">
                     {perfilCreador.nombre[0]}
                   </span>
                 }
               />
             ) : (
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">
+              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-texto-tenue">
                 {perfilCreador.nombre[0]}
               </span>
             )}
             <div className="min-w-0">
-              <h2 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
+              <h2 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto">
                 {perfilCreador.nombre}
               </h2>
               <EtiquetasDisciplina

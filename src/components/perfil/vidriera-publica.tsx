@@ -53,11 +53,11 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
       )}
 
       <div>
-        <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-ink-900">
+        <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-texto">
           {perfil.nombre}
         </h1>
         {datos.length > 0 && (
-          <p className="mt-1 text-sm text-ink-500">{datos.join(" · ")}</p>
+          <p className="mt-1 text-sm text-texto-tenue">{datos.join(" · ")}</p>
         )}
       </div>
 
@@ -70,7 +70,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
               target="_blank"
               rel="noopener noreferrer nofollow"
               aria-label={red.etiqueta}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 transition-colors hover:border-ink-400 hover:text-ink-900"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-borde text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
             >
               <Icono nombre={red.icono} className="h-4 w-4" />
             </a>
@@ -121,7 +121,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
           <ul className="flex flex-col gap-1.5">
             {perfil.obras.map((o, i) => (
               <li key={i} className="text-sm text-ink-700">
-                <span className="font-medium text-ink-900">{o.titulo}</span>
+                <span className="font-medium text-texto">{o.titulo}</span>
                 <span className="text-ink-400"> · {o.anio} · </span>
                 {o.rol}
               </li>

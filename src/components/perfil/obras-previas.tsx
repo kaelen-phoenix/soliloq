@@ -65,10 +65,10 @@ export function ObrasPrevias({ creadorId, obras }: { creadorId: string; obras: O
     <div className="flex flex-col gap-4">
       <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
         {lista.map((o) => (
-          <li key={o.id} className="flex items-center justify-between rounded-xl border border-ink-100 px-4 py-2">
+          <li key={o.id} className="flex items-center justify-between rounded-xl border border-borde px-4 py-2">
             <div>
-              <p className="font-medium text-ink-900">{o.titulo}</p>
-              <p className="text-xs text-ink-500">
+              <p className="font-medium text-texto">{o.titulo}</p>
+              <p className="text-xs text-texto-tenue">
                 {o.anio} · {o.rol_desempenado}
               </p>
             </div>
@@ -77,10 +77,10 @@ export function ObrasPrevias({ creadorId, obras }: { creadorId: string; obras: O
             </button>
           </li>
         ))}
-        {lista.length === 0 && <p className="text-sm text-ink-500">Todavía no cargaste obras previas.</p>}
+        {lista.length === 0 && <p className="text-sm text-texto-tenue">Todavía no cargaste obras previas.</p>}
       </ul>
 
-      <form onSubmit={agregar} className="flex flex-col gap-3 rounded-xl border border-dashed border-ink-200 p-4">
+      <form onSubmit={agregar} className="flex flex-col gap-3 rounded-xl border border-dashed border-borde p-4">
         <CampoTexto id="titulo_obra" etiqueta="Título" value={titulo} onChange={(e) => setTitulo(e.target.value)} />
         <div className="grid grid-cols-2 gap-3">
           <CampoTexto id="anio_obra" etiqueta="Año" type="number" value={anio} onChange={(e) => setAnio(e.target.value)} />

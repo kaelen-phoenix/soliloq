@@ -21,7 +21,7 @@ export default async function BuscarTalentoPage() {
   return (
     <main className="px-5 py-5">
       {/* El título lo pone el encabezado (titulo-seccion). Acá va solo la bajada. */}
-      <p className="mb-5 text-sm text-ink-500">
+      <p className="mb-5 text-sm text-texto-tenue">
         Encontrá artistas por nombre, habilidad o experiencia, y filtrá por edad, género o zona.
       </p>
       <BuscadorTalento />

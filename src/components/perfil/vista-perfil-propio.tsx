@@ -19,14 +19,14 @@ export function VistaPerfilPropio({
 }) {
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex items-center justify-between gap-3 rounded-xl bg-ink-50 px-4 py-3">
-        <p className="text-xs leading-snug text-ink-500">
+      <div className="flex items-center justify-between gap-3 rounded-xl bg-fondo-sutil px-4 py-3">
+        <p className="text-xs leading-snug text-texto-tenue">
           Así te ven los demás.
           {aviso && <span className="block text-ink-400">{aviso}</span>}
         </p>
         <Link
           href={hrefEditar}
-          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-ink-200 bg-white px-3 py-1.5 text-sm font-medium text-ink-900 transition-colors hover:border-ink-300"
+          className="flex shrink-0 items-center gap-1.5 rounded-lg border border-borde bg-superficie px-3 py-1.5 text-sm font-medium text-texto transition-colors hover:border-ink-300"
         >
           <Icono nombre="cambiar" className="h-3.5 w-3.5" />
           Editar

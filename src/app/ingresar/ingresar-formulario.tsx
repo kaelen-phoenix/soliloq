@@ -97,11 +97,11 @@ export function IngresarFormulario({ next }: { next?: string }) {
 
   if (verificacionEnviada) {
     return (
-      <div className="rounded-2xl border border-ink-100 p-6">
-        <h2 className="text-lg font-semibold text-ink-900">Confirmá tu email</h2>
-        <p className="mt-1.5 text-sm leading-relaxed text-ink-500">
+      <div className="rounded-2xl border border-borde p-6">
+        <h2 className="text-lg font-semibold text-texto">Confirmá tu email</h2>
+        <p className="mt-1.5 text-sm leading-relaxed text-texto-tenue">
           Te enviamos un enlace de verificación a{" "}
-          <span className="text-ink-900">{email}</span>. Abrilo y vas a entrar con la contraseña
+          <span className="text-texto">{email}</span>. Abrilo y vas a entrar con la contraseña
           que acabás de elegir.
         </p>
         <Boton
@@ -120,14 +120,14 @@ export function IngresarFormulario({ next }: { next?: string }) {
 
   return (
     <div className="flex flex-col gap-4">
-      <div className="flex gap-1 rounded-xl bg-ink-50 p-1">
+      <div className="flex gap-1 rounded-xl bg-fondo-sutil p-1">
         {(["ingresar", "registrarme"] as const).map((m) => (
           <button
             key={m}
             type="button"
             onClick={() => cambiarModo(m)}
             className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              modo === m ? "bg-white text-ink-900 shadow-sm" : "text-ink-500 hover:text-ink-800"
+              modo === m ? "bg-superficie text-texto shadow-sm" : "text-texto-tenue hover:text-ink-800"
             }`}
           >
             {m === "ingresar" ? "Ingresar" : "Crear cuenta"}
@@ -163,7 +163,7 @@ export function IngresarFormulario({ next }: { next?: string }) {
       {modo === "ingresar" && (
         <Link
           href="/recuperar"
-          className="self-start text-sm text-ink-500 underline underline-offset-4 hover:text-ink-900"
+          className="self-start text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
         >
           Olvidé mi contraseña
         </Link>

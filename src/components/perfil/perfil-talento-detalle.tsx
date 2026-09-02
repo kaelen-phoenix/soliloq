@@ -28,11 +28,11 @@ export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
       <GaleriaFotos fotos={fotosOrdenadas.map((f) => f.url)} alt={talento.nombre} />
 
       <div>
-        <h2 className="text-lg font-bold text-ink-900">{talento.nombre}</h2>
-        <p className="text-sm text-ink-500">
+        <h2 className="text-lg font-bold text-texto">{talento.nombre}</h2>
+        <p className="text-sm text-texto-tenue">
           {calcularEdad(talento.fecha_nacimiento)} años · {talento.ubicacion_publica}
         </p>
-        <p className="text-sm text-ink-500">
+        <p className="text-sm text-texto-tenue">
           {talento.genero_descripcion || etiquetaGenero(talento.genero)}
         </p>
       </div>
@@ -46,7 +46,7 @@ export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
               target="_blank"
               rel="noopener noreferrer"
               aria-label={red.etiqueta}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 transition-colors hover:border-ink-400 hover:text-ink-900"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-borde text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
             >
               <Icono nombre={red.icono} className="h-4 w-4" />
             </a>

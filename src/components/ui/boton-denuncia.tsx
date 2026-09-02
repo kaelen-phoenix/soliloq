@@ -101,9 +101,9 @@ export function BotonDenuncia({
 
   if (enviada) {
     return (
-      <div className="rounded-xl border border-ink-200 bg-ink-50 p-4">
-        <p className="text-base font-medium text-ink-900">Recibimos tu denuncia</p>
-        <p className="mt-1 text-sm leading-relaxed text-ink-600">
+      <div className="rounded-xl border border-borde bg-fondo-sutil p-4">
+        <p className="text-base font-medium text-texto">Recibimos tu denuncia</p>
+        <p className="mt-1 text-sm leading-relaxed text-texto-tenue">
           La vamos a revisar. Si necesitás dejar de ver a esta persona ahora mismo, escribinos
           y lo resolvemos.
         </p>
@@ -112,13 +112,13 @@ export function BotonDenuncia({
   }
 
   return (
-    <form onSubmit={enviar} className="flex flex-col gap-3 rounded-xl border border-ink-200 p-4">
+    <form onSubmit={enviar} className="flex flex-col gap-3 rounded-xl border border-borde p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-base font-medium text-ink-900">Denunciar {queSeDenuncia}</p>
+        <p className="text-base font-medium text-texto">Denunciar {queSeDenuncia}</p>
         <button
           type="button"
           onClick={() => setAbierto(false)}
-          className="shrink-0 text-ink-400 hover:text-ink-900"
+          className="shrink-0 text-ink-400 hover:text-texto"
           aria-label="Cerrar"
         >
           <Icono nombre="cruz" className="h-4 w-4" />
@@ -151,7 +151,7 @@ export function BotonDenuncia({
         value={detalle}
         onChange={(e) => setDetalle(e.target.value)}
         placeholder="Contanos qué pasó (opcional pero ayuda mucho)."
-        className="rounded-xl border border-ink-200 px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
+        className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
       />
 
       {error && <p className="text-xs text-error-600">{error}</p>}

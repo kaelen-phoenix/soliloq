@@ -17,10 +17,10 @@ export default async function SuspendidoPage() {
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-12">
       <Logotipo tamano="sm" />
-      <h1 className="mt-8 font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
+      <h1 className="mt-8 font-display text-xl font-semibold tracking-[-0.02em] text-texto">
         {t("titulo")}
       </h1>
-      <p className="mt-2 text-base leading-relaxed text-ink-500">{t("texto")}</p>
+      <p className="mt-2 text-base leading-relaxed text-texto-tenue">{t("texto")}</p>
       <div className="mt-7">
         <CerrarSesionBoton />
       </div>

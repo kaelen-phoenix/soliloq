@@ -30,7 +30,7 @@ function Opciones<T extends string>({
           className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${
             valor === o.valor
               ? "border-ink-900 bg-ink-900 text-white"
-              : "border-ink-200 text-ink-600 hover:border-ink-300"
+              : "border-borde text-texto-tenue hover:border-ink-300"
           }`}
         >
           {o.etiqueta}

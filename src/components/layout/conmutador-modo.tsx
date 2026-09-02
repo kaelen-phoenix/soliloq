@@ -32,7 +32,7 @@ export function ConmutadorModo({
             <span className="text-ink-200">·</span>
             <Link
               href="/perfil/nuevo"
-              className="text-2xs font-medium text-ink-600 underline decoration-ink-300 underline-offset-2 hover:text-ink-900"
+              className="text-2xs font-medium text-texto-tenue underline decoration-ink-300 underline-offset-2 hover:text-texto"
             >
               {t("sumarPerfil", { rol: t(rolFaltante) })}
             </Link>
@@ -56,10 +56,10 @@ export function ConmutadorModo({
         disabled={pendiente}
         onClick={() => iniciarTransicion(() => conmutarModo(otro))}
         aria-label={t("cambiarA", { rol: t(otro) })}
-        className="group inline-flex items-center gap-1 rounded-lg border border-ink-200 py-1 pl-2 pr-1.5 text-2xs font-medium text-ink-600 transition-colors hover:border-ink-300 hover:bg-ink-50 disabled:opacity-50"
+        className="group inline-flex items-center gap-1 rounded-lg border border-borde py-1 pl-2 pr-1.5 text-2xs font-medium text-texto-tenue transition-colors hover:border-ink-300 hover:bg-fondo-sutil disabled:opacity-50"
       >
         <span>{t("cambiarA", { rol: t(otro) })}</span>
-        <Icono nombre="cambiar" className="h-3.5 w-3.5 text-ink-400 group-hover:text-ink-600" />
+        <Icono nombre="cambiar" className="h-3.5 w-3.5 text-ink-400 group-hover:text-texto-tenue" />
       </button>
     </div>
   );

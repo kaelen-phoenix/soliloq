@@ -20,10 +20,10 @@ export default async function IngresarPage({
           ya está en el panel de al lado, así que acá va el título de la acción y no la marca
           repetida dos veces en la misma pantalla. */}
       <div className="mb-8 mt-4 lg:mt-0">
-        <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
+        <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto">
           {t("titulo")}
         </h1>
-        <p className="mt-1.5 text-base leading-snug text-ink-500">{t("bajada")}</p>
+        <p className="mt-1.5 text-base leading-snug text-texto-tenue">{t("bajada")}</p>
       </div>
 
       {searchParams.error === "enlace_invalido" && (

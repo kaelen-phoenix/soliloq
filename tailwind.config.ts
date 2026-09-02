@@ -2,9 +2,19 @@ import type { Config } from "tailwindcss";
 
 const config: Config = {
   content: ["./src/**/*.{js,ts,jsx,tsx,mdx}"],
+  // Oscuro por `prefers-color-scheme` (en `globals.css`), con override manual desde Ajustes
+  // vía `data-tema` en `<html>`. Casi no hay clases `dark:` en el código: el tema cambia
+  // por las variables semánticas, no por variantes.
+  darkMode: ["selector", '[data-tema="dark"]'],
   theme: {
     extend: {
       colors: {
+        // Colores semánticos: cambian con el tema (ver `globals.css`).
+        superficie: "rgb(var(--superficie) / <alpha-value>)",
+        "fondo-sutil": "rgb(var(--fondo-sutil) / <alpha-value>)",
+        texto: "rgb(var(--texto) / <alpha-value>)",
+        "texto-tenue": "rgb(var(--texto-tenue) / <alpha-value>)",
+        borde: "rgb(var(--borde) / <alpha-value>)",
         // Acento: se usa solo en acciones primarias y estados activos.
         brand: {
           50: "#fdf2f7",
@@ -56,9 +66,11 @@ const config: Config = {
           500: "#7a747e",
           400: "#9d97a0",
           300: "#c0bbc4",
-          200: "#e0dde2",
-          100: "#eeecf0",
-          50: "#f7f6f8",
+          // 200/100/50 son variables: en oscuro se oscurecen para que los chips y
+          // skeletons (`bg-ink-100` y compañía) no queden brillando sobre fondo oscuro.
+          200: "rgb(var(--ink-200) / <alpha-value>)",
+          100: "rgb(var(--ink-100) / <alpha-value>)",
+          50: "rgb(var(--ink-50) / <alpha-value>)",
         },
         // Estados. Estaban sueltos como `red-600` y `amber-800` de Tailwind: fuera del
         // sistema, el próximo rojo iba a ser otro y nadie lo iba a notar. Tres pasos por

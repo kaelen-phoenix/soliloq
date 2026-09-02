@@ -93,8 +93,8 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
       )}
 
       {esDueño ? (
-        <footer className="mt-12 border-t border-ink-100 pt-5 text-sm">
-          <Link href="/perfil" className="font-medium text-ink-700 hover:text-ink-900">
+        <footer className="mt-12 border-t border-borde pt-5 text-sm">
+          <Link href="/perfil" className="font-medium text-ink-700 hover:text-texto">
             Volver a mi perfil
           </Link>
         </footer>
@@ -102,17 +102,17 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
         <div className="mt-10">
           <Link
             href="/"
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-ink-200 py-3 text-sm font-semibold text-ink-800 transition-colors hover:bg-ink-50"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-borde py-3 text-sm font-semibold text-ink-800 transition-colors hover:bg-fondo-sutil"
           >
             Ir a Yalope
           </Link>
         </div>
       ) : (
         <section className="mt-10 rounded-2xl border border-brand-200 bg-brand-50/60 p-6 text-center">
-          <p className="font-display text-lg font-semibold tracking-[-0.02em] text-ink-900">
+          <p className="font-display text-lg font-semibold tracking-[-0.02em] text-texto">
             ¿Casteás o sos artista?
           </p>
-          <p className="mx-auto mt-1.5 max-w-[38ch] text-sm leading-relaxed text-ink-600">
+          <p className="mx-auto mt-1.5 max-w-[38ch] text-sm leading-relaxed text-texto-tenue">
             Armá tu perfil en Yalope y compartilo como este: fotos, experiencia y un enlace
             para pasarle a cualquier casting.
           </p>

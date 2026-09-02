@@ -25,18 +25,18 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
             height={64}
             contenedorClassName="shrink-0 rounded-full"
             fallback={
-              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-texto-tenue">
                 {creador.nombre[0]}
               </div>
             }
           />
         ) : (
-          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">
+          <div className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-texto-tenue">
             {creador.nombre[0]}
           </div>
         )}
         <div>
-          <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-ink-900">
+          <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto">
             {creador.nombre}
           </h1>
           <EtiquetasDisciplina
@@ -55,9 +55,9 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
           <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Obras previas</h2>
           <ul className="mt-2 flex flex-col gap-2">
             {obrasPrevias.map((o) => (
-              <li key={o.id} className="rounded-xl border border-ink-100 px-4 py-2">
-                <p className="font-medium text-ink-900">{o.titulo}</p>
-                <p className="text-xs text-ink-500">
+              <li key={o.id} className="rounded-xl border border-borde px-4 py-2">
+                <p className="font-medium text-texto">{o.titulo}</p>
+                <p className="text-xs text-texto-tenue">
                   {o.anio} · {o.rol_desempenado}
                 </p>
               </li>

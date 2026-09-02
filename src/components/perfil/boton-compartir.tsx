@@ -125,11 +125,11 @@ export function BotonCompartir({
   const textoCompartir = `${nombre} en Yalope`;
 
   return (
-    <section className="mt-8 max-w-2xl rounded-2xl border border-ink-100 p-4">
+    <section className="mt-8 max-w-2xl rounded-2xl border border-borde p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-base font-medium text-ink-900">Compartir mi perfil</h2>
-          <p className="mt-1 text-sm leading-relaxed text-ink-500">
+          <h2 className="text-base font-medium text-texto">Compartir mi perfil</h2>
+          <p className="mt-1 text-sm leading-relaxed text-texto-tenue">
             {activo
               ? "Tu enlace está activo: cualquiera que lo tenga ve tu vidriera pública, sin cuenta."
               : "Un enlace que se ve sin cuenta: tus fotos, tu presentación y tus habilidades o disciplinas. Nunca tu fecha de nacimiento, tu ubicación exacta ni tu contacto."}
@@ -146,7 +146,7 @@ export function BotonCompartir({
           type="button"
           onClick={alternarQr}
           aria-pressed={urlQr !== null}
-          className="inline-flex h-10 items-center gap-2 rounded-xl border border-ink-200 px-4 text-sm font-medium text-ink-700 transition-colors hover:bg-ink-50"
+          className="inline-flex h-10 items-center gap-2 rounded-xl border border-borde px-4 text-sm font-medium text-ink-700 transition-colors hover:bg-fondo-sutil"
         >
           <Icono nombre="qr" className="h-4 w-4" />
           {urlQr ? "Ocultar QR" : "Código QR"}
@@ -159,11 +159,11 @@ export function BotonCompartir({
       </div>
 
       {urlQr && (
-        <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-ink-100 bg-ink-50/50 p-5 text-center">
-          <div className="rounded-xl bg-white p-3 shadow-tarjeta">
+        <div className="mt-4 flex flex-col items-center gap-3 rounded-2xl border border-borde bg-fondo-sutil/50 p-5 text-center">
+          <div className="rounded-xl bg-superficie p-3 shadow-tarjeta">
             <CodigoQr valor={urlQr} tam={176} />
           </div>
-          <p className="max-w-[36ch] text-xs leading-relaxed text-ink-500">
+          <p className="max-w-[36ch] text-xs leading-relaxed text-texto-tenue">
             Mostralo para que lo escaneen y abran tu perfil, sin cuenta. Es el mismo enlace:{" "}
             <span className="break-all font-medium text-ink-700">{urlQr}</span>
           </p>
@@ -177,7 +177,7 @@ export function BotonCompartir({
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Compartir por WhatsApp"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 transition-colors hover:border-ink-400 hover:text-ink-900"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-borde text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
           >
             <Icono nombre="whatsapp" className="h-4 w-4" />
           </a>
@@ -186,7 +186,7 @@ export function BotonCompartir({
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Compartir en X"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 transition-colors hover:border-ink-400 hover:text-ink-900"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-borde text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
           >
             <Icono nombre="x" className="h-4 w-4" />
           </a>
@@ -195,7 +195,7 @@ export function BotonCompartir({
             target="_blank"
             rel="noopener noreferrer"
             aria-label="Compartir en Facebook"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 transition-colors hover:border-ink-400 hover:text-ink-900"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-borde text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
           >
             <Icono nombre="facebook" className="h-4 w-4" />
           </a>
@@ -208,14 +208,14 @@ export function BotonCompartir({
               window.open("https://instagram.com", "_blank", "noopener,noreferrer");
             }}
             aria-label="Compartir en Instagram"
-            className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-600 transition-colors hover:border-ink-400 hover:text-ink-900"
+            className="flex h-9 w-9 items-center justify-center rounded-full border border-borde text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
           >
             <Icono nombre="instagram" className="h-4 w-4" />
           </button>
           <button
             type="button"
             onClick={copiarEnlace}
-            className="flex h-9 items-center gap-1.5 rounded-full border border-ink-200 px-3 text-xs font-medium text-ink-600 transition-colors hover:border-ink-400 hover:text-ink-900"
+            className="flex h-9 items-center gap-1.5 rounded-full border border-borde px-3 text-xs font-medium text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
           >
             <Icono nombre="enlace" className="h-3.5 w-3.5" />
             Copiar enlace
@@ -228,7 +228,7 @@ export function BotonCompartir({
           <button
             type="button"
             onClick={regenerar}
-            className="text-ink-500 underline underline-offset-4 hover:text-ink-900"
+            className="text-texto-tenue underline underline-offset-4 hover:text-texto"
           >
             Regenerar enlace
           </button>

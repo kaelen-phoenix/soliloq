@@ -17,7 +17,7 @@ const TAMANOS = {
 type Tono = "ink" | "claro";
 
 const TONO: Record<Tono, { texto: string; acento: string }> = {
-  ink: { texto: "text-ink-900", acento: "text-brand-500" },
+  ink: { texto: "text-texto", acento: "text-brand-500" },
   claro: { texto: "text-white", acento: "text-candileja-400" },
 };
 

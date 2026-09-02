@@ -16,8 +16,8 @@ export const CampoTexto = forwardRef<HTMLInputElement, Props>(
       <input
         ref={ref}
         id={id}
-        className={`rounded-xl border bg-white px-3.5 py-2.5 text-base text-ink-900 transition-colors placeholder:text-ink-400 focus:border-ink-900 ${
-          error ? "border-error-400" : "border-ink-200"
+        className={`rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto transition-colors placeholder:text-ink-400 focus:border-ink-900 ${
+          error ? "border-error-400" : "border-borde"
         } ${className}`}
         {...props}
       />

@@ -38,7 +38,7 @@ export function TituloSeccion({ modoActivo }: { modoActivo: RolUsuario }) {
   // Sube a `2xl` en pantallas medianas para separarlo del cuerpo; en el teléfono se
   // queda en `xl` para no comerse el encabezado.
   return (
-    <h1 className="font-display text-xl font-semibold leading-none tracking-[-0.02em] text-ink-900 sm:text-2xl">
+    <h1 className="font-display text-xl font-semibold leading-none tracking-[-0.02em] text-texto sm:text-2xl">
       {titulo}
     </h1>
   );

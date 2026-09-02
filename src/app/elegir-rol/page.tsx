@@ -51,13 +51,13 @@ export default function ElegirRolPage({
   return (
     // En escritorio: fondo teñido y la decisión dentro de una tarjeta. En móvil no cambia
     // nada — ahí la pantalla entera ya es la tarjeta.
-    <main className="flex min-h-screen flex-col justify-center px-6 py-12 sm:bg-ink-50">
-      <div className="mx-auto flex w-full max-w-sm flex-col gap-3 sm:rounded-2xl sm:border sm:border-ink-100 sm:bg-white sm:p-8 sm:shadow-tarjeta">
+    <main className="flex min-h-screen flex-col justify-center px-6 py-12 sm:bg-fondo-sutil">
+      <div className="mx-auto flex w-full max-w-sm flex-col gap-3 sm:rounded-2xl sm:border sm:border-borde sm:bg-superficie sm:p-8 sm:shadow-tarjeta">
       <div className="mb-4">
-        <h1 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-ink-900">
+        <h1 className="text-2xl font-semibold leading-tight tracking-[-0.025em] text-texto">
           ¿Con cuál querés empezar?
         </h1>
-        <p className="mt-2 text-base leading-snug text-ink-500">
+        <p className="mt-2 text-base leading-snug text-texto-tenue">
           Elegí tu primer perfil. Después vas a poder sumar el otro y alternar entre los dos.
         </p>
       </div>
@@ -67,15 +67,15 @@ export default function ElegirRolPage({
           key={opcion.rol}
           onClick={() => elegir(opcion.rol)}
           disabled={cargando !== null}
-          className="group flex items-center gap-4 rounded-2xl border border-ink-200 p-5 text-left transition-colors hover:border-ink-900 disabled:opacity-50"
+          className="group flex items-center gap-4 rounded-2xl border border-borde p-5 text-left transition-colors hover:border-ink-900 disabled:opacity-50"
         >
           <div className="flex-1">
-            <h2 className="text-base font-semibold text-ink-900">{opcion.titulo}</h2>
-            <p className="mt-1 text-sm leading-snug text-ink-500">{opcion.detalle}</p>
+            <h2 className="text-base font-semibold text-texto">{opcion.titulo}</h2>
+            <p className="mt-1 text-sm leading-snug text-texto-tenue">{opcion.detalle}</p>
           </div>
           <Icono
             nombre="flecha-derecha"
-            className="h-4 w-4 shrink-0 text-ink-300 transition-colors group-hover:text-ink-900"
+            className="h-4 w-4 shrink-0 text-ink-300 transition-colors group-hover:text-texto"
           />
         </button>
       ))}

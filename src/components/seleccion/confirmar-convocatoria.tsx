@@ -54,8 +54,8 @@ export function ConfirmarConvocatoria({
 
   return (
     <div className="mt-3 rounded-xl border border-brand-500/30 bg-brand-500/5 p-3.5">
-      <p className="text-base font-medium text-ink-900">¡Fuiste convocado!</p>
-      <p className="mt-1 text-sm leading-relaxed text-ink-600">
+      <p className="text-base font-medium text-texto">¡Fuiste convocado!</p>
+      <p className="mt-1 text-sm leading-relaxed text-texto-tenue">
         Te quieren sumar al equipo de <span className="font-medium">{obraTitulo}</span>. Como tu
         postulación tiene más de una semana, necesitamos confirmar que seguís disponible.
       </p>
@@ -75,7 +75,7 @@ export function ConfirmarConvocatoria({
           type="button"
           onClick={() => responder("rechazado")}
           disabled={enviando !== null}
-          className="rounded-xl border border-ink-200 px-4 text-sm font-medium text-ink-600 transition-colors hover:border-ink-300 hover:text-ink-900 disabled:opacity-50"
+          className="rounded-xl border border-borde px-4 text-sm font-medium text-texto-tenue transition-colors hover:border-ink-300 hover:text-texto disabled:opacity-50"
         >
           Ya no puedo
         </button>

@@ -4,7 +4,7 @@ import { Esqueleto, PantallaCargando } from "@/components/ui/esqueleto";
 export default function Cargando() {
   return (
     <PantallaCargando className="flex flex-col px-5 py-5">
-      <div className="rounded-2xl border border-ink-100 p-5">
+      <div className="rounded-2xl border border-borde p-5">
         <div className="flex items-center gap-3.5">
           <Esqueleto className="h-14 w-14 shrink-0 rounded-full" />
           <div className="min-w-0 flex-1">

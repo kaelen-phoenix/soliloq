@@ -10,9 +10,9 @@ const ETIQUETA_ESTADO: Record<string, string> = {
 };
 
 const COLOR_ESTADO: Record<string, string> = {
-  borrador: "bg-ink-100 text-ink-600",
+  borrador: "bg-ink-100 text-texto-tenue",
   publicada: "bg-ink-900 text-white",
-  cerrada: "bg-ink-50 text-ink-400",
+  cerrada: "bg-fondo-sutil text-ink-400",
 };
 
 export async function TableroCreador({ creadorId }: { creadorId: string }) {
@@ -52,10 +52,10 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
             <li key={obra.id}>
               <Link
                 href={`/obras/${obra.id}`}
-                className="flex items-center gap-3 rounded-xl border border-ink-100 bg-white p-4 transition-colors hover:border-ink-200"
+                className="flex items-center gap-3 rounded-xl border border-borde bg-superficie p-4 transition-colors hover:border-borde"
               >
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-medium text-ink-900">{obra.titulo}</p>
+                  <p className="truncate text-base font-medium text-texto">{obra.titulo}</p>
                   <span
                     className={`mt-1.5 inline-block rounded-md px-1.5 py-0.5 text-2xs font-medium uppercase tracking-wide ${COLOR_ESTADO[obra.estado]}`}
                   >
