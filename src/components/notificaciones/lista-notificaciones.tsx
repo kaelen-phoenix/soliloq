@@ -2,7 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Icono } from "@/components/ui/icono";
+import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Imagen } from "@/components/ui/imagen";
 import { createClient } from "@/lib/supabase/client";
 import type { TipoNotificacion } from "@/lib/supabase/types";
@@ -113,13 +113,11 @@ export function ListaNotificaciones({
 
   if (notificaciones.length === 0) {
     return (
-      <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
-        <Icono nombre="campana" className="h-8 w-8 text-ink-300" />
-        <p className="mt-3 text-base font-medium text-ink-900">Sin notificaciones</p>
-        <p className="mt-1 text-sm leading-snug text-ink-500">
-          Acá vas a ver los avisos cuando se arma un equipo y cuando se abre una sala.
-        </p>
-      </div>
+      <EstadoVacio
+        icono="campana"
+        titulo="Sin notificaciones"
+        detalle="Acá vas a ver los avisos cuando se arma un equipo y cuando se abre una sala."
+      />
     );
   }
 
