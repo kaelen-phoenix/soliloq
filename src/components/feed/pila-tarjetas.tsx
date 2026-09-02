@@ -174,7 +174,7 @@ export function PilaTarjetas({
   return (
     <main className="flex flex-col px-5 py-4">
       <div className="mb-4 flex items-center gap-2">
-        <label htmlFor="radio" className="text-2xs font-medium text-ink-400">
+        <label htmlFor="radio" className="text-2xs font-medium text-texto-tenue">
           Distancia
         </label>
         <select
@@ -243,7 +243,7 @@ export function PilaTarjetas({
           </motion.div>
         ) : (
           <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-borde px-10 text-center">
-            <Icono nombre="feed" className="h-8 w-8 text-ink-300" />
+            <Icono nombre="feed" className="h-8 w-8 text-texto-tenue" />
             {hayFueraDelRadio ? (
               <>
                 <p className="mt-3 text-base font-medium text-texto">

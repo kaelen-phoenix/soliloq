@@ -113,13 +113,13 @@ export function BandejaPostulantes({
                     contenedorClassName="shrink-0 rounded-lg"
                     fallback={
                       <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-ink-100">
-                        <Icono nombre="imagen" className="h-5 w-5 text-ink-300" />
+                        <Icono nombre="imagen" className="h-5 w-5 text-texto-tenue" />
                       </div>
                     }
                   />
                 ) : (
                   <div className="flex h-14 w-14 items-center justify-center rounded-lg bg-ink-100">
-                    <Icono nombre="imagen" className="h-5 w-5 text-ink-300" />
+                    <Icono nombre="imagen" className="h-5 w-5 text-texto-tenue" />
                   </div>
                 )}
                 <div className="min-w-0 flex-1">
@@ -130,7 +130,7 @@ export function BandejaPostulantes({
                 </div>
                 <Icono
                   nombre="chevron"
-                  className={`h-4 w-4 shrink-0 text-ink-300 transition-transform ${expandido ? "rotate-180" : ""}`}
+                  className={`h-4 w-4 shrink-0 text-texto-tenue transition-transform ${expandido ? "rotate-180" : ""}`}
                 />
               </button>
 
@@ -149,7 +149,7 @@ export function BandejaPostulantes({
               )}
 
               {p.estado === "vencida" && (
-                <p className="border-t border-borde px-4 py-2.5 text-xs leading-snug text-ink-400">
+                <p className="border-t border-borde px-4 py-2.5 text-xs leading-snug text-texto-tenue">
                   Se cerró sola por falta de respuesta.
                 </p>
               )}

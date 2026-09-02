@@ -75,7 +75,7 @@ export default function ElegirRolPage({
           </div>
           <Icono
             nombre="flecha-derecha"
-            className="h-4 w-4 shrink-0 text-ink-300 transition-colors group-hover:text-texto"
+            className="h-4 w-4 shrink-0 text-texto-tenue transition-colors group-hover:text-texto"
           />
         </button>
       ))}

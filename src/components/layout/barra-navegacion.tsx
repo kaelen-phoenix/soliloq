@@ -35,7 +35,7 @@ export function BarraNavegacion({
                 href={item.href}
                 aria-current={activo ? "page" : undefined}
                 className={`flex flex-col items-center gap-1 pb-1.5 pt-2.5 text-2xs font-medium transition-colors ${
-                  activo ? "acento-texto" : "text-ink-400 hover:text-texto-tenue"
+                  activo ? "acento-texto" : "text-texto-tenue hover:text-texto-tenue"
                 }`}
               >
                 <Icono nombre={item.icono} className="h-[22px] w-[22px]" />

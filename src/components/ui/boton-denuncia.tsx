@@ -91,7 +91,7 @@ export function BotonDenuncia({
       <button
         type="button"
         onClick={() => setAbierto(true)}
-        className="inline-flex items-center gap-1.5 text-xs text-ink-400 underline underline-offset-4 hover:text-texto"
+        className="inline-flex items-center gap-1.5 text-xs text-texto-tenue underline underline-offset-4 hover:text-texto"
       >
         <Icono nombre="bandera" className="h-3.5 w-3.5" />
         Denunciar
@@ -118,7 +118,7 @@ export function BotonDenuncia({
         <button
           type="button"
           onClick={() => setAbierto(false)}
-          className="shrink-0 text-ink-400 hover:text-texto"
+          className="shrink-0 text-texto-tenue hover:text-texto"
           aria-label="Cerrar"
         >
           <Icono nombre="cruz" className="h-4 w-4" />

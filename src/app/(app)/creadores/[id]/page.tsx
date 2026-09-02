@@ -44,7 +44,7 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
             otroDetalle={creador.otro_detalle}
             className="mt-1.5"
           />
-          <p className="text-sm text-ink-400">{creador.ubicacion_publica}</p>
+          <p className="text-sm text-texto-tenue">{creador.ubicacion_publica}</p>
         </div>
       </div>
 
@@ -52,7 +52,7 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
 
       {obrasPrevias && obrasPrevias.length > 0 && (
         <section className="mt-6">
-          <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Obras previas</h2>
+          <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Obras previas</h2>
           <ul className="mt-2 flex flex-col gap-2">
             {obrasPrevias.map((o) => (
               <li key={o.id} className="rounded-xl border border-borde px-4 py-2">

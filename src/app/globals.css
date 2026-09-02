@@ -27,11 +27,20 @@
     --superficie: 255 255 255;
     --fondo-sutil: 247 246 248;
     --texto: 24 22 26;
-    --texto-tenue: 122 116 126;
+    /* Texto secundario: más oscuro que antes para que no compita en contraste con el
+       fondo (AA cómodo sobre blanco y sobre la crema de la portada). */
+    --texto-tenue: 92 87 96;
     --borde: 224 221 226;
     --ink-50: 247 246 248;
     --ink-100: 238 236 240;
     --ink-200: 224 221 226;
+    /* Cajas y distintivos de estado: en oscuro dejan de ser bloques casi blancos. */
+    --error-50: 253 242 242;
+    --error-800: 143 29 29;
+    --alerta-50: 253 247 236;
+    --alerta-800: 124 61 7;
+    --exito-50: 240 247 242;
+    --exito-800: 31 86 54;
     /* Acción primaria y estado seleccionado: contraste fuerte contra la superficie.
        En claro es tinta sobre blanco; en oscuro se invierte para no desaparecer. */
     --accion: 24 22 26;
@@ -43,11 +52,17 @@
       --superficie: 22 20 24;
       --fondo-sutil: 32 30 35;
       --texto: 240 238 242;
-      --texto-tenue: 165 159 168;
+      --texto-tenue: 170 164 174;
       --borde: 58 54 62;
       --ink-50: 32 30 35;
       --ink-100: 44 41 48;
       --ink-200: 64 60 68;
+      --error-50: 48 26 28;
+      --error-800: 240 168 168;
+      --alerta-50: 46 34 20;
+      --alerta-800: 240 200 140;
+      --exito-50: 22 40 30;
+      --exito-800: 150 214 170;
       --accion: 240 238 242;
       --accion-texto: 22 20 24;
     }
@@ -57,11 +72,17 @@
     --superficie: 22 20 24;
     --fondo-sutil: 32 30 35;
     --texto: 240 238 242;
-    --texto-tenue: 165 159 168;
+    --texto-tenue: 170 164 174;
     --borde: 58 54 62;
     --ink-50: 32 30 35;
     --ink-100: 44 41 48;
     --ink-200: 64 60 68;
+    --error-50: 48 26 28;
+    --error-800: 240 168 168;
+    --alerta-50: 46 34 20;
+    --alerta-800: 240 200 140;
+    --exito-50: 22 40 30;
+    --exito-800: 150 214 170;
     --accion: 240 238 242;
     --accion-texto: 22 20 24;
   }
@@ -72,17 +93,18 @@
      así las pantallas fuera del área autenticada no cambian. */
   :root {
     --acento: theme("colors.brand.500");
-    --acento-suave: theme("colors.brand.50");
+    /* Fondo suave del acento: un tinte del acento sobre la superficie actual, así funciona
+       igual en claro y en oscuro (antes era un `brand-50` casi blanco fijo, que en oscuro
+       quedaba como un bloque brillante). */
+    --acento-suave: color-mix(in srgb, var(--acento) 13%, rgb(var(--superficie)));
   }
 
   [data-rol="talento"] {
     --acento: theme("colors.talento.500");
-    --acento-suave: theme("colors.talento.50");
   }
 
   [data-rol="creador"] {
     --acento: theme("colors.creador.500");
-    --acento-suave: theme("colors.creador.50");
   }
 
   /* Los títulos ganan peso por tamaño y tracking, no por sombras ni adornos. */

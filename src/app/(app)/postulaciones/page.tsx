@@ -21,8 +21,8 @@ const COLOR_ESTADO: Record<string, string> = {
   en_duda: "bg-alerta-50 text-alerta-800",
   esperando_confirmacion: "bg-brand-500 text-white",
   aprobado: "bg-accion text-accion-texto",
-  rechazado: "bg-fondo-sutil text-ink-400",
-  vencida: "bg-fondo-sutil text-ink-400",
+  rechazado: "bg-fondo-sutil text-texto-tenue",
+  vencida: "bg-fondo-sutil text-texto-tenue",
 };
 
 export default async function PostulacionesPage() {
@@ -89,7 +89,7 @@ export default async function PostulacionesPage() {
             )}
 
             {p.estado === "vencida" && (
-              <p className="mt-2 text-xs leading-snug text-ink-400">
+              <p className="mt-2 text-xs leading-snug text-texto-tenue">
                 Pasaron 30 días sin respuesta, así que la cerramos. Podés volver
                 a postularte si la convocatoria sigue abierta.
               </p>

@@ -169,7 +169,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
         </button>
       </div>
 
-      <p className="mt-3 text-center text-xs text-ink-400">
+      <p className="mt-3 text-center text-xs text-texto-tenue">
         {personas.length} {personas.length === 1 ? "persona" : "personas"} por ver
       </p>
     </div>

@@ -101,7 +101,7 @@ export function BuscarEquipo({
             className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
           />
           <div className="flex items-center justify-between gap-3">
-            <span className="text-2xs text-ink-400">
+            <span className="text-2xs text-texto-tenue">
               {pitch.length}/{MAX_PITCH}
             </span>
             <Boton onClick={() => guardar(true)} cargando={guardando} textoCargando="Guardando…">

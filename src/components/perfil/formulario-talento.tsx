@@ -182,7 +182,7 @@ export function FormularioTalento({
   return (
     <form onSubmit={guardar} className="flex max-w-2xl flex-col gap-6">
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Ficha básica</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Ficha básica</h2>
         <CampoTexto
           id="nombre"
           etiqueta="Nombre completo"
@@ -243,13 +243,13 @@ export function FormularioTalento({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Portfolio de fotos</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Portfolio de fotos</h2>
         <SubirFotos talentoId={userId} fotos={fotos} onCambio={setFotos} persistir={!esAlta} />
         {errores.fotos && <p className="text-xs text-error-600">{errores.fotos}</p>}
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Videoreel (opcional)</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Videoreel (opcional)</h2>
         <CampoTexto
           id="videoreel"
           etiqueta="Enlace de YouTube o Vimeo"
@@ -264,7 +264,7 @@ export function FormularioTalento({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">CV y habilidades</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">CV y habilidades</h2>
         <div className="flex flex-col gap-1.5">
           <label htmlFor="experiencia" className="text-sm font-medium text-texto">
             Experiencia
@@ -278,7 +278,7 @@ export function FormularioTalento({
             className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
             placeholder="Contá tu formación, obras en las que participaste, etc."
           />
-          <p className="text-right text-xs text-ink-300">{experiencia.length}/2000</p>
+          <p className="text-right text-xs text-texto-tenue">{experiencia.length}/2000</p>
         </div>
 
         <div className="flex flex-wrap gap-2">
@@ -300,7 +300,7 @@ export function FormularioTalento({
       </section>
 
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Redes sociales (opcional)</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Redes sociales (opcional)</h2>
         {REDES.map((red) => (
           <CampoTexto
             key={red.clave}
@@ -318,7 +318,7 @@ export function FormularioTalento({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Buscador de creadores</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Buscador de creadores</h2>
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
