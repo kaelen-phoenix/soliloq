@@ -66,7 +66,7 @@ const JSON_LD = {
 export default async function BienvenidaPage() {
   const t = await getTranslations("landing");
   return (
-    <div className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
+    <div data-tema="light" className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}

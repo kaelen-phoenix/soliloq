@@ -87,6 +87,30 @@
     --accion-texto: 22 20 24;
   }
 
+  /* Fuerza el tema claro para un subárbol (no solo en `:root`). Lo usan las páginas de
+     marca —portada y «Apoyar»—, que son superficies branded siempre claras: sin esto, sus
+     hijos que usan tokens semánticos (`FormularioContacto`, `BannerSponsors`) se volvían
+     oscuros con el sistema y quedaban ilegibles sobre las tarjetas blancas de la página. */
+  [data-tema="light"] {
+    color-scheme: light;
+    --superficie: 255 255 255;
+    --fondo-sutil: 247 246 248;
+    --texto: 24 22 26;
+    --texto-tenue: 92 87 96;
+    --borde: 224 221 226;
+    --ink-50: 247 246 248;
+    --ink-100: 238 236 240;
+    --ink-200: 224 221 226;
+    --error-50: 253 242 242;
+    --error-800: 143 29 29;
+    --alerta-50: 253 247 236;
+    --alerta-800: 124 61 7;
+    --exito-50: 240 247 242;
+    --exito-800: 31 86 54;
+    --accion: 24 22 26;
+    --accion-texto: 255 255 255;
+  }
+
   /* Acento por rol. Un único punto de verdad: el layout de `(app)` pone
      `data-rol` en su contenedor y todo lo que quiera acento lee estas variables
      (utilidades `acento-*` más abajo, y el anillo de foco). Por defecto es `brand`,
