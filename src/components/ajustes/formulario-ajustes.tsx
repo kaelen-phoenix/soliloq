@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { guardarIdioma, guardarTema } from "@/app/acciones-ajustes";
+import { BotonInstalar } from "@/components/pwa/boton-instalar";
 
 type Idioma = "es" | "en";
 type Tema = "sistema" | "claro" | "oscuro";
@@ -89,6 +90,8 @@ export function FormularioAjustes({
           ]}
         />
       </section>
+
+      <BotonInstalar conSeccion />
     </div>
   );
 }

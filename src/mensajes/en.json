@@ -87,6 +87,16 @@
     "claro": "Light",
     "oscuro": "Dark"
   },
+  "instalar": {
+    "titulo": "Install the app",
+    "ayuda": "Add Yalope to your phone to open it like an app: full screen and from your home screen.",
+    "boton": "Install the app",
+    "iosTitulo": "Install on iPhone or iPad",
+    "iosPaso1": "Tap the Share button in Safari's toolbar.",
+    "iosPaso2": "Choose “Add to Home Screen”.",
+    "iosPaso3": "Confirm with “Add”.",
+    "iosCerrar": "Got it"
+  },
   "auth": {
     "titulo": "Log in to Yalope",
     "bajada": "Theatre match for talent and creators.",

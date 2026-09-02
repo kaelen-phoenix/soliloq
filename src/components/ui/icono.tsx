@@ -26,6 +26,7 @@ type NombreIcono =
   | "facebook"
   | "enlace"
   | "compartir"
+  | "descargar"
   | "qr"
   | "admin"
   | "ajustes";
@@ -150,6 +151,13 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
       <circle cx="6" cy="12" r="2.5" />
       <circle cx="18" cy="18" r="2.5" />
       <path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6" />
+    </>
+  ),
+  descargar: (
+    <>
+      <path d="M12 3v12" />
+      <path d="m7 11 5 5 5-5" />
+      <path d="M5 21h14" />
     </>
   ),
   qr: (
