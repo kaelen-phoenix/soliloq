@@ -137,7 +137,7 @@ export default function BienvenidaPage() {
 
           <div className="relative mx-auto w-full max-w-5xl px-5 pb-20 pt-6">
             <header className="flex items-center justify-between">
-              <Logotipo tamano="sm" className="[&_span]:!text-white [&_span:last-child]:!bg-candileja-400" />
+              <Logotipo tamano="sm" tono="claro" />
               <nav className="flex items-center gap-2">
                 <Link
                   href="/ingresar"
