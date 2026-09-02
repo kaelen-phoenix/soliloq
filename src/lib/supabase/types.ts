@@ -669,6 +669,16 @@ export interface Database {
           disciplinas: DisciplinaArtistica[];
           otro_detalle: string | null;
           fotos: string[];
+          ubicacion_publica: string | null;
+          /** Solo talento: años cumplidos, calculados en la RPC. Nunca la fecha. */
+          edad: number | null;
+          genero: string | null;
+          genero_descripcion: string | null;
+          videoreel_url: string | null;
+          /** `{ [claveRed]: urlCanonica }`. `{}` si no cargó ninguna. */
+          redes: Record<string, string>;
+          /** Solo creador: `[{ titulo, anio, rol }]`, más nuevas primero. */
+          obras: { titulo: string; anio: number; rol: string }[];
         }[];
       };
       /**
