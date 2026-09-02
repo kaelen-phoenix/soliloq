@@ -11,9 +11,11 @@ type Metricas = Database["public"]["Functions"]["admin_metricas"]["Returns"][num
 type Usuario = Database["public"]["Functions"]["admin_usuarios"]["Returns"][number];
 type Denuncia = Database["public"]["Functions"]["admin_denuncias"]["Returns"][number];
 type Bloqueo = Database["public"]["Functions"]["admin_bloqueos"]["Returns"][number];
+type Mensaje = Database["public"]["Functions"]["admin_mensajes"]["Returns"][number];
+type Sponsor = Database["public"]["Tables"]["sponsors"]["Row"];
 
 const PAGINA = 50;
-type Pestana = "resumen" | "usuarios" | "denuncias" | "bloqueos";
+type Pestana = "resumen" | "usuarios" | "denuncias" | "bloqueos" | "mensajes" | "sponsors";
 
 function fecha(v: string | null) {
   return v ? new Date(v).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -34,7 +36,7 @@ export function PanelAdmin({
   return (
     <div className="flex flex-col gap-6">
       <nav className="flex flex-wrap gap-1.5">
-        {(["resumen", "usuarios", "denuncias", "bloqueos"] as const).map((p) => (
+        {(["resumen", "usuarios", "denuncias", "bloqueos", "mensajes", "sponsors"] as const).map((p) => (
           <button
             key={p}
             type="button"
@@ -54,6 +56,230 @@ export function PanelAdmin({
       )}
       {pestana === "denuncias" && <Denuncias supabase={supabase} />}
       {pestana === "bloqueos" && <Bloqueos supabase={supabase} />}
+      {pestana === "mensajes" && <Mensajes supabase={supabase} />}
+      {pestana === "sponsors" && <Sponsors supabase={supabase} />}
+    </div>
+  );
+}
+
+// --- Mensajes de contacto ---------------------------------------------------------------
+
+function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const [filas, setFilas] = useState<Mensaje[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+
+  const cargar = useCallback(async () => {
+    const { data, error: e } = await supabase.rpc("admin_mensajes", { p_limite: 200, p_offset: 0 });
+    if (e) setError(e.message ?? "No se pudo leer.");
+    else setFilas(data ?? []);
+  }, [supabase]);
+
+  useEffect(() => {
+    cargar();
+  }, [cargar]);
+
+  async function alternarLeido(m: Mensaje) {
+    const { error: e } = await supabase.rpc("admin_marcar_mensaje_leido", {
+      p_id: m.id,
+      p_leido: !m.leido,
+    });
+    if (e) setError(e.message ?? "No se pudo aplicar.");
+    else setFilas((prev) => (prev ?? []).map((f) => (f.id === m.id ? { ...f, leido: !m.leido } : f)));
+  }
+
+  if (error) return <p className="text-sm text-error-600">{error}</p>;
+  if (filas === null) return <p className="text-sm text-texto-tenue">Cargando mensajes…</p>;
+  if (filas.length === 0)
+    return <EstadoVacio icono="campana" titulo="Sin mensajes" detalle="No hay mensajes de contacto." />;
+
+  return (
+    <ul className="flex flex-col gap-3">
+      {filas.map((m) => (
+        <li
+          key={m.id}
+          className={`rounded-2xl border p-4 ${m.leido ? "border-borde bg-superficie" : "border-brand-200 bg-brand-50/40"}`}
+        >
+          <div className="flex items-start justify-between gap-3">
+            <div className="min-w-0">
+              <p className="text-sm font-medium text-texto">
+                {m.nombre} · <span className="text-texto-tenue">{m.tipo}</span>
+              </p>
+              <p className="truncate text-xs text-texto-tenue">
+                <a href={`mailto:${m.email}`} className="underline underline-offset-2">
+                  {m.email}
+                </a>{" "}
+                · {fecha(m.creado_en)}
+              </p>
+              <p className="mt-2 whitespace-pre-line text-sm leading-relaxed text-texto">{m.mensaje}</p>
+            </div>
+            <button
+              type="button"
+              onClick={() => alternarLeido(m)}
+              className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto-tenue transition-colors hover:bg-fondo-sutil"
+            >
+              {m.leido ? "No leído" : "Leído"}
+            </button>
+          </div>
+        </li>
+      ))}
+    </ul>
+  );
+}
+
+// --- Sponsors -------------------------------------------------------------------------------
+
+const NIVELES_SPONSOR = ["reparto", "coproduccion", "produccion"] as const;
+type FormSponsor = {
+  id: string | null;
+  nombre: string;
+  logo_url: string;
+  sitio_url: string;
+  nivel: (typeof NIVELES_SPONSOR)[number];
+  activo: boolean;
+  orden: number;
+};
+
+const VACIO: FormSponsor = {
+  id: null,
+  nombre: "",
+  logo_url: "",
+  sitio_url: "",
+  nivel: "reparto",
+  activo: true,
+  orden: 0,
+};
+
+function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const [filas, setFilas] = useState<Sponsor[] | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [form, setForm] = useState<FormSponsor>(VACIO);
+
+  const cargar = useCallback(async () => {
+    const { data, error: e } = await supabase.rpc("admin_sponsors");
+    if (e) setError(e.message ?? "No se pudo leer.");
+    else setFilas(data ?? []);
+  }, [supabase]);
+
+  useEffect(() => {
+    cargar();
+  }, [cargar]);
+
+  async function guardar(e: React.FormEvent) {
+    e.preventDefault();
+    const { error: err } = await supabase.rpc("admin_guardar_sponsor", {
+      p_id: form.id,
+      p_nombre: form.nombre.trim(),
+      p_logo_url: form.logo_url.trim(),
+      p_sitio_url: form.sitio_url.trim() || null,
+      p_nivel: form.nivel,
+      p_activo: form.activo,
+      p_orden: Number(form.orden) || 0,
+    });
+    if (err) {
+      setError(err.message ?? "No se pudo guardar.");
+      return;
+    }
+    setError(null);
+    setForm(VACIO);
+    cargar();
+  }
+
+  async function borrar(s: Sponsor) {
+    if (!window.confirm(`¿Borrar a ${s.nombre}?`)) return;
+    const { error: e } = await supabase.rpc("admin_borrar_sponsor", { p_id: s.id });
+    if (e) setError(e.message ?? "No se pudo borrar.");
+    else setFilas((prev) => (prev ?? []).filter((f) => f.id !== s.id));
+  }
+
+  return (
+    <div className="flex flex-col gap-4">
+      {error && <p className="text-xs text-error-600">{error}</p>}
+
+      {(filas ?? []).length > 0 && (
+        <ul className="flex flex-col divide-y divide-borde rounded-2xl border border-borde">
+          {(filas ?? []).map((s) => (
+            <li key={s.id} className="flex items-center gap-3 p-3.5">
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img src={s.logo_url} alt={s.nombre} className="h-8 w-14 shrink-0 object-contain" />
+              <div className="min-w-0 flex-1 text-sm">
+                <p className="truncate text-texto">
+                  {s.nombre}
+                  {!s.activo && <span className="ml-1.5 text-xs text-texto-tenue">(inactivo)</span>}
+                </p>
+                <p className="truncate text-xs text-texto-tenue">
+                  {s.nivel} · orden {s.orden}
+                </p>
+              </div>
+              <button
+                type="button"
+                onClick={() =>
+                  setForm({
+                    id: s.id,
+                    nombre: s.nombre,
+                    logo_url: s.logo_url,
+                    sitio_url: s.sitio_url ?? "",
+                    nivel: s.nivel,
+                    activo: s.activo,
+                    orden: s.orden,
+                  })
+                }
+                className="rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto-tenue hover:bg-fondo-sutil"
+              >
+                Editar
+              </button>
+              <button
+                type="button"
+                onClick={() => borrar(s)}
+                className="rounded-lg border border-error-400 px-2.5 py-1 text-xs font-medium text-error-600 hover:bg-error-50"
+              >
+                Borrar
+              </button>
+            </li>
+          ))}
+        </ul>
+      )}
+
+      <form onSubmit={guardar} className="rounded-2xl border border-dashed border-borde p-4">
+        <p className="mb-3 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
+          {form.id ? "Editar sponsor" : "Nuevo sponsor"}
+        </p>
+        <div className="flex flex-col gap-2">
+          <CampoTexto id="sp-nombre" etiqueta="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+          <CampoTexto id="sp-logo" etiqueta="URL del logo (PNG/SVG transparente)" value={form.logo_url} onChange={(e) => setForm({ ...form, logo_url: e.target.value })} />
+          <CampoTexto id="sp-sitio" etiqueta="URL del sitio (opcional)" value={form.sitio_url} onChange={(e) => setForm({ ...form, sitio_url: e.target.value })} />
+          <div className="flex gap-2">
+            <label className="flex flex-col gap-1.5 text-sm font-medium text-texto">
+              Nivel
+              <select
+                value={form.nivel}
+                onChange={(e) => setForm({ ...form, nivel: e.target.value as FormSponsor["nivel"] })}
+                className="rounded-xl border border-borde bg-superficie px-3 py-2 text-sm"
+              >
+                {NIVELES_SPONSOR.map((n) => (
+                  <option key={n} value={n}>
+                    {n}
+                  </option>
+                ))}
+              </select>
+            </label>
+            <CampoTexto id="sp-orden" etiqueta="Orden" type="number" value={String(form.orden)} onChange={(e) => setForm({ ...form, orden: Number(e.target.value) })} />
+            <label className="flex items-center gap-2 self-end pb-2.5 text-sm text-texto">
+              <input type="checkbox" checked={form.activo} onChange={(e) => setForm({ ...form, activo: e.target.checked })} />
+              Activo
+            </label>
+          </div>
+        </div>
+        <div className="mt-3 flex gap-2">
+          <Boton variante="secundario" type="submit">
+            {form.id ? "Guardar" : "Agregar"}
+          </Boton>
+          {form.id && (
+            <button type="button" onClick={() => setForm(VACIO)} className="text-xs text-texto-tenue underline underline-offset-4">
+              Cancelar
+            </button>
+          )}
+        </div>
+      </form>
     </div>
   );
 }

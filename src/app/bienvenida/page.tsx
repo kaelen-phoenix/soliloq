@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
+import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo } from "@/components/ui/logotipo";
 import { MascarasTeatro } from "@/components/ui/mascaras-teatro";
@@ -250,12 +251,20 @@ export default async function BienvenidaPage() {
       </main>
 
       <footer className="border-t border-ink-100 bg-[#faf5ec]">
-        <div className="mx-auto flex w-full max-w-5xl flex-col items-start gap-3 px-5 py-8 text-sm text-ink-500 sm:flex-row sm:items-center sm:justify-between">
-          <Logotipo tamano="sm" />
-          <p>{t("pieLema")}</p>
-          <Link href="/ingresar" className="font-medium text-ink-700 hover:text-ink-900">
-            {t("entrar")}
-          </Link>
+        <div className="mx-auto w-full max-w-5xl px-5 py-8">
+          <BannerSponsors niveles={["produccion"]} className="mb-6" />
+          <div className="flex flex-col items-start gap-3 text-sm text-ink-500 sm:flex-row sm:items-center sm:justify-between">
+            <Logotipo tamano="sm" />
+            <p>{t("pieLema")}</p>
+            <div className="flex gap-4">
+              <Link href="/apoyar" className="font-medium text-ink-700 hover:text-ink-900">
+                {t("apoyarEnlace")}
+              </Link>
+              <Link href="/ingresar" className="font-medium text-ink-700 hover:text-ink-900">
+                {t("entrar")}
+              </Link>
+            </div>
+          </div>
         </div>
       </footer>
     </div>
