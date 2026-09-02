@@ -44,7 +44,9 @@ export type TipoNotificacion =
   | "convocado"
   | "espera_vencida"
   /** Interés mutuo entre dos personas, sin proyecto de por medio (0033). */
-  | "equipo_armado";
+  | "equipo_armado"
+  /** Alguien contactó desde el enlace público del perfil (0037), interés todavía no mutuo. */
+  | "interes_recibido";
 
 export type MotivoDenuncia =
   | "acoso"
@@ -72,6 +74,9 @@ export interface Database {
           /** Opt-in explícito para aparecer en el feed de personas (0033). */
           busca_equipo: boolean;
           pitch: string | null;
+          /** Token del enlace público del perfil (0037). Existe siempre; solo resuelve con `enlace_publico_activo`. */
+          enlace_token: string;
+          enlace_publico_activo: boolean;
           creado_en: string;
         };
         Insert: {
@@ -79,6 +84,8 @@ export interface Database {
           rol?: RolUsuario | null;
           modo_activo?: RolUsuario | null;
           onboarding_completo?: boolean;
+          enlace_token?: string;
+          enlace_publico_activo?: boolean;
         };
         Update: {
           rol?: RolUsuario | null;
@@ -86,6 +93,8 @@ export interface Database {
           onboarding_completo?: boolean;
           busca_equipo?: boolean;
           pitch?: string | null;
+          enlace_token?: string;
+          enlace_publico_activo?: boolean;
         };
         Relationships: [];
       };
@@ -447,6 +456,8 @@ export interface Database {
           obra_id: string | null;
           rol_id: string | null;
           sala_id: string | null;
+          /** Quién generó el interés, para `interes_recibido` (0037). `null` en el resto de los tipos. */
+          de_perfil: string | null;
           leida_en: string | null;
           creado_en: string;
         };
@@ -456,6 +467,7 @@ export interface Database {
           obra_id?: string | null;
           rol_id?: string | null;
           sala_id?: string | null;
+          de_perfil?: string | null;
         };
         Update: {
           leida_en?: string | null;
@@ -640,6 +652,50 @@ export interface Database {
           es_talento: boolean;
           es_creador: boolean;
           distancia_metros: number | null;
+        }[];
+      };
+      /**
+       * Vidriera anónima del enlace público (0037). Proyección acotada por diseño: nunca
+       * fecha de nacimiento, género, ubicación, redes ni videoreel. Cero filas = token
+       * inválido o enlace apagado (404 indistinguible).
+       */
+      perfil_publico: {
+        Args: { p_token: string };
+        Returns: {
+          tipo: "talento" | "creador";
+          nombre: string;
+          texto: string | null;
+          habilidades: string[];
+          disciplinas: DisciplinaArtistica[];
+          otro_detalle: string | null;
+          fotos: string[];
+        }[];
+      };
+      /**
+       * Contacto desde el enlace público (0037): marca interés hacia el dueño y notifica
+       * `interes_recibido` si todavía no es mutuo. Rechaza token inválido, perfil propio y
+       * pares bloqueados con `raise exception`.
+       */
+      contactar_desde_perfil: {
+        Args: { p_token: string };
+        Returns: void;
+      };
+      /**
+       * Proyección acotada de quien contactó desde un enlace público, para responder el
+       * interés (0037). Solo visible para quien recibió ese interés.
+       */
+      perfil_para_responder: {
+        Args: { p_de: string };
+        Returns: {
+          perfil_id: string;
+          nombre: string;
+          pitch: string | null;
+          ubicacion_publica: string | null;
+          disciplinas: DisciplinaArtistica[];
+          otro_detalle: string | null;
+          habilidades: string[];
+          es_talento: boolean;
+          es_creador: boolean;
         }[];
       };
       metricas_obra: {

@@ -17,6 +17,8 @@ interface Notificacion {
   obra_id: string | null;
   rol_id: string | null;
   sala_id: string | null;
+  /** Quién generó el interés, para `interes_recibido`. */
+  de_perfil: string | null;
   obras: Obra | Obra[] | null;
 }
 
@@ -97,6 +99,8 @@ export function ListaNotificaciones({
       router.push("/postulaciones");
     } else if (n.tipo === "match" && n.obra_id) {
       router.push(`/obras/${n.obra_id}`);
+    } else if (n.tipo === "interes_recibido" && n.de_perfil) {
+      router.push(`/equipo/responder/${n.de_perfil}`);
     }
   }
 
@@ -171,6 +175,10 @@ export function ListaNotificaciones({
                       El interés fue mutuo. Ya pueden hablar.
                     </p>
                   </>
+                ) : n.tipo === "interes_recibido" ? (
+                  <p className="text-base leading-snug text-ink-900">
+                    Alguien quiere contactarte desde tu perfil
+                  </p>
                 ) : n.tipo === "espera_vencida" ? (
                   <p className="text-base leading-snug text-ink-600">
                     Tu postulación a <span className="font-medium">{tituloObra(n)}</span> se cerró

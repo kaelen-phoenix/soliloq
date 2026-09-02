@@ -10,7 +10,7 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 
 type Modo = "ingresar" | "registrarme";
 
-export function IngresarFormulario() {
+export function IngresarFormulario({ next }: { next?: string }) {
   const router = useRouter();
   const [modo, setModo] = useState<Modo>("ingresar");
   const [email, setEmail] = useState("");
@@ -58,8 +58,8 @@ export function IngresarFormulario() {
         setError(mensajeErrorAuth(errorIngreso.code, errorIngreso.message));
         return;
       }
-      // El middleware decide el destino real según el estado de la cuenta.
-      router.replace("/");
+      // Sin `next` el middleware decide el destino real según el estado de la cuenta.
+      router.replace(next ?? "/");
       router.refresh();
       return;
     }
@@ -67,7 +67,7 @@ export function IngresarFormulario() {
     const { data, error: errorAlta } = await supabase.auth.signUp({
       email,
       password: clave,
-      options: { emailRedirectTo: urlCallback() },
+      options: { emailRedirectTo: urlCallback(next) },
     });
     setCargando(false);
 
@@ -78,7 +78,7 @@ export function IngresarFormulario() {
 
     // Con confirmación por email activada no hay sesión hasta abrir el enlace.
     if (data.session) {
-      router.replace("/");
+      router.replace(next ?? "/");
       router.refresh();
       return;
     }
@@ -91,7 +91,7 @@ export function IngresarFormulario() {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: urlCallback() },
+      options: { redirectTo: urlCallback(next) },
     });
   }
 
