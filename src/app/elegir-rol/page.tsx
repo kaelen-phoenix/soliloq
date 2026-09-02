@@ -67,7 +67,7 @@ export default function ElegirRolPage({
           key={opcion.rol}
           onClick={() => elegir(opcion.rol)}
           disabled={cargando !== null}
-          className="group flex items-center gap-4 rounded-2xl border border-borde p-5 text-left transition-colors hover:border-ink-900 disabled:opacity-50"
+          className="group flex items-center gap-4 rounded-2xl border border-borde p-5 text-left transition-colors hover:border-texto disabled:opacity-50"
         >
           <div className="flex-1">
             <h2 className="text-base font-semibold text-texto">{opcion.titulo}</h2>

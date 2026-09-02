@@ -98,7 +98,7 @@ export function BuscarEquipo({
             value={pitch}
             onChange={(e) => setPitch(e.target.value)}
             placeholder="Soy iluminador, tengo tiempo libre y ganas de armar algo con gente que recién empieza."
-            className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
+            className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
           />
           <div className="flex items-center justify-between gap-3">
             <span className="text-2xs text-texto-tenue">

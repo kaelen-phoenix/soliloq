@@ -250,7 +250,7 @@ export function FormularioCreador({
           maxLength={1000}
           value={descripcion}
           onChange={(e) => setDescripcion(e.target.value)}
-          className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
+          className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
           placeholder="Contanos sobre tu trayectoria o la de tu compañía."
         />
         <div className="flex items-center gap-3">

@@ -182,7 +182,7 @@ export function PilaTarjetas({
           value={opcionActual.metros ?? ""}
           disabled={recargando}
           onChange={(e) => cambiarRadio(e.target.value === "" ? null : Number(e.target.value))}
-          className="rounded-lg border border-borde bg-superficie px-2 py-1 text-2xs font-medium text-texto focus:border-ink-900"
+          className="rounded-lg border border-borde bg-superficie px-2 py-1 text-2xs font-medium text-texto focus:border-accion"
         >
           {opciones.map((o) => (
             <option key={o.etiqueta} value={o.metros ?? ""}>
@@ -256,7 +256,7 @@ export function PilaTarjetas({
                 <button
                   type="button"
                   onClick={() => cambiarRadio(null)}
-                  className="mt-4 rounded-lg border border-ink-900 px-3 py-1.5 text-xs font-medium text-texto"
+                  className="mt-4 rounded-lg border border-texto px-3 py-1.5 text-xs font-medium text-texto"
                 >
                   Buscar en todo el mundo
                 </button>
