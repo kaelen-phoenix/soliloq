@@ -12,7 +12,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) redirect("/ingresar");
+  // Sin sesión no se entra al área de la app: se va a la landing, que explica qué es
+  // Yalope y tiene los accesos a "Entrar" y "Crear mi perfil". (El middleware no corre
+  // en este proyecto —vive en la raíz y con `src/` Next lo ignora—, así que el corte
+  // de sesión del área autenticada es este.)
+  if (!user) redirect("/bienvenida");
 
   const estado = await leerEstadoCuenta(supabase, user.id);
   if (!estado.modoActivo) redirect("/completar-perfil");
