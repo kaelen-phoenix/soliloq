@@ -28,6 +28,12 @@ function AccionesCuenta() {
       >
         Cambiar contraseña
       </Link>
+      <Link
+        href="/apoyar"
+        className="text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
+      >
+        Apoyar Yalope
+      </Link>
       <CerrarSesionBoton />
     </section>
   );

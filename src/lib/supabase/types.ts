@@ -584,6 +584,51 @@ export interface Database {
           }
         ];
       };
+      /** Sponsors que sostienen la app (0042). Lectura pública de los activos. */
+      sponsors: {
+        Row: {
+          id: string;
+          nombre: string;
+          logo_url: string;
+          sitio_url: string | null;
+          nivel: "reparto" | "coproduccion" | "produccion";
+          activo: boolean;
+          orden: number;
+          creado_en: string;
+        };
+        Insert: {
+          nombre: string;
+          logo_url: string;
+          sitio_url?: string | null;
+          nivel: "reparto" | "coproduccion" | "produccion";
+          activo?: boolean;
+          orden?: number;
+        };
+        Update: {
+          nombre?: string;
+          logo_url?: string;
+          sitio_url?: string | null;
+          nivel?: "reparto" | "coproduccion" | "produccion";
+          activo?: boolean;
+          orden?: number;
+        };
+        Relationships: [];
+      };
+      /** Mensajes del formulario de contacto (0042). Se escribe por RPC, se lee por admin. */
+      mensajes_contacto: {
+        Row: {
+          id: string;
+          nombre: string;
+          email: string;
+          tipo: "sugerencia" | "sponsor" | "donacion" | "otro";
+          mensaje: string;
+          creado_en: string;
+          leido_en: string | null;
+        };
+        Insert: { nombre: string; email: string; tipo: string; mensaje: string };
+        Update: { leido_en?: string | null };
+        Relationships: [];
+      };
     };
     Views: {
       feed_talento: {
@@ -806,6 +851,47 @@ export interface Database {
       };
       admin_crear_bloqueo: {
         Args: { p_a: string; p_b: string; p_motivo?: string | null };
+        Returns: void;
+      };
+      /** Página «Apoyar» (0042). */
+      enviar_mensaje_contacto: {
+        Args: { p_nombre: string; p_email: string; p_tipo: string; p_mensaje: string };
+        Returns: void;
+      };
+      admin_mensajes: {
+        Args: { p_limite?: number; p_offset?: number };
+        Returns: {
+          id: string;
+          nombre: string;
+          email: string;
+          tipo: string;
+          mensaje: string;
+          creado_en: string;
+          leido: boolean;
+        }[];
+      };
+      admin_marcar_mensaje_leido: {
+        Args: { p_id: string; p_leido: boolean };
+        Returns: void;
+      };
+      admin_sponsors: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["sponsors"]["Row"][];
+      };
+      admin_guardar_sponsor: {
+        Args: {
+          p_id: string | null;
+          p_nombre: string;
+          p_logo_url: string;
+          p_sitio_url: string | null;
+          p_nivel: string;
+          p_activo: boolean;
+          p_orden: number;
+        };
+        Returns: string;
+      };
+      admin_borrar_sponsor: {
+        Args: { p_id: string };
         Returns: void;
       };
     };
