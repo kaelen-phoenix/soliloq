@@ -92,28 +92,38 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
         </div>
       )}
 
-      <footer className="mt-12 border-t border-ink-100 pt-5 text-sm text-ink-500">
-        {esDueño ? (
+      {esDueño ? (
+        <footer className="mt-12 border-t border-ink-100 pt-5 text-sm">
           <Link href="/perfil" className="font-medium text-ink-700 hover:text-ink-900">
             Volver a mi perfil
           </Link>
-        ) : user ? (
-          <Link href="/" className="font-medium text-ink-700 hover:text-ink-900">
+        </footer>
+      ) : user ? (
+        <div className="mt-10">
+          <Link
+            href="/"
+            className="flex w-full items-center justify-center gap-2 rounded-xl border border-ink-200 py-3 text-sm font-semibold text-ink-800 transition-colors hover:bg-ink-50"
+          >
             Ir a Yalope
           </Link>
-        ) : (
-          <p>
-            ¿Casteás o sos artista?{" "}
-            <Link
-              href="/ingresar"
-              className="font-medium text-ink-900 underline decoration-ink-300 underline-offset-2 hover:decoration-ink-900"
-            >
-              Entrá a Yalope
-            </Link>{" "}
-            y armá tu perfil.
+        </div>
+      ) : (
+        <section className="mt-10 rounded-2xl border border-brand-200 bg-brand-50/60 p-6 text-center">
+          <p className="font-display text-lg font-semibold tracking-[-0.02em] text-ink-900">
+            ¿Casteás o sos artista?
           </p>
-        )}
-      </footer>
+          <p className="mx-auto mt-1.5 max-w-[38ch] text-sm leading-relaxed text-ink-600">
+            Armá tu perfil en Yalope y compartilo como este: fotos, experiencia y un enlace
+            para pasarle a cualquier casting.
+          </p>
+          <Link
+            href="/ingresar"
+            className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+          >
+            Crear mi cuenta gratis
+          </Link>
+        </section>
+      )}
     </main>
   );
 }
