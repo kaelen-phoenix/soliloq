@@ -10,6 +10,17 @@ const RUTAS_PUBLICAS = ["/ingresar", "/recuperar", "/auth/callback"];
 // onboarding esté a medias: se llega ahí desde el enlace de recuperación.
 const RUTAS_SIEMPRE_DISPONIBLES = ["/cambiar-clave"];
 
+// El enlace público del perfil (`/p/[token]`) se sirve igual con o sin sesión: a diferencia
+// de `RUTAS_PUBLICAS`, acá un usuario logueado NO se rebota a `/` — la vidriera es para
+// cualquiera, tenga cuenta o no.
+const RUTAS_ABIERTAS = ["/p/"];
+
+/** Solo destinos internos: `next` viaja por la URL y no puede convertirse en un redirect abierto. */
+function conNext(destino: string, next: string): string {
+  if (!next.startsWith("/") || next.startsWith("//") || next === "/") return destino;
+  return `${destino}?next=${encodeURIComponent(next)}`;
+}
+
 export async function actualizarSesion(request: NextRequest) {
   let response = NextResponse.next({ request });
 
@@ -38,12 +49,19 @@ export async function actualizarSesion(request: NextRequest) {
 
   const path = request.nextUrl.pathname;
   const esRutaPublica = RUTAS_PUBLICAS.some((r) => path.startsWith(r));
+  const esRutaAbierta = RUTAS_ABIERTAS.some((r) => path.startsWith(r));
 
+  // `destino` puede traer query (`conNext`): separarla es necesario porque `url.pathname`
+  // no acepta un `?` adentro.
   const redirigir = (destino: string) => {
+    const [pathname, search] = destino.split("?");
     const url = request.nextUrl.clone();
-    url.pathname = destino;
+    url.pathname = pathname;
+    url.search = search ? `?${search}` : "";
     return NextResponse.redirect(url);
   };
+
+  if (esRutaAbierta) return response;
 
   if (!user) {
     return esRutaPublica ? response : redirigir("/ingresar");
@@ -62,12 +80,12 @@ export async function actualizarSesion(request: NextRequest) {
   const enPerfilNuevo = path.startsWith("/perfil/nuevo");
 
   if (destino === "elegir-rol") {
-    return enRol ? response : redirigir("/elegir-rol");
+    return enRol ? response : redirigir(conNext("/elegir-rol", path));
   }
 
   if (destino === "completar-perfil") {
     // Se permite volver a /elegir-rol para corregir mientras no exista ningún perfil.
-    return enRol || enAltaPerfil ? response : redirigir("/completar-perfil");
+    return enRol || enAltaPerfil ? response : redirigir(conNext("/completar-perfil", path));
   }
 
   // Con al menos un perfil creado, el onboarding terminó: esas pantallas ya no aplican.

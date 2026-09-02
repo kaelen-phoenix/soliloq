@@ -4,8 +4,14 @@ import { IngresarFormulario } from "./ingresar-formulario";
 export default function IngresarPage({
   searchParams,
 }: {
-  searchParams: { error?: string };
+  searchParams: { error?: string; next?: string };
 }) {
+  // Solo destinos internos: sin esto, `next` sería un redirect abierto.
+  const next =
+    searchParams.next?.startsWith("/") && !searchParams.next.startsWith("//")
+      ? searchParams.next
+      : undefined;
+
   return (
     <MarcoAcceso>
       {/* En móvil el logotipo lo pone el marco justo arriba de esto; en escritorio el nombre
@@ -26,7 +32,7 @@ export default function IngresarPage({
         </p>
       )}
 
-      <IngresarFormulario />
+      <IngresarFormulario next={next} />
     </MarcoAcceso>
   );
 }

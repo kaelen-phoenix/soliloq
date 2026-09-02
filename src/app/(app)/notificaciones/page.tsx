@@ -11,7 +11,7 @@ export default async function NotificacionesPage() {
   const { data: notificaciones } = await supabase
     .from("notificaciones")
     .select(
-      "id, tipo, leida_en, creado_en, obra_id, rol_id, sala_id, obras(titulo, perfiles_creador(nombre, imagen_url))"
+      "id, tipo, leida_en, creado_en, obra_id, rol_id, sala_id, de_perfil, obras(titulo, perfiles_creador(nombre, imagen_url))"
     )
     .eq("destinatario_id", user.id)
     .order("creado_en", { ascending: false });

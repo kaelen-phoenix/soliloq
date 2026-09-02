@@ -7,6 +7,7 @@ import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle
 import { Icono } from "@/components/ui/icono";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BuscarEquipo } from "@/components/perfil/buscar-equipo";
+import { BotonCompartir } from "@/components/perfil/boton-compartir";
 import { EtiquetasDisciplina } from "@/components/perfil/etiquetas-disciplina";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
@@ -58,7 +59,7 @@ export default async function PerfilPage({
 
   const { data: cuenta } = await supabase
     .from("perfiles")
-    .select("busca_equipo, pitch")
+    .select("busca_equipo, pitch, enlace_token, enlace_publico_activo")
     .eq("id", user.id)
     .single();
 
@@ -67,6 +68,18 @@ export default async function PerfilPage({
   const armarEquipo = (
     <BuscarEquipo buscaEquipo={cuenta?.busca_equipo ?? false} pitchInicial={cuenta?.pitch ?? null} />
   );
+
+  // Ídem: el enlace público es de la cuenta, no de cada perfil. `nombre` se resuelve abajo,
+  // según el modo activo, porque `perfiles` no lo tiene.
+  const compartir = (nombre: string) =>
+    cuenta && (
+      <BotonCompartir
+        userId={user.id}
+        nombre={nombre}
+        tokenInicial={cuenta.enlace_token}
+        activoInicial={cuenta.enlace_publico_activo}
+      />
+    );
 
   if (estado.modoActivo === "talento") {
     const [{ data: perfilTalento }, { data: fotos }] = await Promise.all([
@@ -102,6 +115,7 @@ export default async function PerfilPage({
             <PerfilTalentoDetalle talento={{ ...perfilTalento, fotos: fotosConUrl }} />
           </VistaPerfilPropio>
         )}
+        {!editando && perfilTalento && compartir(perfilTalento.nombre)}
         {!editando && armarEquipo}
         <AccionesCuenta />
       </main>
@@ -167,6 +181,7 @@ export default async function PerfilPage({
         </h2>
         <ObrasPrevias creadorId={user.id} obras={obrasPrevias ?? []} />
       </section>
+      {!editando && perfilCreador && compartir(perfilCreador.nombre)}
       {!editando && armarEquipo}
       <AccionesCuenta />
     </main>

@@ -19,9 +19,19 @@ const OPCIONES: { rol: RolUsuario; titulo: string; detalle: string }[] = [
   },
 ];
 
-export default function ElegirRolPage() {
+export default function ElegirRolPage({
+  searchParams,
+}: {
+  searchParams: { next?: string };
+}) {
   const [cargando, setCargando] = useState<RolUsuario | null>(null);
   const router = useRouter();
+
+  // Solo destinos internos: sin esto, `next` sería un redirect abierto.
+  const next =
+    searchParams.next?.startsWith("/") && !searchParams.next.startsWith("//")
+      ? searchParams.next
+      : undefined;
 
   async function elegir(rol: RolUsuario) {
     setCargando(rol);
@@ -32,7 +42,9 @@ export default function ElegirRolPage() {
     if (!user) return;
 
     await supabase.from("perfiles").update({ rol }).eq("id", user.id);
-    router.replace("/completar-perfil");
+    router.replace(
+      next ? `/completar-perfil?next=${encodeURIComponent(next)}` : "/completar-perfil"
+    );
     router.refresh();
   }
 

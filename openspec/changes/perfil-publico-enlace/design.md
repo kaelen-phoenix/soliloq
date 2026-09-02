@@ -110,6 +110,8 @@ El `insert` dispara `al_marcar_interes()` (`0033`) sin cambios: si el dueño ya 
 
 Decidir en tasks si se agrega columna `actor_id`/`de_perfil` a `notificaciones` o si se reusa una referencia ya existente. La tabla `notificaciones` hoy referencia `sala_id`; para `interes_recibido` no hay sala todavía, así que hace falta llevar **quién** generó el interés. Es el único cambio de forma de `notificaciones`.
 
+**Resuelto**: la notificación se emite desde dentro de `contactar_desde_perfil()`, no con un trigger genérico `after insert or update on intereses_equipo`. Un trigger genérico dispararía también para los intereses que nacen de `feed_equipo` (armar equipo), rompiendo el "match ciego" que `0033` diseñó a propósito: hoy nadie se entera de un interés unilateral hasta que es mutuo. `interes_recibido` es una pieza nueva solo para el contacto dirigido que nace de un enlace público; `al_marcar_interes()` y el feed quedan sin cambios de comportamiento.
+
 **Alternativa descartada** (más chica): no notificar; confiar en que quien contacta prenda `busca_equipo` y aparezca en el feed del dueño. Rechazada: quien llega desde un enlace compartido viene a contactar a **una** persona, no a explorar; obligarlo a entrar al feed de armar equipo (y exponerse ahí a todos) es fricción y sobreexposición. El contacto dirigido necesita un canal dirigido.
 
 ### 6. Alcance: talento y creador

@@ -43,11 +43,14 @@ export function FormularioTalento({
   esAlta,
   datosIniciales,
   fotosIniciales,
+  destinoAlTerminar,
 }: {
   userId: string;
   esAlta: boolean;
   datosIniciales?: DatosIniciales;
   fotosIniciales: FotoTalento[];
+  /** A dónde ir tras el alta. Por defecto la home; si venía de un enlace público, vuelve ahí. */
+  destinoAlTerminar?: string;
 }) {
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
@@ -161,7 +164,7 @@ export function FormularioTalento({
         .from("perfiles")
         .update({ onboarding_completo: true, modo_activo: "talento" })
         .eq("id", userId);
-      router.replace("/");
+      router.replace(destinoAlTerminar ?? "/");
       router.refresh();
       // No se apaga `cargando`: la navegación desmonta el formulario, y apagarlo acá haría
       // parpadear el botón a "Guardar" durante el viaje.

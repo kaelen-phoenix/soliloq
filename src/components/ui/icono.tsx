@@ -21,7 +21,11 @@ type NombreIcono =
   | "x"
   | "linkedin"
   | "vimeo"
-  | "sitio";
+  | "sitio"
+  | "whatsapp"
+  | "facebook"
+  | "enlace"
+  | "compartir";
 
 const TRAZOS: Record<NombreIcono, React.ReactNode> = {
   feed: (
@@ -117,6 +121,32 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
       <circle cx="12" cy="12" r="9" />
       <path d="M3.5 9h17M3.5 15h17" />
       <path d="M12 3a14 14 0 0 1 0 18M12 3a14 14 0 0 0 0 18" />
+    </>
+  ),
+  whatsapp: (
+    <>
+      <path d="M4 20l1.3-4A8 8 0 1 1 8.5 19L4 20Z" />
+      <path d="M8.5 8.5c.3 2.5 2.5 4.7 5 5 .8.1 1.6-.5 1.5-1.2l-.2-1-2-.7-1 1c-1-.5-1.9-1.4-2.4-2.4l1-1-.7-2-1-.2c-.7-.1-1.3.7-1.2 1.5Z" />
+    </>
+  ),
+  facebook: (
+    <>
+      <circle cx="12" cy="12" r="9" />
+      <path d="M14 8.5h-1.5A2 2 0 0 0 10.5 10.5v1.5H9v2h1.5V21h2v-7h1.8l.3-2h-2.1v-1.2c0-.5.3-.8.8-.8H14z" />
+    </>
+  ),
+  enlace: (
+    <>
+      <path d="M10 14a4.5 4.5 0 0 0 6.4 0l2-2a4.5 4.5 0 0 0-6.4-6.4l-1 1" />
+      <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-2 2a4.5 4.5 0 0 0 6.4 6.4l1-1" />
+    </>
+  ),
+  compartir: (
+    <>
+      <circle cx="18" cy="6" r="2.5" />
+      <circle cx="6" cy="12" r="2.5" />
+      <circle cx="18" cy="18" r="2.5" />
+      <path d="m8.2 10.8 7.6-3.6M8.2 13.2l7.6 3.6" />
     </>
   ),
 };

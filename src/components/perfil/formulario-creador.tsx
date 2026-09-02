@@ -29,10 +29,13 @@ export function FormularioCreador({
   userId,
   esAlta,
   datosIniciales,
+  destinoAlTerminar,
 }: {
   userId: string;
   esAlta: boolean;
   datosIniciales?: DatosIniciales;
+  /** A dónde ir tras el alta. Por defecto la home; si venía de un enlace público, vuelve ahí. */
+  destinoAlTerminar?: string;
 }) {
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
@@ -124,7 +127,7 @@ export function FormularioCreador({
         .from("perfiles")
         .update({ onboarding_completo: true, modo_activo: "creador" })
         .eq("id", userId);
-      router.replace("/");
+      router.replace(destinoAlTerminar ?? "/");
       router.refresh();
       // No se apaga `cargando`: la navegación desmonta el formulario.
       return;
