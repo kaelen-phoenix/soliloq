@@ -2,35 +2,44 @@
  * Única definición de la marca. Cualquier lugar que muestre "Yalope" tiene que usar esto,
  * para que no existan dos versiones del logo que se desincronicen.
  *
- * El gesto es una **bambalina**: la cenefa de tela que corona el escenario, un solo trazo
- * de pliegues arriba de la palabra. El acento cierra como un punto, no como una barra.
- * Todo hereda el color según `tono` (fondo claro u oscuro).
+ * La marca es un **arco de proscenio**: el marco del escenario visto de frente, con la
+ * tabla del piso y una figura bajo la luz. Geométrico y de una sola tinta, así se lee
+ * igual en un favicon de 16px que en una portada. La palabra va en la serif de display
+ * (registro de programa de mano). Todo hereda el color según `tono`.
  */
 
 const TAMANOS = {
-  sm: { texto: "text-lg", bambalina: "h-2 w-14" },
-  md: { texto: "text-2xl", bambalina: "h-2.5 w-20" },
-  lg: { texto: "text-3xl", bambalina: "h-3 w-28" },
+  sm: { marca: "h-5 w-5", texto: "text-lg", gap: "gap-1.5" },
+  md: { marca: "h-7 w-7", texto: "text-2xl", gap: "gap-2" },
+  lg: { marca: "h-10 w-10", texto: "text-[2rem]", gap: "gap-2.5" },
 } as const;
 
-type Tono = "ink" | "claro";
+type Tono = "ink" | "claro" | "acento";
 
-const TONO: Record<Tono, { texto: string; acento: string }> = {
-  ink: { texto: "text-texto", acento: "text-brand-500" },
-  claro: { texto: "text-white", acento: "text-candileja-400" },
+const TONO: Record<Tono, { texto: string; marca: string }> = {
+  ink: { texto: "text-texto", marca: "text-texto" },
+  claro: { texto: "text-white", marca: "text-white" },
+  acento: { texto: "text-texto", marca: "text-brand-500" },
 };
 
-function Bambalina({ className = "" }: { className?: string }) {
-  // Pliegues de cenefa: la tela cae en semicírculos desde una barra fina.
+export function MarcaProscenio({ className = "h-6 w-6" }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 56 10"
-      preserveAspectRatio="none"
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth={2}
+      strokeLinecap="round"
+      strokeLinejoin="round"
       className={className}
-      fill="currentColor"
       aria-hidden="true"
     >
-      <path d="M0 0h56v2c-3.5 0-3.5 6-7 6s-3.5-6-7-6-3.5 6-7 6-3.5-6-7-6-3.5 6-7 6-3.5-6-7-6-3.5 6-7 6-3.5-6-7-6V0Z" />
+      {/* Arco de proscenio, abierto abajo. */}
+      <path d="M3.5 21V10.5C3.5 6 7.5 2.5 12 2.5S20.5 6 20.5 10.5V21" />
+      {/* Tabla del escenario. */}
+      <path d="M2 21h20" />
+      {/* Figura bajo la luz. */}
+      <circle cx="12" cy="15.5" r="1.9" fill="currentColor" stroke="none" />
     </svg>
   );
 }
@@ -48,23 +57,18 @@ export function Logotipo({
   const c = TONO[tono];
 
   return (
-    <span className={`inline-flex flex-col items-start gap-1.5 ${className}`}>
-      <Bambalina className={`${t.bambalina} ${c.acento}`} />
+    <span className={`inline-flex items-center ${t.gap} ${className}`}>
+      <MarcaProscenio className={`${t.marca} ${c.marca}`} />
       <span
         className={`font-display font-semibold leading-none tracking-[-0.02em] ${t.texto} ${c.texto}`}
       >
         Yalope
-        <span className={c.acento} aria-hidden="true">
-          .
-        </span>
       </span>
     </span>
   );
 }
 
-/**
- * Variante horizontal para barras y encabezados: solo la palabra y el punto de acento.
- */
+/** Igual que `Logotipo` pero siempre en el tamaño chico, para barras y encabezados. */
 export function LogotipoInline({
   tono = "ink",
   className = "",
@@ -72,15 +76,5 @@ export function LogotipoInline({
   tono?: Tono;
   className?: string;
 }) {
-  const c = TONO[tono];
-  return (
-    <span
-      className={`font-display text-lg font-semibold leading-none tracking-[-0.02em] ${c.texto} ${className}`}
-    >
-      Yalope
-      <span className={c.acento} aria-hidden="true">
-        .
-      </span>
-    </span>
-  );
+  return <Logotipo tamano="sm" tono={tono} className={className} />;
 }

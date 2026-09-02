@@ -36,10 +36,7 @@ export function MarcoAcceso({ children }: { children: React.ReactNode }) {
         <FondoTelon variante="oscuro" />
 
         <div className="relative">
-          <span className="font-display text-2xl font-semibold tracking-[-0.02em] text-white">
-            Yalope
-          </span>
-          <span className="mt-2 block h-[3px] w-8 rounded-full bg-brand-500" aria-hidden="true" />
+          <Logotipo tamano="md" tono="claro" />
         </div>
 
         <div className="relative max-w-md">
@@ -66,7 +63,7 @@ export function MarcoAcceso({ children }: { children: React.ReactNode }) {
           </ul>
         </div>
 
-        <p className="relative text-2xs text-white/30">Match teatral · Argentina</p>
+        <p className="relative text-2xs text-white/40">Match teatral · Argentina</p>
       </aside>
 
       {/* Columna del formulario. En móvil ocupa todo y trae el telón claro de fondo; en

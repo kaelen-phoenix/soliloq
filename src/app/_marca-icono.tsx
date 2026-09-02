@@ -1,14 +1,15 @@
 /**
  * El dibujo de la marca para los íconos generados (`icon.tsx`, `apple-icon.tsx`, los PNG
  * del manifest y la imagen OG). No es un componente de la app: lo consume `ImageResponse`,
- * que solo entiende estilos inline y un subconjunto de CSS. Es un mini escenario —cenefa
- * de pliegues y dos cortinados— en blanco sobre el frambuesa de la marca.
+ * que solo entiende estilos inline y un subconjunto de SVG. Es el arco de proscenio en
+ * blanco sobre el frambuesa de la marca.
  */
 
 export const FRAMBUESA = "#cf1f57";
-export const CREMA = "#faf5ec";
+export const CREMA = "#fbfaf7";
 
 export function MarcaIcono({ lado, radio }: { lado: number; radio: number }) {
+  const s = lado * 0.6;
   return (
     <div
       style={{
@@ -22,26 +23,19 @@ export function MarcaIcono({ lado, radio }: { lado: number; radio: number }) {
       }}
     >
       <svg
-        width={lado * 0.62}
-        height={lado * 0.62}
-        viewBox="0 0 48 48"
+        width={s}
+        height={s}
+        viewBox="0 0 24 24"
         fill="none"
+        stroke="#ffffff"
+        strokeWidth={2.1}
+        strokeLinecap="round"
+        strokeLinejoin="round"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Cenefa (bambalina) */}
-        <path
-          d="M2 4h44v6c-4 0-4 7-8 7s-4-7-8-7-4 7-8 7-4-7-8-7-4 7-8 7-4-7-8-7V4Z"
-          fill="#ffffff"
-        />
-        {/* Cortinado izquierdo */}
-        <path d="M4 6c1 12 .6 24-2 34 3 1.6 7 1.6 10 0-1.8-10-2.2-22-1-34H4Z" fill="#ffffff" />
-        {/* Cortinado derecho */}
-        <path
-          d="M44 6c-1 12-.6 24 2 34-3 1.6-7 1.6-10 0 1.8-10 2.2-22 1-34h7Z"
-          fill="#ffffff"
-        />
-        {/* Foco de escena */}
-        <circle cx="24" cy="30" r="5" fill={CREMA} />
+        <path d="M3.5 21V10.5C3.5 6 7.5 2.5 12 2.5S20.5 6 20.5 10.5V21" />
+        <path d="M2 21h20" />
+        <circle cx="12" cy="15.3" r="2" fill="#ffffff" stroke="none" />
       </svg>
     </div>
   );
