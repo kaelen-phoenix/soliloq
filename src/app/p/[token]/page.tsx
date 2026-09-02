@@ -1,4 +1,5 @@
 import type { Metadata } from "next";
+import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
@@ -79,7 +80,9 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
 
   return (
     <main className="mx-auto max-w-lg px-5 py-8">
-      <Logotipo tamano="sm" className="mb-8" />
+      <Link href="/" aria-label="Ir a Yalope" className="mb-8 inline-block">
+        <Logotipo tamano="sm" />
+      </Link>
 
       <VidrieraPublica perfil={{ ...perfil, fotos }} />
 
@@ -88,6 +91,29 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
           <BotonContactarPublico token={params.token} haySesion={!!user} />
         </div>
       )}
+
+      <footer className="mt-12 border-t border-ink-100 pt-5 text-sm text-ink-500">
+        {esDueño ? (
+          <Link href="/perfil" className="font-medium text-ink-700 hover:text-ink-900">
+            Volver a mi perfil
+          </Link>
+        ) : user ? (
+          <Link href="/" className="font-medium text-ink-700 hover:text-ink-900">
+            Ir a Yalope
+          </Link>
+        ) : (
+          <p>
+            ¿Casteás o sos artista?{" "}
+            <Link
+              href="/ingresar"
+              className="font-medium text-ink-900 underline decoration-ink-300 underline-offset-2 hover:decoration-ink-900"
+            >
+              Entrá a Yalope
+            </Link>{" "}
+            y armá tu perfil.
+          </p>
+        )}
+      </footer>
     </main>
   );
 }
