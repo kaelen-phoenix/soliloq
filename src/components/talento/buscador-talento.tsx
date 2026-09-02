@@ -92,13 +92,50 @@ export function BuscadorTalento() {
   const prefiereReduccion = usePrefiereReduccion();
   const { lista, item } = variantesSeguras(prefiereReduccion);
 
+  const hayFiltros =
+    texto.trim() !== "" ||
+    edadMin !== "" ||
+    edadMax !== "" ||
+    generos.length > 0 ||
+    habilidades.length > 0 ||
+    ubicacion !== null;
+
+  function limpiarFiltros() {
+    setTexto("");
+    setEdadMin("");
+    setEdadMax("");
+    setGeneros([]);
+    setHabilidades([]);
+    setUbicacion(null);
+    setRadioMetros(RADIO_INICIAL_METROS);
+  }
+
+  const conteo = hayMas
+    ? `${resultados.length}+ resultados`
+    : `${resultados.length} ${resultados.length === 1 ? "resultado" : "resultados"}`;
+
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-ink-100 bg-ink-50/50 p-4">
+        <div className="flex items-end justify-between gap-3">
+          <span className="text-2xs font-medium uppercase tracking-wide text-ink-400">
+            Filtros
+          </span>
+          {hayFiltros && (
+            <button
+              type="button"
+              onClick={limpiarFiltros}
+              className="text-xs font-medium text-ink-500 underline decoration-ink-300 underline-offset-2 hover:text-ink-900"
+            >
+              Limpiar
+            </button>
+          )}
+        </div>
+
         <CampoTexto
           id="buscar-nombre"
-          etiqueta="Nombre"
-          placeholder="Buscar por nombre"
+          etiqueta="Buscar"
+          placeholder="Nombre, habilidad o experiencia"
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
         />
@@ -214,22 +251,25 @@ export function BuscadorTalento() {
         />
       ) : (
         <>
-          <motion.div
-            className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3"
-            variants={lista}
-            initial="oculto"
-            animate="visible"
-          >
-            {resultados.map((t) => (
-              <motion.div
-                key={t.id}
-                variants={item}
-                whileTap={prefiereReduccion ? undefined : toque}
-              >
-                <TarjetaTalento talento={t} />
-              </motion.div>
-            ))}
-          </motion.div>
+          <div className="flex flex-col gap-3">
+            <p className="text-2xs font-medium uppercase tracking-wide text-ink-400">{conteo}</p>
+            <motion.div
+              className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3"
+              variants={lista}
+              initial="oculto"
+              animate="visible"
+            >
+              {resultados.map((t) => (
+                <motion.div
+                  key={t.id}
+                  variants={item}
+                  whileTap={prefiereReduccion ? undefined : toque}
+                >
+                  <TarjetaTalento talento={t} />
+                </motion.div>
+              ))}
+            </motion.div>
+          </div>
           {hayMas && (
             <div className="flex justify-center">
               <Boton
