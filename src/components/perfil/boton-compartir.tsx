@@ -135,7 +135,7 @@ export function BotonCompartir({
               : "Un enlace que se ve sin cuenta: tus fotos, tu presentación y tus habilidades o disciplinas. Nunca tu fecha de nacimiento, tu ubicación exacta ni tu contacto."}
           </p>
         </div>
-        <Icono nombre="compartir" className="h-5 w-5 shrink-0 text-ink-300" />
+        <Icono nombre="compartir" className="h-5 w-5 shrink-0 text-texto-tenue" />
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">

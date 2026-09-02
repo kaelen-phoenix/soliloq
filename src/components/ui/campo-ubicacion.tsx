@@ -175,7 +175,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
             if (valor) onCambio(null);
           }}
           onFocus={() => sugerencias.length > 0 && setAbierto(true)}
-          className={`w-full rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto transition-colors placeholder:text-ink-400 focus:border-ink-900 ${
+          className={`w-full rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto transition-colors placeholder:text-texto-tenue focus:border-ink-900 ${
             error ? "border-error-400" : "border-borde"
           }`}
         />
@@ -200,7 +200,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
         type="button"
         onClick={usarMiUbicacion}
         disabled={ubicando}
-        className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-texto-tenue underline underline-offset-4 hover:text-texto disabled:text-ink-400 disabled:no-underline"
+        className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-texto-tenue underline underline-offset-4 hover:text-texto disabled:text-texto-tenue disabled:no-underline"
       >
         {ubicando ? "Buscando tu ubicación…" : "Usar mi ubicación actual"}
       </button>

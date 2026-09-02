@@ -108,7 +108,7 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
           </Link>
         </div>
       ) : (
-        <section className="mt-10 rounded-2xl border border-brand-200 bg-brand-50/60 p-6 text-center">
+        <section className="mt-10 rounded-2xl border border-brand-200 acento-fondo p-6 text-center">
           <p className="font-display text-lg font-semibold tracking-[-0.02em] text-texto">
             ¿Casteás o sos artista?
           </p>

@@ -194,7 +194,7 @@ export function ListaNotificaciones({
                     Se abrió la sala de <span className="font-medium">{tituloObra(n)}</span>
                   </p>
                 )}
-                <p className="mt-0.5 text-2xs text-ink-400">
+                <p className="mt-0.5 text-2xs text-texto-tenue">
                   {new Date(n.creado_en).toLocaleString("es-AR", {
                     day: "numeric",
                     month: "short",

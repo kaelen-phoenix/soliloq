@@ -101,7 +101,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           )}
           {rol.rol_descripcion && (
             <div>
-              <p className="mb-1 text-2xs font-medium uppercase tracking-wide text-ink-400">
+              <p className="mb-1 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
                 Sobre el rol
               </p>
               <p>{rol.rol_descripcion}</p>
@@ -109,7 +109,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           )}
           {rol.obra_sinopsis && (
             <div>
-              <p className="mb-1 text-2xs font-medium uppercase tracking-wide text-ink-400">
+              <p className="mb-1 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
                 Sinopsis
               </p>
               <p>{rol.obra_sinopsis}</p>

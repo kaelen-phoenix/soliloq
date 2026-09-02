@@ -149,7 +149,7 @@ export function BuscadorTalento() {
             )}
             <Icono
               nombre="chevron"
-              className={`h-3.5 w-3.5 text-ink-400 transition-transform ${verFiltros ? "rotate-180" : ""}`}
+              className={`h-3.5 w-3.5 text-texto-tenue transition-transform ${verFiltros ? "rotate-180" : ""}`}
             />
           </button>
           {hayFiltros && (
@@ -234,7 +234,7 @@ export function BuscadorTalento() {
         />
         {ubicacion && (
           <div className="flex flex-col gap-1.5">
-            <label htmlFor="buscar-radio" className="text-2xs font-medium text-ink-400">
+            <label htmlFor="buscar-radio" className="text-2xs font-medium text-texto-tenue">
               Radio
             </label>
             <select
@@ -277,7 +277,7 @@ export function BuscadorTalento() {
       ) : (
         <>
           <div className="flex flex-col gap-3">
-            <p className="text-2xs font-medium uppercase tracking-wide text-ink-400">{conteo}</p>
+            <p className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{conteo}</p>
             <motion.div
               className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3"
               variants={lista}

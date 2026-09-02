@@ -186,7 +186,7 @@ export function FormularioCreador({
         <fieldset className="flex flex-col gap-2.5">
           <legend className="text-sm font-medium text-texto">
             Perfil artístico
-            <span className="ml-1.5 font-normal text-ink-400">Elegí todo lo que hagas</span>
+            <span className="ml-1.5 font-normal text-texto-tenue">Elegí todo lo que hagas</span>
           </legend>
 
           <div className="flex flex-wrap gap-2">
@@ -244,7 +244,7 @@ export function FormularioCreador({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Descripción e imagen (opcional)</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Descripción e imagen (opcional)</h2>
         <textarea
           rows={4}
           maxLength={1000}

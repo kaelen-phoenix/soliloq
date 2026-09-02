@@ -61,7 +61,7 @@ export default async function SalasPage() {
                   {s.ultimoMensaje ?? "Sala recién creada"}
                 </p>
               </div>
-              <Icono nombre="chevron" className="h-4 w-4 -rotate-90 shrink-0 text-ink-300" />
+              <Icono nombre="chevron" className="h-4 w-4 -rotate-90 shrink-0 text-texto-tenue" />
             </Link>
           </li>
         ))}

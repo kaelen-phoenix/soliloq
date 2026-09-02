@@ -187,7 +187,7 @@ export function SalaChat({
 
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 [&>*]:mx-auto [&>*]:max-w-3xl">
         {mensajes.length === 0 && (
-          <p className="mx-auto mt-10 max-w-[16rem] text-center text-sm leading-relaxed text-ink-400">
+          <p className="mx-auto mt-10 max-w-[16rem] text-center text-sm leading-relaxed text-texto-tenue">
             Esta sala se abrió porque hay equipo. Coordinen fechas de audición y compartan textos acá.
           </p>
         )}
@@ -229,7 +229,7 @@ export function SalaChat({
           onChange={(e) => setTexto(e.target.value)}
           maxLength={2000}
           placeholder="Escribí un mensaje…"
-          className="flex-1 rounded-full border border-borde px-4 py-2.5 text-base placeholder:text-ink-400 focus:border-ink-900"
+          className="flex-1 rounded-full border border-borde px-4 py-2.5 text-base placeholder:text-texto-tenue focus:border-ink-900"
         />
         <button
           type="submit"

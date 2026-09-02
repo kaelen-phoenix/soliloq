@@ -184,7 +184,7 @@ export default async function PerfilPage({
                 otroDetalle={perfilCreador.otro_detalle}
                 className="mt-1.5"
               />
-              <p className="text-sm text-ink-400">{perfilCreador.ubicacion_publica}</p>
+              <p className="text-sm text-texto-tenue">{perfilCreador.ubicacion_publica}</p>
             </div>
           </div>
 
@@ -195,7 +195,7 @@ export default async function PerfilPage({
       )}
 
       <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
           Historial de obras previas
         </h2>
         <ObrasPrevias creadorId={user.id} obras={obrasPrevias ?? []} />

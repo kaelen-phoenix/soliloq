@@ -22,7 +22,7 @@ export function VistaPerfilPropio({
       <div className="flex items-center justify-between gap-3 rounded-xl bg-fondo-sutil px-4 py-3">
         <p className="text-xs leading-snug text-texto-tenue">
           Así te ven los demás.
-          {aviso && <span className="block text-ink-400">{aviso}</span>}
+          {aviso && <span className="block text-texto-tenue">{aviso}</span>}
         </p>
         <Link
           href={hrefEditar}

@@ -12,7 +12,7 @@ const ETIQUETA_ESTADO: Record<string, string> = {
 const COLOR_ESTADO: Record<string, string> = {
   borrador: "bg-ink-100 text-texto-tenue",
   publicada: "bg-accion text-accion-texto",
-  cerrada: "bg-fondo-sutil text-ink-400",
+  cerrada: "bg-fondo-sutil text-texto-tenue",
 };
 
 export async function TableroCreador({ creadorId }: { creadorId: string }) {
@@ -67,7 +67,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
                     {pendientes}
                   </span>
                 )}
-                <Icono nombre="chevron" className="h-4 w-4 -rotate-90 text-ink-300" />
+                <Icono nombre="chevron" className="h-4 w-4 -rotate-90 text-texto-tenue" />
               </Link>
             </li>
           );

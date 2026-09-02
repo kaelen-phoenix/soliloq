@@ -189,7 +189,7 @@ export function SubirFotos({
         ))}
 
         {fotos.length < MAX_FOTOS && (
-          <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-ink-300 text-ink-400 transition-colors hover:border-ink-900 hover:text-texto">
+          <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-ink-300 text-texto-tenue transition-colors hover:border-ink-900 hover:text-texto">
             <Icono nombre="mas" className="h-5 w-5" />
             <span className="text-2xs font-medium">{subiendo ? "Subiendo…" : "Agregar"}</span>
             <input

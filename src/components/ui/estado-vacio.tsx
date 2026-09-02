@@ -23,7 +23,7 @@ export function EstadoVacio({
   return (
     <div className="flex flex-col items-center rounded-2xl border border-dashed border-borde px-8 py-12 text-center">
       <span className="relative flex h-14 w-14 items-center justify-center rounded-full bg-fondo-sutil">
-        <Icono nombre={icono} className="h-6 w-6 text-ink-400" />
+        <Icono nombre={icono} className="h-6 w-6 text-texto-tenue" />
         <span
           className="absolute -bottom-1 h-[2.5px] w-5 rounded-full bg-brand-500/70"
           aria-hidden="true"

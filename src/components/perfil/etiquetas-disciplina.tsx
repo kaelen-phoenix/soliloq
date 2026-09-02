@@ -19,7 +19,7 @@ export function EtiquetasDisciplina({
   className?: string;
 }) {
   if (disciplinas.length === 0) {
-    return <p className={`text-sm text-ink-400 ${className}`}>Perfil artístico sin completar</p>;
+    return <p className={`text-sm text-texto-tenue ${className}`}>Perfil artístico sin completar</p>;
   }
 
   return (

@@ -36,7 +36,7 @@ export default async function DetalleObraPage({ params }: { params: { id: string
       </div>
 
       <section className="mt-7 flex flex-col gap-2.5">
-        <h3 className="text-2xs font-medium uppercase tracking-wide text-ink-400">Roles</h3>
+        <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Roles</h3>
 
         {roles && roles.length === 0 && (
           <p className="text-sm text-texto-tenue">Todavía no definiste roles para esta obra.</p>
@@ -60,7 +60,7 @@ export default async function DetalleObraPage({ params }: { params: { id: string
                       {" · "}
                       {aprobados}/{rol.vacantes} cubiertas
                     </p>
-                    <p className="mt-0.5 text-xs text-ink-400">
+                    <p className="mt-0.5 text-xs text-texto-tenue">
                       {rol.generos_buscados.length === 0
                         ? "Abierto a cualquier género"
                         : rol.generos_buscados.map(etiquetaGenero).join(", ")}
@@ -81,7 +81,7 @@ export default async function DetalleObraPage({ params }: { params: { id: string
       </section>
 
       <section className="mt-8 flex flex-col gap-2.5">
-        <h3 className="text-2xs font-medium uppercase tracking-wide text-ink-400">
+        <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
           Rendimiento
         </h3>
         <MetricasObra obraId={obra.id} />

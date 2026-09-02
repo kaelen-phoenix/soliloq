@@ -169,7 +169,7 @@ export function IngresarFormulario({ next }: { next?: string }) {
         </Link>
       )}
 
-      <div className="flex items-center gap-3 text-2xs uppercase tracking-wide text-ink-300">
+      <div className="flex items-center gap-3 text-2xs uppercase tracking-wide text-texto-tenue">
         <div className="h-px flex-1 bg-ink-100" />
         o
         <div className="h-px flex-1 bg-ink-100" />

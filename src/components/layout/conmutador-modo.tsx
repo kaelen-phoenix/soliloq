@@ -24,7 +24,7 @@ export function ConmutadorModo({
   if (!tieneAmbosPerfiles) {
     return (
       <div className="flex items-center gap-2.5">
-        <span className="text-2xs font-medium uppercase tracking-wide text-ink-400">
+        <span className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
           {t(modoActivo)}
         </span>
         {rolFaltante && (
@@ -59,7 +59,7 @@ export function ConmutadorModo({
         className="group inline-flex items-center gap-1 rounded-lg border border-borde py-1 pl-2 pr-1.5 text-2xs font-medium text-texto-tenue transition-colors hover:border-ink-300 hover:bg-fondo-sutil disabled:opacity-50"
       >
         <span>{t("cambiarA", { rol: t(otro) })}</span>
-        <Icono nombre="cambiar" className="h-3.5 w-3.5 text-ink-400 group-hover:text-texto-tenue" />
+        <Icono nombre="cambiar" className="h-3.5 w-3.5 text-texto-tenue group-hover:text-texto-tenue" />
       </button>
     </div>
   );

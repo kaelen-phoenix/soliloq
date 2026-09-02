@@ -97,7 +97,7 @@ function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       {filas.map((m) => (
         <li
           key={m.id}
-          className={`rounded-2xl border p-4 ${m.leido ? "border-borde bg-superficie" : "border-brand-200 bg-brand-50/40"}`}
+          className={`rounded-2xl border p-4 ${m.leido ? "border-borde bg-superficie" : "border-brand-200 acento-fondo"}`}
         >
           <div className="flex items-start justify-between gap-3">
             <div className="min-w-0">
@@ -407,7 +407,7 @@ function Usuarios({
                 <p className="truncate text-sm font-medium text-texto">
                   {u.nombre ?? "(sin nombre)"}
                   {u.es_admin && (
-                    <span className="ml-1.5 rounded bg-brand-50 px-1.5 py-0.5 text-2xs font-semibold text-brand-600">
+                    <span className="ml-1.5 rounded acento-fondo px-1.5 py-0.5 text-2xs font-semibold text-brand-600">
                       admin
                     </span>
                   )}
@@ -490,7 +490,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
   }
 
   if (error) return <p className="text-sm text-error-600">{error}</p>;
-  if (filas === null) return <p className="text-sm text-ink-400">Cargando denuncias…</p>;
+  if (filas === null) return <p className="text-sm text-texto-tenue">Cargando denuncias…</p>;
   if (filas.length === 0)
     return <EstadoVacio icono="bandera" titulo="Sin denuncias" detalle="No hay denuncias registradas." />;
 
@@ -508,7 +508,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
               </p>
               {d.detalle && <p className="mt-2 text-sm leading-relaxed text-texto">{d.detalle}</p>}
               {d.resolucion && (
-                <p className="mt-1 text-xs italic text-ink-400">Resolución: {d.resolucion}</p>
+                <p className="mt-1 text-xs italic text-texto-tenue">Resolución: {d.resolucion}</p>
               )}
             </div>
           </div>
@@ -584,7 +584,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     setFilas(null);
   }
 
-  if (filas === null && !error) return <p className="text-sm text-ink-400">Cargando bloqueos…</p>;
+  if (filas === null && !error) return <p className="text-sm text-texto-tenue">Cargando bloqueos…</p>;
 
   return (
     <div className="flex flex-col gap-4">
@@ -618,7 +618,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       )}
 
       <form onSubmit={crear} className="rounded-2xl border border-dashed border-borde p-4">
-        <p className="mb-3 text-2xs font-medium uppercase tracking-wide text-ink-400">
+        <p className="mb-3 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
           Imponer un bloqueo (por id de perfil)
         </p>
         <div className="flex flex-col gap-2 sm:flex-row">

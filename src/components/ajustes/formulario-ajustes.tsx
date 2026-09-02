@@ -63,7 +63,7 @@ export function FormularioAjustes({
     <div className="flex max-w-lg flex-col gap-8">
       <section>
         <h2 className="text-sm font-medium text-texto">{t("idioma")}</h2>
-        <p className="mb-3 mt-0.5 text-xs text-ink-400">{t("idiomaAyuda")}</p>
+        <p className="mb-3 mt-0.5 text-xs text-texto-tenue">{t("idiomaAyuda")}</p>
         <Opciones<Idioma>
           valor={idiomaInicial}
           pendiente={pendiente}
@@ -77,7 +77,7 @@ export function FormularioAjustes({
 
       <section>
         <h2 className="text-sm font-medium text-texto">{t("tema")}</h2>
-        <p className="mb-3 mt-0.5 text-xs text-ink-400">{t("temaAyuda")}</p>
+        <p className="mb-3 mt-0.5 text-xs text-texto-tenue">{t("temaAyuda")}</p>
         <Opciones<Tema>
           valor={temaInicial}
           pendiente={pendiente}

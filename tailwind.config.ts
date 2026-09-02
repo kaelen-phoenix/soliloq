@@ -79,22 +79,25 @@ const config: Config = {
         // Estados. Estaban sueltos como `red-600` y `amber-800` de Tailwind: fuera del
         // sistema, el próximo rojo iba a ser otro y nadie lo iba a notar. Tres pasos por
         // color alcanzan — fondo, borde y texto — porque un estado no necesita una rampa.
+        // Estados. `50` (fondo de la caja) y `800` (texto de la caja) son variables: en
+        // oscuro dejan de ser casi blanco / casi negro y quedan legibles. `400`/`600`
+        // leen bien en los dos temas, quedan fijos.
         error: {
-          50: "#fdf2f2",
+          50: "rgb(var(--error-50) / <alpha-value>)",
           400: "#e88a8a",
           600: "#c62b2b",
-          800: "#8f1d1d",
+          800: "rgb(var(--error-800) / <alpha-value>)",
         },
         alerta: {
-          50: "#fdf7ec",
+          50: "rgb(var(--alerta-50) / <alpha-value>)",
           400: "#e0a44a",
           600: "#b45309",
-          800: "#7c3d07",
+          800: "rgb(var(--alerta-800) / <alpha-value>)",
         },
         exito: {
-          50: "#f0f7f2",
+          50: "rgb(var(--exito-50) / <alpha-value>)",
           600: "#2f7d4f",
-          800: "#1f5636",
+          800: "rgb(var(--exito-800) / <alpha-value>)",
         },
         // Familias de oficio. Son cuatro y no diecisiete a propósito: ninguna paleta
         // categórica distingue diecisiete tonos, y arriba de ocho la gente ya no los
