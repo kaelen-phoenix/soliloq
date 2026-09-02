@@ -159,8 +159,8 @@ export function SubirFotos({
               src={foto.url}
               alt="Foto de portfolio"
               fill
+              absoluto
               sizes="(max-width: 640px) 33vw, 200px"
-              contenedorClassName="absolute inset-0"
             />
             {indice === 0 && (
               <span className="absolute left-1.5 top-1.5 rounded bg-ink-950/75 px-1.5 py-0.5 text-2xs font-medium uppercase tracking-wide text-white backdrop-blur-sm">

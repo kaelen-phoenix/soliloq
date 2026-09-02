@@ -32,6 +32,13 @@ type PropsFill = PropsBase & {
   fill: true;
   /** Requerido en modo `fill`: describe el ancho de render en cada breakpoint. */
   sizes: string;
+  /**
+   * El consumidor ya tiene un contenedor posicionado (con su `aspect-ratio` y otros
+   * hijos absolutos): el wrapper se pone `absolute inset-0` para llenarlo en vez de
+   * `relative`. Sin esto, `relative` le gana a un `absolute` que venga por
+   * `contenedorClassName` (orden del CSS de Tailwind) y el wrapper queda sin alto.
+   */
+  absoluto?: boolean;
   width?: never;
   height?: never;
 };
@@ -89,8 +96,9 @@ export function Imagen(props: ImagenProps) {
     ) : null;
 
   if (props.fill) {
+    const posicion = props.absoluto ? "absolute inset-0" : "relative";
     return (
-      <span className={`relative block overflow-hidden bg-ink-100 ${contenedorClassName}`}>
+      <span className={`${posicion} block overflow-hidden bg-ink-100 ${contenedorClassName}`}>
         <Image {...comunes} alt={alt} fill sizes={props.sizes} className={claseImg} />
         {placeholder}
       </span>
