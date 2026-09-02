@@ -175,7 +175,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
             if (valor) onCambio(null);
           }}
           onFocus={() => sugerencias.length > 0 && setAbierto(true)}
-          className={`w-full rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto transition-colors placeholder:text-texto-tenue focus:border-ink-900 ${
+          className={`w-full rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto transition-colors placeholder:text-texto-tenue focus:border-accion ${
             error ? "border-error-400" : "border-borde"
           }`}
         />

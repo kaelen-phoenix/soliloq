@@ -253,7 +253,7 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
               <select
                 value={form.nivel}
                 onChange={(e) => setForm({ ...form, nivel: e.target.value as FormSponsor["nivel"] })}
-                className="rounded-xl border border-borde bg-superficie px-3 py-2 text-sm"
+                className="rounded-xl border border-borde bg-superficie px-3 py-2 text-sm text-texto"
               >
                 {NIVELES_SPONSOR.map((n) => (
                   <option key={n} value={n}>

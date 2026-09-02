@@ -214,7 +214,7 @@ export function FormularioTalento({
             id="genero"
             value={genero}
             onChange={(e) => setGenero(e.target.value as Genero | "")}
-            className={`rounded-xl border bg-superficie px-3.5 py-2.5 text-base focus:border-ink-900 ${
+            className={`rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto focus:border-accion ${
               errores.genero ? "border-error-400" : "border-borde"
             }`}
           >
@@ -275,7 +275,7 @@ export function FormularioTalento({
             maxLength={2000}
             value={experiencia}
             onChange={(e) => setExperiencia(e.target.value)}
-            className="rounded-xl border border-borde px-3.5 py-2.5 text-base outline-none focus:border-ink-900"
+            className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
             placeholder="Contá tu formación, obras en las que participaste, etc."
           />
           <p className="text-right text-xs text-texto-tenue">{experiencia.length}/2000</p>
@@ -324,7 +324,7 @@ export function FormularioTalento({
             type="checkbox"
             checked={apareceEnBuscador}
             onChange={(e) => setApareceEnBuscador(e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-ink-300 text-texto focus:ring-ink-900"
+            className="mt-0.5 h-4 w-4 rounded border-ink-300 text-texto focus:ring-accion"
           />
           <span className="text-sm text-texto">
             Aparecer en el buscador de creadores
