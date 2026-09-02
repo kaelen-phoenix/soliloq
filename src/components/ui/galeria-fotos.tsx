@@ -70,14 +70,14 @@ export function GaleriaFotos({
             type="button"
             onClick={() => setAbierta(i)}
             aria-label={`Ampliar foto ${i + 1} de ${fotos.length}`}
-            className={`group relative block overflow-hidden ${itemClassName}`}
+            className="group block w-full"
           >
             <Imagen
               src={url}
               alt={alt}
               fill
               sizes="(max-width: 640px) 33vw, 220px"
-              contenedorClassName="absolute inset-0"
+              contenedorClassName={itemClassName}
               className="transition-transform duration-200 group-hover:scale-[1.03]"
             />
           </button>
