@@ -3,11 +3,64 @@ import Link from "next/link";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo } from "@/components/ui/logotipo";
 
+const TITULO = "Yalope — Casting teatral en tu teléfono";
+const DESCRIPCION =
+  "Yalope conecta talento y creadores de teatro. Postulate a convocatorias, compartí tu perfil como booking y armá elenco con un match rápido y visual.";
+
 export const metadata: Metadata = {
-  title: "Yalope — Casting teatral en tu teléfono",
-  description:
-    "Yalope conecta talento y creadores de teatro. Postulate a convocatorias, compartí tu perfil como booking y armá elenco con un match rápido y visual.",
-  alternates: { canonical: "/bienvenida" },
+  title: TITULO,
+  description: DESCRIPCION,
+  // La landing se sirve en `/` (rewrite para anónimos), así que esa es la URL canónica.
+  alternates: { canonical: "/" },
+  keywords: [
+    "casting teatral",
+    "convocatorias de teatro",
+    "audiciones",
+    "actores",
+    "actrices",
+    "elenco",
+    "casting online",
+    "teatro Argentina",
+    "buscar talento teatro",
+  ],
+  openGraph: {
+    type: "website",
+    url: "https://yalope.com/",
+    siteName: "Yalope",
+    locale: "es_AR",
+    title: TITULO,
+    description: DESCRIPCION,
+    images: [{ url: "/og.png", width: 1200, height: 630, alt: "Yalope" }],
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: TITULO,
+    description: DESCRIPCION,
+    images: ["/og.png"],
+  },
+};
+
+// Datos estructurados: le dan al buscador el nombre, el logo y la caja de búsqueda del sitio.
+const JSON_LD = {
+  "@context": "https://schema.org",
+  "@graph": [
+    {
+      "@type": "Organization",
+      "@id": "https://yalope.com/#organizacion",
+      name: "Yalope",
+      url: "https://yalope.com",
+      logo: "https://yalope.com/og.png",
+      description: DESCRIPCION,
+    },
+    {
+      "@type": "WebSite",
+      "@id": "https://yalope.com/#sitio",
+      url: "https://yalope.com",
+      name: "Yalope",
+      inLanguage: "es-AR",
+      publisher: { "@id": "https://yalope.com/#organizacion" },
+    },
+  ],
 };
 
 const PARA = [
@@ -50,6 +103,10 @@ const PASOS = [
 export default function BienvenidaPage() {
   return (
     <div className="flex min-h-screen flex-col bg-white text-ink-900">
+      <script
+        type="application/ld+json"
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+      />
       <header className="mx-auto flex w-full max-w-5xl items-center justify-between px-5 py-5">
         <Logotipo tamano="sm" />
         <nav className="flex items-center gap-2">
