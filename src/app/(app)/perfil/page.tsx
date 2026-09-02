@@ -5,6 +5,7 @@ import { FormularioTalento } from "@/components/perfil/formulario-talento";
 import { ObrasPrevias } from "@/components/perfil/obras-previas";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 import { Icono } from "@/components/ui/icono";
+import { Imagen } from "@/components/ui/imagen";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BuscarEquipo } from "@/components/perfil/buscar-equipo";
 import { BotonCompartir } from "@/components/perfil/boton-compartir";
@@ -145,11 +146,17 @@ export default async function PerfilPage({
         >
           <div className="flex items-center gap-4">
             {perfilCreador.imagen_url ? (
-              // eslint-disable-next-line @next/next/no-img-element
-              <img
+              <Imagen
                 src={perfilCreador.imagen_url}
                 alt=""
-                className="h-16 w-16 rounded-full object-cover"
+                width={64}
+                height={64}
+                contenedorClassName="shrink-0 rounded-full"
+                fallback={
+                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">
+                    {perfilCreador.nombre[0]}
+                  </span>
+                }
               />
             ) : (
               <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { Imagen } from "@/components/ui/imagen";
 
 export interface ResultadoTalento {
   id: string;
@@ -17,13 +18,14 @@ export function TarjetaTalento({ talento }: { talento: ResultadoTalento }) {
   return (
     <Link
       href={`/talentos/${talento.id}`}
-      className="group flex flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white transition-colors hover:border-ink-300"
+      className="group flex flex-col overflow-hidden rounded-2xl border border-ink-100 bg-white transition hover:border-ink-300 hover:shadow-tarjeta"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
+      <Imagen
         src={talento.fotoUrl}
         alt={talento.nombre}
-        className="aspect-[3/4] w-full object-cover"
+        fill
+        sizes="(max-width: 640px) 50vw, 240px"
+        contenedorClassName="aspect-[3/4] w-full"
       />
       <div className="flex flex-col gap-1 p-3">
         <p className="text-sm font-semibold text-ink-900">{talento.nombre}</p>

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { EtiquetasDisciplina } from "@/components/perfil/etiquetas-disciplina";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
+import { Imagen } from "@/components/ui/imagen";
 
 export default async function PerfilCreadorPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -17,8 +18,18 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
     <main className="px-5 py-5">
       <div className="flex items-center gap-4">
         {creador.imagen_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={creador.imagen_url} alt={creador.nombre} className="h-16 w-16 rounded-full object-cover" />
+          <Imagen
+            src={creador.imagen_url}
+            alt={creador.nombre}
+            width={64}
+            height={64}
+            contenedorClassName="shrink-0 rounded-full"
+            fallback={
+              <div className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">
+                {creador.nombre[0]}
+              </div>
+            }
+          />
         ) : (
           <div className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-600">
             {creador.nombre[0]}

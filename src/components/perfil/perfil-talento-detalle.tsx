@@ -1,6 +1,7 @@
 import { VideoreelEmbed } from "./videoreel-embed";
 import { calcularEdad, etiquetaGenero, REDES, type Genero } from "@/lib/constantes";
 import { Icono } from "@/components/ui/icono";
+import { Imagen } from "@/components/ui/imagen";
 
 export interface TalentoDetalle {
   id: string;
@@ -26,8 +27,14 @@ export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
     <div className="flex flex-col gap-4">
       <div className="grid grid-cols-3 gap-2">
         {fotosOrdenadas.map((foto) => (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img key={foto.id} src={foto.url} alt={talento.nombre} className="aspect-[3/4] rounded-xl object-cover" />
+          <Imagen
+            key={foto.id}
+            src={foto.url}
+            alt={talento.nombre}
+            fill
+            sizes="(max-width: 640px) 33vw, 220px"
+            contenedorClassName="aspect-[3/4] rounded-xl"
+          />
         ))}
       </div>
 

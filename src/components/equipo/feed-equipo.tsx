@@ -1,10 +1,13 @@
 "use client";
 
+import { AnimatePresence, motion } from "framer-motion";
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
+import { Imagen } from "@/components/ui/imagen";
+import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { EtiquetasDisciplina } from "@/components/perfil/etiquetas-disciplina";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
@@ -33,6 +36,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
   const router = useRouter();
   const [personas, setPersonas] = useState(personasIniciales);
   const [error, setError] = useState<string | null>(null);
+  const prefiereReduccion = usePrefiereReduccion();
 
   const actual = personas[0];
 
@@ -80,11 +84,29 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
     <div className="flex flex-col">
       {error && <p className="mb-3 text-xs text-error-600">{error}</p>}
 
-      <article className="rounded-2xl border border-ink-100 bg-white p-5 shadow-tarjeta">
+      <AnimatePresence mode="wait" initial={false}>
+      <motion.article
+        key={actual.perfil_id}
+        className="rounded-2xl border border-ink-100 bg-white p-5 shadow-tarjeta"
+        initial={prefiereReduccion ? false : { opacity: 0, y: 10 }}
+        animate={{ opacity: 1, y: 0 }}
+        exit={prefiereReduccion ? undefined : { opacity: 0, y: -10 }}
+        transition={{ duration: 0.18, ease: "easeOut" }}
+      >
         <div className="flex items-center gap-3.5">
           {actual.imagen_url ? (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={actual.imagen_url} alt="" className="h-14 w-14 rounded-full object-cover" />
+            <Imagen
+              src={actual.imagen_url}
+              alt=""
+              width={56}
+              height={56}
+              contenedorClassName="shrink-0 rounded-full"
+              fallback={
+                <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-500">
+                  {actual.nombre[0]}
+                </span>
+              }
+            />
           ) : (
             <span className="flex h-14 w-14 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-ink-500">
               {actual.nombre[0]}
@@ -125,7 +147,8 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
             ))}
           </ul>
         )}
-      </article>
+      </motion.article>
+      </AnimatePresence>
 
       <div className="mx-auto mt-7 flex items-center gap-5">
         <button

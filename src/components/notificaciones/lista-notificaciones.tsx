@@ -2,7 +2,8 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
-import { Icono } from "@/components/ui/icono";
+import { EstadoVacio } from "@/components/ui/estado-vacio";
+import { Imagen } from "@/components/ui/imagen";
 import { createClient } from "@/lib/supabase/client";
 import type { TipoNotificacion } from "@/lib/supabase/types";
 
@@ -48,8 +49,14 @@ function ParDeCaras({ propia, proyecto }: { propia: string | null; proyecto: str
   // tenga imagen. Decorativo, así que va sin texto alternativo.
   const Cara = ({ url, extra = "" }: { url: string | null; extra?: string }) =>
     url ? (
-      // eslint-disable-next-line @next/next/no-img-element
-      <img src={url} alt="" className={`${base} ${extra}`} />
+      <Imagen
+        src={url}
+        alt=""
+        width={36}
+        height={36}
+        contenedorClassName={`shrink-0 rounded-full border-2 border-white ${extra}`}
+        fallback={<span className={`${base} ${extra}`} aria-hidden="true" />}
+      />
     ) : (
       <span className={`${base} ${extra}`} aria-hidden="true" />
     );
@@ -106,13 +113,11 @@ export function ListaNotificaciones({
 
   if (notificaciones.length === 0) {
     return (
-      <div className="flex flex-col items-center rounded-2xl border border-dashed border-ink-200 px-8 py-12 text-center">
-        <Icono nombre="campana" className="h-8 w-8 text-ink-300" />
-        <p className="mt-3 text-base font-medium text-ink-900">Sin notificaciones</p>
-        <p className="mt-1 text-sm leading-snug text-ink-500">
-          Acá vas a ver los avisos cuando se arma un equipo y cuando se abre una sala.
-        </p>
-      </div>
+      <EstadoVacio
+        icono="campana"
+        titulo="Sin notificaciones"
+        detalle="Acá vas a ver los avisos cuando se arma un equipo y cuando se abre una sala."
+      />
     );
   }
 

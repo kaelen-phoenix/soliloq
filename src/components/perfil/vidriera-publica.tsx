@@ -1,4 +1,5 @@
 import { EtiquetasDisciplina } from "./etiquetas-disciplina";
+import { Imagen } from "@/components/ui/imagen";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 export interface PerfilPublico {
@@ -22,12 +23,14 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
       {perfil.fotos.length > 0 && (
         <div className="grid grid-cols-3 gap-2">
           {perfil.fotos.map((url, i) => (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img
+            <Imagen
               key={i}
               src={url}
               alt={perfil.nombre}
-              className="aspect-[3/4] rounded-xl object-cover"
+              fill
+              priority={i === 0}
+              sizes="(max-width: 640px) 33vw, 220px"
+              contenedorClassName="aspect-[3/4] rounded-xl"
             />
           ))}
         </div>

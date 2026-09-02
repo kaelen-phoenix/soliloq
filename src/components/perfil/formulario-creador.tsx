@@ -7,6 +7,7 @@ import { AvisoGuardado, useAvisoGuardado } from "@/components/ui/aviso-guardado"
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
+import { Imagen } from "@/components/ui/imagen";
 import { aColumnas, desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
 import { clasesDisciplina, DISCIPLINAS, MAX_OTRO_DETALLE } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
@@ -226,8 +227,13 @@ export function FormularioCreador({
         />
         <div className="flex items-center gap-3">
           {imagenUrl && (
-            // eslint-disable-next-line @next/next/no-img-element
-            <img src={imagenUrl} alt="Imagen de perfil" className="h-16 w-16 rounded-full object-cover" />
+            <Imagen
+              src={imagenUrl}
+              alt="Imagen de perfil"
+              width={64}
+              height={64}
+              contenedorClassName="shrink-0 rounded-full"
+            />
           )}
           <label className="cursor-pointer rounded-xl border border-ink-200 px-3.5 py-2 text-sm hover:bg-ink-50">
             {subiendoImagen ? "Subiendo…" : "Elegir imagen"}

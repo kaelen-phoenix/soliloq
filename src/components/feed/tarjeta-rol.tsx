@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
+import { Imagen } from "@/components/ui/imagen";
 
 export interface RolFeed {
   rol_id: string;
@@ -59,8 +60,18 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
 
       <div className="flex items-center gap-2.5 border-b border-ink-100 px-5 py-3">
         {rol.creador_imagen_url ? (
-          // eslint-disable-next-line @next/next/no-img-element
-          <img src={rol.creador_imagen_url} alt="" className="h-7 w-7 rounded-full object-cover" />
+          <Imagen
+            src={rol.creador_imagen_url}
+            alt=""
+            width={28}
+            height={28}
+            contenedorClassName="shrink-0 rounded-full"
+            fallback={
+              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-ink-600">
+                {rol.creador_nombre[0]}
+              </span>
+            }
+          />
         ) : (
           <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-ink-600">
             {rol.creador_nombre[0]}

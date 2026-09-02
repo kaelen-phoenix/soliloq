@@ -45,16 +45,25 @@ export function ConmutadorModo({
     );
   }
 
+  // Estado y acción, separados. Antes un solo botón mostraba el modo **actual**
+  // ("TALENTO") con un ícono de intercambio: parecía que llevaba *a* Talento cuando en
+  // realidad estabas en Talento y te pasaba a Creador. Ahora la píldora dice dónde estás
+  // y el botón dice a dónde vas —nunca el estado actual.
   return (
-    <button
-      type="button"
-      disabled={pendiente}
-      onClick={() => iniciarTransicion(() => conmutarModo(otro))}
-      className="group inline-flex items-center gap-1.5 rounded-lg border border-ink-200 py-1 pl-2.5 pr-2 text-2xs font-medium text-ink-700 transition-colors hover:border-ink-300 hover:bg-ink-50 disabled:opacity-50"
-      title={`Cambiar a modo ${ETIQUETA[otro]}`}
-    >
-      <span className="uppercase tracking-wide">{ETIQUETA[modoActivo]}</span>
-      <Icono nombre="cambiar" className="h-3.5 w-3.5 text-ink-400 group-hover:text-ink-600" />
-    </button>
+    <div className="flex items-center gap-2">
+      <span className="inline-flex items-center rounded-md acento-fondo px-2 py-0.5 text-2xs font-medium acento-texto">
+        Estás en {ETIQUETA[modoActivo]}
+      </span>
+      <button
+        type="button"
+        disabled={pendiente}
+        onClick={() => iniciarTransicion(() => conmutarModo(otro))}
+        aria-label={`Cambiar a ${ETIQUETA[otro]}`}
+        className="group inline-flex items-center gap-1 rounded-lg border border-ink-200 py-1 pl-2 pr-1.5 text-2xs font-medium text-ink-600 transition-colors hover:border-ink-300 hover:bg-ink-50 disabled:opacity-50"
+      >
+        <span>Cambiar a {ETIQUETA[otro]}</span>
+        <Icono nombre="cambiar" className="h-3.5 w-3.5 text-ink-400 group-hover:text-ink-600" />
+      </button>
+    </div>
   );
 }

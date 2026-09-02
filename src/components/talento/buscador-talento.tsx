@@ -1,9 +1,13 @@
 "use client";
 
+import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
+import { EstadoVacio } from "@/components/ui/estado-vacio";
+import { Esqueleto } from "@/components/ui/esqueleto";
+import { toque, usePrefiereReduccion, variantesSeguras } from "@/components/ui/movimiento";
 import { GENEROS_BUSCABLES, HABILIDADES, type Genero } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
 import { opcionesDeRadio, RADIO_INICIAL_METROS, type Ubicacion } from "@/lib/ubicacion";
@@ -85,6 +89,8 @@ export function BuscadorTalento() {
   }, [buscar]);
 
   const opcionesRadio = opcionesDeRadio("km");
+  const prefiereReduccion = usePrefiereReduccion();
+  const { lista, item } = variantesSeguras(prefiereReduccion);
 
   return (
     <div className="flex flex-col gap-6">
@@ -187,18 +193,43 @@ export function BuscadorTalento() {
       </div>
 
       {cargando && resultados.length === 0 ? (
-        <p className="text-sm text-ink-400">Buscando…</p>
+        <div
+          className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3"
+          role="status"
+          aria-label="Buscando"
+        >
+          {Array.from({ length: 6 }).map((_, i) => (
+            <div key={i} className="flex flex-col gap-2">
+              <Esqueleto className="aspect-[3/4] rounded-2xl" />
+              <Esqueleto className="h-3.5 w-2/3" />
+              <Esqueleto className="h-3 w-1/2" />
+            </div>
+          ))}
+        </div>
       ) : resultados.length === 0 ? (
-        <p className="text-sm text-ink-500">
-          No hay talento que coincida con esos filtros. Probá aflojando alguno.
-        </p>
+        <EstadoVacio
+          icono="buscar"
+          titulo="Sin coincidencias"
+          detalle="No hay talento que coincida con esos filtros. Probá aflojando alguno."
+        />
       ) : (
         <>
-          <div className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3">
+          <motion.div
+            className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3"
+            variants={lista}
+            initial="oculto"
+            animate="visible"
+          >
             {resultados.map((t) => (
-              <TarjetaTalento key={t.id} talento={t} />
+              <motion.div
+                key={t.id}
+                variants={item}
+                whileTap={prefiereReduccion ? undefined : toque}
+              >
+                <TarjetaTalento talento={t} />
+              </motion.div>
             ))}
-          </div>
+          </motion.div>
           {hayMas && (
             <div className="flex justify-center">
               <Boton
