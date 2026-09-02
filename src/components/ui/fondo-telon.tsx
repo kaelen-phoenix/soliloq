@@ -26,9 +26,9 @@ export function FondoTelon({ variante = "claro" }: { variante?: "claro" | "oscur
       >
         <defs>
           <radialGradient id={idCenital} cx="50%" cy="0%" r="70%">
-            <stop offset="0%" stopColor={oscuro ? "#ffffff" : "#d81b7a"} stopOpacity={oscuro ? 0.14 : 0.1} />
-            <stop offset="45%" stopColor={oscuro ? "#f9a8c9" : "#d81b7a"} stopOpacity={oscuro ? 0.06 : 0.03} />
-            <stop offset="100%" stopColor={oscuro ? "#ffffff" : "#d81b7a"} stopOpacity="0" />
+            <stop offset="0%" stopColor={oscuro ? "#ffffff" : "#cf1f57"} stopOpacity={oscuro ? 0.14 : 0.1} />
+            <stop offset="45%" stopColor={oscuro ? "#f9a8c9" : "#cf1f57"} stopOpacity={oscuro ? 0.06 : 0.03} />
+            <stop offset="100%" stopColor={oscuro ? "#ffffff" : "#cf1f57"} stopOpacity="0" />
           </radialGradient>
         </defs>
         <ellipse cx="360" cy="40" rx="360" ry="260" fill={`url(#${idCenital})`} />
@@ -44,7 +44,7 @@ export function FondoTelon({ variante = "claro" }: { variante?: "claro" | "oscur
       >
         <defs>
           <linearGradient id={idTelon} x1="0" y1="0" x2="0" y2="1">
-            <stop offset="0%" stopColor={oscuro ? "#ffffff" : "#18161a"} stopOpacity={oscuro ? 0.09 : 0.07} />
+            <stop offset="0%" stopColor={oscuro ? "#ffffff" : "#18161a"} stopOpacity={oscuro ? 0.12 : 0.09} />
             <stop offset="100%" stopColor={oscuro ? "#ffffff" : "#18161a"} stopOpacity="0" />
           </linearGradient>
         </defs>

@@ -43,7 +43,7 @@ function fotoDelProyecto(n: Notificacion): string | null {
  * cuando se superponen; sin él las dos fotos se funden en una mancha.
  */
 function ParDeCaras({ propia, proyecto }: { propia: string | null; proyecto: string | null }) {
-  const base = "h-9 w-9 shrink-0 rounded-full border-2 border-white bg-ink-100 object-cover";
+  const base = "h-9 w-9 shrink-0 rounded-full border-2 border-superficie bg-ink-100 object-cover";
 
   // El hueco relleno cuando falta la foto: sin él las dos caras se desalinean según quién
   // tenga imagen. Decorativo, así que va sin texto alternativo.
@@ -54,7 +54,7 @@ function ParDeCaras({ propia, proyecto }: { propia: string | null; proyecto: str
         alt=""
         width={36}
         height={36}
-        contenedorClassName={`shrink-0 rounded-full border-2 border-white ${extra}`}
+        contenedorClassName={`shrink-0 rounded-full border-2 border-superficie ${extra}`}
         fallback={<span className={`${base} ${extra}`} aria-hidden="true" />}
       />
     ) : (

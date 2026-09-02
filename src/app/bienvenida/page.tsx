@@ -3,8 +3,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
 import { Icono } from "@/components/ui/icono";
-import { Logotipo } from "@/components/ui/logotipo";
-import { MascarasTeatro } from "@/components/ui/mascaras-teatro";
+import { Logotipo, MarcaProscenio } from "@/components/ui/logotipo";
 
 const TITULO = "Yalope — Casting teatral en tu teléfono";
 const DESCRIPCION =
@@ -67,7 +66,7 @@ const JSON_LD = {
 export default async function BienvenidaPage() {
   const t = await getTranslations("landing");
   return (
-    <div className="flex min-h-screen flex-col bg-[#faf5ec] text-ink-900">
+    <div className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
@@ -111,7 +110,7 @@ export default async function BienvenidaPage() {
                 </Link>
                 <Link
                   href="/ingresar"
-                  className="rounded-xl bg-candileja-400 px-3.5 py-2 text-sm font-semibold text-telon-900 transition-colors hover:bg-candileja-300"
+                  className="rounded-xl border border-white/30 px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
                 >
                   {t("crearPerfil")}
                 </Link>
@@ -120,7 +119,7 @@ export default async function BienvenidaPage() {
 
             <div className="mt-16 grid items-center gap-10 md:mt-20 md:grid-cols-[1.1fr_0.9fr]">
               <div>
-                <MascarasTeatro className="h-10 w-12 text-candileja-300" />
+                <MarcaProscenio className="h-9 w-9 text-candileja-300" />
                 <h1 className="mt-5 font-display text-[2.6rem] font-semibold leading-[1.03] tracking-[-0.02em] md:text-[3.4rem]">
                   {t("heroTitulo")}
                 </h1>
@@ -146,19 +145,28 @@ export default async function BienvenidaPage() {
 
               {/* El programa de mano: una tarjeta de talento estilizada. */}
               <div className="relative mx-auto w-full max-w-[300px]">
-                <div className="rotate-1 rounded-[1.75rem] bg-[#faf5ec] p-3 shadow-tarjeta ring-1 ring-black/10">
-                  <div className="aspect-[3/4] rounded-2xl bg-gradient-to-br from-telon-200 via-candileja-100 to-[#faf5ec]" />
+                <div className="rotate-1 rounded-[1.75rem] bg-[#fbfaf7] p-3 shadow-[0_24px_64px_-24px_rgba(0,0,0,0.55)] ring-1 ring-black/10">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-b from-telon-800 to-telon-950">
+                    <div
+                      className="absolute inset-x-0 bottom-0 h-1/2"
+                      style={{
+                        background:
+                          "radial-gradient(ellipse at 50% 130%, rgba(234,177,43,0.45), transparent 70%)",
+                      }}
+                    />
+                    <MarcaProscenio className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 text-white/85" />
+                  </div>
                   <div className="flex items-center justify-between px-1.5 pb-1 pt-3">
                     <div>
-                      <div className="h-3 w-24 rounded-full bg-ink-300" />
-                      <div className="mt-2 h-2.5 w-16 rounded-full bg-ink-200" />
+                      <div className="h-3 w-24 rounded-full bg-ink-200" />
+                      <div className="mt-2 h-2.5 w-16 rounded-full bg-ink-100" />
                     </div>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-telon-500 text-white">
+                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-500 text-white">
                       <Icono nombre="corazon" className="h-5 w-5" relleno />
                     </div>
                   </div>
                 </div>
-                <div className="absolute -right-3 -top-3 -z-10 h-full w-full -rotate-2 rounded-[1.75rem] bg-telon-700/60" />
+                <div className="absolute -right-3 -top-3 -z-10 h-full w-full -rotate-2 rounded-[1.75rem] bg-telon-800/50" />
               </div>
             </div>
           </div>
@@ -167,37 +175,37 @@ export default async function BienvenidaPage() {
         {/* Para quién */}
         <section className="mx-auto w-full max-w-5xl px-5 py-16">
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-tarjeta">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-telon-50 text-telon-600">
+            <div className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500 text-white">
                 <Icono nombre="corazon" className="h-5 w-5" />
               </span>
               <h2 className="mt-4 font-display text-xl font-semibold tracking-[-0.02em]">
                 {t("paraArtistasTitulo")}
               </h2>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-700">
                 {t("paraArtistasTexto")}
               </p>
               <Link
                 href="/ingresar"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-telon-600 hover:text-telon-700"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700"
               >
                 {t("crearPerfil")}
                 <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
               </Link>
             </div>
-            <div className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-tarjeta">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-candileja-50 text-candileja-600">
+            <div className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-ink-900 text-white">
                 <Icono nombre="buscar" className="h-5 w-5" />
               </span>
               <h2 className="mt-4 font-display text-xl font-semibold tracking-[-0.02em]">
                 {t("paraCreadoresTitulo")}
               </h2>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-600">
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-700">
                 {t("paraCreadoresTexto")}
               </p>
               <Link
                 href="/ingresar"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-medium text-candileja-600 hover:text-candileja-700"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-900 hover:text-ink-700"
               >
                 {t("publicarConvocatoria")}
                 <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
@@ -206,8 +214,8 @@ export default async function BienvenidaPage() {
           </div>
         </section>
 
-        {/* Cómo funciona: banda cálida, con los números en rojo de marquesina. */}
-        <section id="como-funciona" className="border-y border-candileja-200/60 bg-candileja-50/70">
+        {/* Cómo funciona: banda neutra, con los números en rojo de marquesina. */}
+        <section id="como-funciona" className="border-y border-ink-100 bg-[#f4f1ea]">
           <div className="mx-auto w-full max-w-5xl px-5 py-16">
             <h2 className="font-display text-2xl font-semibold tracking-[-0.02em]">
               {t("comoFunciona")}
@@ -215,9 +223,9 @@ export default async function BienvenidaPage() {
             <div className="mt-8 grid gap-8 md:grid-cols-3">
               {(["1", "2", "3"] as const).map((n) => (
                 <div key={n}>
-                  <span className="font-display text-2xl font-semibold text-telon-500">0{n}</span>
+                  <span className="font-display text-3xl font-semibold text-brand-600">0{n}</span>
                   <h3 className="mt-1 text-base font-semibold text-ink-900">{t(`paso${n}Titulo`)}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-600">{t(`paso${n}Texto`)}</p>
+                  <p className="mt-1.5 text-sm leading-relaxed text-ink-700">{t(`paso${n}Texto`)}</p>
                 </div>
               ))}
             </div>
@@ -235,7 +243,7 @@ export default async function BienvenidaPage() {
             aria-hidden="true"
           />
           <div className="relative mx-auto w-full max-w-5xl px-5 py-20 text-center">
-            <MascarasTeatro className="mx-auto h-9 w-11 text-candileja-300" />
+            <MarcaProscenio className="mx-auto h-9 w-9 text-candileja-300" />
             <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.02em]">
               {t("cierreTitulo")}
             </h2>
@@ -250,17 +258,17 @@ export default async function BienvenidaPage() {
         </section>
       </main>
 
-      <footer className="border-t border-ink-100 bg-[#faf5ec]">
+      <footer className="border-t border-ink-100 bg-[#fbfaf7]">
         <div className="mx-auto w-full max-w-5xl px-5 py-8">
           <BannerSponsors niveles={["produccion"]} className="mb-6" />
-          <div className="flex flex-col items-start gap-3 text-sm text-ink-500 sm:flex-row sm:items-center sm:justify-between">
+          <div className="flex flex-col items-start gap-3 text-sm text-ink-700 sm:flex-row sm:items-center sm:justify-between">
             <Logotipo tamano="sm" />
             <p>{t("pieLema")}</p>
             <div className="flex gap-4">
-              <Link href="/apoyar" className="font-medium text-ink-700 hover:text-ink-900">
+              <Link href="/apoyar" className="font-medium text-ink-900 hover:text-brand-600">
                 {t("apoyarEnlace")}
               </Link>
-              <Link href="/ingresar" className="font-medium text-ink-700 hover:text-ink-900">
+              <Link href="/ingresar" className="font-medium text-ink-900 hover:text-brand-600">
                 {t("entrar")}
               </Link>
             </div>
