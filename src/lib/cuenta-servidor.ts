@@ -12,7 +12,11 @@ export async function leerEstadoCuenta(
   userId: string
 ): Promise<EstadoCuenta> {
   const [{ data: perfil }, { count: talento }, { count: creador }] = await Promise.all([
-    supabase.from("perfiles").select("rol, modo_activo").eq("id", userId).maybeSingle(),
+    supabase
+      .from("perfiles")
+      .select("rol, modo_activo, es_admin, suspendido_en")
+      .eq("id", userId)
+      .maybeSingle(),
     supabase.from("perfiles_talento").select("id", { count: "exact", head: true }).eq("id", userId),
     supabase.from("perfiles_creador").select("id", { count: "exact", head: true }).eq("id", userId),
   ]);

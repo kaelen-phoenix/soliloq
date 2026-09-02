@@ -77,6 +77,10 @@ export interface Database {
           /** Token del enlace público del perfil (0037). Existe siempre; solo resuelve con `enlace_publico_activo`. */
           enlace_token: string;
           enlace_publico_activo: boolean;
+          /** Administrador de la app (0040). Es un flag, no un rol. */
+          es_admin: boolean;
+          /** Timestamp de suspensión por un admin, o null si está activa (0040). */
+          suspendido_en: string | null;
           creado_en: string;
         };
         Insert: {
@@ -95,6 +99,8 @@ export interface Database {
           pitch?: string | null;
           enlace_token?: string;
           enlace_publico_activo?: boolean;
+          es_admin?: boolean;
+          suspendido_en?: string | null;
         };
         Relationships: [];
       };
@@ -721,6 +727,80 @@ export interface Database {
           aprobados: number;
           rechazados: number;
         }[];
+      };
+      /** Panel de administración (0040). Todas rechazan con `raise exception` si `auth.uid()` no es admin. */
+      es_admin: { Args: Record<string, never>; Returns: boolean };
+      admin_metricas: {
+        Args: Record<string, never>;
+        Returns: {
+          total: number;
+          con_talento: number;
+          con_creador: number;
+          con_ambos: number;
+          suspendidos: number;
+          con_enlace_publico: number;
+          bloqueos: number;
+          denuncias_abiertas: number;
+          registros_7d: number;
+        }[];
+      };
+      admin_usuarios: {
+        Args: { p_texto?: string | null; p_limite?: number; p_offset?: number };
+        Returns: {
+          id: string;
+          nombre: string | null;
+          email: string;
+          roles: string[];
+          suspendido: boolean;
+          es_admin: boolean;
+          creado_en: string;
+          ultimo_acceso: string | null;
+        }[];
+      };
+      admin_suspender_usuario: {
+        Args: { p_id: string; p_suspender: boolean };
+        Returns: void;
+      };
+      admin_denuncias: {
+        Args: { p_estado?: string | null; p_limite?: number; p_offset?: number };
+        Returns: {
+          id: string;
+          motivo: string;
+          detalle: string | null;
+          estado: string;
+          resolucion: string | null;
+          creado_en: string;
+          resuelto_en: string | null;
+          denunciante: string | null;
+          denunciado: string | null;
+          denunciado_id: string | null;
+          obra_titulo: string | null;
+        }[];
+      };
+      admin_resolver_denuncia: {
+        Args: { p_id: string; p_estado: string; p_resolucion?: string | null };
+        Returns: void;
+      };
+      admin_bloqueos: {
+        Args: { p_limite?: number; p_offset?: number };
+        Returns: {
+          perfil_menor: string;
+          perfil_mayor: string;
+          nombre_menor: string | null;
+          nombre_mayor: string | null;
+          creado_por: string;
+          nombre_autor: string | null;
+          motivo: string | null;
+          creado_en: string;
+        }[];
+      };
+      admin_levantar_bloqueo: {
+        Args: { p_menor: string; p_mayor: string };
+        Returns: void;
+      };
+      admin_crear_bloqueo: {
+        Args: { p_a: string; p_b: string; p_motivo?: string | null };
+        Returns: void;
       };
     };
   };

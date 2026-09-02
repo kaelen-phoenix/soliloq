@@ -19,6 +19,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (!user) redirect("/bienvenida");
 
   const estado = await leerEstadoCuenta(supabase, user.id);
+  if (estado.suspendido) redirect("/suspendido");
   if (!estado.modoActivo) redirect("/completar-perfil");
 
   return (
@@ -43,7 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       data-rol={estado.modoActivo}
       className="min-h-screen pb-20 sm:bg-ink-50 sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
     >
-      <BarraLateral rol={estado.modoActivo} />
+      <BarraLateral rol={estado.modoActivo} esAdmin={estado.esAdmin} />
 
       <div className="min-w-0 flex-1">
         <Encabezado
@@ -57,7 +58,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
       </div>
 
-      <BarraNavegacion rol={estado.modoActivo} />
+      <BarraNavegacion rol={estado.modoActivo} esAdmin={estado.esAdmin} />
     </div>
   );
 }

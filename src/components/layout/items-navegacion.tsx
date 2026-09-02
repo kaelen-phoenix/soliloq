@@ -3,7 +3,15 @@ import type { RolUsuario } from "@/lib/supabase/types";
 export interface ItemNavegacion {
   href: string;
   label: string;
-  icono: "feed" | "postulaciones" | "salas" | "perfil" | "tablero" | "corazon" | "buscar";
+  icono:
+    | "feed"
+    | "postulaciones"
+    | "salas"
+    | "perfil"
+    | "tablero"
+    | "corazon"
+    | "buscar"
+    | "admin";
   /** Rótulo corto para la barra inferior, donde compite con otros tres y se corta. */
   labelCorto?: string;
 }
@@ -29,3 +37,21 @@ export const ITEMS_NAVEGACION: Record<RolUsuario, ItemNavegacion[]> = {
     { href: "/perfil", label: "Perfil", icono: "perfil" },
   ],
 };
+
+const ITEM_ADMIN: ItemNavegacion = {
+  href: "/admin",
+  label: "Admin",
+  labelCorto: "Admin",
+  icono: "admin",
+};
+
+/**
+ * La lista de navegación para un usuario: la de su rol, más "Admin" al final si lo es.
+ * El admin no es un rol (no entra en `ITEMS_NAVEGACION`), es un flag que suma un ítem.
+ */
+export function itemsParaNavegacion(
+  rol: RolUsuario,
+  { esAdmin = false }: { esAdmin?: boolean } = {}
+): ItemNavegacion[] {
+  return esAdmin ? [...ITEMS_NAVEGACION[rol], ITEM_ADMIN] : ITEMS_NAVEGACION[rol];
+}
