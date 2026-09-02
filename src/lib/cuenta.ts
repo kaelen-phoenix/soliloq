@@ -8,11 +8,17 @@ export interface EstadoCuenta {
   /** Modo en el que opera efectivamente, ya corregido contra los perfiles que existen. */
   modoActivo: RolUsuario | null;
   tieneAmbosPerfiles: boolean;
+  /** Flag de administrador de la app (no es un rol). */
+  esAdmin: boolean;
+  /** La cuenta está suspendida por un admin. */
+  suspendido: boolean;
 }
 
 interface FilaPerfil {
   rol: RolUsuario | null;
   modo_activo: RolUsuario | null;
+  es_admin?: boolean | null;
+  suspendido_en?: string | null;
 }
 
 /**
@@ -48,6 +54,8 @@ export function resolverEstadoCuenta(
     tienePerfilCreador,
     modoActivo,
     tieneAmbosPerfiles: tienePerfilTalento && tienePerfilCreador,
+    esAdmin: perfil?.es_admin ?? false,
+    suspendido: perfil?.suspendido_en != null,
   };
 }
 

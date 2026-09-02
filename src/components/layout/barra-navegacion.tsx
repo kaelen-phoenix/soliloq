@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
-import { ITEMS_NAVEGACION } from "./items-navegacion";
+import { itemsParaNavegacion } from "./items-navegacion";
 import type { RolUsuario } from "@/lib/supabase/types";
 
 /**
@@ -12,9 +12,15 @@ import type { RolUsuario } from "@/lib/supabase/types";
  * Desaparece en escritorio, donde el lugar lo toma `BarraLateral`. Los ítems salen de
  * `ITEMS_NAVEGACION`, compartidos con ella.
  */
-export function BarraNavegacion({ rol }: { rol: RolUsuario }) {
+export function BarraNavegacion({
+  rol,
+  esAdmin = false,
+}: {
+  rol: RolUsuario;
+  esAdmin?: boolean;
+}) {
   const pathname = usePathname();
-  const items = ITEMS_NAVEGACION[rol];
+  const items = itemsParaNavegacion(rol, { esAdmin });
 
   return (
     <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-ink-100 bg-white/85 backdrop-blur-xl lg:hidden">
