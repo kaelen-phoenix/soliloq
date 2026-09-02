@@ -32,30 +32,38 @@
     --ink-50: 247 246 248;
     --ink-100: 238 236 240;
     --ink-200: 224 221 226;
+    /* Acción primaria y estado seleccionado: contraste fuerte contra la superficie.
+       En claro es tinta sobre blanco; en oscuro se invierte para no desaparecer. */
+    --accion: 24 22 26;
+    --accion-texto: 255 255 255;
   }
 
   @media (prefers-color-scheme: dark) {
     :root:not([data-tema="light"]) {
-      --superficie: 24 22 26;
-      --fondo-sutil: 33 31 36;
-      --texto: 238 236 240;
-      --texto-tenue: 157 151 160;
-      --borde: 55 51 59;
-      --ink-50: 33 31 36;
+      --superficie: 22 20 24;
+      --fondo-sutil: 32 30 35;
+      --texto: 240 238 242;
+      --texto-tenue: 165 159 168;
+      --borde: 58 54 62;
+      --ink-50: 32 30 35;
       --ink-100: 44 41 48;
-      --ink-200: 63 59 67;
+      --ink-200: 64 60 68;
+      --accion: 240 238 242;
+      --accion-texto: 22 20 24;
     }
   }
 
   :root[data-tema="dark"] {
-    --superficie: 24 22 26;
-    --fondo-sutil: 33 31 36;
-    --texto: 238 236 240;
-    --texto-tenue: 157 151 160;
-    --borde: 55 51 59;
-    --ink-50: 33 31 36;
+    --superficie: 22 20 24;
+    --fondo-sutil: 32 30 35;
+    --texto: 240 238 242;
+    --texto-tenue: 165 159 168;
+    --borde: 58 54 62;
+    --ink-50: 32 30 35;
     --ink-100: 44 41 48;
-    --ink-200: 63 59 67;
+    --ink-200: 64 60 68;
+    --accion: 240 238 242;
+    --accion-texto: 22 20 24;
   }
 
   /* Acento por rol. Un único punto de verdad: el layout de `(app)` pone

@@ -159,7 +159,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
 
   return (
     <div className="flex flex-col gap-1.5" ref={contenedor}>
-      <label htmlFor={id} className="text-sm font-medium text-ink-700">
+      <label htmlFor={id} className="text-sm font-medium text-texto">
         {etiqueta}
       </label>
       <div className="relative">
@@ -186,7 +186,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
                 <button
                   type="button"
                   onClick={() => elegir(sugerencia)}
-                  className="w-full px-3.5 py-2.5 text-left text-base text-ink-800 hover:bg-fondo-sutil"
+                  className="w-full px-3.5 py-2.5 text-left text-base text-texto hover:bg-fondo-sutil"
                 >
                   {sugerencia.texto}
                 </button>

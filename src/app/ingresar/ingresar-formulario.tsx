@@ -127,7 +127,7 @@ export function IngresarFormulario({ next }: { next?: string }) {
             type="button"
             onClick={() => cambiarModo(m)}
             className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
-              modo === m ? "bg-superficie text-texto shadow-sm" : "text-texto-tenue hover:text-ink-800"
+              modo === m ? "bg-superficie text-texto shadow-sm" : "text-texto-tenue hover:text-texto"
             }`}
           >
             {m === "ingresar" ? "Ingresar" : "Crear cuenta"}

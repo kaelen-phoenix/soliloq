@@ -143,7 +143,7 @@ export function BuscadorTalento() {
           >
             Filtros
             {nAvanzados > 0 && (
-              <span className="rounded-full bg-ink-900 px-1.5 text-2xs font-semibold text-white">
+              <span className="rounded-full bg-accion px-1.5 text-2xs font-semibold text-accion-texto">
                 {nAvanzados}
               </span>
             )}
@@ -186,7 +186,7 @@ export function BuscadorTalento() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-ink-700">Género</span>
+          <span className="text-sm font-medium text-texto">Género</span>
           <div className="flex flex-wrap gap-2">
             {GENEROS_BUSCABLES.map((g) => (
               <button
@@ -195,7 +195,7 @@ export function BuscadorTalento() {
                 onClick={() => alternar(generos, setGeneros, g.valor)}
                 className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                   generos.includes(g.valor)
-                    ? "border-ink-900 bg-ink-900 text-white"
+                    ? "border-accion bg-accion text-accion-texto"
                     : "border-borde text-texto-tenue"
                 }`}
               >
@@ -206,7 +206,7 @@ export function BuscadorTalento() {
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-ink-700">Habilidades</span>
+          <span className="text-sm font-medium text-texto">Habilidades</span>
           <div className="flex flex-wrap gap-2">
             {HABILIDADES.map((h) => (
               <button
@@ -215,7 +215,7 @@ export function BuscadorTalento() {
                 onClick={() => alternar(habilidades, setHabilidades, h)}
                 className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                   habilidades.includes(h)
-                    ? "border-ink-900 bg-ink-900 text-white"
+                    ? "border-accion bg-accion text-accion-texto"
                     : "border-borde text-texto-tenue"
                 }`}
               >

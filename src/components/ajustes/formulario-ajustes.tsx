@@ -29,7 +29,7 @@ function Opciones<T extends string>({
           onClick={() => onElegir(o.valor)}
           className={`rounded-full border px-4 py-2 text-sm font-medium transition-colors disabled:opacity-50 ${
             valor === o.valor
-              ? "border-ink-900 bg-ink-900 text-white"
+              ? "border-accion bg-accion text-accion-texto"
               : "border-borde text-texto-tenue hover:border-ink-300"
           }`}
         >
@@ -62,7 +62,7 @@ export function FormularioAjustes({
   return (
     <div className="flex max-w-lg flex-col gap-8">
       <section>
-        <h2 className="text-sm font-medium text-ink-700">{t("idioma")}</h2>
+        <h2 className="text-sm font-medium text-texto">{t("idioma")}</h2>
         <p className="mb-3 mt-0.5 text-xs text-ink-400">{t("idiomaAyuda")}</p>
         <Opciones<Idioma>
           valor={idiomaInicial}
@@ -76,7 +76,7 @@ export function FormularioAjustes({
       </section>
 
       <section>
-        <h2 className="text-sm font-medium text-ink-700">{t("tema")}</h2>
+        <h2 className="text-sm font-medium text-texto">{t("tema")}</h2>
         <p className="mb-3 mt-0.5 text-xs text-ink-400">{t("temaAyuda")}</p>
         <Opciones<Tema>
           valor={temaInicial}

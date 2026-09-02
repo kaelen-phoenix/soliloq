@@ -10,7 +10,7 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
 export const CampoTexto = forwardRef<HTMLInputElement, Props>(
   ({ etiqueta, error, id, className = "", ...props }, ref) => (
     <div className="flex flex-col gap-1.5">
-      <label htmlFor={id} className="text-sm font-medium text-ink-700">
+      <label htmlFor={id} className="text-sm font-medium text-texto">
         {etiqueta}
       </label>
       <input

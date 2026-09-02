@@ -85,7 +85,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
           <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">
             {perfil.tipo === "talento" ? "Experiencia" : "Sobre"}
           </h2>
-          <p className="mt-1 max-w-prose whitespace-pre-line text-sm leading-relaxed text-ink-700">
+          <p className="mt-1 max-w-prose whitespace-pre-line text-sm leading-relaxed text-texto">
             {perfil.texto}
           </p>
         </div>
@@ -103,7 +103,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
               {perfil.habilidades.map((h) => (
                 <span
                   key={h}
-                  className="rounded-md bg-ink-100 px-2.5 py-1 text-xs font-medium text-ink-700"
+                  className="rounded-md bg-ink-100 px-2.5 py-1 text-xs font-medium text-texto"
                 >
                   {h}
                 </span>
@@ -120,7 +120,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
           </h2>
           <ul className="flex flex-col gap-1.5">
             {perfil.obras.map((o, i) => (
-              <li key={i} className="text-sm text-ink-700">
+              <li key={i} className="text-sm text-texto">
                 <span className="font-medium text-texto">{o.titulo}</span>
                 <span className="text-ink-400"> · {o.anio} · </span>
                 {o.rol}

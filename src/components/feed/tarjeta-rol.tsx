@@ -77,7 +77,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
             {rol.creador_nombre[0]}
           </span>
         )}
-        <span className="flex-1 truncate text-sm text-ink-700">{rol.creador_nombre}</span>
+        <span className="flex-1 truncate text-sm text-texto">{rol.creador_nombre}</span>
         <button
           type="button"
           onClick={() => setExpandido((v) => !v)}

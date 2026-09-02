@@ -40,7 +40,7 @@ export function PanelAdmin({
             type="button"
             onClick={() => setPestana(p)}
             className={`rounded-full px-3.5 py-1.5 text-sm font-medium capitalize transition-colors ${
-              pestana === p ? "bg-ink-900 text-white" : "text-texto-tenue hover:bg-fondo-sutil"
+              pestana === p ? "bg-accion text-accion-texto" : "text-texto-tenue hover:bg-fondo-sutil"
             }`}
           >
             {p}
@@ -201,7 +201,7 @@ function Usuarios({
                   onClick={() => alternarSuspension(u)}
                   className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
                     u.suspendido
-                      ? "border-borde text-ink-700 hover:bg-fondo-sutil"
+                      ? "border-borde text-texto hover:bg-fondo-sutil"
                       : "border-error-400 text-error-600 hover:bg-error-50"
                   }`}
                 >
@@ -280,7 +280,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
               <p className="mt-0.5 text-xs text-texto-tenue">
                 {d.denunciante ?? "?"} → {d.denunciado ?? d.obra_titulo ?? "?"} · {fecha(d.creado_en)}
               </p>
-              {d.detalle && <p className="mt-2 text-sm leading-relaxed text-ink-700">{d.detalle}</p>}
+              {d.detalle && <p className="mt-2 text-sm leading-relaxed text-texto">{d.detalle}</p>}
               {d.resolucion && (
                 <p className="mt-1 text-xs italic text-ink-400">Resolución: {d.resolucion}</p>
               )}
@@ -382,7 +382,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
               <button
                 type="button"
                 onClick={() => levantar(b)}
-                className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-ink-700 transition-colors hover:bg-fondo-sutil"
+                className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto transition-colors hover:bg-fondo-sutil"
               >
                 Levantar
               </button>

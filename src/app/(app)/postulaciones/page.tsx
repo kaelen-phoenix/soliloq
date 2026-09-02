@@ -20,7 +20,7 @@ const COLOR_ESTADO: Record<string, string> = {
   pendiente: "bg-ink-100 text-texto-tenue",
   en_duda: "bg-alerta-50 text-alerta-800",
   esperando_confirmacion: "bg-brand-500 text-white",
-  aprobado: "bg-ink-900 text-white",
+  aprobado: "bg-accion text-accion-texto",
   rechazado: "bg-fondo-sutil text-ink-400",
   vencida: "bg-fondo-sutil text-ink-400",
 };

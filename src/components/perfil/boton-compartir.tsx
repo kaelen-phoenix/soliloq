@@ -146,7 +146,7 @@ export function BotonCompartir({
           type="button"
           onClick={alternarQr}
           aria-pressed={urlQr !== null}
-          className="inline-flex h-10 items-center gap-2 rounded-xl border border-borde px-4 text-sm font-medium text-ink-700 transition-colors hover:bg-fondo-sutil"
+          className="inline-flex h-10 items-center gap-2 rounded-xl border border-borde px-4 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil"
         >
           <Icono nombre="qr" className="h-4 w-4" />
           {urlQr ? "Ocultar QR" : "Código QR"}
@@ -165,7 +165,7 @@ export function BotonCompartir({
           </div>
           <p className="max-w-[36ch] text-xs leading-relaxed text-texto-tenue">
             Mostralo para que lo escaneen y abran tu perfil, sin cuenta. Es el mismo enlace:{" "}
-            <span className="break-all font-medium text-ink-700">{urlQr}</span>
+            <span className="break-all font-medium text-texto">{urlQr}</span>
           </p>
         </div>
       )}

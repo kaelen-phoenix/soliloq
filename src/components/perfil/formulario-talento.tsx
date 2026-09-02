@@ -207,7 +207,7 @@ export function FormularioTalento({
         />
 
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="genero" className="text-sm font-medium text-ink-700">
+          <label htmlFor="genero" className="text-sm font-medium text-texto">
             Género
           </label>
           <select
@@ -266,7 +266,7 @@ export function FormularioTalento({
       <section className="flex flex-col gap-3">
         <h2 className="text-2xs font-medium uppercase tracking-wide text-ink-400">CV y habilidades</h2>
         <div className="flex flex-col gap-1.5">
-          <label htmlFor="experiencia" className="text-sm font-medium text-ink-700">
+          <label htmlFor="experiencia" className="text-sm font-medium text-texto">
             Experiencia
           </label>
           <textarea
@@ -289,7 +289,7 @@ export function FormularioTalento({
               onClick={() => alternarHabilidad(h)}
               className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
                 habilidades.includes(h)
-                  ? "border-ink-900 bg-ink-900 text-white"
+                  ? "border-accion bg-accion text-accion-texto"
                   : "border-borde text-texto-tenue"
               }`}
             >
@@ -326,7 +326,7 @@ export function FormularioTalento({
             onChange={(e) => setApareceEnBuscador(e.target.checked)}
             className="mt-0.5 h-4 w-4 rounded border-ink-300 text-texto focus:ring-ink-900"
           />
-          <span className="text-sm text-ink-700">
+          <span className="text-sm text-texto">
             Aparecer en el buscador de creadores
             <span className="mt-0.5 block text-xs text-texto-tenue">
               Los creadores pueden encontrarte por ubicación, edad, género o habilidades.

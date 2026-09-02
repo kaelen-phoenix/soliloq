@@ -125,7 +125,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
         </div>
 
         {actual.pitch && (
-          <p className="mt-4 text-base leading-relaxed text-ink-800">{actual.pitch}</p>
+          <p className="mt-4 text-base leading-relaxed text-texto">{actual.pitch}</p>
         )}
 
         {actual.disciplinas.length > 0 && (
