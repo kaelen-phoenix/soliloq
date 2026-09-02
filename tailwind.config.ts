@@ -95,6 +95,34 @@ const config: Config = {
         direccion: { 50: "#f1f2fd", 600: "#4338ca" },
         diseno: { 50: "#f5f8ec", 600: "#65a30d" },
         tecnica: { 50: "#ecf7fa", 600: "#0891b2" },
+
+        // Identidad escénica. NO son colores de estado ni de acción: viven en superficies
+        // grandes y decorativas (portada, encabezados de marquesina, motivos de telón).
+        // `telon` es el rojo cortina; `candileja` es el dorado de las luces de escena a ras
+        // de piso. Se usan con generosidad ahí y nunca en un chip inline, para que no se
+        // confundan con `error` (rojo) ni con `alerta` (ámbar).
+        telon: {
+          50: "#fdf2f3",
+          100: "#fbe1e4",
+          200: "#f5c2c9",
+          300: "#ec97a4",
+          400: "#df5f75",
+          500: "#c8203a",
+          600: "#a81930",
+          700: "#851426",
+          900: "#4a0b16",
+        },
+        candileja: {
+          50: "#fdf8ec",
+          100: "#fbefcf",
+          200: "#f6dd97",
+          300: "#f0c65a",
+          400: "#eab12b",
+          500: "#e0a11a",
+          600: "#b87e12",
+          700: "#8f6110",
+          900: "#4d3407",
+        },
       },
       // Escala tipográfica. Antes había 17 tamaños sueltos y ocho se usaban una sola vez:
       // cada pantalla elegía su número. Ocho escalones cubren todo, y el más chico es 11px
