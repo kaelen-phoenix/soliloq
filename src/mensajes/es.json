@@ -87,6 +87,16 @@
     "claro": "Claro",
     "oscuro": "Oscuro"
   },
+  "instalar": {
+    "titulo": "Instalar la app",
+    "ayuda": "Sumá Yalope a tu teléfono para abrirla como una app: a pantalla completa y desde el inicio.",
+    "boton": "Instalar la app",
+    "iosTitulo": "Instalar en iPhone o iPad",
+    "iosPaso1": "Tocá el botón Compartir en la barra de Safari.",
+    "iosPaso2": "Elegí «Agregar a inicio».",
+    "iosPaso3": "Confirmá con «Agregar».",
+    "iosCerrar": "Entendido"
+  },
   "auth": {
     "titulo": "Entrá a Yalope",
     "bajada": "Match teatral para talento y creadores.",

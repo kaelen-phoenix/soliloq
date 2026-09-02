@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
+import { BotonInstalar } from "@/components/pwa/boton-instalar";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo, MarcaProscenio } from "@/components/ui/logotipo";
 
@@ -140,6 +141,7 @@ export default async function BienvenidaPage() {
                   >
                     {t("verComoFunciona")}
                   </a>
+                  <BotonInstalar className="inline-flex items-center gap-2 rounded-xl border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10" />
                 </div>
               </div>
 
