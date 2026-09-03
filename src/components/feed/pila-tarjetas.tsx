@@ -1,14 +1,24 @@
 "use client";
 
-import { useMemo, useState } from "react";
-import { motion, useAnimation } from "framer-motion";
+import { useCallback, useEffect, useMemo, useState } from "react";
+import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { Icono } from "@/components/ui/icono";
+import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { createClient } from "@/lib/supabase/client";
 import { ROLES_EJEMPLO } from "@/lib/onboarding-ejemplo";
 import { opcionesDeRadio, radioMasCercano, type UnidadDistancia } from "@/lib/ubicacion";
 import { TarjetaRol, type RolFeed } from "./tarjeta-rol";
 
 const UMBRAL_SWIPE = 120;
+
+type Decision = "postular" | "descartar";
+
+// Un golpecito corto al decidir. No todos los navegadores lo tienen (iOS Safari no).
+function vibrar() {
+  if (typeof navigator !== "undefined" && typeof navigator.vibrate === "function") {
+    navigator.vibrate(12);
+  }
+}
 
 export function PilaTarjetas({
   talentoId,
@@ -37,7 +47,17 @@ export function PilaTarjetas({
   // "ya viste todo".
   const [hayFueraDelRadio, setHayFueraDelRadio] = useState(false);
   const [avisoError, setAvisoError] = useState<string | null>(null);
-  const controles = useAnimation();
+  // Últimas decisiones reales, para "Deshacer". Los ejemplos no entran acá.
+  const [historial, setHistorial] = useState<{ rol: RolFeed; decision: Decision }[]>([]);
+
+  const prefiereReduccion = usePrefiereReduccion();
+
+  // La posición de la tarjeta de arriba. De acá cuelgan el giro y los sellos "Me interesa"
+  // / "Paso", así el gesto tiene respuesta visual mientras se arrastra, no solo al soltar.
+  const x = useMotionValue(0);
+  const rotate = useTransform(x, [-220, 220], prefiereReduccion ? [0, 0] : [-14, 14]);
+  const opacidadSi = useTransform(x, [30, 130], [0, 1]);
+  const opacidadNo = useTransform(x, [-130, -30], [1, 0]);
 
   // El filtro por distancia y por género ya vino resuelto de Postgres; acá solo se avanza.
   // Los ejemplos que queden van adelante, así el onboarding se ve antes que lo real.
@@ -77,6 +97,8 @@ export function PilaTarjetas({
     const nuevos = data ?? [];
     setRoles(nuevos);
     setIndice(0);
+    // El feed cambió entero: lo que había para deshacer ya no está en pantalla.
+    setHistorial([]);
 
     // La consulta de más se paga únicamente en el caso vacío, que es el único donde hay algo
     // que explicar.
@@ -104,7 +126,7 @@ export function PilaTarjetas({
     recargar(radio, nueva);
   }
 
-  async function registrarDecision(rol: RolFeed, decision: "postular" | "descartar") {
+  async function registrarDecision(rol: RolFeed, decision: Decision) {
     const supabase = createClient();
     const tabla = decision === "postular" ? "postulaciones" : "descartes";
     const { error } = await supabase
@@ -121,6 +143,7 @@ export function PilaTarjetas({
           : "No pudimos guardar el descarte. Probá de nuevo."
       );
       setRoles((prev) => [rol, ...prev]);
+      setHistorial((prev) => prev.filter((h) => h.rol.rol_id !== rol.rol_id));
     }
   }
 
@@ -141,35 +164,99 @@ export function PilaTarjetas({
       .eq("id", talentoId);
   }
 
-  function avanzar(rol: RolFeed, decision: "postular" | "descartar") {
+  const avanzar = useCallback(
+    (rol: RolFeed, decision: Decision) => {
+      setAvisoError(null);
+      x.set(0);
+      vibrar();
+
+      // Un ejemplo no se guarda en ningún lado: no hay obra, no hay creador y no hay quién
+      // apruebe. Postularse acá es parte del tutorial, no una postulación.
+      if (rol.es_ejemplo) {
+        const quedan = ejemplos.filter((e) => e.rol_id !== rol.rol_id);
+        setEjemplos(quedan);
+        if (quedan.length === 0) marcarOnboardingVisto();
+        return;
+      }
+
+      setIndice((i) => i + 1);
+      setHistorial((prev) => [...prev, { rol, decision }].slice(-10));
+      registrarDecision(rol, decision);
+    },
+    // `registrarDecision` y `marcarOnboardingVisto` solo tocan setState y la red con
+    // `talentoId` (prop estable): no dependen de nada reactivo, no van en la lista.
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+    [ejemplos, x]
+  );
+
+  const salir = useCallback(
+    async (decision: Decision) => {
+      if (!actual || recargando) return;
+      if (prefiereReduccion) {
+        avanzar(actual, decision);
+        return;
+      }
+      const signo = decision === "postular" ? 1 : -1;
+      await animate(x, signo * 520, { duration: 0.18, ease: "easeOut" });
+      avanzar(actual, decision);
+    },
+    [actual, recargando, avanzar, x, prefiereReduccion]
+  );
+
+  /** Revierte la última decisión real: la borra de la base y vuelve a poner la tarjeta. */
+  async function deshacer() {
+    const ultima = historial[historial.length - 1];
+    if (!ultima || recargando) return;
+
+    setHistorial((prev) => prev.slice(0, -1));
+    setIndice((i) => Math.max(0, i - 1));
     setAvisoError(null);
-    controles.set({ x: 0, rotate: 0 });
+    x.set(0);
 
-    // Un ejemplo no se guarda en ningún lado: no hay obra, no hay creador y no hay quién
-    // apruebe. Postularse acá es parte del tutorial, no una postulación.
-    if (rol.es_ejemplo) {
-      const quedan = ejemplos.filter((e) => e.rol_id !== rol.rol_id);
-      setEjemplos(quedan);
-      if (quedan.length === 0) marcarOnboardingVisto();
-      return;
+    const supabase = createClient();
+    const tabla = ultima.decision === "postular" ? "postulaciones" : "descartes";
+    const { error } = await supabase
+      .from(tabla)
+      .delete()
+      .match({ rol_id: ultima.rol.rol_id, talento_id: talentoId });
+
+    if (error) {
+      setAvisoError("No pudimos deshacer. Probá de nuevo.");
+      setHistorial((prev) => [...prev, ultima]);
+      setIndice((i) => i + 1);
     }
-
-    setIndice((i) => i + 1);
-    registrarDecision(rol, decision);
   }
 
-  async function onDragEnd(_: unknown, info: { offset: { x: number } }) {
+  function onDragEnd(_: unknown, info: { offset: { x: number } }) {
     if (!actual) return;
     if (info.offset.x > UMBRAL_SWIPE) {
-      await controles.start({ x: 500, rotate: 12, transition: { duration: 0.18 } });
-      avanzar(actual, "postular");
+      salir("postular");
     } else if (info.offset.x < -UMBRAL_SWIPE) {
-      await controles.start({ x: -500, rotate: -12, transition: { duration: 0.18 } });
-      avanzar(actual, "descartar");
+      salir("descartar");
     } else {
-      controles.start({ x: 0, rotate: 0, transition: { type: "spring", stiffness: 400, damping: 30 } });
+      animate(x, 0, { type: "spring", stiffness: 400, damping: 30 });
     }
   }
+
+  // Flechas del teclado en escritorio: ← descarta, → se postula. Se ignora si se está
+  // escribiendo en un campo (el select de distancia, por ejemplo).
+  useEffect(() => {
+    function onKey(e: KeyboardEvent) {
+      const t = e.target as HTMLElement | null;
+      if (t && (t.tagName === "INPUT" || t.tagName === "SELECT" || t.tagName === "TEXTAREA")) {
+        return;
+      }
+      if (e.key === "ArrowRight") {
+        e.preventDefault();
+        salir("postular");
+      } else if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        salir("descartar");
+      }
+    }
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [salir]);
 
   return (
     <main className="flex flex-col px-5 py-4">
@@ -206,6 +293,18 @@ export function PilaTarjetas({
             </button>
           ))}
         </div>
+
+        {historial.length > 0 && (
+          <button
+            type="button"
+            onClick={deshacer}
+            disabled={recargando}
+            className="ml-auto inline-flex items-center gap-1 text-2xs font-medium text-texto-tenue transition-colors hover:text-texto disabled:opacity-50"
+          >
+            <Icono nombre="cambiar" className="h-3.5 w-3.5" />
+            Deshacer
+          </button>
+        )}
       </div>
 
       {avisoError && <p className="mb-3 text-xs text-error-600">{avisoError}</p>}
@@ -234,12 +333,26 @@ export function PilaTarjetas({
         {actual ? (
           <motion.div
             className="absolute inset-0 cursor-grab active:cursor-grabbing"
+            style={{ x, rotate }}
             drag="x"
             dragConstraints={{ left: 0, right: 0 }}
-            animate={controles}
             onDragEnd={onDragEnd}
           >
             <TarjetaRol rol={actual} />
+
+            {/* Sellos que aparecen con el gesto, tipo timbre sobre la tarjeta. */}
+            <motion.div
+              style={{ opacity: opacidadSi }}
+              className="pointer-events-none absolute left-5 top-6 -rotate-12 rounded-lg border-2 border-exito-600 px-3 py-1 text-lg font-bold uppercase tracking-wide text-exito-600"
+            >
+              Me interesa
+            </motion.div>
+            <motion.div
+              style={{ opacity: opacidadNo }}
+              className="pointer-events-none absolute right-5 top-6 rotate-12 rounded-lg border-2 border-ink-400 px-3 py-1 text-lg font-bold uppercase tracking-wide text-ink-400"
+            >
+              Paso
+            </motion.div>
           </motion.div>
         ) : (
           <div className="flex h-full flex-col items-center justify-center rounded-2xl border border-dashed border-borde px-10 text-center">
@@ -269,6 +382,16 @@ export function PilaTarjetas({
                 <p className="mt-1 text-sm text-texto-tenue">
                   Volvé más tarde a ver nuevas propuestas.
                 </p>
+                {historial.length > 0 && (
+                  <button
+                    type="button"
+                    onClick={deshacer}
+                    className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-texto px-3 py-1.5 text-xs font-medium text-texto"
+                  >
+                    <Icono nombre="cambiar" className="h-3.5 w-3.5" />
+                    Deshacer la última
+                  </button>
+                )}
               </>
             )}
           </div>
@@ -279,16 +402,18 @@ export function PilaTarjetas({
         <div className="mx-auto mt-7 flex items-center gap-5">
           <button
             type="button"
-            onClick={() => avanzar(actual, "descartar")}
-            className="flex h-14 w-14 items-center justify-center rounded-full border border-borde bg-superficie text-texto-tenue transition-colors hover:border-ink-300 hover:text-texto"
+            onClick={() => salir("descartar")}
+            disabled={recargando}
+            className="flex h-14 w-14 items-center justify-center rounded-full border border-borde bg-superficie text-texto-tenue transition-colors hover:border-ink-300 hover:text-texto disabled:opacity-50"
             aria-label="Descartar"
           >
             <Icono nombre="cruz" className="h-6 w-6" />
           </button>
           <button
             type="button"
-            onClick={() => avanzar(actual, "postular")}
-            className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500 text-white shadow-tarjeta transition-colors hover:bg-brand-600"
+            onClick={() => salir("postular")}
+            disabled={recargando}
+            className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500 text-white shadow-tarjeta transition-colors hover:bg-brand-600 disabled:opacity-50"
             aria-label="Postularme"
           >
             <Icono nombre="corazon" className="h-7 w-7" relleno />
