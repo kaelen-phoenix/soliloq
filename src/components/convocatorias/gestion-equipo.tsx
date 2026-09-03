@@ -5,6 +5,7 @@ import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
+import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
 import { createClient } from "@/lib/supabase/client";
 
 export interface EquipoActivo {
@@ -100,10 +101,12 @@ function FormEquipo({
 export function GestionEquipo({
   creadorId,
   equipo,
+  fotos,
   tieneObraPublicada,
 }: {
   creadorId: string;
   equipo: EquipoActivo | null;
+  fotos: FotoEquipo[];
   tieneObraPublicada: boolean;
 }) {
   const router = useRouter();
@@ -197,24 +200,27 @@ export function GestionEquipo({
         {abierto ? (
           form
         ) : (
-          <div className="mt-4 flex flex-wrap gap-2">
-            <button
-              type="button"
-              onClick={() => setAbierto(true)}
-              className="inline-flex items-center gap-1.5 rounded-lg border border-borde px-3 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil"
-            >
-              <Icono nombre="cambiar" className="h-3.5 w-3.5" />
-              Editar
-            </button>
-            <button
-              type="button"
-              onClick={desactivar}
-              disabled={cargando}
-              className="rounded-lg px-3 py-1.5 text-sm font-medium text-texto-tenue transition-colors hover:text-error-600 disabled:opacity-50"
-            >
-              Cerrar el equipo
-            </button>
-          </div>
+          <>
+            <div className="mt-4 flex flex-wrap gap-2">
+              <button
+                type="button"
+                onClick={() => setAbierto(true)}
+                className="inline-flex items-center gap-1.5 rounded-lg border border-borde px-3 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil"
+              >
+                <Icono nombre="cambiar" className="h-3.5 w-3.5" />
+                Editar
+              </button>
+              <button
+                type="button"
+                onClick={desactivar}
+                disabled={cargando}
+                className="rounded-lg px-3 py-1.5 text-sm font-medium text-texto-tenue transition-colors hover:text-error-600 disabled:opacity-50"
+              >
+                Cerrar el equipo
+              </button>
+            </div>
+            <FotosEquipo equipoId={equipo.id} creadorId={creadorId} fotosIniciales={fotos} />
+          </>
         )}
       </section>
     );
