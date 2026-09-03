@@ -229,7 +229,7 @@ export function SalaChat({
           onChange={(e) => setTexto(e.target.value)}
           maxLength={2000}
           placeholder="Escribí un mensaje…"
-          className="flex-1 rounded-full border border-borde px-4 py-2.5 text-base placeholder:text-texto-tenue focus:border-accion"
+          className="flex-1 rounded-full border border-borde bg-superficie px-4 py-2.5 text-base text-texto placeholder:text-texto-tenue focus:border-accion"
         />
         <button
           type="submit"
