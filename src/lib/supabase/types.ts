@@ -450,6 +450,20 @@ export interface Database {
         Update: Record<string, never>;
         Relationships: [];
       };
+      /** El talento descarta un equipo del feed (0046, issue #57). */
+      descartes_equipo: {
+        Row: {
+          talento_id: string;
+          equipo_id: string;
+          creado_en: string;
+        };
+        Insert: {
+          talento_id: string;
+          equipo_id: string;
+        };
+        Update: Record<string, never>;
+        Relationships: [];
+      };
       intereses_equipo: {
         Row: {
           de_perfil: string;
@@ -562,12 +576,15 @@ export interface Database {
           id: string;
           /** `null` en las salas de "armar equipo": nacen de un interés mutuo, sin obra. */
           obra_id: string | null;
+          /** Sala del "Armar equipo" del Creador (0046): el creador + los aceptados. */
+          equipo_id: string | null;
           /** Solo para salas sin obra; con obra, el título lo presta ella. */
           titulo: string | null;
           creado_en: string;
         };
         Insert: {
           obra_id?: string | null;
+          equipo_id?: string | null;
           titulo?: string | null;
         };
         Update: Record<string, never>;
@@ -801,6 +818,30 @@ export interface Database {
        */
       contactar_desde_perfil: {
         Args: { p_token: string };
+        Returns: void;
+      };
+      /** Feed de equipos activos con ≥3 fotos para el talento (0046, issue #57). */
+      feed_equipos_para_talento: {
+        Args: Record<string, never>;
+        Returns: {
+          equipo_id: string;
+          titulo: string;
+          cupo: number;
+          creado_en: string;
+          creador_id: string;
+          creador_nombre: string;
+          creador_imagen_url: string | null;
+          fotos: string[];
+        }[];
+      };
+      /** El talento marca interés (o descarta) un equipo del feed (0046). */
+      interes_en_equipo: {
+        Args: { p_equipo_id: string; p_interesa: boolean };
+        Returns: void;
+      };
+      /** El creador acepta a un interesado en su equipo, hasta el cupo; abre la sala (0046). */
+      aceptar_en_equipo: {
+        Args: { p_equipo_id: string; p_talento_id: string };
         Returns: void;
       };
       /**
