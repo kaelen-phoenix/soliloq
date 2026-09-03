@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FormularioRol } from "@/components/convocatorias/formulario-rol";
 import { AccionesObra } from "@/components/convocatorias/acciones-obra";
+import { FotosObra } from "@/components/convocatorias/fotos-obra";
 import { MetricasObra } from "@/components/convocatorias/metricas-obra";
 import { etiquetaGenero } from "@/lib/constantes";
 
@@ -14,12 +15,26 @@ export default async function DetalleObraPage({ params }: { params: { id: string
   const { data: obra } = await supabase.from("obras").select("*").eq("id", params.id).single();
   if (!obra) notFound();
 
-  const { data: roles } = await supabase
-    .from("roles")
-    .select(
-      "id, nombre, tipo, edad_minima, edad_maxima, vacantes, generos_buscados, postulaciones(id, estado)"
-    )
-    .eq("obra_id", params.id);
+  const [{ data: roles }, { data: fotosRaw }] = await Promise.all([
+    supabase
+      .from("roles")
+      .select(
+        "id, nombre, tipo, edad_minima, edad_maxima, vacantes, generos_buscados, postulaciones(id, estado)"
+      )
+      .eq("obra_id", params.id),
+    supabase
+      .from("fotos_obra")
+      .select("id, storage_path, orden")
+      .eq("obra_id", params.id)
+      .order("orden"),
+  ]);
+
+  const fotos = (fotosRaw ?? []).map((f) => ({
+    id: f.id,
+    storage_path: f.storage_path,
+    orden: f.orden,
+    url: supabase.storage.from("fotos-perfil").getPublicUrl(f.storage_path).data.publicUrl,
+  }));
 
   return (
     <main className="px-5 py-5">
@@ -31,8 +46,17 @@ export default async function DetalleObraPage({ params }: { params: { id: string
         <p className="mt-3 max-w-prose text-base leading-relaxed text-texto-tenue">{obra.sinopsis}</p>
       )}
 
+      <div className="mt-5 max-w-2xl">
+        <FotosObra obraId={obra.id} creadorId={obra.creador_id} fotosIniciales={fotos} />
+      </div>
+
       <div className="mt-5">
-        <AccionesObra obraId={obra.id} estado={obra.estado} cantidadRoles={roles?.length ?? 0} />
+        <AccionesObra
+          obraId={obra.id}
+          estado={obra.estado}
+          cantidadRoles={roles?.length ?? 0}
+          cantidadFotos={fotos.length}
+        />
       </div>
 
       <section className="mt-7 flex flex-col gap-2.5">

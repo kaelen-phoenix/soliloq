@@ -6,7 +6,19 @@ import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import type { EstadoObra } from "@/lib/supabase/types";
 
-export function AccionesObra({ obraId, estado, cantidadRoles }: { obraId: string; estado: EstadoObra; cantidadRoles: number }) {
+const MIN_FOTOS = 3;
+
+export function AccionesObra({
+  obraId,
+  estado,
+  cantidadRoles,
+  cantidadFotos,
+}: {
+  obraId: string;
+  estado: EstadoObra;
+  cantidadRoles: number;
+  cantidadFotos: number;
+}) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
@@ -15,6 +27,10 @@ export function AccionesObra({ obraId, estado, cantidadRoles }: { obraId: string
     setError(null);
     if (cantidadRoles === 0) {
       setError("Definí al menos un rol antes de publicar.");
+      return;
+    }
+    if (cantidadFotos < MIN_FOTOS) {
+      setError(`Subí al menos ${MIN_FOTOS} fotos antes de publicar.`);
       return;
     }
     setCargando(true);
