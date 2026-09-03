@@ -45,6 +45,20 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
     }))
     .sort((a, b) => a.orden - b.orden);
 
+  const { data: interesadosRaw } = equipo
+    ? await supabase.rpc("interesados_en_equipo", { p_equipo_id: equipo.id })
+    : { data: null };
+
+  const interesados = (interesadosRaw ?? []).map((i) => ({
+    perfil_id: i.perfil_id,
+    nombre: i.nombre,
+    ubicacion_publica: i.ubicacion_publica,
+    aceptado: i.aceptado,
+    foto_url: i.foto_path
+      ? supabase.storage.from("fotos-perfil").getPublicUrl(i.foto_path).data.publicUrl
+      : null,
+  }));
+
   return (
     <main className="px-5 py-5">
       {/* Un perfil de Creador lleva adelante una sola iniciativa: un proyecto (obra con
@@ -64,6 +78,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
           creadorId={creadorId}
           equipo={equipo ?? null}
           fotos={fotosEquipo}
+          interesados={interesados}
           tieneObraPublicada={tieneObraPublicada}
         />
       </div>

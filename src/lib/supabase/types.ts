@@ -844,6 +844,17 @@ export interface Database {
         Args: { p_equipo_id: string; p_talento_id: string };
         Returns: void;
       };
+      /** Proyección acotada de quién se interesó en un equipo, para que el creador elija (0047). */
+      interesados_en_equipo: {
+        Args: { p_equipo_id: string };
+        Returns: {
+          perfil_id: string;
+          nombre: string;
+          foto_path: string | null;
+          ubicacion_publica: string | null;
+          aceptado: boolean;
+        }[];
+      };
       /**
        * Proyección acotada de quien contactó desde un enlace público, para responder el
        * interés (0037). Solo visible para quien recibió ese interés.
