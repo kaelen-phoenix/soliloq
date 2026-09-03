@@ -38,9 +38,15 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           {/* El distintivo va primero y en color: si alguien mira la tarjeta un segundo, esto
               es lo único que no se puede perder. Una convocatoria falsa que se confunde con
               una real es peor que no mostrar nada. */}
-          {rol.es_ejemplo && (
+          {rol.es_ejemplo ? (
             <span className="rounded-md bg-brand-500 px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-white">
               Ejemplo
+            </span>
+          ) : (
+            /* Distintivo de tipo de propuesta (issue #58): Proyecto en rojo, contra el
+               naranja del "Armar equipo". */
+            <span className="rounded-md bg-brand-600 px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-white">
+              Proyecto
             </span>
           )}
           <span className="rounded-md bg-superficie/10 px-2 py-1 text-2xs font-medium uppercase tracking-wide text-white/70">

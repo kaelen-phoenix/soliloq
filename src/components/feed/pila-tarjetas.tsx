@@ -8,10 +8,17 @@ import { createClient } from "@/lib/supabase/client";
 import { ROLES_EJEMPLO } from "@/lib/onboarding-ejemplo";
 import { opcionesDeRadio, radioMasCercano, type UnidadDistancia } from "@/lib/ubicacion";
 import { TarjetaRol, type RolFeed } from "./tarjeta-rol";
+import { TarjetaEquipo, type EquipoFeed } from "./tarjeta-equipo";
 
 const UMBRAL_SWIPE = 120;
 
 type Decision = "postular" | "descartar";
+
+// La pila mezcla dos cosas: roles de un proyecto y equipos. Se etiquetan para que la
+// tarjeta y la decisión sepan con qué están tratando.
+type ItemFeed =
+  | { kind: "rol"; data: RolFeed }
+  | { kind: "equipo"; data: EquipoFeed };
 
 // Un golpecito corto al decidir. No todos los navegadores lo tienen (iOS Safari no).
 function vibrar() {
@@ -25,12 +32,14 @@ export function PilaTarjetas({
   radioInicialMetros,
   unidadInicial,
   rolesIniciales,
+  equiposIniciales,
   mostrarEjemplos,
 }: {
   talentoId: string;
   radioInicialMetros: number | null;
   unidadInicial: UnidadDistancia;
   rolesIniciales: RolFeed[];
+  equiposIniciales: EquipoFeed[];
   /** Primera vez de esta cuenta: van las tarjetas de ejemplo antes que las reales. */
   mostrarEjemplos: boolean;
 }) {
@@ -39,6 +48,9 @@ export function PilaTarjetas({
   // onboarding por tocar un filtro.
   const [ejemplos, setEjemplos] = useState<RolFeed[]>(mostrarEjemplos ? ROLES_EJEMPLO : []);
   const [roles, setRoles] = useState(rolesIniciales);
+  // Los equipos van al final de la pila, después de los roles. No entran en "Deshacer":
+  // marcar interés le avisa al creador, y deshacer eso es raro. Al decidir, se sacan de acá.
+  const [equipos, setEquipos] = useState(equiposIniciales);
   const [indice, setIndice] = useState(0);
   const [radio, setRadio] = useState<number | null>(radioInicialMetros);
   const [unidad, setUnidad] = useState<UnidadDistancia>(unidadInicial);
@@ -60,8 +72,16 @@ export function PilaTarjetas({
   const opacidadNo = useTransform(x, [-130, -30], [1, 0]);
 
   // El filtro por distancia y por género ya vino resuelto de Postgres; acá solo se avanza.
-  // Los ejemplos que queden van adelante, así el onboarding se ve antes que lo real.
-  const pila = useMemo(() => [...ejemplos, ...roles.slice(indice)], [ejemplos, roles, indice]);
+  // Los ejemplos que queden van adelante, así el onboarding se ve antes que lo real; los
+  // equipos van al final.
+  const pila = useMemo<ItemFeed[]>(
+    () => [
+      ...ejemplos.map((r) => ({ kind: "rol" as const, data: r })),
+      ...roles.slice(indice).map((r) => ({ kind: "rol" as const, data: r })),
+      ...equipos.map((e) => ({ kind: "equipo" as const, data: e })),
+    ],
+    [ejemplos, roles, indice, equipos]
+  );
 
   const actual = pila[0];
   const siguiente = pila[1];
@@ -164,11 +184,32 @@ export function PilaTarjetas({
       .eq("id", talentoId);
   }
 
+  async function registrarInteresEquipo(equipo: EquipoFeed, decision: Decision) {
+    const supabase = createClient();
+    const { error } = await supabase.rpc("interes_en_equipo", {
+      p_equipo_id: equipo.equipo_id,
+      p_interesa: decision === "postular",
+    });
+    if (error) {
+      setAvisoError("No pudimos registrar tu decisión. Probá de nuevo.");
+      setEquipos((prev) => [equipo, ...prev]);
+    }
+  }
+
   const avanzar = useCallback(
-    (rol: RolFeed, decision: Decision) => {
+    (item: ItemFeed, decision: Decision) => {
       setAvisoError(null);
       x.set(0);
       vibrar();
+
+      if (item.kind === "equipo") {
+        // Los equipos no tienen "Deshacer": se sacan de la pila y listo.
+        setEquipos((prev) => prev.filter((e) => e.equipo_id !== item.data.equipo_id));
+        registrarInteresEquipo(item.data, decision);
+        return;
+      }
+
+      const rol = item.data;
 
       // Un ejemplo no se guarda en ningún lado: no hay obra, no hay creador y no hay quién
       // apruebe. Postularse acá es parte del tutorial, no una postulación.
@@ -183,8 +224,8 @@ export function PilaTarjetas({
       setHistorial((prev) => [...prev, { rol, decision }].slice(-10));
       registrarDecision(rol, decision);
     },
-    // `registrarDecision` y `marcarOnboardingVisto` solo tocan setState y la red con
-    // `talentoId` (prop estable): no dependen de nada reactivo, no van en la lista.
+    // `registrarDecision`, `registrarInteresEquipo` y `marcarOnboardingVisto` solo tocan
+    // setState y la red con `talentoId` (prop estable): no van en la lista.
     // eslint-disable-next-line react-hooks/exhaustive-deps
     [ejemplos, x]
   );
@@ -311,24 +352,29 @@ export function PilaTarjetas({
 
       {/* Sólo mientras haya ejemplos arriba de la pila. Dice cuántos faltan para que se lea
           como algo que termina, no como el estado normal de la app. */}
-      {actual?.es_ejemplo && (
+      {actual?.kind === "rol" && actual.data.es_ejemplo && (
         <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-500/5 px-3.5 py-2.5">
           <p className="text-sm font-medium text-texto">Así funciona Yalope</p>
           <p className="mt-0.5 text-xs leading-snug text-texto-tenue">
             Deslizá a la derecha para postularte, a la izquierda para descartar. Cuando alguien
             te aprueba se abre una sala con el equipo. Estas {ejemplos.length}{" "}
             {ejemplos.length === 1 ? "tarjeta es un ejemplo" : "tarjetas son ejemplos"} — después
-            siguen las convocatorias reales.
+            siguen las propuestas reales.
           </p>
         </div>
       )}
 
       <div className="relative mx-auto h-[500px] w-full max-w-sm">
-        {siguiente && (
-          <div className="absolute inset-0 scale-[0.96] opacity-40 blur-[0.5px]">
-            <TarjetaRol rol={siguiente} />
-          </div>
-        )}
+        {siguiente &&
+          (siguiente.kind === "rol" ? (
+            <div className="absolute inset-0 scale-[0.96] opacity-40 blur-[0.5px]">
+              <TarjetaRol rol={siguiente.data} />
+            </div>
+          ) : (
+            <div className="absolute inset-0 scale-[0.96] opacity-40 blur-[0.5px]">
+              <TarjetaEquipo equipo={siguiente.data} />
+            </div>
+          ))}
 
         {actual ? (
           <motion.div
@@ -338,7 +384,11 @@ export function PilaTarjetas({
             dragConstraints={{ left: 0, right: 0 }}
             onDragEnd={onDragEnd}
           >
-            <TarjetaRol rol={actual} />
+            {actual.kind === "rol" ? (
+              <TarjetaRol rol={actual.data} />
+            ) : (
+              <TarjetaEquipo equipo={actual.data} />
+            )}
 
             {/* Sellos que aparecen con el gesto, tipo timbre sobre la tarjeta. */}
             <motion.div
@@ -377,10 +427,10 @@ export function PilaTarjetas({
             ) : (
               <>
                 <p className="mt-3 text-base font-medium text-texto">
-                  No hay convocatorias nuevas
+                  No hay propuestas nuevas
                 </p>
                 <p className="mt-1 text-sm text-texto-tenue">
-                  Volvé más tarde a ver nuevas propuestas.
+                  Volvé más tarde a ver nuevos proyectos y equipos.
                 </p>
                 {historial.length > 0 && (
                   <button
