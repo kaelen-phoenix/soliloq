@@ -6,14 +6,18 @@ El alta de Talento hoy es `src/components/perfil/formulario-talento.tsx` (client
 
 La feature **no toca la base**: agrega un paso previo al formulario que lo precarga.
 
-## Decisiones abiertas
+## Decisiones — RESUELTAS (2026-09-03, criterio de negocio)
 
-| # | Decisión | Propuesta |
+El dueño delegó estas decisiones. Nota de prioridad: **#5 es P2**. El issue mismo admite que la calidad de extracción por reglas será "bastante peor" que un modelo, y suma dependencias pesadas (`tesseract.js`, `pdfjs-dist`). Se prioriza #57 (modelo de producto, P1). #5 queda listo para implementar pero después.
+
+| # | Decisión | Resolución |
 |---|---|---|
-| 1 | ¿Extracción en cliente o server? ¿El archivo toca storage? | **Server, en memoria.** El archivo llega por `FormData` a un route handler / server action, se procesa en un `Buffer` y se descarta al responder. No entra a Supabase Storage. Evita inflar el bundle del cliente con wasm de OCR y mantiene el "no se persiste" trivial. |
-| 2 | ¿Foto del CV como foto de perfil? | **No en v1.** La foto de un CV rara vez sirve para lo que la app necesita. |
-| 3 | Topes | PDF/DOCX ≤ 8 MB; imagen ≤ 12 MB; PDF ≤ 15 páginas (más que eso no es un CV y el OCR/parseo se dispara). |
-| 4 | Habilidades sin match | **No mostrarlas en v1.** Solo se preseleccionan las que matchean `HABILIDADES`. "Ofrecer aparte" queda como follow-up. |
+| 1 | ¿Extracción en cliente o server? ¿Storage? | **Server, en memoria.** `FormData` → route handler → `Buffer` → se descarta al responder. No entra a Storage. Evita inflar el bundle del cliente y hace trivial el "no se persiste". |
+| 2 | ¿Foto del CV como foto de perfil? | **No en v1.** |
+| 3 | Topes | PDF/DOCX ≤ 8 MB; imagen ≤ 12 MB; PDF ≤ 15 páginas. |
+| 4 | Habilidades sin match | **No se muestran en v1.** Solo se preseleccionan las que matchean `HABILIDADES`. |
+| 5 | Ubicación extraída | **String a confirmar.** La extracción deja la ciudad como texto y el formulario obliga a re-elegirla en el autocompletado (que resuelve coords). Nada de geocoding server-side en v1: menos dependencias, y la persona valida igual. |
+| 6 | Cold-start del OCR | Medir tras un spike; si el cold-start con `tesseract.js` + `pdfjs-dist` en el server duele, aislar el OCR en su propia función. No bloquea el diseño. |
 
 ## Arquitectura
 
