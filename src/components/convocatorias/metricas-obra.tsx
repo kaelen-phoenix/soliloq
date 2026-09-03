@@ -13,7 +13,9 @@ type MetricaRol = Database["public"]["Functions"]["metricas_obra"]["Returns"][nu
 const SEGMENTOS = [
   { clave: "aprobados", etiqueta: "Hay equipo", color: "bg-brand-500", texto: "text-brand-600" },
   { clave: "en_duda", etiqueta: "En duda", color: "bg-alerta-600", texto: "text-alerta-800" },
-  { clave: "pendientes", etiqueta: "Sin ver", color: "bg-ink-300", texto: "text-texto-tenue" },
+  // `texto-tenue` e `ink-200` son variables: se oscurecen en tema oscuro en vez de quedar
+  // como bloques grises brillantes. Antes "pendientes" era `ink-300` fijo.
+  { clave: "pendientes", etiqueta: "Sin ver", color: "bg-texto-tenue", texto: "text-texto-tenue" },
   { clave: "rechazados", etiqueta: "Descartados", color: "bg-ink-200", texto: "text-texto-tenue" },
 ] as const;
 
