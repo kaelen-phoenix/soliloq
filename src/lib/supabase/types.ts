@@ -428,14 +428,43 @@ export interface Database {
           de_perfil: string;
           a_perfil: string;
           interesa: boolean;
+          /** Interés hacia un equipo por cupo (0044); `null` = interés hacia una persona (0033). */
+          equipo_id: string | null;
           creado_en: string;
         };
         Insert: {
           de_perfil: string;
           a_perfil: string;
           interesa: boolean;
+          equipo_id?: string | null;
         };
-        Update: { interesa?: boolean };
+        Update: { interesa?: boolean; equipo_id?: string | null };
+        Relationships: [];
+      };
+      /** Armar equipo: juntar gente por cupo, sin roles (0044, issue #57). */
+      equipos: {
+        Row: {
+          id: string;
+          creador_id: string;
+          titulo: string;
+          /** Cuántas personas quiere sumar. 1..6. */
+          cupo: number;
+          activo: boolean;
+          creado_en: string;
+          actualizado_en: string;
+        };
+        Insert: {
+          creador_id: string;
+          titulo: string;
+          cupo: number;
+          activo?: boolean;
+        };
+        Update: {
+          titulo?: string;
+          cupo?: number;
+          activo?: boolean;
+          actualizado_en?: string;
+        };
         Relationships: [];
       };
       denuncias: {
