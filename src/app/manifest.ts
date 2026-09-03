@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { CREMA, FRAMBUESA } from "./_marca-icono";
+import { CREMA, NARANJA } from "./_marca-icono";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -10,7 +10,7 @@ export default function manifest(): MetadataRoute.Manifest {
     start_url: "/",
     display: "standalone",
     background_color: CREMA,
-    theme_color: FRAMBUESA,
+    theme_color: NARANJA,
     orientation: "portrait",
     icons: [
       { src: "/icons/icon-192.png", sizes: "192x192", type: "image/png" },

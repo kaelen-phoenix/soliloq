@@ -4,7 +4,7 @@ import Link from "next/link";
 import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
 import { BotonInstalar } from "@/components/pwa/boton-instalar";
 import { Icono } from "@/components/ui/icono";
-import { Logotipo, MarcaProscenio } from "@/components/ui/logotipo";
+import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 
 const TITULO = "Yalope — Casting teatral en tu teléfono";
 const DESCRIPCION =
@@ -120,7 +120,7 @@ export default async function BienvenidaPage() {
 
             <div className="mt-16 grid items-center gap-10 md:mt-20 md:grid-cols-[1.1fr_0.9fr]">
               <div>
-                <MarcaProscenio className="h-9 w-9 text-candileja-300" />
+                <MarcaYalope className="h-9 w-9 text-candileja-300" />
                 <h1 className="mt-5 font-display text-[2.6rem] font-semibold leading-[1.03] tracking-[-0.02em] md:text-[3.4rem]">
                   {t("heroTitulo")}
                 </h1>
@@ -156,7 +156,7 @@ export default async function BienvenidaPage() {
                           "radial-gradient(ellipse at 50% 130%, rgba(234,177,43,0.45), transparent 70%)",
                       }}
                     />
-                    <MarcaProscenio className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 text-white/85" />
+                    <MarcaYalope className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 text-white/85" />
                   </div>
                   <div className="flex items-center justify-between px-1.5 pb-1 pt-3">
                     <div>
@@ -245,7 +245,7 @@ export default async function BienvenidaPage() {
             aria-hidden="true"
           />
           <div className="relative mx-auto w-full max-w-5xl px-5 py-20 text-center">
-            <MarcaProscenio className="mx-auto h-9 w-9 text-candileja-300" />
+            <MarcaYalope className="mx-auto h-9 w-9 text-candileja-300" />
             <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.02em]">
               {t("cierreTitulo")}
             </h2>

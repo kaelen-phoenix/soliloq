@@ -4,7 +4,7 @@ import Link from "next/link";
 import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
 import { FormularioContacto } from "@/components/apoyar/formulario-contacto";
 import { Icono } from "@/components/ui/icono";
-import { Logotipo, MarcaProscenio } from "@/components/ui/logotipo";
+import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 
 // Plataforma de donación: el Cafecito de Yalope.
 const DONACION_URL = "https://cafecito.app/yalope";
@@ -59,7 +59,7 @@ export default async function ApoyarPage() {
           </header>
 
           <div className="mt-12">
-            <MarcaProscenio className="h-8 w-8 text-candileja-300" />
+            <MarcaYalope className="h-8 w-8 text-candileja-300" />
             <h1 className="mt-4 font-display text-[2.25rem] font-semibold leading-tight tracking-[-0.02em] md:text-[2.75rem]">
               {t("titulo")}
             </h1>
