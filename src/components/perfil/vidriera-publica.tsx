@@ -26,12 +26,27 @@ export interface PerfilPublico {
   obras: { titulo: string; anio: number; rol: string }[];
 }
 
+/** Un bloque del booking, con el título en registro de programa de mano. */
+function Seccion({ titulo, children }: { titulo: string; children: React.ReactNode }) {
+  return (
+    <section className="py-6 first:pt-0 last:pb-0">
+      <h2 className="mb-3 font-display text-[0.78rem] font-semibold uppercase tracking-[0.14em] text-ink-500">
+        {titulo}
+      </h2>
+      {children}
+    </section>
+  );
+}
+
 /**
  * El booking: la carta de presentación de un artista para pasarle a una directora de
- * casting. Fotos ampliables, datos de cabecera (edad, ciudad, género), experiencia,
- * videoreel, redes y obras previas. No trae correo ni teléfono: para eso está "Contactar".
+ * casting. Headshot grande, nombre en la serif de display, datos de cabecera, videoreel,
+ * trayectoria, habilidades y obras previas. No trae correo ni teléfono: para eso está
+ * "Contactar".
  */
 export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
+  const esTalento = perfil.tipo === "talento";
+
   const generoTexto =
     perfil.genero_descripcion ||
     (perfil.genero && perfil.genero !== "sin_especificar"
@@ -47,22 +62,22 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
   const redes = REDES.filter((r) => perfil.redes?.[r.clave]);
 
   return (
-    <div className="flex flex-col gap-5">
+    <article className="flex flex-col">
       {perfil.fotos.length > 0 && (
-        <GaleriaFotos fotos={perfil.fotos} alt={perfil.nombre} />
+        <GaleriaFotos fotos={perfil.fotos} alt={perfil.nombre} destacarPrimera />
       )}
 
-      <div>
-        <h1 className="font-display text-2xl font-semibold tracking-[-0.02em] text-texto">
+      <header className={perfil.fotos.length > 0 ? "mt-5" : ""}>
+        <h1 className="font-display text-[2rem] font-semibold leading-[1.05] tracking-[-0.02em] text-ink-900 sm:text-[2.5rem]">
           {perfil.nombre}
         </h1>
         {datos.length > 0 && (
-          <p className="mt-1 text-sm text-texto-tenue">{datos.join(" · ")}</p>
+          <p className="mt-2 text-sm text-ink-600">{datos.join("  ·  ")}</p>
         )}
-      </div>
+      </header>
 
       {redes.length > 0 && (
-        <div className="flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-2">
           {redes.map((red) => (
             <a
               key={red.clave}
@@ -70,7 +85,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
               target="_blank"
               rel="noopener noreferrer nofollow"
               aria-label={red.etiqueta}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-borde text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-colors hover:border-ink-400 hover:text-ink-800"
             >
               <Icono nombre={red.icono} className="h-4 w-4" />
             </a>
@@ -78,57 +93,63 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
         </div>
       )}
 
-      {perfil.videoreel_url && <VideoreelEmbed url={perfil.videoreel_url} />}
+      <div className="mt-6 flex flex-col divide-y divide-ink-100 border-t border-ink-100">
+        {perfil.videoreel_url && (
+          <Seccion titulo="Videoreel">
+            <VideoreelEmbed url={perfil.videoreel_url} />
+          </Seccion>
+        )}
 
-      {perfil.texto && (
-        <div>
-          <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-            {perfil.tipo === "talento" ? "Experiencia" : "Sobre"}
-          </h2>
-          <p className="mt-1 max-w-prose whitespace-pre-line text-sm leading-relaxed text-texto">
-            {perfil.texto}
-          </p>
-        </div>
-      )}
+        {perfil.texto && (
+          <Seccion titulo={esTalento ? "Trayectoria" : "Sobre el proyecto"}>
+            <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-ink-800">
+              {perfil.texto}
+            </p>
+          </Seccion>
+        )}
 
-      {perfil.tipo === "creador" ? (
-        <EtiquetasDisciplina disciplinas={perfil.disciplinas} otroDetalle={perfil.otro_detalle} />
-      ) : (
-        perfil.habilidades.length > 0 && (
-          <div>
-            <h2 className="mb-2 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-              Habilidades
-            </h2>
-            <div className="flex flex-wrap gap-2">
-              {perfil.habilidades.map((h) => (
-                <span
-                  key={h}
-                  className="rounded-md bg-ink-100 px-2.5 py-1 text-xs font-medium text-texto"
-                >
-                  {h}
-                </span>
+        {esTalento
+          ? perfil.habilidades.length > 0 && (
+              <Seccion titulo="Habilidades">
+                <div className="flex flex-wrap gap-2">
+                  {perfil.habilidades.map((h) => (
+                    <span
+                      key={h}
+                      className="rounded-full border border-ink-200 px-3 py-1 text-xs font-medium text-ink-700"
+                    >
+                      {h}
+                    </span>
+                  ))}
+                </div>
+              </Seccion>
+            )
+          : perfil.disciplinas.length > 0 && (
+              <Seccion titulo="Perfil artístico">
+                <EtiquetasDisciplina
+                  disciplinas={perfil.disciplinas}
+                  otroDetalle={perfil.otro_detalle}
+                />
+              </Seccion>
+            )}
+
+        {perfil.obras.length > 0 && (
+          <Seccion titulo="Obras previas">
+            <ul className="flex flex-col gap-2">
+              {perfil.obras.map((o, i) => (
+                <li key={i} className="text-sm text-ink-800">
+                  <span className="font-medium text-ink-900">{o.titulo}</span>
+                  <span className="text-ink-500">
+                    {"  ·  "}
+                    {o.anio}
+                    {"  ·  "}
+                  </span>
+                  {o.rol}
+                </li>
               ))}
-            </div>
-          </div>
-        )
-      )}
-
-      {perfil.obras.length > 0 && (
-        <div>
-          <h2 className="mb-2 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-            Obras previas
-          </h2>
-          <ul className="flex flex-col gap-1.5">
-            {perfil.obras.map((o, i) => (
-              <li key={i} className="text-sm text-texto">
-                <span className="font-medium text-texto">{o.titulo}</span>
-                <span className="text-texto-tenue"> · {o.anio} · </span>
-                {o.rol}
-              </li>
-            ))}
-          </ul>
-        </div>
-      )}
-    </div>
+            </ul>
+          </Seccion>
+        )}
+      </div>
+    </article>
   );
 }

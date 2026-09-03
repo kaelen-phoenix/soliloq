@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { Logotipo } from "@/components/ui/logotipo";
+import { Logotipo, MarcaProscenio } from "@/components/ui/logotipo";
 import { VidrieraPublica } from "@/components/perfil/vidriera-publica";
 import { BotonContactarPublico } from "@/components/perfil/boton-contactar-publico";
 
@@ -15,15 +15,6 @@ const obtenerPerfil = cache(async (token: string) => {
   return data?.[0] ?? null;
 });
 
-function urlPrimeraFoto(
-  perfil: NonNullable<Awaited<ReturnType<typeof obtenerPerfil>>>
-): string {
-  if (!perfil.fotos[0]) return "/icons/icon-512.png";
-  if (perfil.tipo === "creador") return perfil.fotos[0];
-  const supabase = createClient();
-  return supabase.storage.from("fotos-perfil").getPublicUrl(perfil.fotos[0]).data.publicUrl;
-}
-
 export async function generateMetadata({
   params,
 }: {
@@ -32,22 +23,14 @@ export async function generateMetadata({
   const perfil = await obtenerPerfil(params.token);
   if (!perfil) return {};
 
-  const imagen = urlPrimeraFoto(perfil);
-
   return {
-    title: perfil.nombre,
+    title: `${perfil.nombre} · Yalope`,
+    description: perfil.texto?.slice(0, 160) || `El perfil de ${perfil.nombre} en Yalope.`,
     // Un enlace pensado para pegar en un chat, no para que lo indexe un buscador.
+    // La tarjeta al compartir la arma `opengraph-image.tsx`.
     robots: { index: false, follow: false },
-    openGraph: {
-      type: "profile",
-      title: perfil.nombre,
-      images: [imagen],
-    },
-    twitter: {
-      card: "summary_large_image",
-      title: perfil.nombre,
-      images: [imagen],
-    },
+    openGraph: { type: "profile", title: perfil.nombre },
+    twitter: { card: "summary_large_image", title: perfil.nombre },
   };
 }
 
@@ -79,51 +62,53 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
   );
 
   return (
-    <main className="mx-auto max-w-lg px-5 py-8">
-      <Link href="/" aria-label="Ir a Yalope" className="mb-8 inline-block">
-        <Logotipo tamano="sm" />
-      </Link>
+    // Tema claro fijo: esto es una hoja de booking, un documento que se comparte. Se ve
+    // igual para cualquiera, no según el tema de la app de quien lo abre.
+    <div data-tema="light" className="min-h-screen bg-[#fbfaf7] text-ink-900">
+      <div className="mx-auto max-w-xl px-5 py-8 sm:py-12">
+        <header className="mb-8 flex items-center justify-between">
+          <Link href="/" aria-label="Ir a Yalope">
+            <Logotipo tamano="sm" />
+          </Link>
+          <span className="text-2xs font-medium uppercase tracking-[0.16em] text-ink-400">
+            Booking
+          </span>
+        </header>
 
-      <VidrieraPublica perfil={{ ...perfil, fotos }} />
+        <VidrieraPublica perfil={{ ...perfil, fotos }} />
 
-      {!esDueño && (
-        <div className="mt-6">
-          <BotonContactarPublico token={params.token} haySesion={!!user} />
-        </div>
-      )}
+        {!esDueño && (
+          <section className="mt-10 rounded-2xl border border-ink-200 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
+            <h2 className="font-display text-lg font-semibold tracking-[-0.02em] text-ink-900">
+              ¿Te interesa trabajar con {perfil.nombre.split(" ")[0]}?
+            </h2>
+            <p className="mt-1 text-sm leading-relaxed text-ink-600">
+              {user
+                ? "Le mandamos tu interés. Si responde, se abre una sala para hablar."
+                : "Creá tu cuenta en Yalope para dejarle tu interés. Si responde, se abre una sala para hablar."}
+            </p>
+            <div className="mt-4">
+              <BotonContactarPublico token={params.token} haySesion={!!user} />
+            </div>
+          </section>
+        )}
 
-      {esDueño ? (
-        <footer className="mt-12 border-t border-borde pt-5 text-sm">
-          <Link href="/perfil" className="font-medium text-texto hover:text-texto">
-            Volver a mi perfil
+        <footer className="mt-12 flex items-center justify-between border-t border-ink-100 pt-5 text-sm text-ink-500">
+          {esDueño ? (
+            <Link href="/perfil" className="font-medium text-ink-700 hover:text-brand-600">
+              Volver a mi perfil
+            </Link>
+          ) : (
+            <span className="inline-flex items-center gap-1.5">
+              <MarcaProscenio className="h-4 w-4 text-ink-400" />
+              Perfil en Yalope
+            </span>
+          )}
+          <Link href="/" className="font-medium text-ink-700 hover:text-brand-600">
+            yalope.com
           </Link>
         </footer>
-      ) : user ? (
-        <div className="mt-10">
-          <Link
-            href="/"
-            className="flex w-full items-center justify-center gap-2 rounded-xl border border-borde py-3 text-sm font-semibold text-texto transition-colors hover:bg-fondo-sutil"
-          >
-            Ir a Yalope
-          </Link>
-        </div>
-      ) : (
-        <section className="mt-10 rounded-2xl border border-brand-200 acento-fondo p-6 text-center">
-          <p className="font-display text-lg font-semibold tracking-[-0.02em] text-texto">
-            ¿Casteás o sos artista?
-          </p>
-          <p className="mx-auto mt-1.5 max-w-[38ch] text-sm leading-relaxed text-texto-tenue">
-            Armá tu perfil en Yalope y compartilo como este: fotos, experiencia y un enlace
-            para pasarle a cualquier casting.
-          </p>
-          <Link
-            href="/ingresar"
-            className="mt-4 inline-flex items-center justify-center gap-2 rounded-xl bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
-          >
-            Crear mi cuenta gratis
-          </Link>
-        </section>
-      )}
-    </main>
+      </div>
+    </div>
   );
 }
