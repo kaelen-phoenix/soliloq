@@ -49,17 +49,21 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
     if (perfil) {
       nombre = perfil.nombre;
 
+      // Satori (ImageResponse) no decodifica WebP, y las fotos de talento se guardan en
+      // WebP. Se pide vía la transformación de Storage, que devuelve JPEG. Las de creador
+      // son URLs externas de formato desconocido: para el OG no se arriesgan, va la
+      // tarjeta de solo texto.
       const primera = perfil.fotos?.[0];
-      if (primera) {
-        foto =
-          perfil.tipo === "talento"
-            ? supabase.storage.from("fotos-perfil").getPublicUrl(primera).data.publicUrl
-            : primera;
+      if (primera && perfil.tipo === "talento") {
+        foto = supabase.storage.from("fotos-perfil").getPublicUrl(primera, {
+          transform: { width: 600, height: 800, resize: "cover" },
+        }).data.publicUrl;
       }
 
       datos = [
         perfil.edad != null ? `${perfil.edad} años` : null,
-        perfil.ubicacion_publica,
+        // Solo la localidad: "Caseros, Provincia de Buenos Aires, Argentina" no entra.
+        perfil.ubicacion_publica?.split(",")[0]?.trim() || null,
       ]
         .filter(Boolean)
         .join("  ·  ");
