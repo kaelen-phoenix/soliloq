@@ -1,5 +1,6 @@
 import { createClient } from "@/lib/supabase/server";
 import { PilaTarjetas } from "./pila-tarjetas";
+import type { RolFeed } from "./tarjeta-rol";
 import type { EquipoFeed } from "./tarjeta-equipo";
 
 export async function FeedTalento({ talentoId }: { talentoId: string }) {
@@ -14,12 +15,20 @@ export async function FeedTalento({ talentoId }: { talentoId: string }) {
   // El radio viaja a Postgres: el filtro por distancia se resuelve en la query, no acá.
   const radio = perfilTalento?.radio_busqueda_metros ?? null;
 
-  const [{ data: roles }, { data: equiposRaw }] = await Promise.all([
+  const [{ data: rolesRaw }, { data: equiposRaw }] = await Promise.all([
     supabase.rpc("feed_para_talento", { p_talento_id: talentoId, p_radio_metros: radio }),
     supabase.rpc("feed_equipos_para_talento"),
   ]);
 
-  // Las fotos del equipo vienen como rutas de Storage; se resuelven acá a URL pública.
+  const publicUrl = (p: string) =>
+    supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl;
+
+  // Las fotos de la obra vienen como rutas de Storage; se resuelven acá a URL pública.
+  const roles: RolFeed[] = (rolesRaw ?? []).map((r) => ({
+    ...r,
+    fotos: (r.obra_fotos ?? []).map(publicUrl),
+  }));
+
   const equipos: EquipoFeed[] = (equiposRaw ?? []).map((e) => ({
     equipo_id: e.equipo_id,
     titulo: e.titulo,
@@ -27,9 +36,7 @@ export async function FeedTalento({ talentoId }: { talentoId: string }) {
     creador_id: e.creador_id,
     creador_nombre: e.creador_nombre,
     creador_imagen_url: e.creador_imagen_url,
-    fotos: (e.fotos ?? []).map(
-      (p) => supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl
-    ),
+    fotos: (e.fotos ?? []).map(publicUrl),
   }));
 
   return (

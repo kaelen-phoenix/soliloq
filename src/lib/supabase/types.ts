@@ -254,6 +254,25 @@ export interface Database {
           }
         ];
       };
+      /** Fotos del proyecto (0048, issue #57). */
+      fotos_obra: {
+        Row: {
+          id: string;
+          obra_id: string;
+          storage_path: string;
+          orden: number;
+          creado_en: string;
+        };
+        Insert: {
+          obra_id: string;
+          storage_path: string;
+          orden: number;
+        };
+        Update: {
+          orden?: number;
+        };
+        Relationships: [];
+      };
       /** Fotos del "Armar equipo" del Creador (0045, issue #57). */
       fotos_equipo: {
         Row: {
@@ -725,6 +744,8 @@ export interface Database {
           creador_id: string;
           creador_nombre: string;
           creador_imagen_url: string | null;
+          /** Rutas de Storage de las fotos de la obra (0048); `{}` si no tiene. */
+          obra_fotos: string[];
         };
         Relationships: [];
       };

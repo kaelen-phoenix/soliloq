@@ -20,6 +20,8 @@ export interface RolFeed {
   creador_id: string;
   creador_nombre: string;
   creador_imagen_url: string | null;
+  /** URLs ya resueltas de las fotos de la obra (0048). Puede venir vacío. */
+  fotos?: string[];
   /** Tarjeta del onboarding, no una convocatoria real. Ver `lib/onboarding-ejemplo.ts`. */
   es_ejemplo?: boolean;
 }
@@ -29,12 +31,19 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
 
   const rango =
     rol.edad_minima && rol.edad_maxima ? `${rol.edad_minima}–${rol.edad_maxima} años` : null;
+  const foto = rol.fotos?.[0];
 
   return (
     <article className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-borde bg-superficie shadow-tarjeta">
-      {/* Zona "escenario": alto contraste para que la tarjeta se lea de un vistazo. */}
-      <div className="flex flex-1 flex-col justify-between bg-ink-950 p-6 text-white">
-        <div className="flex items-center gap-2">
+      {/* Zona "escenario": con foto de la obra si tiene (0048), o el panel oscuro si no. */}
+      <div className="relative flex flex-1 flex-col justify-between bg-ink-950 p-6 text-white">
+        {foto && (
+          <>
+            <Imagen src={foto} alt="" fill absoluto sizes="(max-width: 640px) 100vw, 384px" />
+            <div className="absolute inset-0 bg-gradient-to-t from-ink-950/90 via-ink-950/40 to-ink-950/30" />
+          </>
+        )}
+        <div className="relative flex items-center gap-2">
           {/* El distintivo va primero y en color: si alguien mira la tarjeta un segundo, esto
               es lo único que no se puede perder. Una convocatoria falsa que se confunde con
               una real es peor que no mostrar nada. */}
@@ -55,7 +64,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           <span className="text-2xs text-white/50">{rol.obra_ubicacion_texto}</span>
         </div>
 
-        <div>
+        <div className="relative">
           <h2 className="text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">
             {rol.obra_titulo}
           </h2>
