@@ -24,9 +24,11 @@ function Marca() {
         strokeLinejoin="round"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M12 21V12" />
-        <path d="M12 12C10.5 8.5 8 5.7 5 3.7" />
-        <path d="M12 12C13.5 8.5 16 5.7 19 3.7" />
+        <path d="M12 21V13.5" />
+        <path d="M12 13.5C10.8 10.6 8.9 7.7 6.2 5.2" />
+        <path d="M12 13.5C11.3 11.6 10.4 10 9.1 8.6" />
+        <path d="M12 13.5C13.2 10.6 15.1 7.7 17.8 5.2" />
+        <path d="M12 13.5C12.7 11.6 13.6 10 14.9 8.6" />
       </svg>
       <div style={{ display: "flex", fontSize: 27, fontWeight: 800, letterSpacing: -1 }}>
         yalope

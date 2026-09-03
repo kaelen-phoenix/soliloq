@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
-import { CREMA, NARANJA, MarcaIcono } from "./_marca-icono";
+import { LOGO_DATA_URI } from "./_logo-datauri";
+import { TINTA } from "./_marca-icono";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -13,21 +14,15 @@ export default function OgImage() {
           width: "100%",
           height: "100%",
           display: "flex",
-          flexDirection: "column",
           alignItems: "center",
           justifyContent: "center",
-          gap: 40,
-          background: NARANJA,
-          color: CREMA,
+          background: TINTA,
         }}
       >
-        <MarcaIcono lado={200} radio={0} />
-        <div style={{ display: "flex", fontSize: 92, fontWeight: 800, letterSpacing: -3 }}>
-          yalope
-        </div>
-        <div style={{ display: "flex", fontSize: 34, opacity: 0.85 }}>Match teatral</div>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img src={LOGO_DATA_URI} alt="" width={1040} height={693} style={{ objectFit: "contain" }} />
       </div>
     ),
-    { ...size },
+    { ...size }
   );
 }

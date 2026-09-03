@@ -37,13 +37,13 @@ export function MarcaYalope({ className = "h-6 w-6" }: { className?: string }) {
       aria-hidden="true"
     >
       {/* Tallo. */}
-      <path d="M12 21V13" />
+      <path d="M12 21V13.5" />
       {/* Brazo izquierdo: trazo largo + uno corto por dentro, como una mano abierta. */}
-      <path d="M12 13C10.3 10 8.2 7.4 5.5 5.4" />
-      <path d="M12 13C11 11 9.9 9.3 8.7 8" />
+      <path d="M12 13.5C10.8 10.6 8.9 7.7 6.2 5.2" />
+      <path d="M12 13.5C11.3 11.6 10.4 10 9.1 8.6" />
       {/* Brazo derecho, espejado. */}
-      <path d="M12 13C13.7 10 15.8 7.4 18.5 5.4" />
-      <path d="M12 13C13 11 14.1 9.3 15.3 8" />
+      <path d="M12 13.5C13.2 10.6 15.1 7.7 17.8 5.2" />
+      <path d="M12 13.5C12.7 11.6 13.6 10 14.9 8.6" />
     </svg>
   );
 }
