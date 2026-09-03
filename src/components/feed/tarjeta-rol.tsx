@@ -31,7 +31,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
     rol.edad_minima && rol.edad_maxima ? `${rol.edad_minima}–${rol.edad_maxima} años` : null;
 
   return (
-    <article className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl bg-superficie shadow-tarjeta ring-1 ring-ink-900/5">
+    <article className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-borde bg-superficie shadow-tarjeta">
       {/* Zona "escenario": alto contraste para que la tarjeta se lea de un vistazo. */}
       <div className="flex flex-1 flex-col justify-between bg-ink-950 p-6 text-white">
         <div className="flex items-center gap-2">
