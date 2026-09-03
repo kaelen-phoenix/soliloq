@@ -75,6 +75,11 @@ export const viewport: Viewport = {
   initialScale: 1,
   maximumScale: 1,
   viewportFit: "cover",
+  // Al abrirse el teclado en el teléfono, la ventana de layout se achica en lugar de que
+  // el teclado tape el contenido. Es lo que hace que en el chat (`salas/[id]`) el cuadro
+  // de texto quede pegado arriba del teclado y no "salte" dejando un hueco: el `100dvh`
+  // del contenedor y la barra inferior fija se reacomodan solos.
+  interactiveWidget: "resizes-content",
 };
 
 // Fija `data-tema` antes del primer paint según la cookie, para que el override manual
