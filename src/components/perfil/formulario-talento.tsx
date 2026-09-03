@@ -38,17 +38,28 @@ interface DatosIniciales {
   aparece_en_buscador: boolean;
 }
 
+const ETIQUETA_CAMPO: Record<string, string> = {
+  nombre: "nombre",
+  ubicacion: "ubicación",
+  experiencia: "experiencia",
+  habilidades: "habilidades",
+  redes: "redes",
+};
+
 export function FormularioTalento({
   userId,
   esAlta,
   datosIniciales,
   fotosIniciales,
+  camposDelArchivo,
   destinoAlTerminar,
 }: {
   userId: string;
   esAlta: boolean;
-  datosIniciales?: DatosIniciales;
+  datosIniciales?: Partial<DatosIniciales>;
   fotosIniciales: FotoTalento[];
+  /** Campos que se precargaron desde un CV subido (issue #5), para avisar que se revisen. */
+  camposDelArchivo?: string[];
   /** A dónde ir tras el alta. Por defecto la home; si venía de un enlace público, vuelve ahí. */
   destinoAlTerminar?: string;
 }) {
@@ -179,8 +190,23 @@ export function FormularioTalento({
     setGuardado(true);
   }
 
+  const marcados = (camposDelArchivo ?? []).map((c) => ETIQUETA_CAMPO[c] ?? c);
+
   return (
     <form onSubmit={guardar} className="flex max-w-2xl flex-col gap-6">
+      {marcados.length > 0 && (
+        <div className="rounded-xl border border-brand-500/30 bg-brand-500/5 px-3.5 py-2.5">
+          <p className="text-sm font-medium text-texto">Precargamos desde tu CV</p>
+          <p className="mt-0.5 text-xs leading-snug text-texto-tenue">
+            {marcados.join(", ")}. Revisá que esté bien antes de guardar
+            {marcados.includes("ubicación")
+              ? "; la ubicación tenés que elegirla de la lista de sugerencias"
+              : ""}
+            . El resto lo completás vos.
+          </p>
+        </div>
+      )}
+
       <section className="flex flex-col gap-4">
         <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Ficha básica</h2>
         <CampoTexto
