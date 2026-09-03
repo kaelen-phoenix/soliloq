@@ -28,7 +28,7 @@ export default async function ApoyarPage() {
   return (
     <div data-tema="light" className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
       {/* Cabecera: el mismo escenario oscuro que la portada. */}
-      <section className="relative overflow-hidden bg-telon-900 text-white">
+      <section className="relative overflow-hidden bg-ink-950 text-white">
         <div
           className="pointer-events-none absolute inset-0 opacity-30"
           style={{
@@ -41,7 +41,7 @@ export default async function ApoyarPage() {
           className="pointer-events-none absolute inset-x-0 bottom-0 h-1/2"
           style={{
             background:
-              "radial-gradient(ellipse at 50% 130%, rgba(234,177,43,0.22), transparent 65%)",
+              "radial-gradient(ellipse at 50% 130%, rgba(230,45,3,0.28), transparent 65%)",
           }}
           aria-hidden="true"
         />
@@ -59,7 +59,7 @@ export default async function ApoyarPage() {
           </header>
 
           <div className="mt-12">
-            <MarcaYalope className="h-8 w-8 text-candileja-300" />
+            <MarcaYalope className="h-8 w-8 text-brand-400" />
             <h1 className="mt-4 font-display text-[2.25rem] font-semibold leading-tight tracking-[-0.02em] md:text-[2.75rem]">
               {t("titulo")}
             </h1>
@@ -69,7 +69,7 @@ export default async function ApoyarPage() {
                 <li key={d} className="flex gap-3">
                   <span
                     aria-hidden="true"
-                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-candileja-400"
+                    className="mt-2 h-1.5 w-1.5 shrink-0 rounded-full bg-brand-500"
                   />
                   {d}
                 </li>

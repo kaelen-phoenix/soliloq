@@ -74,9 +74,9 @@ export default async function BienvenidaPage() {
       />
 
       <main className="flex-1">
-        {/* Hero: el telón. Fondo rojo cortina con pliegues y el resplandor dorado de las
-            candilejas subiendo desde el piso. Es la declaración de identidad de la app. */}
-        <section className="relative overflow-hidden bg-telon-900 text-white">
+        {/* Hero: fondo casi negro con un resplandor rojo-naranja de marca subiendo desde el
+            piso y un filo encendido al pie. Es la declaración de identidad de la app. */}
+        <section className="relative overflow-hidden bg-ink-950 text-white">
           <div
             className="pointer-events-none absolute inset-0 opacity-[0.35]"
             style={{
@@ -89,13 +89,13 @@ export default async function BienvenidaPage() {
             className="pointer-events-none absolute inset-x-0 bottom-0 h-2/3"
             style={{
               background:
-                "radial-gradient(ellipse at 50% 100%, rgba(240,198,90,0.30), transparent 62%)",
+                "radial-gradient(ellipse at 50% 100%, rgba(230,45,3,0.38), transparent 62%)",
             }}
             aria-hidden="true"
           />
-          {/* Filo de candilejas al pie del escenario. */}
+          {/* Filo encendido al pie. */}
           <div
-            className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-candileja-400/70"
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-1 bg-brand-500/70"
             aria-hidden="true"
           />
 
@@ -120,7 +120,7 @@ export default async function BienvenidaPage() {
 
             <div className="mt-16 grid items-center gap-10 md:mt-20 md:grid-cols-[1.1fr_0.9fr]">
               <div>
-                <MarcaYalope className="h-9 w-9 text-candileja-300" />
+                <MarcaYalope className="h-9 w-9 text-brand-400" />
                 <h1 className="mt-5 font-display text-[2.6rem] font-semibold leading-[1.03] tracking-[-0.02em] md:text-[3.4rem]">
                   {t("heroTitulo")}
                 </h1>
@@ -130,7 +130,7 @@ export default async function BienvenidaPage() {
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href="/ingresar"
-                    className="inline-flex items-center gap-2 rounded-xl bg-candileja-400 px-5 py-3 text-sm font-semibold text-telon-900 transition-colors hover:bg-candileja-300"
+                    className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
                   >
                     {t("crearPerfil")}
                     <Icono nombre="flecha-derecha" className="h-4 w-4" />
@@ -148,12 +148,12 @@ export default async function BienvenidaPage() {
               {/* El programa de mano: una tarjeta de talento estilizada. */}
               <div className="relative mx-auto w-full max-w-[300px]">
                 <div className="rotate-1 rounded-[1.75rem] bg-[#fbfaf7] p-3 shadow-[0_24px_64px_-24px_rgba(0,0,0,0.55)] ring-1 ring-black/10">
-                  <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-b from-telon-800 to-telon-950">
+                  <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-b from-ink-800 to-ink-950">
                     <div
                       className="absolute inset-x-0 bottom-0 h-1/2"
                       style={{
                         background:
-                          "radial-gradient(ellipse at 50% 130%, rgba(234,177,43,0.45), transparent 70%)",
+                          "radial-gradient(ellipse at 50% 130%, rgba(254,128,100,0.40), transparent 70%)",
                       }}
                     />
                     <MarcaYalope className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 text-white/85" />
@@ -168,7 +168,7 @@ export default async function BienvenidaPage() {
                     </div>
                   </div>
                 </div>
-                <div className="absolute -right-3 -top-3 -z-10 h-full w-full -rotate-2 rounded-[1.75rem] bg-telon-800/50" />
+                <div className="absolute -right-3 -top-3 -z-10 h-full w-full -rotate-2 rounded-[1.75rem] bg-ink-800/50" />
               </div>
             </div>
           </div>
@@ -235,7 +235,7 @@ export default async function BienvenidaPage() {
         </section>
 
         {/* Cierre: telón de nuevo, cerrando la función. */}
-        <section className="relative overflow-hidden bg-telon-600 text-white">
+        <section className="relative overflow-hidden bg-brand-700 text-white">
           <div
             className="pointer-events-none absolute inset-0 opacity-25"
             style={{
@@ -245,13 +245,13 @@ export default async function BienvenidaPage() {
             aria-hidden="true"
           />
           <div className="relative mx-auto w-full max-w-5xl px-5 py-20 text-center">
-            <MarcaYalope className="mx-auto h-9 w-9 text-candileja-300" />
+            <MarcaYalope className="mx-auto h-9 w-9 text-brand-400" />
             <h2 className="mx-auto mt-5 max-w-2xl font-display text-3xl font-semibold leading-tight tracking-[-0.02em]">
               {t("cierreTitulo")}
             </h2>
             <Link
               href="/ingresar"
-              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-candileja-400 px-6 py-3 text-sm font-semibold text-telon-900 transition-colors hover:bg-candileja-300"
+              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
             >
               {t("sumate")}
               <Icono nombre="flecha-derecha" className="h-4 w-4" />
