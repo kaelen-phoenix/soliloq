@@ -1,12 +1,20 @@
 # Identidad de marca
 
-`identidad-de-marca.pdf` — documento de marca de Yalope (Drive, 03/09/2026): paleta e isotipo «Y» de manos + wordmark, con degradé naranja→rojo.
+- `logotipo-yalope.svg` / `.png` — el logotipo real de Yalope (isotipo «Y» de dos manos + wordmark «yalope», degradé naranja→rojo sobre negro). El SVG lleva el PNG embebido; no es vector puro.
+- `identidad-de-marca.pdf` — documento de marca con la paleta.
 
-**Ojo:** esta identidad **todavía no está aplicada en el código.** La app corre con la identidad anterior (frambuesa `#cf1f57` + arco de proscenio en Fraunces). La adopción se trackea en el issue #59.
+## Dónde se usa (`docs/marca/README` → código)
+
+| Superficie | Qué usa |
+|---|---|
+| Imágenes OG (compartir) | El **PNG real** del logotipo, edge-to-edge sobre negro (`_logo-datauri.ts` + `app/opengraph-image.tsx`). |
+| Favicon, apple-icon, íconos PWA | El **isotipo redibujado** en SVG (naranja-rojo plano sobre negro) — Satori no embebe un logo ancho en un cuadrado ni hace degradés (`app/_marca-icono.tsx`). |
+| Logo en la app (barras, portada, «Apoyar») | Isotipo redibujado + wordmark «yalope» en **Baloo 2** 800 (`components/ui/logotipo.tsx`). |
+| OG del perfil compartido (`/p/[token]`) | Isotipo redibujado chico + «yalope» en texto. |
 
 ## Paleta (del PDF)
 
-Acentos: `#e62d03` (rojo-naranja principal) · `#FB6543` (coral) · `#743404` (marрón) · `#040404` (casi negro)
+Acentos: `#e62d03` (rojo-naranja principal) · `#FB6543` (coral) · `#743404` (marrón) · `#040404` (casi negro)
 
 Rampa naranja→marrón: `#FFF5F3` `#FEE1DA` `#FFBFB0` `#FCA995` `#FE8064` `#FB6543` `#F23906` `#D63B13` `#B62803` `#9D280B` `#7A1801` `#631604` `#420800` `#2F0601`
 

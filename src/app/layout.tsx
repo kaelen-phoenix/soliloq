@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter, Nunito } from "next/font/google";
+import { Baloo_2, Fraunces, Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
@@ -25,10 +25,11 @@ const fraunces = Fraunces({
   style: ["normal"],
 });
 
-// Solo para el wordmark de la marca: «yalope» en minúscula, sans redondeada y pesada
-// (ver `docs/marca/`). No es una fuente de interfaz ni de títulos — esos siguen en Inter
-// y Fraunces. Un solo peso: el wordmark siempre va en 800.
-const nunito = Nunito({
+// Solo para el wordmark de la marca: «yalope» en minúscula, en la sans redondeada y pesada
+// del logotipo (ver `docs/marca/logotipo-yalope.svg`). Baloo 2 es la que más se acerca a
+// esas terminaciones redondas. No es una fuente de interfaz ni de títulos — esos siguen en
+// Inter y Fraunces. Un solo peso: el wordmark siempre va en 800.
+const baloo = Baloo_2({
   subsets: ["latin"],
   display: "swap",
   variable: "--font-marca",
@@ -92,7 +93,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${fraunces.variable} ${nunito.variable}`}>
+    <html lang={locale} className={`${inter.variable} ${fraunces.variable} ${baloo.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
       </head>

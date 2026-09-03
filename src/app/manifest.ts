@@ -1,5 +1,5 @@
 import type { MetadataRoute } from "next";
-import { CREMA, NARANJA } from "./_marca-icono";
+import { NARANJA, TINTA } from "./_marca-icono";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
@@ -9,7 +9,7 @@ export default function manifest(): MetadataRoute.Manifest {
       "Conectá talento y creadores de teatro. Postulate a convocatorias y armá elenco con un match rápido y visual.",
     start_url: "/",
     display: "standalone",
-    background_color: CREMA,
+    background_color: TINTA,
     theme_color: NARANJA,
     orientation: "portrait",
     icons: [
