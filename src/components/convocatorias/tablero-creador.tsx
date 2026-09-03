@@ -27,7 +27,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
       .order("creado_en", { ascending: false }),
     supabase
       .from("equipos")
-      .select("id, titulo, cupo, activo")
+      .select("id, titulo, cupo, activo, fotos_equipo(id, storage_path, orden)")
       .eq("creador_id", creadorId)
       .eq("activo", true)
       .maybeSingle(),
@@ -35,6 +35,15 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
 
   const tieneObraPublicada = (obras ?? []).some((o) => o.estado === "publicada");
   const hayEquipoActivo = equipo != null;
+
+  const fotosEquipo = (equipo?.fotos_equipo ?? [])
+    .map((f) => ({
+      id: f.id,
+      storage_path: f.storage_path,
+      orden: f.orden,
+      url: supabase.storage.from("fotos-perfil").getPublicUrl(f.storage_path).data.publicUrl,
+    }))
+    .sort((a, b) => a.orden - b.orden);
 
   return (
     <main className="px-5 py-5">
@@ -54,6 +63,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
         <GestionEquipo
           creadorId={creadorId}
           equipo={equipo ?? null}
+          fotos={fotosEquipo}
           tieneObraPublicada={tieneObraPublicada}
         />
       </div>

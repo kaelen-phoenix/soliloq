@@ -254,6 +254,33 @@ export interface Database {
           }
         ];
       };
+      /** Fotos del "Armar equipo" del Creador (0045, issue #57). */
+      fotos_equipo: {
+        Row: {
+          id: string;
+          equipo_id: string;
+          storage_path: string;
+          orden: number;
+          creado_en: string;
+        };
+        Insert: {
+          equipo_id: string;
+          storage_path: string;
+          orden: number;
+        };
+        Update: {
+          orden?: number;
+        };
+        Relationships: [
+          {
+            foreignKeyName: "fotos_equipo_equipo_id_fkey";
+            columns: ["equipo_id"];
+            isOneToOne: false;
+            referencedRelation: "equipos";
+            referencedColumns: ["id"];
+          }
+        ];
+      };
       fotos_talento: {
         Row: {
           id: string;
