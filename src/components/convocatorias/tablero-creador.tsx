@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
+import { GestionEquipo } from "@/components/convocatorias/gestion-equipo";
 import { createClient } from "@/lib/supabase/server";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
@@ -18,23 +19,46 @@ const COLOR_ESTADO: Record<string, string> = {
 export async function TableroCreador({ creadorId }: { creadorId: string }) {
   const supabase = createClient();
 
-  const { data: obras } = await supabase
-    .from("obras")
-    .select("id, titulo, estado, roles(id, postulaciones(id, estado))")
-    .eq("creador_id", creadorId)
-    .order("creado_en", { ascending: false });
+  const [{ data: obras }, { data: equipo }] = await Promise.all([
+    supabase
+      .from("obras")
+      .select("id, titulo, estado, roles(id, postulaciones(id, estado))")
+      .eq("creador_id", creadorId)
+      .order("creado_en", { ascending: false }),
+    supabase
+      .from("equipos")
+      .select("id, titulo, cupo, activo")
+      .eq("creador_id", creadorId)
+      .eq("activo", true)
+      .maybeSingle(),
+  ]);
+
+  const tieneObraPublicada = (obras ?? []).some((o) => o.estado === "publicada");
+  const hayEquipoActivo = equipo != null;
 
   return (
     <main className="px-5 py-5">
-      <Link
-        href="/obras/nueva"
-        className="mb-5 flex items-center justify-center gap-1.5 rounded-xl bg-accion px-4 py-3 text-sm font-medium text-accion-texto transition-colors hover:opacity-90"
-      >
-        <Icono nombre="mas" className="h-4 w-4" />
-        Crear nueva obra
-      </Link>
+      {/* Un perfil de Creador lleva adelante una sola iniciativa: un proyecto (obra con
+          roles) o un equipo (por cupo, sin roles). Ver issue #57. */}
+      {!hayEquipoActivo && (
+        <Link
+          href="/obras/nueva"
+          className="mb-3 flex items-center justify-center gap-1.5 rounded-xl bg-accion px-4 py-3 text-sm font-medium text-accion-texto transition-colors hover:opacity-90"
+        >
+          <Icono nombre="mas" className="h-4 w-4" />
+          Crear nueva obra
+        </Link>
+      )}
 
-      {(!obras || obras.length === 0) && (
+      <div className="mb-5">
+        <GestionEquipo
+          creadorId={creadorId}
+          equipo={equipo ?? null}
+          tieneObraPublicada={tieneObraPublicada}
+        />
+      </div>
+
+      {!hayEquipoActivo && (!obras || obras.length === 0) && (
         <EstadoVacio
           icono="tablero"
           titulo="Todavía no creaste ninguna obra"

@@ -8,7 +8,16 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 import { GENEROS_BUSCABLES, type Genero } from "@/lib/constantes";
 import type { TipoRol } from "@/lib/supabase/types";
 
-export function FormularioRol({ obraId }: { obraId: string }) {
+const MAX_ROLES = 10;
+
+export function FormularioRol({
+  obraId,
+  cantidadRoles,
+}: {
+  obraId: string;
+  /** Cuántos roles tiene ya la obra. Tope de 10 (issue #57). */
+  cantidadRoles: number;
+}) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
   const [nombre, setNombre] = useState("");
@@ -71,6 +80,14 @@ export function FormularioRol({ obraId }: { obraId: string }) {
     setGeneros([]);
     setAbierto(false);
     router.refresh();
+  }
+
+  if (cantidadRoles >= MAX_ROLES) {
+    return (
+      <p className="text-sm text-texto-tenue">
+        Llegaste al máximo de {MAX_ROLES} roles por obra.
+      </p>
+    );
   }
 
   if (!abierto) {
