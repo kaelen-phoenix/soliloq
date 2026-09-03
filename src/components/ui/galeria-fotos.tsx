@@ -17,11 +17,17 @@ export function GaleriaFotos({
   alt,
   className = "grid grid-cols-3 gap-2",
   itemClassName = "aspect-[3/4] rounded-xl",
+  destacarPrimera = false,
 }: {
   fotos: string[];
   alt: string;
   className?: string;
   itemClassName?: string;
+  /**
+   * Layout de booking: la primera foto va grande arriba (headshot) y el resto en una
+   * grilla debajo. El visor sigue recorriendo todas las fotos en orden.
+   */
+  destacarPrimera?: boolean;
 }) {
   const [abierta, setAbierta] = useState<number | null>(null);
   const prefiereReduccion = usePrefiereReduccion();
@@ -61,28 +67,52 @@ export function GaleriaFotos({
   const btnRedondo =
     "absolute z-10 flex h-10 w-10 items-center justify-center rounded-full bg-superficie/10 text-white transition-colors hover:bg-superficie/20";
 
+  const miniatura = (url: string, i: number, contClass: string, sizes: string) => (
+    <button
+      key={i}
+      type="button"
+      onClick={() => setAbierta(i)}
+      aria-label={`Ampliar foto ${i + 1} de ${fotos.length}`}
+      className="group block w-full"
+    >
+      <Imagen
+        src={url}
+        alt={alt}
+        fill
+        sizes={sizes}
+        contenedorClassName={contClass}
+        className="transition-transform duration-200 group-hover:scale-[1.03]"
+      />
+    </button>
+  );
+
   return (
     <>
-      <div className={className}>
-        {fotos.map((url, i) => (
-          <button
-            key={i}
-            type="button"
-            onClick={() => setAbierta(i)}
-            aria-label={`Ampliar foto ${i + 1} de ${fotos.length}`}
-            className="group block w-full"
-          >
-            <Imagen
-              src={url}
-              alt={alt}
-              fill
-              sizes="(max-width: 640px) 33vw, 220px"
-              contenedorClassName={itemClassName}
-              className="transition-transform duration-200 group-hover:scale-[1.03]"
-            />
-          </button>
-        ))}
-      </div>
+      {destacarPrimera ? (
+        <div className="flex flex-col gap-2">
+          {miniatura(
+            fotos[0],
+            0,
+            "aspect-[4/5] rounded-2xl",
+            "(max-width: 640px) 100vw, 560px",
+          )}
+          {fotos.length > 1 && (
+            <div className="grid grid-cols-3 gap-2">
+              {fotos
+                .slice(1)
+                .map((url, k) =>
+                  miniatura(url, k + 1, "aspect-[3/4] rounded-xl", "(max-width: 640px) 33vw, 180px"),
+                )}
+            </div>
+          )}
+        </div>
+      ) : (
+        <div className={className}>
+          {fotos.map((url, i) =>
+            miniatura(url, i, itemClassName, "(max-width: 640px) 33vw, 220px"),
+          )}
+        </div>
+      )}
 
       <AnimatePresence>
         {abierta !== null && (
