@@ -1,11 +1,13 @@
-## 0. Decisiones de producto / técnicas
+## 0. Decisiones — RESUELTAS (ver design.md)
 
-- [ ] 0.1 Confirmar: extracción en server, en memoria, sin storage (propuesta del design).
-- [ ] 0.2 Confirmar: la foto del CV no se usa en v1.
-- [ ] 0.3 Confirmar topes (8 MB doc / 12 MB imagen / 15 páginas PDF).
-- [ ] 0.4 Confirmar: habilidades sin match no se muestran en v1.
-- [ ] 0.5 Decidir cómo se resuelve la ubicación extraída (coords server-side vs. string a confirmar).
-- [ ] 0.6 Medir cold-start con `pdfjs-dist` + `tesseract.js` en el deploy; decidir si el OCR va aislado.
+- [x] 0.1 Extracción en server, en memoria, sin storage.
+- [x] 0.2 Foto del CV: no se usa en v1.
+- [x] 0.3 Topes: 8 MB doc / 12 MB imagen / 15 páginas PDF.
+- [x] 0.4 Habilidades sin match: no se muestran en v1.
+- [x] 0.5 Ubicación extraída: string a confirmar en el autocompletado (sin geocoding server-side).
+- [x] 0.6 Cold-start del OCR: medir tras un spike; aislar la función si duele. No bloquea.
+
+**Prioridad: P2.** Se implementa después de #57. El change queda listo para arrancar.
 
 ## 1. Dependencias
 

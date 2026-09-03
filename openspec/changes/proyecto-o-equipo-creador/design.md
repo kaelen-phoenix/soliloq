@@ -5,14 +5,17 @@ El repo ya tiene **dos circuitos** que esta feature unifica bajo una sola elecci
 - **Obras + roles + postulaciones** (`0001`…, `convocatorias`, `feed_para_talento`, `seleccion-match`, `sala-proyecto`). Es el camino "principal". Los roles ya existen y ya tienen tipo (`actuacion` / `tecnica`).
 - **Armar equipo** (`0033_armar_equipo.sql`): `busca_equipo` (bool en `perfiles`), `intereses_equipo` (de_perfil / a_perfil / interesa), `feed_equipo`, `perfil_para_responder`. Nació como función paralela, sin "cupo" ni "título".
 
-## Decisiones abiertas (bloquean implementación)
+## Decisiones — RESUELTAS (2026-09-03, criterio de negocio)
 
-| # | Decisión | Default propuesto |
-|---|---|---|
-| 1 | Tope de integrantes de un Equipo | **6** (dominante en la spec; la línea "1–10" se descarta salvo aviso) |
-| 2 | `0033` (`intereses_equipo` / `busca_equipo`) | Reusar la tabla `intereses_equipo` para el match de Equipo; agregar `equipos` (id, creador_id, titulo, cupo, activo). Deprecar `busca_equipo` como bool suelto. Migración aditiva + backfill de los `busca_equipo=true` actuales a un `equipos` con título placeholder |
-| 3 | Obras existentes → Proyectos | Toda `obra` existente se considera un Proyecto. "Activo" pasa a ser un flag por obra/equipo; un creador puede tener varias obras históricas pero **una sola activa** |
-| 4 | ¿Dónde vive "tipo de iniciativa activa"? | No una columna en `perfiles`: un Creador tiene 0..1 `obra` activa **o** 0..1 `equipo` activo. Una vista/función deriva "qué tiene activo". Constraint: no puede haber ambas activas |
+El dueño delegó estas decisiones ("pensando en lo mejor para el negocio, tomá tus decisiones").
+
+| # | Decisión | Resolución | Por qué |
+|---|---|---|---|
+| 1 | Tope de integrantes de un Equipo | **6**. La línea "1–10" de la spec se descarta. | Es el número dominante en la spec (título, contexto, impacto, criterios). Un equipo de armado inicial no necesita más; 6 mantiene la sala manejable. |
+| 2 | `0033` (`intereses_equipo` / `busca_equipo`) | **Reusar `intereses_equipo`** para el match de Equipo (se le suma `equipo_id` nullable). **Nueva tabla `equipos`** (id, creador_id, titulo, cupo, activo). `busca_equipo` (bool en `perfiles`) queda deprecado: en la migración, cada `busca_equipo=true` genera un `equipos` con `cupo=6` y `titulo` placeholder editable ("Armá equipo conmigo"). | No se pierde ni un dato en prod. Reusar `intereses_equipo` evita duplicar el circuito de match/sala que ya está probado. |
+| 3 | Obras existentes → Proyectos | Toda `obra` es un Proyecto. Se agrega `obras.activa boolean default true`. Un creador puede tener varias obras históricas; **una sola activa**. Al migrar, si un creador tiene >1 obra, queda activa la más reciente y el resto `activa=false`. | Cambio aditivo, sin backfill destructivo. "Activa" por publicación (no por perfil) permite archivar sin borrar. |
+| 4 | ¿Dónde vive "iniciativa activa"? | **No** en `perfiles`. Un Creador tiene 0..1 obra activa **XOR** 0..1 equipo activo. La exclusión mutua se enforce **en la aplicación** en la fase 1 y con **constraint de base** (trigger) en la fase 2, junto con el feed. | Meter el trigger de una en prod, a ciegas, puede bloquear el alta de obra si la lógica falla. Se valida primero en la app corriendo. |
+| 5 | Tope de 10 roles | Constraint de base `count(roles) por obra <= 10` **solo si** ninguna obra existente ya lo supera (a verificar antes de aplicar). Si alguna lo supera, se enforce solo en el form en fase 1. | — |
 
 ## Modelo de datos (propuesta, sujeta a decisiones)
 

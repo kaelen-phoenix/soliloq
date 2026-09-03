@@ -1,10 +1,15 @@
-## 0. Decisiones de producto (bloqueantes)
+## 0. Decisiones — RESUELTAS (ver design.md)
 
-- [ ] 0.1 Confirmar tope de integrantes de un Equipo (6 vs. otro).
-- [ ] 0.2 Confirmar qué se hace con `0033` (`intereses_equipo` / `busca_equipo`): migrar o rehacer.
-- [ ] 0.3 Confirmar tratamiento de obras existentes (todas → Proyecto; concepto de "activa").
-- [ ] 0.4 Confirmar dónde vive "iniciativa activa" y la regla de exclusión mutua.
-- [ ] 0.5 Confirmar contenedor de fotos de la publicación (nueva tabla vs. reuso) y el mínimo de 3.
+- [x] 0.1 Tope de integrantes de un Equipo: **6**.
+- [x] 0.2 `0033`: reusar `intereses_equipo` (+ `equipo_id`), nueva tabla `equipos`, `busca_equipo` deprecado con backfill no destructivo.
+- [x] 0.3 Obras existentes: todas son Proyecto; `obras.activa` (default true); si un creador tiene varias, activa la más reciente.
+- [x] 0.4 Exclusión mutua obra/equipo activo: en la app en fase 1, con trigger de base en fase 2 (junto al feed).
+- [x] 0.5 Fotos de la publicación: nueva `fotos_publicacion` (o `fotos_obra`/`fotos_equipo`), mínimo 3 validado en el form.
+
+## Fases
+
+- **Fase 1** (aditiva, sin tocar el feed del talento): tablas + `obras.activa` + elección del Creador + form de Equipo + form de Proyecto con tope 10 y mínimo 3 fotos.
+- **Fase 2** (toca el bucle central): `feed_para_talento` unión Proyecto+Equipo, match de Equipo por cupo, badge visual (#58), trigger de exclusión mutua.
 
 ## 1. Base de datos
 
