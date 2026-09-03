@@ -1,7 +1,7 @@
 import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
 import { etiquetaDisciplina } from "@/lib/constantes";
-import { CREMA, FRAMBUESA } from "@/app/_marca-icono";
+import { CREMA, NARANJA } from "@/app/_marca-icono";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -12,24 +12,24 @@ const INK_600 = "#5c565f";
 
 function Marca() {
   return (
-    <div style={{ display: "flex", alignItems: "center", gap: 12, color: FRAMBUESA }}>
+    <div style={{ display: "flex", alignItems: "center", gap: 12, color: NARANJA }}>
       <svg
         width={30}
         height={30}
         viewBox="0 0 24 24"
         fill="none"
-        stroke={FRAMBUESA}
-        strokeWidth={2.1}
+        stroke={NARANJA}
+        strokeWidth={2.2}
         strokeLinecap="round"
         strokeLinejoin="round"
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M3.5 21V10.5C3.5 6 7.5 2.5 12 2.5S20.5 6 20.5 10.5V21" />
-        <path d="M2 21h20" />
-        <circle cx="12" cy="15.3" r="2" fill={FRAMBUESA} stroke="none" />
+        <path d="M12 21V12" />
+        <path d="M12 12C10.5 8.5 8 5.7 5 3.7" />
+        <path d="M12 12C13.5 8.5 16 5.7 19 3.7" />
       </svg>
-      <div style={{ display: "flex", fontSize: 26, fontWeight: 700, letterSpacing: -0.5 }}>
-        Yalope
+      <div style={{ display: "flex", fontSize: 27, fontWeight: 800, letterSpacing: -1 }}>
+        yalope
       </div>
     </div>
   );
@@ -102,7 +102,7 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
             justifyContent: "center",
             gap: 22,
             padding: foto ? 64 : 80,
-            borderLeft: foto ? `6px solid ${FRAMBUESA}` : "none",
+            borderLeft: foto ? `6px solid ${NARANJA}` : "none",
             alignItems: foto ? "flex-start" : "center",
             textAlign: foto ? "left" : "center",
           }}
@@ -124,7 +124,7 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
             <div style={{ display: "flex", fontSize: 28, color: INK_600 }}>{datos}</div>
           ) : null}
           {oficios ? (
-            <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: FRAMBUESA }}>
+            <div style={{ display: "flex", fontSize: 24, fontWeight: 600, color: NARANJA }}>
               {oficios}
             </div>
           ) : null}

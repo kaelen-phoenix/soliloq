@@ -17,36 +17,37 @@ const config: Config = {
         borde: "rgb(var(--borde) / <alpha-value>)",
         accion: "rgb(var(--accion) / <alpha-value>)",
         "accion-texto": "rgb(var(--accion-texto) / <alpha-value>)",
-        // Acento: se usa solo en acciones primarias y estados activos. Frambuesa cálida —
-        // más rica y teatral que el magenta plano de antes, y bien distinta del rojo de
+        // Acento: se usa solo en acciones primarias y estados activos. Rojo-naranja de la
+        // identidad de marca (ver `docs/marca/`): `500` es el "rojo Yalope" `#e62d03`, con
+        // la rampa cálida naranja→ladrillo del documento. Bien distinto del rojo plano de
         // `error`.
         brand: {
-          50: "#fdf1f4",
-          100: "#fce0e8",
-          200: "#f8c1d1",
-          300: "#f191ac",
-          400: "#e65a82",
-          500: "#cf1f57",
-          600: "#b01449",
-          700: "#8f0f3c",
-          900: "#500722",
+          50: "#fff5f3",
+          100: "#fee1da",
+          200: "#ffbfb0",
+          300: "#fca995",
+          400: "#fe8064",
+          500: "#e62d03",
+          600: "#c62703",
+          700: "#9d280b",
+          900: "#5f1604",
         },
         // Acento por rol. No es un color nuevo suelto: `talento` es la rampa de `brand`
-        // (el rosa que la app ya usaba por defecto) y `creador` es su complementario en
-        // índigo, con el mismo peso visual. Solo tiñen encabezado, ítem de navegación
+        // (el rojo-naranja de marca) y `creador` es su complementario en índigo, con el
+        // mismo peso visual. Solo tiñen encabezado, ítem de navegación
         // activo y anillo de foco —vía la variable `--acento` en `globals.css`— para
         // reforzar en qué modo estás. Nunca reemplazan a `brand` en las acciones
         // primarias ni conviven con las etiquetas de familia de oficio en la misma zona.
         talento: {
-          50: "#fdf1f4",
-          100: "#fce0e8",
-          200: "#f8c1d1",
-          300: "#f191ac",
-          400: "#e65a82",
-          500: "#cf1f57",
-          600: "#b01449",
-          700: "#8f0f3c",
-          900: "#500722",
+          50: "#fff5f3",
+          100: "#fee1da",
+          200: "#ffbfb0",
+          300: "#fca995",
+          400: "#fe8064",
+          500: "#e62d03",
+          600: "#c62703",
+          700: "#9d280b",
+          900: "#5f1604",
         },
         creador: {
           50: "#eef0fb",
@@ -162,9 +163,11 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        // Reservada para la marca y los títulos de portada. Si aparece en un botón o
+        // Reservada para los títulos de portada y de pantalla. Si aparece en un botón o
         // en un label, está mal usada: la interfaz es toda `sans`.
         display: ["var(--font-display)", "Georgia", "serif"],
+        // Solo el wordmark «yalope». No usar en ningún otro lado.
+        marca: ["var(--font-marca)", "system-ui", "sans-serif"],
       },
       // `rounded-card` y `shadow-sutil` vivieron acá sin que nadie los usara nunca: uno
       // duplicaba `rounded-2xl` (los dos son 1rem) y el otro no llegó a aplicarse. Un token

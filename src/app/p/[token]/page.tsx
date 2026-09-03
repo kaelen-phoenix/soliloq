@@ -3,7 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
-import { Logotipo, MarcaProscenio } from "@/components/ui/logotipo";
+import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 import { VidrieraPublica } from "@/components/perfil/vidriera-publica";
 import { BotonContactarPublico } from "@/components/perfil/boton-contactar-publico";
 
@@ -100,7 +100,7 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
             </Link>
           ) : (
             <span className="inline-flex items-center gap-1.5">
-              <MarcaProscenio className="h-4 w-4 text-ink-400" />
+              <MarcaYalope className="h-4 w-4 text-ink-400" />
               Perfil en Yalope
             </span>
           )}

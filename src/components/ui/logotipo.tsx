@@ -1,11 +1,11 @@
 /**
- * Única definición de la marca. Cualquier lugar que muestre "Yalope" tiene que usar esto,
+ * Única definición de la marca. Cualquier lugar que muestre "yalope" tiene que usar esto,
  * para que no existan dos versiones del logo que se desincronicen.
  *
- * La marca es un **arco de proscenio**: el marco del escenario visto de frente, con la
- * tabla del piso y una figura bajo la luz. Geométrico y de una sola tinta, así se lee
- * igual en un favicon de 16px que en una portada. La palabra va en la serif de display
- * (registro de programa de mano). Todo hereda el color según `tono`.
+ * La marca es una **«Y» abierta hacia arriba**: dos brazos que se abren, como manos que
+ * reciben o un brote. Geométrica y de una sola tinta, así se lee igual en un favicon de
+ * 16px que en una portada. El wordmark va en minúscula, en la sans redondeada `marca`
+ * (ver `docs/marca/`). Todo hereda el color según `tono`.
  */
 
 const TAMANOS = {
@@ -16,30 +16,34 @@ const TAMANOS = {
 
 type Tono = "ink" | "claro" | "acento";
 
+// El isotipo va siempre en el rojo de marca (salvo sobre superficie oscura, donde va en
+// blanco). El wordmark va en tinta, para que la marca no grite en cada barra lateral.
 const TONO: Record<Tono, { texto: string; marca: string }> = {
-  ink: { texto: "text-texto", marca: "text-texto" },
+  ink: { texto: "text-texto", marca: "text-brand-500" },
   claro: { texto: "text-white", marca: "text-white" },
-  acento: { texto: "text-texto", marca: "text-brand-500" },
+  acento: { texto: "text-brand-600", marca: "text-brand-500" },
 };
 
-export function MarcaProscenio({ className = "h-6 w-6" }: { className?: string }) {
+export function MarcaYalope({ className = "h-6 w-6" }: { className?: string }) {
   return (
     <svg
       viewBox="0 0 24 24"
       fill="none"
       stroke="currentColor"
-      strokeWidth={2}
+      strokeWidth={2.1}
       strokeLinecap="round"
       strokeLinejoin="round"
       className={className}
       aria-hidden="true"
     >
-      {/* Arco de proscenio, abierto abajo. */}
-      <path d="M3.5 21V10.5C3.5 6 7.5 2.5 12 2.5S20.5 6 20.5 10.5V21" />
-      {/* Tabla del escenario. */}
-      <path d="M2 21h20" />
-      {/* Figura bajo la luz. */}
-      <circle cx="12" cy="15.5" r="1.9" fill="currentColor" stroke="none" />
+      {/* Tallo. */}
+      <path d="M12 21V13" />
+      {/* Brazo izquierdo: trazo largo + uno corto por dentro, como una mano abierta. */}
+      <path d="M12 13C10.3 10 8.2 7.4 5.5 5.4" />
+      <path d="M12 13C11 11 9.9 9.3 8.7 8" />
+      {/* Brazo derecho, espejado. */}
+      <path d="M12 13C13.7 10 15.8 7.4 18.5 5.4" />
+      <path d="M12 13C13 11 14.1 9.3 15.3 8" />
     </svg>
   );
 }
@@ -58,11 +62,11 @@ export function Logotipo({
 
   return (
     <span className={`inline-flex items-center ${t.gap} ${className}`}>
-      <MarcaProscenio className={`${t.marca} ${c.marca}`} />
+      <MarcaYalope className={`${t.marca} ${c.marca}`} />
       <span
-        className={`font-display font-semibold leading-none tracking-[-0.02em] ${t.texto} ${c.texto}`}
+        className={`font-marca font-extrabold lowercase leading-none tracking-[-0.03em] ${t.texto} ${c.texto}`}
       >
-        Yalope
+        yalope
       </span>
     </span>
   );

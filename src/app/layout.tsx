@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Fraunces, Inter, Nunito } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
@@ -23,6 +23,16 @@ const fraunces = Fraunces({
   display: "swap",
   variable: "--font-display",
   style: ["normal"],
+});
+
+// Solo para el wordmark de la marca: «yalope» en minúscula, sans redondeada y pesada
+// (ver `docs/marca/`). No es una fuente de interfaz ni de títulos — esos siguen en Inter
+// y Fraunces. Un solo peso: el wordmark siempre va en 800.
+const nunito = Nunito({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-marca",
+  weight: ["800"],
 });
 
 const DESCRIPCION =
@@ -77,7 +87,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${fraunces.variable}`}>
+    <html lang={locale} className={`${inter.variable} ${fraunces.variable} ${nunito.variable}`}>
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
       </head>
