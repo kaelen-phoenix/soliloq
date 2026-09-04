@@ -95,7 +95,11 @@
     "iosPaso1": "Tocá el botón Compartir en la barra de Safari.",
     "iosPaso2": "Elegí «Agregar a inicio».",
     "iosPaso3": "Confirmá con «Agregar».",
-    "iosCerrar": "Entendido"
+    "iosCerrar": "Entendido",
+    "genericoTitulo": "Instalar Yalope",
+    "genericoPaso1": "Abrí el menú del navegador (⋮ o el botón Compartir).",
+    "genericoPaso2": "Elegí «Instalar app» o «Agregar a pantalla de inicio».",
+    "genericoPaso3": "Confirmá."
   },
   "auth": {
     "titulo": "Entrá a Yalope",

@@ -26,13 +26,17 @@ function esIOS() {
   );
 }
 
+type Ayuda = "ios" | "generico" | null;
+
 /**
- * Botón para instalar Yalope como PWA.
+ * Botón para instalar Yalope como PWA. Se muestra **siempre** (salvo que la app ya
+ * esté corriendo instalada, donde no tendría sentido).
  *
- * - Android / Chrome / Edge: dispara el diálogo nativo vía `beforeinstallprompt`.
- * - iOS / iPadOS: Safari no expone ese evento, así que el botón abre un instructivo
- *   (Compartir → «Agregar a inicio»).
- * - Si la app ya está instalada, no se renderiza nada.
+ * - Android / Chrome / Edge: si el navegador ya disparó `beforeinstallprompt`, el botón
+ *   abre el diálogo nativo.
+ * - iOS / iPadOS: Safari no expone ese evento → instructivo (Compartir → «Agregar a inicio»).
+ * - Cualquier otro caso (escritorio, Firefox, o Chrome antes de que dispare el evento):
+ *   instructivo genérico (menú del navegador → «Instalar app»).
  */
 export function BotonInstalar({
   className,
@@ -45,11 +49,14 @@ export function BotonInstalar({
 }) {
   const t = useTranslations("instalar");
   const [evento, setEvento] = useState<EventoInstalacion | null>(null);
-  const [visible, setVisible] = useState(false);
-  const [ayudaIOS, setAyudaIOS] = useState(false);
+  const [oculto, setOculto] = useState(false);
+  const [ayuda, setAyuda] = useState<Ayuda>(null);
 
   useEffect(() => {
-    if (yaInstalada()) return;
+    if (yaInstalada()) {
+      setOculto(true);
+      return;
+    }
 
     // El SW es requisito para que Chrome considere la app instalable.
     if ("serviceWorker" in navigator) {
@@ -59,18 +66,14 @@ export function BotonInstalar({
     function alPoderInstalar(e: Event) {
       e.preventDefault();
       setEvento(e as EventoInstalacion);
-      setVisible(true);
     }
     function alInstalar() {
-      setVisible(false);
       setEvento(null);
+      setOculto(true);
     }
 
     window.addEventListener("beforeinstallprompt", alPoderInstalar);
     window.addEventListener("appinstalled", alInstalar);
-
-    // iOS no dispara `beforeinstallprompt`: se muestra igual, con instructivo.
-    if (esIOS()) setVisible(true);
 
     return () => {
       window.removeEventListener("beforeinstallprompt", alPoderInstalar);
@@ -78,17 +81,17 @@ export function BotonInstalar({
     };
   }, []);
 
-  if (!visible) return null;
+  if (oculto) return null;
 
   async function instalar() {
-    if (!evento) {
-      setAyudaIOS(true);
+    if (evento) {
+      await evento.prompt();
+      const { outcome } = await evento.userChoice;
+      setEvento(null);
+      if (outcome === "accepted") setOculto(true);
       return;
     }
-    await evento.prompt();
-    const { outcome } = await evento.userChoice;
-    setEvento(null);
-    if (outcome === "accepted") setVisible(false);
+    setAyuda(esIOS() ? "ios" : "generico");
   }
 
   const boton = (
@@ -105,6 +108,12 @@ export function BotonInstalar({
     </button>
   );
 
+  const titulo = ayuda === "ios" ? t("iosTitulo") : t("genericoTitulo");
+  const pasos =
+    ayuda === "ios"
+      ? [t("iosPaso1"), t("iosPaso2"), t("iosPaso3")]
+      : [t("genericoPaso1"), t("genericoPaso2"), t("genericoPaso3")];
+
   return (
     <>
       {conSeccion ? (
@@ -117,29 +126,27 @@ export function BotonInstalar({
         boton
       )}
 
-      {ayudaIOS ? (
+      {ayuda ? (
         <div
           role="dialog"
           aria-modal="true"
-          aria-label={t("iosTitulo")}
+          aria-label={titulo}
           className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
-          onClick={() => setAyudaIOS(false)}
+          onClick={() => setAyuda(null)}
         >
           <div
             className="w-full max-w-sm rounded-2xl bg-superficie p-5 text-texto shadow-tarjeta"
             onClick={(e) => e.stopPropagation()}
           >
-            <h3 className="font-display text-lg font-semibold tracking-[-0.02em]">
-              {t("iosTitulo")}
-            </h3>
+            <h3 className="font-display text-lg font-semibold tracking-[-0.02em]">{titulo}</h3>
             <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-texto-tenue">
-              <li>{t("iosPaso1")}</li>
-              <li>{t("iosPaso2")}</li>
-              <li>{t("iosPaso3")}</li>
+              {pasos.map((paso) => (
+                <li key={paso}>{paso}</li>
+              ))}
             </ol>
             <button
               type="button"
-              onClick={() => setAyudaIOS(false)}
+              onClick={() => setAyuda(null)}
               className="mt-5 w-full rounded-xl bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto"
             >
               {t("iosCerrar")}

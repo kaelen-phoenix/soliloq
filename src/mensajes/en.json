@@ -95,7 +95,11 @@
     "iosPaso1": "Tap the Share button in Safari's toolbar.",
     "iosPaso2": "Choose “Add to Home Screen”.",
     "iosPaso3": "Confirm with “Add”.",
-    "iosCerrar": "Got it"
+    "iosCerrar": "Got it",
+    "genericoTitulo": "Install Yalope",
+    "genericoPaso1": "Open your browser menu (⋮ or the Share button).",
+    "genericoPaso2": "Choose “Install app” or “Add to Home Screen”.",
+    "genericoPaso3": "Confirm."
   },
   "auth": {
     "titulo": "Log in to Yalope",
