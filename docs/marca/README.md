@@ -8,7 +8,7 @@
 | Superficie | Qué usa |
 |---|---|
 | Imágenes OG (compartir) | El **PNG real** del logotipo, edge-to-edge sobre negro (`_logo-datauri.ts` + `app/opengraph-image.tsx`). |
-| Favicon, apple-icon, íconos PWA | El **isotipo redibujado** en SVG (naranja-rojo plano sobre negro) — Satori no embebe un logo ancho en un cuadrado ni hace degradés (`app/_marca-icono.tsx`). |
+| Favicon, apple-icon, íconos PWA | El **isotipo redibujado** en SVG: dos manos de tres trazos cada una (naranja `#f2571e` izquierda, rojo `#e62d03` derecha) sobre negro. No se recorta el PNG apaisado a un cuadrado —el wordmark va pegado al isotipo— y Satori no hace degradés (`app/_marca-icono.tsx`). |
 | Logo en la app (barras, portada, «Apoyar») | Isotipo redibujado + wordmark «yalope» en **Baloo 2** 800 (`components/ui/logotipo.tsx`). |
 | OG del perfil compartido (`/p/[token]`) | Isotipo redibujado chico + «yalope» en texto. |
 
