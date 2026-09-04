@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { createAdminClient } from "@/lib/supabase/admin";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { borrarUsuarioYArchivos } from "@/lib/supabase/borrar-usuario";
 
@@ -25,7 +26,11 @@ export async function adminBorrarUsuario(idObjetivo: string): Promise<Resultado>
   if (!estado.esAdmin) return { ok: false, error: "No autorizado." };
   if (idObjetivo === user.id) return { ok: false, error: "No podés borrarte a vos mismo." };
 
-  const { data: objetivo } = await supabase
+  // `perfiles_select_propio` (0001) solo deja leer la fila propia: con el cliente de
+  // sesión, mirar el perfil de otra persona siempre da null, sea quien sea. Hace falta el
+  // service-role para chequear si el objetivo es admin.
+  const admin = createAdminClient();
+  const { data: objetivo } = await admin
     .from("perfiles")
     .select("es_admin")
     .eq("id", idObjetivo)
