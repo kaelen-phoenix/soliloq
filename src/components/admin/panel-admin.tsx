@@ -5,6 +5,7 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { createClient } from "@/lib/supabase/client";
+import { adminBorrarUsuario } from "@/app/(app)/admin/acciones";
 import type { Database } from "@/lib/supabase/types";
 
 type Metricas = Database["public"]["Functions"]["admin_metricas"]["Returns"][number];
@@ -327,6 +328,7 @@ function Usuarios({
   const [offset, setOffset] = useState(iniciales.length);
   const [hayMas, setHayMas] = useState(iniciales.length === PAGINA);
   const [cargando, setCargando] = useState(false);
+  const [borrandoId, setBorrandoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const buscar = useCallback(
@@ -370,6 +372,25 @@ function Usuarios({
     }
     setError(null);
     setFilas((prev) => prev.map((f) => (f.id === u.id ? { ...f, suspendido: suspender } : f)));
+  }
+
+  async function borrar(u: Usuario) {
+    if (
+      !window.confirm(
+        `¿Borrar a ${u.nombre ?? u.email}? Se elimina la cuenta con todo su contenido ` +
+          `—perfil, proyectos, salas, mensajes—. Es irreversible; para una baja reversible usá Suspender.`,
+      )
+    )
+      return;
+    setBorrandoId(u.id);
+    const res = await adminBorrarUsuario(u.id);
+    setBorrandoId(null);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
+    setError(null);
+    setFilas((prev) => prev.filter((f) => f.id !== u.id));
   }
 
   return (
@@ -422,17 +443,27 @@ function Usuarios({
                 </p>
               </div>
               {u.id !== miId && !u.es_admin && (
-                <button
-                  type="button"
-                  onClick={() => alternarSuspension(u)}
-                  className={`shrink-0 rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-                    u.suspendido
-                      ? "border-borde text-texto hover:bg-fondo-sutil"
-                      : "border-error-400 text-error-600 hover:bg-error-50"
-                  }`}
-                >
-                  {u.suspendido ? "Reactivar" : "Suspender"}
-                </button>
+                <div className="flex shrink-0 gap-1.5">
+                  <button
+                    type="button"
+                    onClick={() => alternarSuspension(u)}
+                    className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+                      u.suspendido
+                        ? "border-borde text-texto hover:bg-fondo-sutil"
+                        : "border-error-400 text-error-600 hover:bg-error-50"
+                    }`}
+                  >
+                    {u.suspendido ? "Reactivar" : "Suspender"}
+                  </button>
+                  <button
+                    type="button"
+                    onClick={() => borrar(u)}
+                    disabled={borrandoId === u.id}
+                    className="rounded-lg border border-error-400 px-2.5 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:opacity-50"
+                  >
+                    {borrandoId === u.id ? "Borrando…" : "Borrar"}
+                  </button>
+                </div>
               )}
             </li>
           ))}
