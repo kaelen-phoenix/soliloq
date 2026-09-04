@@ -1,7 +1,7 @@
 import Link from "next/link";
 import { redirect } from "next/navigation";
-import { AltaTalento } from "@/components/perfil/alta-talento";
 import { FormularioCreador } from "@/components/perfil/formulario-creador";
+import { FormularioTalento } from "@/components/perfil/formulario-talento";
 import { rolFaltante } from "@/lib/cuenta";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
@@ -32,7 +32,7 @@ export default async function NuevoPerfilPage() {
       </p>
 
       {falta === "talento" ? (
-        <AltaTalento userId={user.id} />
+        <FormularioTalento userId={user.id} esAlta fotosIniciales={[]} />
       ) : (
         <FormularioCreador userId={user.id} esAlta />
       )}
