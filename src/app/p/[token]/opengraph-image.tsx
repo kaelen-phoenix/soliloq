@@ -2,6 +2,7 @@ import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
 import { etiquetaDisciplina } from "@/lib/constantes";
 import { CREMA, NARANJA } from "@/app/_marca-icono";
+import { ISOTIPO_TRAZOS, ISOTIPO_VIEWBOX } from "@/lib/marca-isotipo";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
@@ -14,21 +15,15 @@ function Marca() {
   return (
     <div style={{ display: "flex", alignItems: "center", gap: 12, color: NARANJA }}>
       <svg
-        width={30}
+        width={24}
         height={30}
-        viewBox="0 0 24 24"
-        fill="none"
-        stroke={NARANJA}
-        strokeWidth={2.2}
-        strokeLinecap="round"
-        strokeLinejoin="round"
+        viewBox={ISOTIPO_VIEWBOX}
+        fill={NARANJA}
         xmlns="http://www.w3.org/2000/svg"
       >
-        <path d="M12 21V13.5" />
-        <path d="M12 13.5C10.8 10.6 8.9 7.7 6.2 5.2" />
-        <path d="M12 13.5C11.3 11.6 10.4 10 9.1 8.6" />
-        <path d="M12 13.5C13.2 10.6 15.1 7.7 17.8 5.2" />
-        <path d="M12 13.5C12.7 11.6 13.6 10 14.9 8.6" />
+        {ISOTIPO_TRAZOS.map((t, i) => (
+          <path key={i} d={t.d} transform={`translate(${t.x},${t.y})`} />
+        ))}
       </svg>
       <div style={{ display: "flex", fontSize: 27, fontWeight: 800, letterSpacing: -1 }}>
         yalope

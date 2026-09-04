@@ -1,19 +1,41 @@
 /**
  * El dibujo de la marca para los íconos generados (`icon.tsx`, `apple-icon.tsx`, los PNG
  * del manifest). No es un componente de la app: lo consume `ImageResponse`, que solo
- * entiende estilos inline y un subconjunto de SVG (nada de degradés en `<defs>`, por eso
- * el isotipo va en un naranja-rojo plano acá).
+ * entiende estilos inline y un subconjunto de SVG.
  *
- * La marca es una **«Y» de dos manos que se abren**, como en `docs/marca/logotipo-yalope.svg`.
+ * El isotipo (la «Y» de dos manos que se abren) sale de `@/lib/marca-isotipo`, que es el
+ * trazado vectorial del logo real (`docs/marca/isotipo.svg`). Acá se pinta a dos tintas
+ * —naranja el brazo izquierdo, rojo el derecho— sobre negro. El PNG apaisado real no se
+ * puede recortar limpio a un cuadrado (el wordmark va pegado), por eso se usa el vector.
  */
+
+import { ISOTIPO_TRAZOS, ISOTIPO_VIEWBOX } from "@/lib/marca-isotipo";
 
 export const NARANJA = "#e62d03";
 export const CREMA = "#fbfaf7";
 export const TINTA = "#060606";
-const MARCA_ICONO = "#f2571e";
+const BRAZO_IZQ = "#f2571e";
+const BRAZO_DER = "#e62d03";
 
-export function MarcaIcono({ lado, radio }: { lado: number; radio: number }) {
-  const s = lado * 0.82;
+// El isotipo es más alto que ancho (322×402).
+const [, , ISO_W, ISO_H] = ISOTIPO_VIEWBOX.split(" ").map(Number);
+
+/**
+ * El isotipo real centrado en el cuadrado del ícono, sobre negro.
+ * @param escala  fracción del lado que ocupa el ALTO del isotipo (0.7 normal; ~0.55 para
+ *                maskable, que el sistema recorta a círculo/squircle).
+ */
+export function MarcaIcono({
+  lado,
+  radio,
+  escala = 0.7,
+}: {
+  lado: number;
+  radio: number;
+  escala?: number;
+}) {
+  const h = lado * escala;
+  const w = (h * ISO_W) / ISO_H;
   return (
     <div
       style={{
@@ -27,24 +49,20 @@ export function MarcaIcono({ lado, radio }: { lado: number; radio: number }) {
       }}
     >
       <svg
-        width={s}
-        height={s}
-        viewBox="0 0 24 24"
+        width={w}
+        height={h}
+        viewBox={ISOTIPO_VIEWBOX}
         fill="none"
-        stroke={MARCA_ICONO}
-        strokeWidth={2.5}
-        strokeLinecap="round"
-        strokeLinejoin="round"
         xmlns="http://www.w3.org/2000/svg"
       >
-        {/* Tallo. */}
-        <path d="M12 21.5V13" />
-        {/* Brazo izquierdo: trazo largo + uno corto por dentro, como una mano abierta. */}
-        <path d="M12 13C10.6 10 8.5 6.9 5.5 4.2" />
-        <path d="M12 13C11.2 10.9 10.2 9.1 8.7 7.6" />
-        {/* Brazo derecho, espejado. */}
-        <path d="M12 13C13.4 10 15.5 6.9 18.5 4.2" />
-        <path d="M12 13C12.8 10.9 13.8 9.1 15.3 7.6" />
+        {ISOTIPO_TRAZOS.map((t, i) => (
+          <path
+            key={i}
+            d={t.d}
+            transform={`translate(${t.x},${t.y})`}
+            fill={t.brazo === "izq" ? BRAZO_IZQ : BRAZO_DER}
+          />
+        ))}
       </svg>
     </div>
   );
