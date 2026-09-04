@@ -1,17 +1,20 @@
+import { ISOTIPO_TRAZOS, ISOTIPO_VIEWBOX } from "@/lib/marca-isotipo";
+
 /**
  * Única definición de la marca. Cualquier lugar que muestre "yalope" tiene que usar esto,
  * para que no existan dos versiones del logo que se desincronicen.
  *
- * La marca es una **«Y» abierta hacia arriba**: dos brazos que se abren, como manos que
- * reciben o un brote. Geométrica y de una sola tinta, así se lee igual en un favicon de
- * 16px que en una portada. El wordmark va en minúscula, en la sans redondeada `marca`
- * (ver `docs/marca/`). Todo hereda el color según `tono`.
+ * La marca es una **«Y» de dos manos que se abren**. El isotipo sale de
+ * `@/lib/marca-isotipo` —el trazado vectorial del logo real (`docs/marca/isotipo.svg`)—,
+ * acá a una sola tinta que hereda el color según `tono`. El wordmark va en minúscula, en
+ * la sans redondeada `marca` (ver `docs/marca/`).
  */
 
+// El isotipo es más alto que ancho (~0.8), así que el ancho del recuadro acompaña.
 const TAMANOS = {
-  sm: { marca: "h-5 w-5", texto: "text-lg", gap: "gap-1.5" },
-  md: { marca: "h-7 w-7", texto: "text-2xl", gap: "gap-2" },
-  lg: { marca: "h-10 w-10", texto: "text-[2rem]", gap: "gap-2.5" },
+  sm: { marca: "h-5 w-4", texto: "text-lg", gap: "gap-1.5" },
+  md: { marca: "h-7 w-[1.4rem]", texto: "text-2xl", gap: "gap-2" },
+  lg: { marca: "h-10 w-8", texto: "text-[2rem]", gap: "gap-2.5" },
 } as const;
 
 type Tono = "ink" | "claro" | "acento";
@@ -24,26 +27,17 @@ const TONO: Record<Tono, { texto: string; marca: string }> = {
   acento: { texto: "text-brand-600", marca: "text-brand-500" },
 };
 
-export function MarcaYalope({ className = "h-6 w-6" }: { className?: string }) {
+export function MarcaYalope({ className = "h-6 w-5" }: { className?: string }) {
   return (
     <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth={2.1}
-      strokeLinecap="round"
-      strokeLinejoin="round"
+      viewBox={ISOTIPO_VIEWBOX}
+      fill="currentColor"
       className={className}
       aria-hidden="true"
     >
-      {/* Tallo. */}
-      <path d="M12 21V13.5" />
-      {/* Brazo izquierdo: trazo largo + uno corto por dentro, como una mano abierta. */}
-      <path d="M12 13.5C10.8 10.6 8.9 7.7 6.2 5.2" />
-      <path d="M12 13.5C11.3 11.6 10.4 10 9.1 8.6" />
-      {/* Brazo derecho, espejado. */}
-      <path d="M12 13.5C13.2 10.6 15.1 7.7 17.8 5.2" />
-      <path d="M12 13.5C12.7 11.6 13.6 10 14.9 8.6" />
+      {ISOTIPO_TRAZOS.map((t, i) => (
+        <path key={i} d={t.d} transform={`translate(${t.x},${t.y})`} />
+      ))}
     </svg>
   );
 }
