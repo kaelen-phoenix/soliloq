@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useTransition } from "react";
 import { guardarIdioma, guardarTema } from "@/app/acciones-ajustes";
 import { BotonInstalar } from "@/components/pwa/boton-instalar";
+import { BotonNotificaciones } from "@/components/pwa/boton-notificaciones";
 import { BorrarCuenta } from "@/components/ajustes/borrar-cuenta";
 
 type Idioma = "es" | "en";
@@ -93,6 +94,8 @@ export function FormularioAjustes({
       </section>
 
       <BotonInstalar conSeccion />
+
+      <BotonNotificaciones />
 
       <BorrarCuenta />
     </div>
