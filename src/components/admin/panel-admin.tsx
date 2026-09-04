@@ -6,6 +6,7 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { createClient } from "@/lib/supabase/client";
 import { adminBorrarUsuario } from "@/app/(app)/admin/acciones";
+import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { Database } from "@/lib/supabase/types";
 
 type Metricas = Database["public"]["Functions"]["admin_metricas"]["Returns"][number];
@@ -329,6 +330,7 @@ function Usuarios({
   const [hayMas, setHayMas] = useState(iniciales.length === PAGINA);
   const [cargando, setCargando] = useState(false);
   const [borrandoId, setBorrandoId] = useState<string | null>(null);
+  const [confirmandoId, setConfirmandoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   const buscar = useCallback(
@@ -375,13 +377,6 @@ function Usuarios({
   }
 
   async function borrar(u: Usuario) {
-    if (
-      !window.confirm(
-        `¿Borrar a ${u.nombre ?? u.email}? Se elimina la cuenta con todo su contenido ` +
-          `—perfil, proyectos, salas, mensajes—. Es irreversible; para una baja reversible usá Suspender.`,
-      )
-    )
-      return;
     setBorrandoId(u.id);
     const res = await adminBorrarUsuario(u.id);
     setBorrandoId(null);
@@ -390,6 +385,7 @@ function Usuarios({
       return;
     }
     setError(null);
+    setConfirmandoId(null);
     setFilas((prev) => prev.filter((f) => f.id !== u.id));
   }
 
@@ -423,47 +419,57 @@ function Usuarios({
       ) : (
         <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
           {filas.map((u) => (
-            <li key={u.id} className="flex items-center gap-3 p-3.5">
-              <div className="min-w-0 flex-1">
-                <p className="truncate text-sm font-medium text-texto">
-                  {u.nombre ?? "(sin nombre)"}
-                  {u.es_admin && (
-                    <span className="ml-1.5 rounded acento-fondo px-1.5 py-0.5 text-2xs font-semibold text-brand-600">
-                      admin
-                    </span>
-                  )}
-                  {u.suspendido && (
-                    <span className="ml-1.5 rounded bg-error-50 px-1.5 py-0.5 text-2xs font-semibold text-error-600">
-                      suspendido
-                    </span>
-                  )}
-                </p>
-                <p className="truncate text-xs text-texto-tenue">
-                  {u.email} · {u.roles.join(" + ") || "sin perfil"} · alta {fecha(u.creado_en)}
-                </p>
-              </div>
-              {u.id !== miId && !u.es_admin && (
-                <div className="flex shrink-0 gap-1.5">
-                  <button
-                    type="button"
-                    onClick={() => alternarSuspension(u)}
-                    className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
-                      u.suspendido
-                        ? "border-borde text-texto hover:bg-fondo-sutil"
-                        : "border-error-400 text-error-600 hover:bg-error-50"
-                    }`}
-                  >
-                    {u.suspendido ? "Reactivar" : "Suspender"}
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => borrar(u)}
-                    disabled={borrandoId === u.id}
-                    className="rounded-lg border border-error-400 px-2.5 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50 disabled:opacity-50"
-                  >
-                    {borrandoId === u.id ? "Borrando…" : "Borrar"}
-                  </button>
+            <li key={u.id} className="flex flex-col gap-3 p-3.5">
+              <div className="flex items-center gap-3">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-texto">
+                    {u.nombre ?? "(sin nombre)"}
+                    {u.es_admin && (
+                      <span className="ml-1.5 rounded acento-fondo px-1.5 py-0.5 text-2xs font-semibold text-brand-600">
+                        admin
+                      </span>
+                    )}
+                    {u.suspendido && (
+                      <span className="ml-1.5 rounded bg-error-50 px-1.5 py-0.5 text-2xs font-semibold text-error-600">
+                        suspendido
+                      </span>
+                    )}
+                  </p>
+                  <p className="truncate text-xs text-texto-tenue">
+                    {u.email} · {u.roles.join(" + ") || "sin perfil"} · alta {fecha(u.creado_en)}
+                  </p>
                 </div>
+                {u.id !== miId && !u.es_admin && (
+                  <div className="flex shrink-0 gap-1.5">
+                    <button
+                      type="button"
+                      onClick={() => alternarSuspension(u)}
+                      className={`rounded-lg border px-2.5 py-1 text-xs font-medium transition-colors ${
+                        u.suspendido
+                          ? "border-borde text-texto hover:bg-fondo-sutil"
+                          : "border-error-400 text-error-600 hover:bg-error-50"
+                      }`}
+                    >
+                      {u.suspendido ? "Reactivar" : "Suspender"}
+                    </button>
+                    <button
+                      type="button"
+                      onClick={() => setConfirmandoId(u.id)}
+                      className="rounded-lg border border-error-400 px-2.5 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50"
+                    >
+                      Borrar
+                    </button>
+                  </div>
+                )}
+              </div>
+              {confirmandoId === u.id && (
+                <ConfirmarBorrado
+                  mensaje={`Se elimina la cuenta de ${u.nombre ?? u.email} con todo su contenido —perfil, proyectos, salas, mensajes—. Es irreversible; para una baja reversible usá Suspender. Escribí BORRAR para confirmar.`}
+                  textoBoton="Borrar definitivamente"
+                  cargando={borrandoId === u.id}
+                  onConfirmar={() => borrar(u)}
+                  onCancelar={() => setConfirmandoId(null)}
+                />
               )}
             </li>
           ))}

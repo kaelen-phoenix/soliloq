@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
+import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { EstadoObra } from "@/lib/supabase/types";
 
 const MIN_FOTOS = 3;
@@ -107,29 +108,13 @@ export function AccionesObra({
               Borrar proyecto
             </Boton>
           ) : (
-            <div className="flex flex-col gap-2">
-              <p className="text-sm text-texto">
-                Se borra el proyecto con sus roles, fotos y postulaciones. No se puede deshacer.
-              </p>
-              <div className="flex gap-2">
-                <Boton
-                  variante="peligro"
-                  className="border border-error-600"
-                  onClick={borrar}
-                  cargando={cargando}
-                  textoCargando="Borrando…"
-                >
-                  Borrar definitivamente
-                </Boton>
-                <Boton
-                  variante="secundario"
-                  onClick={() => setConfirmarBorrado(false)}
-                  disabled={cargando}
-                >
-                  Cancelar
-                </Boton>
-              </div>
-            </div>
+            <ConfirmarBorrado
+              mensaje="Se borra el proyecto con sus roles, fotos y postulaciones. No se puede deshacer. Escribí BORRAR para confirmar."
+              textoBoton="Borrar definitivamente"
+              cargando={cargando}
+              onConfirmar={borrar}
+              onCancelar={() => setConfirmarBorrado(false)}
+            />
           )}
         </div>
       )}
