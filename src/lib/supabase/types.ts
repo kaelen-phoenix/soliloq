@@ -721,6 +721,20 @@ export interface Database {
         Update: { leido_en?: string | null };
         Relationships: [];
       };
+      /** Suscripciones a Web Push, una fila por dispositivo (0050). */
+      push_suscripciones: {
+        Row: {
+          id: string;
+          perfil_id: string;
+          endpoint: string;
+          p256dh: string;
+          auth: string;
+          creado_en: string;
+        };
+        Insert: { perfil_id: string; endpoint: string; p256dh: string; auth: string };
+        Update: { p256dh?: string; auth?: string };
+        Relationships: [];
+      };
     };
     Views: {
       feed_talento: {
@@ -751,6 +765,11 @@ export interface Database {
       };
     };
     Functions: {
+      /** ¿Hay un bloqueo entre auth.uid() y p_otro_perfil, en cualquier sentido? (0022). */
+      hay_bloqueo: {
+        Args: { p_otro_perfil: string };
+        Returns: boolean;
+      };
       feed_para_talento: {
         /** `p_radio_metros` en null trae roles de cualquier locación. */
         Args: { p_talento_id: string; p_radio_metros?: number | null };

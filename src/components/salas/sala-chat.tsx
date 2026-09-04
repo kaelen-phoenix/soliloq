@@ -4,6 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { Imagen } from "@/components/ui/imagen";
+import { notificarMensajeNuevo } from "@/app/acciones-push";
 
 export interface Mensaje {
   id: string;
@@ -119,6 +120,9 @@ export function SalaChat({
 
     setMensajes((prev) => prev.map((m) => (m.id === idTemporal ? data : m)));
     ultimoIdRef.current = data.id;
+    // Push a los demás integrantes. No se espera ni se muestra su resultado: el mensaje
+    // ya se mandó bien, avisar por push es un extra que no tiene que poder trabar el chat.
+    notificarMensajeNuevo(salaId, contenido).catch(() => {});
   }
 
   async function reintentar(mensaje: Mensaje) {
@@ -138,6 +142,7 @@ export function SalaChat({
       return;
     }
     setMensajes((prev) => prev.map((m) => (m.id === idTemporal ? data : m)));
+    notificarMensajeNuevo(salaId, mensaje.contenido).catch(() => {});
   }
 
   function integrantePor(id: string) {

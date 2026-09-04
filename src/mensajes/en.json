@@ -156,5 +156,14 @@
     "enviando": "Sending…",
     "enviadoOk": "Thanks! We got your message and we'll get back to you.",
     "enviadoError": "We couldn't send the message. Try again."
+  },
+  "notificacionesPush": {
+    "titulo": "Notifications",
+    "ayuda": "Get notified on this device when someone messages you in a room, even with the app closed.",
+    "denegadoAyuda": "You blocked them from the browser. To turn them on, enable notifications for this site in your browser or phone settings.",
+    "activar": "Enable notifications",
+    "desactivar": "Turn off notifications",
+    "aplicando": "One moment…",
+    "error": "Couldn't do that. Try again."
   }
 }

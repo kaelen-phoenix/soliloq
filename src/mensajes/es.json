@@ -156,5 +156,14 @@
     "enviando": "Enviando…",
     "enviadoOk": "¡Gracias! Recibimos tu mensaje y te vamos a responder.",
     "enviadoError": "No pudimos enviar el mensaje. Probá de nuevo."
+  },
+  "notificacionesPush": {
+    "titulo": "Notificaciones",
+    "ayuda": "Recibí un aviso en este dispositivo cuando te escriban en una sala, aunque no tengas la app abierta.",
+    "denegadoAyuda": "Las bloqueaste desde el navegador. Para activarlas, habilitá las notificaciones para este sitio en la configuración del navegador o del celular.",
+    "activar": "Activar notificaciones",
+    "desactivar": "Desactivar notificaciones",
+    "aplicando": "Un momento…",
+    "error": "No se pudo aplicar. Probá de nuevo."
   }
 }
