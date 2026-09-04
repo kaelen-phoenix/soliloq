@@ -15,6 +15,11 @@ export default async function DetalleObraPage({ params }: { params: { id: string
   const { data: obra } = await supabase.from("obras").select("*").eq("id", params.id).single();
   if (!obra) notFound();
 
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  const esDueno = user?.id === obra.creador_id;
+
   const [{ data: roles }, { data: fotosRaw }] = await Promise.all([
     supabase
       .from("roles")
@@ -56,6 +61,8 @@ export default async function DetalleObraPage({ params }: { params: { id: string
           estado={obra.estado}
           cantidadRoles={roles?.length ?? 0}
           cantidadFotos={fotos.length}
+          esDueno={esDueno}
+          fotosPaths={fotos.map((f) => f.storage_path)}
         />
       </div>
 
