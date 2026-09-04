@@ -85,7 +85,14 @@
     "temaAyuda": "«Sistema» sigue la preferencia de tu dispositivo.",
     "sistema": "Sistema",
     "claro": "Claro",
-    "oscuro": "Oscuro"
+    "oscuro": "Oscuro",
+    "zonaPeligro": "Zona de peligro",
+    "borrarCuenta": "Borrar mi cuenta",
+    "borrarCuentaAyuda": "Se borra tu cuenta y todo tu contenido —perfil, proyectos, salas, mensajes—. No se puede deshacer.",
+    "borrarCuentaConfirmar": "Escribí {palabra} para confirmar.",
+    "borrarCuentaDefinitivo": "Borrar mi cuenta",
+    "borrarCuentaEnCurso": "Borrando…",
+    "cancelar": "Cancelar"
   },
   "instalar": {
     "titulo": "Instalar la app",
