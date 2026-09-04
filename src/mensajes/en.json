@@ -85,7 +85,14 @@
     "temaAyuda": "“System” follows your device's preference.",
     "sistema": "System",
     "claro": "Light",
-    "oscuro": "Dark"
+    "oscuro": "Dark",
+    "zonaPeligro": "Danger zone",
+    "borrarCuenta": "Delete my account",
+    "borrarCuentaAyuda": "This deletes your account and everything in it — profile, projects, rooms, messages. It can’t be undone.",
+    "borrarCuentaConfirmar": "Type {palabra} to confirm.",
+    "borrarCuentaDefinitivo": "Delete my account",
+    "borrarCuentaEnCurso": "Deleting…",
+    "cancelar": "Cancel"
   },
   "instalar": {
     "titulo": "Install the app",
