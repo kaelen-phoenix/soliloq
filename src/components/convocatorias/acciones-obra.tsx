@@ -13,15 +13,21 @@ export function AccionesObra({
   estado,
   cantidadRoles,
   cantidadFotos,
+  esDueno,
+  fotosPaths,
 }: {
   obraId: string;
   estado: EstadoObra;
   cantidadRoles: number;
   cantidadFotos: number;
+  esDueno: boolean;
+  /** `storage_path` de cada foto de la obra, para limpiarlas del Storage al borrar. */
+  fotosPaths: string[];
 }) {
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+  const [confirmarBorrado, setConfirmarBorrado] = useState(false);
 
   async function publicar() {
     setError(null);
@@ -48,6 +54,26 @@ export function AccionesObra({
     router.refresh();
   }
 
+  async function borrar() {
+    setError(null);
+    setCargando(true);
+    const supabase = createClient();
+    // Primero el Storage (no cascadea con la fila); si algo falla, seguimos igual con el
+    // borrado de la obra — no queremos dejar el proyecto a medio eliminar por un huérfano.
+    if (fotosPaths.length > 0) {
+      await supabase.storage.from("fotos-perfil").remove(fotosPaths);
+    }
+    const { error: errorBd } = await supabase.from("obras").delete().eq("id", obraId);
+    if (errorBd) {
+      setCargando(false);
+      setError("No se pudo borrar el proyecto. Probá de nuevo.");
+      return;
+    }
+    // Sin `setCargando(false)`: la pantalla ya se va.
+    router.replace("/");
+    router.refresh();
+  }
+
   return (
     <div className="flex flex-col gap-2">
       {error && <p className="text-xs text-error-600">{error}</p>}
@@ -62,8 +88,51 @@ export function AccionesObra({
             Cerrar convocatoria
           </Boton>
         )}
-        {estado === "cerrada" && <p className="text-sm text-texto-tenue">Esta convocatoria está cerrada.</p>}
+        {estado === "cerrada" && (
+          <p className="text-sm text-texto-tenue">Esta convocatoria está cerrada.</p>
+        )}
       </div>
+
+      {esDueno && (
+        <div className="mt-4 border-t border-borde pt-4">
+          {!confirmarBorrado ? (
+            <Boton
+              variante="fantasma"
+              className="!px-0 text-error-600 hover:!bg-transparent hover:underline"
+              onClick={() => {
+                setError(null);
+                setConfirmarBorrado(true);
+              }}
+            >
+              Borrar proyecto
+            </Boton>
+          ) : (
+            <div className="flex flex-col gap-2">
+              <p className="text-sm text-texto">
+                Se borra el proyecto con sus roles, fotos y postulaciones. No se puede deshacer.
+              </p>
+              <div className="flex gap-2">
+                <Boton
+                  variante="peligro"
+                  className="border border-error-600"
+                  onClick={borrar}
+                  cargando={cargando}
+                  textoCargando="Borrando…"
+                >
+                  Borrar definitivamente
+                </Boton>
+                <Boton
+                  variante="secundario"
+                  onClick={() => setConfirmarBorrado(false)}
+                  disabled={cargando}
+                >
+                  Cancelar
+                </Boton>
+              </div>
+            </div>
+          )}
+        </div>
+      )}
     </div>
   );
 }
