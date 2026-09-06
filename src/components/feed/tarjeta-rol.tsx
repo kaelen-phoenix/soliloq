@@ -52,8 +52,8 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
               Ejemplo
             </span>
           ) : (
-            /* Distintivo de tipo de propuesta (issue #58): Proyecto en rojo, contra el
-               naranja del "Armar equipo". */
+            /* Distintivo de tipo de propuesta (#58 / #101): "Proyecto" en el rojo `brand`,
+               contra el `coral` del "Armar equipo". */
             <span className="rounded-md bg-brand-600 px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-white">
               Proyecto
             </span>
