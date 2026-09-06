@@ -39,7 +39,7 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
         <div className="absolute inset-0 bg-gradient-to-t from-ink-950/90 via-ink-950/25 to-transparent" />
 
         <div className="absolute inset-x-0 top-0 flex items-center gap-2 p-4">
-          <span className="rounded-md bg-brand-400 px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-ink-950">
+          <span className="rounded-md bg-coral px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-ink-950">
             Armar equipo
           </span>
         </div>

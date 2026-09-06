@@ -143,6 +143,13 @@ const config: Config = {
           700: "#8f6110",
           900: "#4d3407",
         },
+        // Distintivo de "Armar equipo" (issue #101): el coral del documento de marca,
+        // bien separado del rojo `brand` con el que va "Proyecto". Solo para ese chip —
+        // `DEFAULT` con texto oscuro (`text-ink-950`), `700` si hace falta texto blanco.
+        coral: {
+          DEFAULT: "#fb6543",
+          700: "#c2410c",
+        },
       },
       // Escala tipográfica. Antes había 17 tamaños sueltos y ocho se usaban una sola vez:
       // cada pantalla elegía su número. Ocho escalones cubren todo, y el más chico es 11px

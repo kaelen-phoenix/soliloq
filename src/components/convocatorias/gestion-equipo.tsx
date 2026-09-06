@@ -17,7 +17,7 @@ export interface EquipoActivo {
 }
 
 const CUPO_MIN = 1;
-const CUPO_MAX = 6;
+const CUPO_MAX = 10;
 const MAX_TITULO = 80;
 
 function FormEquipo({
@@ -191,7 +191,7 @@ export function GestionEquipo({
     return (
       <section className="rounded-2xl border border-borde bg-superficie p-4">
         <div className="min-w-0">
-          <span className="inline-block rounded-md bg-brand-500 px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-white">
+          <span className="inline-block rounded-md bg-coral px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-ink-950">
             Armar equipo
           </span>
           <p className="mt-2 text-base font-medium text-texto">{equipo.titulo}</p>

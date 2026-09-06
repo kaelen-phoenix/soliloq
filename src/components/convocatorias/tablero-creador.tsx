@@ -2,6 +2,7 @@ import Link from "next/link";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { GestionEquipo } from "@/components/convocatorias/gestion-equipo";
+import { PanelesIniciativa } from "@/components/convocatorias/paneles-iniciativa";
 import { createClient } from "@/lib/supabase/server";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
@@ -59,29 +60,25 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
       : null,
   }));
 
-  return (
-    <main className="px-5 py-5">
-      {/* Un perfil de Creador lleva adelante una sola iniciativa: un proyecto (obra con
-          roles) o un equipo (por cupo, sin roles). Ver issue #57. */}
-      {!hayEquipoActivo && (
+  // Un perfil de Creador lleva adelante una sola iniciativa: un proyecto (obra con roles)
+  // o un equipo (por cupo, sin roles). El toggle elige cuál se ve; la exclusión la impone
+  // un trigger de base. Ver issues #57 y #101.
+  const panelProyecto = (
+    <div className="flex flex-col gap-4">
+      {hayEquipoActivo ? (
+        <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
+          Tenés un equipo activo. Cerralo desde «Armar equipo» para armar un proyecto: un
+          perfil de Creador lleva adelante una sola iniciativa a la vez.
+        </p>
+      ) : (
         <Link
           href="/obras/nueva"
-          className="mb-3 flex items-center justify-center gap-1.5 rounded-xl bg-accion px-4 py-3 text-sm font-medium text-accion-texto transition-colors hover:opacity-90"
+          className="flex items-center justify-center gap-1.5 rounded-xl bg-accion px-4 py-3 text-sm font-medium text-accion-texto transition-colors hover:opacity-90"
         >
           <Icono nombre="mas" className="h-4 w-4" />
           Crear nueva obra
         </Link>
       )}
-
-      <div className="mb-5">
-        <GestionEquipo
-          creadorId={creadorId}
-          equipo={equipo ?? null}
-          fotos={fotosEquipo}
-          interesados={interesados}
-          tieneObraPublicada={tieneObraPublicada}
-        />
-      </div>
 
       {!hayEquipoActivo && (!obras || obras.length === 0) && (
         <EstadoVacio
@@ -122,6 +119,24 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
           );
         })}
       </ul>
+    </div>
+  );
+
+  return (
+    <main className="px-5 py-5">
+      <PanelesIniciativa
+        modoInicial={hayEquipoActivo ? "equipo" : "proyecto"}
+        panelProyecto={panelProyecto}
+        panelEquipo={
+          <GestionEquipo
+            creadorId={creadorId}
+            equipo={equipo ?? null}
+            fotos={fotosEquipo}
+            interesados={interesados}
+            tieneObraPublicada={tieneObraPublicada}
+          />
+        }
+      />
     </main>
   );
 }
