@@ -46,13 +46,13 @@ export async function borrarSuscripcionPush(endpoint: string) {
 
 /**
  * Avisa por push a los demás integrantes de la sala de que hay un mensaje nuevo. La llama
- * el cliente después de insertar el mensaje (no hay server action de envío de chat: se
- * inserta directo con RLS, como el resto de la app — ver `sala-chat.tsx`).
+ * el cliente después de insertar el mensaje, pasando su `id`.
  *
- * No falla nunca de forma visible: si VAPID no está configurado, si la sala no existe, o
- * si un envío puntual rebota, el chat en sí ya se mandó bien y no tiene por qué cortarse.
+ * Re-lee el mensaje de la base (RLS: solo salas propias) y verifica que sea del propio
+ * usuario y reciente, así nadie puede disparar notificaciones con texto arbitrario sin un
+ * mensaje real detrás. No falla nunca de forma visible: el chat ya se mandó bien.
  */
-export async function notificarMensajeNuevo(salaId: string, contenido: string) {
+export async function notificarMensajeNuevo(mensajeId: string) {
   if (!VAPID_LISTO) return;
 
   const supabase = createClient();
@@ -60,6 +60,18 @@ export async function notificarMensajeNuevo(salaId: string, contenido: string) {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return;
+
+  const { data: mensaje } = await supabase
+    .from("mensajes")
+    .select("sala_id, contenido, autor_id, creado_en")
+    .eq("id", mensajeId)
+    .maybeSingle();
+  // Tiene que ser un mensaje real, del que llama, y recién enviado.
+  if (!mensaje || mensaje.autor_id !== user.id) return;
+  if (Date.now() - new Date(mensaje.creado_en).getTime() > 30_000) return;
+
+  const salaId = mensaje.sala_id;
+  const contenido = mensaje.contenido;
 
   const { data: sala } = await supabase
     .from("salas")
