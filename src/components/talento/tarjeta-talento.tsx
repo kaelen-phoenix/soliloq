@@ -4,7 +4,8 @@ import { Imagen } from "@/components/ui/imagen";
 export interface ResultadoTalento {
   id: string;
   nombre: string;
-  edad: number;
+  /** #110: `null` si el talento tiene la edad oculta. */
+  edad: number | null;
   ubicacion_publica: string;
   habilidades: string[];
   fotoUrl: string;
@@ -30,7 +31,8 @@ export function TarjetaTalento({ talento }: { talento: ResultadoTalento }) {
       <div className="flex flex-col gap-1 p-3">
         <p className="text-sm font-semibold text-texto">{talento.nombre}</p>
         <p className="text-xs text-texto-tenue">
-          {talento.edad} años · {talento.ubicacion_publica}
+          {talento.edad != null && `${talento.edad} años · `}
+          {talento.ubicacion_publica}
         </p>
         {talento.habilidades.length > 0 && (
           <div className="mt-1 flex flex-wrap gap-1">

@@ -115,6 +115,8 @@ export interface Database {
           id: string;
           nombre: string;
           fecha_nacimiento: string;
+          /** #110: si la edad se muestra en el perfil público. `true` por defecto. */
+          edad_visible: boolean;
           ubicacion_texto: string;
           ubicacion_publica: string;
           ubicacion_place_id: string | null;
@@ -141,6 +143,7 @@ export interface Database {
           id: string;
           nombre: string;
           fecha_nacimiento: string;
+          edad_visible?: boolean;
           ubicacion_texto: string;
           ubicacion_publica: string;
           ubicacion_place_id?: string | null;
@@ -160,6 +163,7 @@ export interface Database {
         Update: {
           nombre?: string;
           fecha_nacimiento?: string;
+          edad_visible?: boolean;
           ubicacion_texto?: string;
           ubicacion_publica?: string;
           ubicacion_place_id?: string | null;
@@ -183,6 +187,9 @@ export interface Database {
         Row: {
           id: string;
           nombre: string;
+          /** #110: opcional; el Creador puede cargar su fecha para mostrar su edad. */
+          fecha_nacimiento: string | null;
+          edad_visible: boolean;
           disciplinas: DisciplinaArtistica[];
           otro_detalle: string | null;
           ubicacion_texto: string;
@@ -198,6 +205,8 @@ export interface Database {
         Insert: {
           id: string;
           nombre: string;
+          fecha_nacimiento?: string | null;
+          edad_visible?: boolean;
           disciplinas: DisciplinaArtistica[];
           otro_detalle?: string | null;
           ubicacion_texto: string;
@@ -211,6 +220,8 @@ export interface Database {
         };
         Update: {
           nombre?: string;
+          fecha_nacimiento?: string | null;
+          edad_visible?: boolean;
           disciplinas?: DisciplinaArtistica[];
           otro_detalle?: string | null;
           ubicacion_texto?: string;
@@ -795,7 +806,7 @@ export interface Database {
         Returns: {
           id: string;
           nombre: string;
-          edad: number;
+          edad: number | null;
           ubicacion_publica: string;
           habilidades: string[];
           foto_principal_path: string;
