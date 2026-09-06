@@ -852,6 +852,15 @@ export interface Database {
         Returns: undefined;
       };
       dar_de_baja_convocado: { Args: { p_convocatoria_id: string }; Returns: undefined };
+      mis_convocados: {
+        Args: Record<string, never>;
+        Returns: {
+          convocatoria_id: string;
+          talento_id: string;
+          nombre: string;
+          foto_path: string | null;
+        }[];
+      };
       feed_para_talento: {
         /** `p_radio_metros` en null trae roles de cualquier locación. */
         Args: { p_talento_id: string; p_radio_metros?: number | null };
