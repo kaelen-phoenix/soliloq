@@ -7,6 +7,14 @@ import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { usePrefiereReduccion } from "@/components/ui/movimiento";
 
+// Deslizamiento entre fotos del visor. `custom` es la dirección (1 siguiente, -1 anterior):
+// la que entra viene del lado hacia el que se avanza, la que sale se va para el opuesto.
+const deslizar = {
+  entra: (dir: number) => ({ x: dir >= 0 ? "100%" : "-100%", opacity: 0 }),
+  centro: { x: 0, opacity: 1 },
+  sale: (dir: number) => ({ x: dir >= 0 ? "-100%" : "100%", opacity: 0 }),
+};
+
 /**
  * Grilla de fotos que al tocar una la abre a pantalla completa. El visor cierra con `Esc`,
  * con el fondo o con la X; con más de una foto, `←` / `→` y las flechas navegan. Bloquea el
@@ -30,13 +38,17 @@ export function GaleriaFotos({
   destacarPrimera?: boolean;
 }) {
   const [abierta, setAbierta] = useState<number | null>(null);
+  // Hacia dónde va la próxima foto: 1 = siguiente (entra por la derecha), -1 = anterior.
+  const [direccion, setDireccion] = useState(0);
   const prefiereReduccion = usePrefiereReduccion();
   const cerrarRef = useRef<HTMLButtonElement>(null);
 
   const cerrar = useCallback(() => setAbierta(null), []);
   const ir = useCallback(
-    (delta: number) =>
-      setAbierta((i) => (i === null ? i : (i + delta + fotos.length) % fotos.length)),
+    (delta: number) => {
+      setDireccion(delta);
+      setAbierta((i) => (i === null ? i : (i + delta + fotos.length) % fotos.length));
+    },
     [fotos.length],
   );
 
@@ -165,18 +177,44 @@ export function GaleriaFotos({
             )}
 
             <div
-              className="relative h-full max-h-[86vh] w-full max-w-3xl"
+              className="relative h-full max-h-[86vh] w-full max-w-3xl overflow-hidden"
               onClick={(e) => e.stopPropagation()}
             >
-              <Image
-                key={abierta}
-                src={fotos[abierta]}
-                alt={alt}
-                fill
-                priority
-                sizes="100vw"
-                className="object-contain"
-              />
+              <AnimatePresence initial={false} custom={direccion}>
+                <motion.div
+                  key={abierta}
+                  custom={direccion}
+                  variants={deslizar}
+                  initial={prefiereReduccion ? false : "entra"}
+                  animate="centro"
+                  exit={prefiereReduccion ? undefined : "sale"}
+                  transition={{
+                    x: { type: "spring", stiffness: 300, damping: 32 },
+                    opacity: { duration: 0.15 },
+                  }}
+                  drag={fotos.length > 1 ? "x" : false}
+                  dragConstraints={{ left: 0, right: 0 }}
+                  dragElastic={0.5}
+                  onDragEnd={(_, info) => {
+                    // Desplazamiento + un poco de la velocidad: un flick corto pero rápido
+                    // también pasa de foto.
+                    const fuerza = info.offset.x + info.velocity.x * 0.2;
+                    if (fuerza < -60) ir(1);
+                    else if (fuerza > 60) ir(-1);
+                  }}
+                  className="absolute inset-0 cursor-grab touch-pan-y active:cursor-grabbing"
+                >
+                  <Image
+                    src={fotos[abierta]}
+                    alt={alt}
+                    fill
+                    priority
+                    draggable={false}
+                    sizes="100vw"
+                    className="pointer-events-none object-contain"
+                  />
+                </motion.div>
+              </AnimatePresence>
             </div>
 
             {fotos.length > 1 && (
