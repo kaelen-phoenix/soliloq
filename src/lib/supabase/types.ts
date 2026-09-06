@@ -732,6 +732,27 @@ export interface Database {
         Update: { leido_en?: string | null };
         Relationships: [];
       };
+      /** "Me interesa" dirigido a una iniciativa (issues #105–#107 / 0054). Solo se ve lo propio. */
+      intereses_match: {
+        Row: {
+          id: string;
+          de_perfil: string;
+          a_perfil: string;
+          obra_id: string | null;
+          equipo_id: string | null;
+          interesa: boolean;
+          creado_en: string;
+        };
+        Insert: {
+          de_perfil: string;
+          a_perfil: string;
+          obra_id?: string | null;
+          equipo_id?: string | null;
+          interesa: boolean;
+        };
+        Update: { interesa?: boolean };
+        Relationships: [];
+      };
       /** Chats destacados (pin personal por usuario) — issue #108 / 0053. */
       chats_destacados: {
         Row: { perfil_id: string; sala_id: string; creado_en: string };

@@ -34,7 +34,7 @@ export const ITEMS_NAVEGACION: Record<RolUsuario, ItemNavegacion[]> = {
   creador: [
     { href: "/", clave: "misProyectos", claveCorto: "misProyectosCorto", icono: "tablero" },
     { href: "/talentos", clave: "buscarTalento", claveCorto: "buscarTalentoCorto", icono: "buscar" },
-    { href: "/equipo", clave: "armarEquipo", claveCorto: "armarEquipoCorto", icono: "corazon" },
+    { href: "/matches", clave: "matches", icono: "corazon" },
     { href: "/salas", clave: "salas", icono: "salas" },
     { href: "/perfil", clave: "perfil", icono: "perfil" },
   ],
