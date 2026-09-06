@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { MatchesLista } from "@/components/convocatorias/matches-lista";
+import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 
 export const metadata = { title: "Matches — Yalope" };
 
@@ -16,19 +17,33 @@ export default async function MatchesPage() {
   const estado = await leerEstadoCuenta(supabase, user.id);
   if (estado.modoActivo !== "creador") notFound();
 
-  const { data: matches } = await supabase.rpc("mis_matches");
+  const [{ data: matches }, { data: convocados }] = await Promise.all([
+    supabase.rpc("mis_matches"),
+    supabase.rpc("mis_convocados"),
+  ]);
+
+  const url = (path: string | null) =>
+    path ? supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl : null;
 
   const filas = (matches ?? []).map((m) => ({
     matchId: m.match_id,
     talentoId: m.talento_id,
     nombre: m.nombre,
-    fotoUrl: m.foto_path
-      ? supabase.storage.from("fotos-perfil").getPublicUrl(m.foto_path).data.publicUrl
-      : null,
+    fotoUrl: url(m.foto_path),
     expiraEn: m.expira_en,
     convocado: m.convocado,
     cupoLleno: m.cupo_lleno,
   }));
+
+  const filasConvocados = (convocados ?? []).map((c) => ({
+    convocatoriaId: c.convocatoria_id,
+    talentoId: c.talento_id,
+    nombre: c.nombre,
+    fotoUrl: url(c.foto_path),
+  }));
+
+  const enCierre =
+    filas.some((f) => f.cupoLleno) || (filas.length === 0 && filasConvocados.length > 0);
 
   return (
     <main className="px-5 py-5">
@@ -39,6 +54,13 @@ export default async function MatchesPage() {
         Personas con las que hubo interés mutuo. Tenés 7 días para convocarlas.
       </p>
 
+      {enCierre && (
+        <p className="mb-4 rounded-xl border border-coral bg-coral/10 px-3.5 py-3 text-sm text-texto">
+          Llenaste el cupo. Para convocar a alguien más, dá de baja a un convocado y se
+          libera un lugar.
+        </p>
+      )}
+
       {filas.length === 0 ? (
         <EstadoVacio
           icono="corazon"
@@ -48,6 +70,8 @@ export default async function MatchesPage() {
       ) : (
         <MatchesLista filas={filas} />
       )}
+
+      <ConvocadosLista filas={filasConvocados} />
     </main>
   );
 }

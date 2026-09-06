@@ -27,6 +27,18 @@ export async function convocarMatch(matchId: string): Promise<Resultado> {
   return { ok: true };
 }
 
+/** El Creador da de baja a un convocado ya aceptado: libera el lugar (issue #107). */
+export async function darDeBajaConvocado(convocatoriaId: string): Promise<Resultado> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("dar_de_baja_convocado", {
+    p_convocatoria_id: convocatoriaId,
+  });
+  if (error) return { ok: false, error: "No se pudo dar de baja. Probá de nuevo." };
+  revalidatePath("/matches");
+  revalidatePath("/salas");
+  return { ok: true };
+}
+
 /**
  * El Creador marca (o desmarca) "Me interesa" en un talento, hacia su iniciativa activa
  * (issue #105).
