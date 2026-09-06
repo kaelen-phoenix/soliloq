@@ -27,7 +27,7 @@ export const ITEMS_NAVEGACION: Record<RolUsuario, ItemNavegacion[]> = {
   talento: [
     { href: "/", clave: "convocatorias", claveCorto: "convocatoriasCorto", icono: "feed" },
     { href: "/postulaciones", clave: "postulaciones", icono: "postulaciones" },
-    { href: "/equipo", clave: "armarEquipo", claveCorto: "armarEquipoCorto", icono: "corazon" },
+    { href: "/convocado", clave: "convocado", icono: "corazon" },
     { href: "/salas", clave: "salas", icono: "salas" },
     { href: "/perfil", clave: "perfil", icono: "perfil" },
   ],

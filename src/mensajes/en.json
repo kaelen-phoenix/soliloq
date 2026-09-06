@@ -24,7 +24,8 @@
     "buscarTalentoCorto": "Search",
     "admin": "Admin",
     "ajustes": "Settings",
-    "matches": "Matches"
+    "matches": "Matches",
+    "convocado": "Invited"
   },
   "titulos": {
     "postulaciones": "Applications",

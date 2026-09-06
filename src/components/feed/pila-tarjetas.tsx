@@ -148,6 +148,22 @@ export function PilaTarjetas({
 
   async function registrarDecision(rol: RolFeed, decision: Decision) {
     const supabase = createClient();
+
+    // "Me interesa" hacia el proyecto (issue #106): alimenta el circuito de match. Va
+    // primero porque puede rebotar por el límite de 20/24 h; si rebota, no se postula.
+    const { error: errInteres } = await supabase.rpc("marcar_interes", {
+      p_a_perfil: rol.creador_id,
+      p_obra_id: rol.obra_id,
+      p_equipo_id: null,
+      p_interesa: decision === "postular",
+    });
+    if (errInteres?.message?.includes("limite_me_interesa")) {
+      setAvisoError("Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde.");
+      setRoles((prev) => [rol, ...prev]);
+      setHistorial((prev) => prev.filter((h) => h.rol.rol_id !== rol.rol_id));
+      return;
+    }
+
     const tabla = decision === "postular" ? "postulaciones" : "descartes";
     const { error } = await supabase
       .from(tabla)
@@ -186,6 +202,21 @@ export function PilaTarjetas({
 
   async function registrarInteresEquipo(equipo: EquipoFeed, decision: Decision) {
     const supabase = createClient();
+
+    // "Me interesa" hacia el equipo (issue #106): alimenta el circuito de match. Va primero
+    // por el límite de 20/24 h.
+    const { error: errInteres } = await supabase.rpc("marcar_interes", {
+      p_a_perfil: equipo.creador_id,
+      p_obra_id: null,
+      p_equipo_id: equipo.equipo_id,
+      p_interesa: decision === "postular",
+    });
+    if (errInteres?.message?.includes("limite_me_interesa")) {
+      setAvisoError("Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde.");
+      setEquipos((prev) => [equipo, ...prev]);
+      return;
+    }
+
     const { error } = await supabase.rpc("interes_en_equipo", {
       p_equipo_id: equipo.equipo_id,
       p_interesa: decision === "postular",
