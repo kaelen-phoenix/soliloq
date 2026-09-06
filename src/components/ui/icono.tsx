@@ -9,6 +9,8 @@ type NombreIcono =
   | "cruz"
   | "ojo"
   | "ojo-cerrado"
+  | "estrella"
+  | "puntos"
   | "corazon"
   | "cambiar"
   | "flecha-derecha"
@@ -77,6 +79,16 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
       <path d="M3 3l18 18" />
       <path d="M10.6 10.7a3 3 0 0 0 4 4" />
       <path d="M9.4 5.3A9.5 9.5 0 0 1 12 5c6.5 0 10 7 10 7a17 17 0 0 1-3.2 3.9M6.1 6.2A17 17 0 0 0 2 12s3.5 7 10 7a9.3 9.3 0 0 0 4.3-1" />
+    </>
+  ),
+  estrella: (
+    <path d="M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8L3.5 9.7l5.9-.9L12 3.5Z" />
+  ),
+  puntos: (
+    <>
+      <circle cx="12" cy="5" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="12" r="1.4" fill="currentColor" stroke="none" />
+      <circle cx="12" cy="19" r="1.4" fill="currentColor" stroke="none" />
     </>
   ),
   corazon: <path d="M20.3 5.7a5 5 0 0 0-7.1 0L12 6.9l-1.2-1.2a5 5 0 1 0-7.1 7.1l8.3 8.3 8.3-8.3a5 5 0 0 0 0-7.1Z" />,
