@@ -7,6 +7,7 @@ import { AvisoGuardado, useAvisoGuardado } from "@/components/ui/aviso-guardado"
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
+import { ToggleVisibilidad } from "@/components/ui/toggle-visibilidad";
 import { Imagen } from "@/components/ui/imagen";
 import { comprimirImagen } from "@/lib/comprimir-imagen";
 import { aColumnas, desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
@@ -15,6 +16,8 @@ import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 interface DatosIniciales {
   nombre: string;
+  fecha_nacimiento: string | null;
+  edad_visible: boolean;
   disciplinas: DisciplinaArtistica[];
   otro_detalle: string | null;
   ubicacion_texto: string;
@@ -41,6 +44,8 @@ export function FormularioCreador({
 }) {
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
+  const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales?.fecha_nacimiento ?? "");
+  const [edadVisible, setEdadVisible] = useState(datosIniciales?.edad_visible ?? true);
   const [disciplinas, setDisciplinas] = useState<DisciplinaArtistica[]>(
     datosIniciales?.disciplinas ?? []
   );
@@ -131,6 +136,8 @@ export function FormularioCreador({
 
     const campos = {
       nombre: nombre.trim(),
+      fecha_nacimiento: fechaNacimiento || null,
+      edad_visible: edadVisible,
       disciplinas,
       // El detalle solo se guarda si "Otro" sigue elegido: si la persona lo desmarca, el
       // texto tiene que irse con él en vez de quedar colgado sin nada que lo explique.
@@ -241,6 +248,25 @@ export function FormularioCreador({
           onCambio={setUbicacion}
           error={errores.ubicacion}
         />
+
+        <div className="flex flex-col gap-1.5">
+          <CampoTexto
+            id="fecha_nacimiento"
+            etiqueta="Fecha de nacimiento (opcional)"
+            type="date"
+            value={fechaNacimiento}
+            onChange={(e) => setFechaNacimiento(e.target.value)}
+            error={errores.fecha_nacimiento}
+          />
+          {fechaNacimiento && (
+            <ToggleVisibilidad
+              visible={edadVisible}
+              onCambio={setEdadVisible}
+              textoVisible="Tu edad se muestra en tu perfil"
+              textoOculto="Tu edad está oculta en tu perfil"
+            />
+          )}
+        </div>
       </section>
 
       <section className="flex flex-col gap-3">

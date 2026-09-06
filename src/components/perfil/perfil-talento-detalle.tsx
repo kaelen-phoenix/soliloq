@@ -7,6 +7,8 @@ export interface TalentoDetalle {
   id: string;
   nombre: string;
   fecha_nacimiento: string;
+  /** #110: si es `false`, la edad no se muestra (salvo en el perfil propio). */
+  edad_visible: boolean;
   /** La recortada a barrio/ciudad. Nunca `ubicacion_texto`: puede ser el domicilio. */
   ubicacion_publica: string;
   genero: Genero;
@@ -19,9 +21,17 @@ export interface TalentoDetalle {
   fotos: { id: string; url: string; orden: number }[];
 }
 
-export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
+export function PerfilTalentoDetalle({
+  talento,
+  esPropio = false,
+}: {
+  talento: TalentoDetalle;
+  /** El dueño ve su edad siempre; el resto solo si `edad_visible`. */
+  esPropio?: boolean;
+}) {
   const fotosOrdenadas = [...talento.fotos].sort((a, b) => a.orden - b.orden);
   const redes = REDES.filter((r) => talento.redes?.[r.clave]);
+  const mostrarEdad = esPropio || talento.edad_visible;
 
   return (
     <div className="flex flex-col gap-4">
@@ -30,7 +40,8 @@ export function PerfilTalentoDetalle({ talento }: { talento: TalentoDetalle }) {
       <div>
         <h2 className="text-lg font-bold text-texto">{talento.nombre}</h2>
         <p className="text-sm text-texto-tenue">
-          {calcularEdad(talento.fecha_nacimiento)} años · {talento.ubicacion_publica}
+          {mostrarEdad && `${calcularEdad(talento.fecha_nacimiento)} años · `}
+          {talento.ubicacion_publica}
         </p>
         <p className="text-sm text-texto-tenue">
           {talento.genero_descripcion || etiquetaGenero(talento.genero)}

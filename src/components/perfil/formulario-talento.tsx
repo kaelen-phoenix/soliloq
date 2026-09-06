@@ -7,6 +7,7 @@ import { AvisoGuardado, useAvisoGuardado } from "@/components/ui/aviso-guardado"
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
+import { ToggleVisibilidad } from "@/components/ui/toggle-visibilidad";
 import {
   GENEROS,
   HABILIDADES,
@@ -23,6 +24,7 @@ import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } fro
 interface DatosIniciales {
   nombre: string;
   fecha_nacimiento: string;
+  edad_visible: boolean;
   ubicacion_texto: string;
   ubicacion_publica: string;
   ubicacion_place_id: string | null;
@@ -55,6 +57,7 @@ export function FormularioTalento({
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
   const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales?.fecha_nacimiento ?? "");
+  const [edadVisible, setEdadVisible] = useState(datosIniciales?.edad_visible ?? true);
   const [ubicacion, setUbicacion] = useState<Ubicacion | null>(
     desdeColumnas(datosIniciales) ?? null,
   );
@@ -130,6 +133,7 @@ export function FormularioTalento({
     const campos = {
       nombre: nombre.trim(),
       fecha_nacimiento: fechaNacimiento,
+      edad_visible: edadVisible,
       ...aColumnas(ubicacion!),
       genero: genero as Genero,
       genero_descripcion: generoDescripcion.trim() || null,
@@ -190,14 +194,26 @@ export function FormularioTalento({
           onChange={(e) => setNombre(e.target.value)}
           error={errores.nombre}
         />
-        <CampoTexto
-          id="fecha_nacimiento"
-          etiqueta="Fecha de nacimiento"
-          type="date"
-          value={fechaNacimiento}
-          onChange={(e) => setFechaNacimiento(e.target.value)}
-          error={errores.fecha_nacimiento}
-        />
+        <div className="flex flex-col gap-1.5">
+          <CampoTexto
+            id="fecha_nacimiento"
+            etiqueta="Fecha de nacimiento"
+            type="date"
+            value={fechaNacimiento}
+            onChange={(e) => setFechaNacimiento(e.target.value)}
+            error={errores.fecha_nacimiento}
+          />
+          <ToggleVisibilidad
+            visible={edadVisible}
+            onCambio={setEdadVisible}
+            textoVisible="Tu edad se muestra en tu perfil"
+            textoOculto="Tu edad está oculta en tu perfil"
+          />
+          <p className="text-xs text-texto-tenue">
+            La fecha se guarda igual y se usa para priorizar las búsquedas por edad, la
+            muestres o no.
+          </p>
+        </div>
         <CampoUbicacion
           id="ubicacion"
           etiqueta="Ubicación"

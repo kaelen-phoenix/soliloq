@@ -125,7 +125,7 @@ export default async function PerfilPage({
             hrefEditar="/perfil?editar=1"
             aviso="Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
           >
-            <PerfilTalentoDetalle talento={{ ...perfilTalento, fotos: fotosConUrl }} />
+            <PerfilTalentoDetalle talento={{ ...perfilTalento, fotos: fotosConUrl }} esPropio />
           </VistaPerfilPropio>
         )}
         {!editando && perfilTalento && compartir(perfilTalento.nombre)}

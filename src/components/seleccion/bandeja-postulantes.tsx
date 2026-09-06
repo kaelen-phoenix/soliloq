@@ -125,7 +125,9 @@ export function BandejaPostulantes({
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-base font-medium text-texto">{p.talento.nombre}</p>
                   <p className="mt-0.5 text-xs text-texto-tenue">
-                    {calcularEdad(p.talento.fecha_nacimiento)} años · {p.talento.ubicacion_publica}
+                    {p.talento.edad_visible &&
+                      `${calcularEdad(p.talento.fecha_nacimiento)} años · `}
+                    {p.talento.ubicacion_publica}
                   </p>
                 </div>
                 <Icono
