@@ -122,7 +122,7 @@ export function SalaChat({
     ultimoIdRef.current = data.id;
     // Push a los demás integrantes. No se espera ni se muestra su resultado: el mensaje
     // ya se mandó bien, avisar por push es un extra que no tiene que poder trabar el chat.
-    notificarMensajeNuevo(salaId, contenido).catch(() => {});
+    notificarMensajeNuevo(data.id).catch(() => {});
   }
 
   async function reintentar(mensaje: Mensaje) {
@@ -142,7 +142,7 @@ export function SalaChat({
       return;
     }
     setMensajes((prev) => prev.map((m) => (m.id === idTemporal ? data : m)));
-    notificarMensajeNuevo(salaId, mensaje.contenido).catch(() => {});
+    notificarMensajeNuevo(data.id).catch(() => {});
   }
 
   function integrantePor(id: string) {
