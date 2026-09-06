@@ -732,6 +732,13 @@ export interface Database {
         Update: { leido_en?: string | null };
         Relationships: [];
       };
+      /** Chats destacados (pin personal por usuario) — issue #108 / 0053. */
+      chats_destacados: {
+        Row: { perfil_id: string; sala_id: string; creado_en: string };
+        Insert: { perfil_id: string; sala_id: string };
+        Update: { creado_en?: string };
+        Relationships: [];
+      };
       /** Suscripciones a Web Push, una fila por dispositivo (0050). */
       push_suscripciones: {
         Row: {
@@ -780,6 +787,11 @@ export interface Database {
       hay_bloqueo: {
         Args: { p_otro_perfil: string };
         Returns: boolean;
+      };
+      /** Salir de una sala (issue #108 / 0053). El dueño no puede. */
+      desvincularme_de_sala: {
+        Args: { p_sala_id: string };
+        Returns: undefined;
       };
       feed_para_talento: {
         /** `p_radio_metros` en null trae roles de cualquier locación. */
