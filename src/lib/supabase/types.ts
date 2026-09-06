@@ -793,6 +793,44 @@ export interface Database {
         Args: { p_sala_id: string };
         Returns: undefined;
       };
+      /** Circuito de Match/Convocatoria (issues #105–#107 / 0054). */
+      marcar_interes: {
+        Args: {
+          p_a_perfil: string;
+          p_obra_id: string | null;
+          p_equipo_id: string | null;
+          p_interesa: boolean;
+        };
+        Returns: undefined;
+      };
+      mis_matches: {
+        Args: Record<string, never>;
+        Returns: {
+          match_id: string;
+          talento_id: string;
+          nombre: string;
+          foto_path: string | null;
+          expira_en: string;
+          convocado: boolean;
+          cupo_lleno: boolean;
+        }[];
+      };
+      convocar: { Args: { p_match_id: string }; Returns: undefined };
+      mis_convocatorias: {
+        Args: Record<string, never>;
+        Returns: {
+          convocatoria_id: string;
+          titulo: string;
+          creador_nombre: string;
+          es_equipo: boolean;
+          creado_en: string;
+        }[];
+      };
+      responder_convocatoria: {
+        Args: { p_convocatoria_id: string; p_aceptar: boolean };
+        Returns: undefined;
+      };
+      dar_de_baja_convocado: { Args: { p_convocatoria_id: string }; Returns: undefined };
       feed_para_talento: {
         /** `p_radio_metros` en null trae roles de cualquier locación. */
         Args: { p_talento_id: string; p_radio_metros?: number | null };
