@@ -3,13 +3,21 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { FormularioRol } from "@/components/convocatorias/formulario-rol";
 import { AccionesObra } from "@/components/convocatorias/acciones-obra";
+import { EditarObra } from "@/components/convocatorias/editar-obra";
 import { FotosObra } from "@/components/convocatorias/fotos-obra";
 import { MetricasObra } from "@/components/convocatorias/metricas-obra";
+import { Icono } from "@/components/ui/icono";
 import { etiquetaGenero } from "@/lib/constantes";
 
 const ETIQUETA_TIPO: Record<string, string> = { actuacion: "Actuación", tecnica: "Técnica" };
 
-export default async function DetalleObraPage({ params }: { params: { id: string } }) {
+export default async function DetalleObraPage({
+  params,
+  searchParams,
+}: {
+  params: { id: string };
+  searchParams: { editar?: string };
+}) {
   const supabase = createClient();
 
   const { data: obra } = await supabase.from("obras").select("*").eq("id", params.id).single();
@@ -19,6 +27,18 @@ export default async function DetalleObraPage({ params }: { params: { id: string
     data: { user },
   } = await supabase.auth.getUser();
   const esDueno = user?.id === obra.creador_id;
+  const editando = esDueno && searchParams.editar === "1";
+
+  if (editando) {
+    return (
+      <main className="px-5 py-5">
+        <h2 className="mb-4 font-display text-xl font-semibold tracking-[-0.02em] text-texto">
+          Editar proyecto
+        </h2>
+        <EditarObra obra={obra} />
+      </main>
+    );
+  }
 
   const [{ data: roles }, { data: fotosRaw }] = await Promise.all([
     supabase
@@ -43,9 +63,20 @@ export default async function DetalleObraPage({ params }: { params: { id: string
 
   return (
     <main className="px-5 py-5">
-      <h2 className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-texto">
-        {obra.titulo}
-      </h2>
+      <div className="flex items-start justify-between gap-3">
+        <h2 className="font-display text-xl font-semibold leading-tight tracking-[-0.02em] text-texto">
+          {obra.titulo}
+        </h2>
+        {esDueno && (
+          <Link
+            href={`/obras/${obra.id}?editar=1`}
+            className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-borde px-3 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil"
+          >
+            <Icono nombre="cambiar" className="h-3.5 w-3.5" />
+            Editar
+          </Link>
+        )}
+      </div>
       <p className="mt-1 text-sm text-texto-tenue">{obra.ubicacion_texto}</p>
       {obra.sinopsis && (
         <p className="mt-3 max-w-prose text-base leading-relaxed text-texto-tenue">{obra.sinopsis}</p>
