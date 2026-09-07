@@ -20,6 +20,10 @@ O a mano: `POST /v1/projects/<ref>/database/query` con `{"query": "<contenido de
   interés mutuo → match (vence 7 días) → convocar → aceptar → sala → cierre por cupo →
   dar de baja libera cupo. Más: RLS de `intereses_match` (solo lo propio), rate-limit de
   20 «Me interesa» / 24 h, y la guarda de dueño en `desvincularme_de_sala`.
+- **`rls_y_borrados.sql`** — `obras_delete_propia` (0049), RLS de `chats_destacados` (0053)
+  y `push_suscripciones` (0050, incl. que no se pueda apropiar un `endpoint` ajeno),
+  `edad_visible` (0052) en `perfil_publico` y `buscar_talento` (prioriza, no excluye), y
+  la cascada de `delete from auth.users` (lo que hace `auth.admin.deleteUser`).
 
 ## Pendiente
 
