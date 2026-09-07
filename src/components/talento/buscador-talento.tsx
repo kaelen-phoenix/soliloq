@@ -1,24 +1,22 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useCallback, useEffect, useRef, useState } from "react";
-import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Esqueleto } from "@/components/ui/esqueleto";
 import { Icono } from "@/components/ui/icono";
-import { toque, usePrefiereReduccion, variantesSeguras } from "@/components/ui/movimiento";
 import { GENEROS_BUSCABLES, HABILIDADES, type Genero } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
 import { opcionesDeRadio, RADIO_INICIAL_METROS, type Ubicacion } from "@/lib/ubicacion";
-import { TarjetaTalento, type ResultadoTalento } from "./tarjeta-talento";
+import { type ResultadoTalento } from "./tarjeta-talento";
+import { PilaTalentos, type IniciativaPlaca } from "./pila-talentos";
 
 const PAGINA = 24;
 
 type Fila = Omit<ResultadoTalento, "fotoUrl"> & { foto_principal_path: string };
 
-export function BuscadorTalento() {
+export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | null }) {
   const supabase = createClient();
 
   const [texto, setTexto] = useState("");
@@ -92,8 +90,6 @@ export function BuscadorTalento() {
   }, [buscar]);
 
   const opcionesRadio = opcionesDeRadio("km");
-  const prefiereReduccion = usePrefiereReduccion();
-  const { lista, item } = variantesSeguras(prefiereReduccion);
 
   const hayFiltros =
     texto.trim() !== "" ||
@@ -112,10 +108,6 @@ export function BuscadorTalento() {
     setUbicacion(null);
     setRadioMetros(RADIO_INICIAL_METROS);
   }
-
-  const conteo = hayMas
-    ? `${resultados.length}+ resultados`
-    : `${resultados.length} ${resultados.length === 1 ? "resultado" : "resultados"}`;
 
   const nAvanzados =
     (edadMin !== "" || edadMax !== "" ? 1 : 0) +
@@ -275,39 +267,13 @@ export function BuscadorTalento() {
           detalle="No hay talento que coincida con esos filtros. Probá aflojando alguno."
         />
       ) : (
-        <>
-          <div className="flex flex-col gap-3">
-            <p className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{conteo}</p>
-            <motion.div
-              className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3"
-              variants={lista}
-              initial="oculto"
-              animate="visible"
-            >
-              {resultados.map((t) => (
-                <motion.div
-                  key={t.id}
-                  variants={item}
-                  whileTap={prefiereReduccion ? undefined : toque}
-                >
-                  <TarjetaTalento talento={t} />
-                </motion.div>
-              ))}
-            </motion.div>
-          </div>
-          {hayMas && (
-            <div className="flex justify-center">
-              <Boton
-                variante="secundario"
-                cargando={cargando}
-                textoCargando="Cargando…"
-                onClick={() => buscar(offset + PAGINA)}
-              >
-                Cargar más
-              </Boton>
-            </div>
-          )}
-        </>
+        <PilaTalentos
+          talentos={resultados}
+          iniciativa={iniciativa}
+          onCasiVacia={() => {
+            if (hayMas && !cargando) buscar(offset + PAGINA);
+          }}
+        />
       )}
     </div>
   );
