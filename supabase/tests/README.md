@@ -6,13 +6,18 @@ las aserciones (`assert` de plpgsql). Un fallo aborta con el mensaje del `assert
 
 ## Correr
 
-Con el PAT de Supabase (`~/.soliloq-deploy/supabase-token.txt`), ver `run.sh`:
-
 ```
+supabase/tests/run.sh                       # todos los *.sql
 supabase/tests/run.sh match_convocatoria.sql
 ```
 
-O a mano: `POST /v1/projects/<ref>/database/query` con `{"query": "<contenido del .sql>"}`.
+Token: `$SUPABASE_ACCESS_TOKEN` si está seteado, si no `~/.soliloq-deploy/supabase-token.txt`.
+
+## En CI
+
+El job `db-tests` de `.github/workflows/ci.yml` los corre cuando un PR toca `supabase/`.
+Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
+`supabase.com/dashboard/account/tokens`). Sin el secret, el job termina OK sin correr nada.
 
 ## Qué cubre
 
