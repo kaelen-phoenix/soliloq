@@ -8,7 +8,7 @@ import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 
 const TITULO = "Yalope — Casting teatral en tu teléfono";
 const DESCRIPCION =
-  "Yalope conecta talento y creadores de teatro. Postulate a convocatorias, compartí tu perfil como booking y armá elenco con un match rápido y visual.";
+  "Yalope conecta talento y creadores de teatro con un match rápido y visual: deslizás perfiles y propuestas, y cuando el interés es de los dos lados, se convocan y hablan.";
 
 export const metadata: Metadata = {
   title: TITULO,
@@ -163,8 +163,13 @@ export default async function BienvenidaPage() {
                       <div className="h-3 w-24 rounded-full bg-ink-200" />
                       <div className="mt-2 h-2.5 w-16 rounded-full bg-ink-100" />
                     </div>
-                    <div className="flex h-11 w-11 items-center justify-center rounded-full bg-brand-500 text-white">
-                      <Icono nombre="corazon" className="h-5 w-5" relleno />
+                    <div className="flex items-center gap-2">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-ink-200 text-ink-500">
+                        <Icono nombre="cruz" className="h-4 w-4" />
+                      </div>
+                      <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-coral text-coral-700">
+                        <Icono nombre="corazon" className="h-5 w-5" relleno />
+                      </div>
                     </div>
                   </div>
                 </div>
