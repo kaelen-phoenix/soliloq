@@ -43,9 +43,7 @@ export default async function DetalleObraPage({
   const [{ data: roles }, { data: fotosRaw }] = await Promise.all([
     supabase
       .from("roles")
-      .select(
-        "id, nombre, tipo, edad_minima, edad_maxima, vacantes, generos_buscados, postulaciones(id, estado)"
-      )
+      .select("id, nombre, tipo, edad_minima, edad_maxima, vacantes, generos_buscados")
       .eq("obra_id", params.id),
     supabase
       .from("fotos_obra")
@@ -105,38 +103,26 @@ export default async function DetalleObraPage({
         )}
 
         <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
-          {roles?.map((rol) => {
-            const aprobados = rol.postulaciones.filter((p: any) => p.estado === "aprobado").length;
-            const sinRevisar = rol.postulaciones.filter((p: any) => p.estado === "pendiente").length;
-            return (
-              <li key={rol.id}>
-                <Link
-                  href={`/obras/${obra.id}/roles/${rol.id}`}
-                  className="flex items-center gap-3 rounded-xl border border-borde bg-superficie p-4 transition-colors hover:border-borde"
-                >
-                  <div className="min-w-0 flex-1">
-                    <p className="truncate text-base font-medium text-texto">{rol.nombre}</p>
-                    <p className="mt-0.5 text-xs text-texto-tenue">
-                      {ETIQUETA_TIPO[rol.tipo]}
-                      {rol.edad_minima && rol.edad_maxima ? ` · ${rol.edad_minima}–${rol.edad_maxima} años` : ""}
-                      {" · "}
-                      {aprobados}/{rol.vacantes} cubiertas
-                    </p>
-                    <p className="mt-0.5 text-xs text-texto-tenue">
-                      {rol.generos_buscados.length === 0
-                        ? "Abierto a cualquier género"
-                        : rol.generos_buscados.map(etiquetaGenero).join(", ")}
-                    </p>
-                  </div>
-                  {sinRevisar > 0 && (
-                    <span className="shrink-0 rounded-full bg-brand-500 px-2 py-0.5 text-2xs font-semibold text-white">
-                      {sinRevisar}
-                    </span>
-                  )}
-                </Link>
-              </li>
-            );
-          })}
+          {roles?.map((rol) => (
+            <li
+              key={rol.id}
+              className="flex items-center gap-3 rounded-xl border border-borde bg-superficie p-4"
+            >
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-base font-medium text-texto">{rol.nombre}</p>
+                <p className="mt-0.5 text-xs text-texto-tenue">
+                  {ETIQUETA_TIPO[rol.tipo]}
+                  {rol.edad_minima && rol.edad_maxima ? ` · ${rol.edad_minima}–${rol.edad_maxima} años` : ""}
+                  {` · ${rol.vacantes} ${rol.vacantes === 1 ? "vacante" : "vacantes"}`}
+                </p>
+                <p className="mt-0.5 text-xs text-texto-tenue">
+                  {rol.generos_buscados.length === 0
+                    ? "Abierto a cualquier género"
+                    : rol.generos_buscados.map(etiquetaGenero).join(", ")}
+                </p>
+              </div>
+            </li>
+          ))}
         </ul>
 
         <FormularioRol obraId={obra.id} cantidadRoles={roles?.length ?? 0} />

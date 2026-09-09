@@ -6,7 +6,6 @@ import type { RolUsuario } from "@/lib/supabase/types";
 
 /** El valor es la clave en el namespace `titulos` de los mensajes. */
 const TITULOS: { patron: RegExp; clave: string }[] = [
-  { patron: /^\/postulaciones/, clave: "postulaciones" },
   { patron: /^\/equipo/, clave: "armarEquipo" },
   { patron: /^\/salas\/.+/, clave: "sala" },
   { patron: /^\/salas$/, clave: "salas" },
@@ -16,7 +15,6 @@ const TITULOS: { patron: RegExp; clave: string }[] = [
   { patron: /^\/ajustes/, clave: "ajustes" },
   { patron: /^\/admin/, clave: "admin" },
   { patron: /^\/obras\/nueva/, clave: "nuevaObra" },
-  { patron: /^\/obras\/.+\/roles\/.+/, clave: "postulantes" },
   { patron: /^\/obras\/.+/, clave: "obra" },
   { patron: /^\/talentos\/.+/, clave: "perfil" },
   { patron: /^\/talentos$/, clave: "buscarTalento" },

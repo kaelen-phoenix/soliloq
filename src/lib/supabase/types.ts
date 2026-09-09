@@ -980,26 +980,11 @@ export interface Database {
           fotos: string[];
         }[];
       };
-      /** El talento marca interés (o descarta) un equipo del feed (0046). */
-      interes_en_equipo: {
-        Args: { p_equipo_id: string; p_interesa: boolean };
+      /** Deshace un "Me interesa"/"Paso" del feed borrando la fila propia en `intereses_match`,
+       *  siempre que todavía no se haya materializado un match (0061). */
+      deshacer_interes: {
+        Args: { p_obra_id: string | null; p_equipo_id: string | null };
         Returns: void;
-      };
-      /** El creador acepta a un interesado en su equipo, hasta el cupo; abre la sala (0046). */
-      aceptar_en_equipo: {
-        Args: { p_equipo_id: string; p_talento_id: string };
-        Returns: void;
-      };
-      /** Proyección acotada de quién se interesó en un equipo, para que el creador elija (0047). */
-      interesados_en_equipo: {
-        Args: { p_equipo_id: string };
-        Returns: {
-          perfil_id: string;
-          nombre: string;
-          foto_path: string | null;
-          ubicacion_publica: string | null;
-          aceptado: boolean;
-        }[];
       };
       /**
        * Proyección acotada de quien contactó desde un enlace público, para responder el

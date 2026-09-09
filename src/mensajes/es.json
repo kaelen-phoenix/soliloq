@@ -13,7 +13,6 @@
   "nav": {
     "convocatorias": "Convocatorias",
     "convocatoriasCorto": "Feed",
-    "postulaciones": "Postulaciones",
     "armarEquipo": "Armar equipo",
     "armarEquipoCorto": "Equipo",
     "salas": "Salas",
@@ -27,7 +26,6 @@
     "matches": "Matches"
   },
   "titulos": {
-    "postulaciones": "Postulaciones",
     "armarEquipo": "Armar equipo",
     "sala": "Sala",
     "salas": "Salas",
@@ -35,7 +33,6 @@
     "nuevoPerfil": "Nuevo perfil",
     "tuPerfil": "Tu perfil",
     "nuevaObra": "Nueva obra",
-    "postulantes": "Postulantes",
     "obra": "Obra",
     "perfil": "Perfil",
     "buscarTalento": "Buscar talento",

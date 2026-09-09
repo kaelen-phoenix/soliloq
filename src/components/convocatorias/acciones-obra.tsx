@@ -109,7 +109,7 @@ export function AccionesObra({
             </Boton>
           ) : (
             <ConfirmarBorrado
-              mensaje="Se borra el proyecto con sus roles, fotos y postulaciones. No se puede deshacer. Escribí BORRAR para confirmar."
+              mensaje="Se borra el proyecto con sus roles, fotos y el interés recibido. No se puede deshacer. Escribí BORRAR para confirmar."
               textoBoton="Borrar definitivamente"
               cargando={cargando}
               onConfirmar={borrar}

@@ -20,13 +20,9 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
     | null
     | undefined;
 
-  const [{ data: mensajes }, { data: integrantesRaw }, { data: postulacionesAprobadas }] = await Promise.all([
+  const [{ data: mensajes }, { data: integrantesRaw }] = await Promise.all([
     supabase.from("mensajes").select("*").eq("sala_id", params.id).order("creado_en"),
     supabase.from("sala_integrantes").select("perfil_id").eq("sala_id", params.id),
-    supabase
-      .from("postulaciones")
-      .select("talento_id, roles(nombre, obra_id)")
-      .eq("estado", "aprobado"),
   ]);
 
   const integrantesIds = (integrantesRaw ?? []).map((i) => i.perfil_id);
@@ -46,16 +42,13 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       return { perfil_id: id, nombre: creador.nombre, foto_url: creador.imagen_url, rol_en_obra: "Director/a" };
     }
     const talento = talentos?.find((t) => t.id === id);
-    const rolNombre = (postulacionesAprobadas ?? []).find(
-      (p: any) => p.talento_id === id && p.roles.obra_id === sala.obra_id
-    )?.roles?.nombre;
     const fotoPrincipal = talento?.fotos_talento?.find((f: any) => f.orden === 0);
     return {
       perfil_id: id,
       nombre: talento?.nombre ?? "Integrante",
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
-      // Sin obra no hay rol que mostrar: la sala nació de un interés mutuo, no de un casting.
-      rol_en_obra: rolNombre ?? (sala.obra_id ? "Elenco" : "Armando equipo"),
+      // La sala nace de un interés mutuo + convocatoria, no de un casting con roles.
+      rol_en_obra: sala.obra_id ? "Elenco" : "Armando equipo",
     };
   });
 
