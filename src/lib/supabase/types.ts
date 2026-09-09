@@ -199,6 +199,8 @@ export interface Database {
           ubicacion_lng: number;
           ubicacion_pais: string;
           descripcion: string | null;
+          /** #132: resumen libre de trayectoria y logros (≤ 2000). */
+          biografia: string | null;
           imagen_url: string | null;
           actualizado_en: string;
         };
@@ -216,6 +218,7 @@ export interface Database {
           ubicacion_lng: number;
           ubicacion_pais: string;
           descripcion?: string | null;
+          biografia?: string | null;
           imagen_url?: string | null;
         };
         Update: {
@@ -231,6 +234,7 @@ export interface Database {
           ubicacion_lng?: number;
           ubicacion_pais?: string;
           descripcion?: string | null;
+          biografia?: string | null;
           imagen_url?: string | null;
         };
         Relationships: [];
@@ -924,8 +928,8 @@ export interface Database {
           videoreel_url: string | null;
           /** `{ [claveRed]: urlCanonica }`. `{}` si no cargó ninguna. */
           redes: Record<string, string>;
-          /** Solo creador: `[{ titulo, anio, rol }]`, más nuevas primero. */
-          obras: { titulo: string; anio: number; rol: string }[];
+          /** Solo creador: resumen libre de trayectoria y logros (#132). */
+          biografia: string | null;
         }[];
       };
       /**

@@ -27,6 +27,7 @@ interface DatosIniciales {
   ubicacion_lng: number;
   ubicacion_pais: string;
   descripcion: string | null;
+  biografia: string | null;
   imagen_url: string | null;
 }
 
@@ -54,6 +55,7 @@ export function FormularioCreador({
     desdeColumnas(datosIniciales) ?? null,
   );
   const [descripcion, setDescripcion] = useState(datosIniciales?.descripcion ?? "");
+  const [biografia, setBiografia] = useState(datosIniciales?.biografia ?? "");
   const [imagenUrl, setImagenUrl] = useState(datosIniciales?.imagen_url ?? "");
   const [subiendoImagen, setSubiendoImagen] = useState(false);
   const [errores, setErrores] = useState<Record<string, string>>({});
@@ -121,6 +123,7 @@ export function FormularioCreador({
     }
     if (!ubicacion) nuevos.ubicacion = "Elegí una ubicación de la lista de sugerencias.";
     if (descripcion.length > 1000) nuevos.descripcion = "Máximo 1000 caracteres.";
+    if (biografia.length > 2000) nuevos.biografia = "Máximo 2000 caracteres.";
     setErrores((prev) => ({ ...prev, ...nuevos }));
     return Object.keys(nuevos).length === 0;
   }
@@ -144,6 +147,7 @@ export function FormularioCreador({
       otro_detalle: disciplinas.includes("otro") ? otroDetalle.trim() : null,
       ...aColumnas(ubicacion!),
       descripcion: descripcion || null,
+      biografia: biografia || null,
       imagen_url: imagenUrl || null,
     };
 
@@ -270,7 +274,7 @@ export function FormularioCreador({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Descripción e imagen (opcional)</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Descripción, biografía e imagen (opcional)</h2>
         <textarea
           rows={4}
           maxLength={1000}
@@ -279,6 +283,23 @@ export function FormularioCreador({
           className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
           placeholder="Contanos sobre tu trayectoria o la de tu compañía."
         />
+
+        <div className="flex flex-col gap-1.5">
+          <label htmlFor="biografia" className="text-sm font-medium text-texto">
+            Biografía
+          </label>
+          <textarea
+            id="biografia"
+            rows={6}
+            maxLength={2000}
+            value={biografia}
+            onChange={(e) => setBiografia(e.target.value)}
+            className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
+            placeholder="Resumí tu trayectoria artística y tus principales logros."
+          />
+          {errores.biografia && <p className="text-xs text-error-600">{errores.biografia}</p>}
+        </div>
+
         <div className="flex items-center gap-3">
           {imagenUrl && (
             <Imagen

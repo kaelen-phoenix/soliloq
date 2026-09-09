@@ -22,8 +22,8 @@ export interface PerfilPublico {
   videoreel_url: string | null;
   /** `{ [claveRed]: urlCanonica }`. */
   redes: Record<string, string>;
-  /** Solo creador. */
-  obras: { titulo: string; anio: number; rol: string }[];
+  /** Solo creador: resumen de trayectoria y logros (#132). */
+  biografia: string | null;
 }
 
 /** Un bloque del booking, con el título en registro de programa de mano. */
@@ -41,8 +41,8 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
 /**
  * El booking: la carta de presentación de un artista para pasarle a una directora de
  * casting. Headshot grande, nombre en la serif de display, datos de cabecera, videoreel,
- * trayectoria, habilidades y obras previas. No trae correo ni teléfono: para eso está
- * "Contactar".
+ * trayectoria, habilidades (talento) o biografía (creador). No trae correo ni teléfono:
+ * para eso está "Contactar".
  */
 export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
   const esTalento = perfil.tipo === "talento";
@@ -132,21 +132,11 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
               </Seccion>
             )}
 
-        {perfil.obras.length > 0 && (
-          <Seccion titulo="Obras previas">
-            <ul className="flex flex-col gap-2">
-              {perfil.obras.map((o, i) => (
-                <li key={i} className="text-sm text-ink-800">
-                  <span className="font-medium text-ink-900">{o.titulo}</span>
-                  <span className="text-ink-500">
-                    {"  ·  "}
-                    {o.anio}
-                    {"  ·  "}
-                  </span>
-                  {o.rol}
-                </li>
-              ))}
-            </ul>
+        {!esTalento && perfil.biografia && (
+          <Seccion titulo="Biografía">
+            <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-ink-800">
+              {perfil.biografia}
+            </p>
           </Seccion>
         )}
       </div>
