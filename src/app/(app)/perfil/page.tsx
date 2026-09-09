@@ -2,7 +2,6 @@ import Link from "next/link";
 import { CerrarSesionBoton } from "@/components/cerrar-sesion-boton";
 import { FormularioCreador } from "@/components/perfil/formulario-creador";
 import { FormularioTalento } from "@/components/perfil/formulario-talento";
-import { ObrasPrevias } from "@/components/perfil/obras-previas";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
@@ -135,10 +134,11 @@ export default async function PerfilPage({
     );
   }
 
-  const [{ data: perfilCreador }, { data: obrasPrevias }] = await Promise.all([
-    supabase.from("perfiles_creador").select("*").eq("id", user.id).single(),
-    supabase.from("obras_previas").select("*").eq("creador_id", user.id),
-  ]);
+  const { data: perfilCreador } = await supabase
+    .from("perfiles_creador")
+    .select("*")
+    .eq("id", user.id)
+    .single();
 
   return (
     <main className="px-5 py-5">
@@ -191,15 +191,20 @@ export default async function PerfilPage({
           {perfilCreador.descripcion && (
             <p className="max-w-prose text-sm leading-relaxed text-texto">{perfilCreador.descripcion}</p>
           )}
+
+          {perfilCreador.biografia && (
+            <div className="mt-2">
+              <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
+                Biografía
+              </h3>
+              <p className="mt-1.5 max-w-prose whitespace-pre-line text-sm leading-relaxed text-texto">
+                {perfilCreador.biografia}
+              </p>
+            </div>
+          )}
         </VistaPerfilPropio>
       )}
 
-      <section className="mt-8 flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-          Historial de obras previas
-        </h2>
-        <ObrasPrevias creadorId={user.id} obras={obrasPrevias ?? []} />
-      </section>
       {!editando && perfilCreador && compartir(perfilCreador.nombre)}
       {!editando && armarEquipo}
       <AccionesCuenta />

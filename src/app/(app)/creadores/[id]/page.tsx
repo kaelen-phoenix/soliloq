@@ -7,10 +7,11 @@ import { Imagen } from "@/components/ui/imagen";
 export default async function PerfilCreadorPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
 
-  const [{ data: creador }, { data: obrasPrevias }] = await Promise.all([
-    supabase.from("perfiles_creador").select("*").eq("id", params.id).single(),
-    supabase.from("obras_previas").select("*").eq("creador_id", params.id).order("anio", { ascending: false }),
-  ]);
+  const { data: creador } = await supabase
+    .from("perfiles_creador")
+    .select("*")
+    .eq("id", params.id)
+    .single();
 
   if (!creador) notFound();
 
@@ -50,19 +51,12 @@ export default async function PerfilCreadorPage({ params }: { params: { id: stri
 
       {creador.descripcion && <p className="mt-4 max-w-prose text-sm text-texto">{creador.descripcion}</p>}
 
-      {obrasPrevias && obrasPrevias.length > 0 && (
+      {creador.biografia && (
         <section className="mt-6">
-          <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Obras previas</h2>
-          <ul className="mt-2 flex flex-col gap-2">
-            {obrasPrevias.map((o) => (
-              <li key={o.id} className="rounded-xl border border-borde px-4 py-2">
-                <p className="font-medium text-texto">{o.titulo}</p>
-                <p className="text-xs text-texto-tenue">
-                  {o.anio} · {o.rol_desempenado}
-                </p>
-              </li>
-            ))}
-          </ul>
+          <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Biografía</h2>
+          <p className="mt-2 max-w-prose whitespace-pre-line text-sm leading-relaxed text-texto">
+            {creador.biografia}
+          </p>
         </section>
       )}
 
