@@ -23,11 +23,24 @@ jobs:
 
       - run: npm run typecheck
 
-      - run: npm run build
+      - name: build
+        run: npm run build
         env:
           # Valores dummy: alcanza para que `next build` no falle al instanciar los
           # clientes de Supabase (usan `new URL(...)`, que tira si falta la variable).
           # El build de Vercel usa las variables reales configuradas ahí.
+          NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
+          NEXT_PUBLIC_SITE_URL: http://localhost:3000
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ci-placeholder-maps-key
+
+      # E2E de las superficies públicas (landing, /ingresar, robots/sitemap/manifest).
+      # Corren contra la app buildeada con variables dummy — sin backend. Los flujos con
+      # sesión (`e2e/flujos/`) se saltean solos.
+      - run: npx playwright install --with-deps chromium
+      - name: e2e público
+        run: npx playwright test e2e/publico.spec.ts
+        env:
           NEXT_PUBLIC_SUPABASE_URL: https://ci-placeholder.supabase.co
           NEXT_PUBLIC_SUPABASE_ANON_KEY: ci-placeholder-anon-key
           NEXT_PUBLIC_SITE_URL: http://localhost:3000
