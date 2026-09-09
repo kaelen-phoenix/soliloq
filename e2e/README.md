@@ -16,7 +16,7 @@ landing para anónimos, `/ingresar` con email + contraseña, y `robots.txt` / `s
 
 ## `flujos/` — necesita staging
 
-Los flujos con sesión (circuito de match: swipe → placa → `/matches` → `/convocado` → sala)
+Los flujos con sesión (circuito de match: swipe → placa → `/matches` → sala)
 **se saltean** salvo que estén:
 
 - `E2E_BASE_URL` — la app corriendo contra una base de **staging** (nunca prod).

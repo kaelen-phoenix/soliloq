@@ -100,9 +100,11 @@ export function ListaNotificaciones({
     await marcarLeida(n.id);
     if ((n.tipo === "sala_creada" || n.tipo === "equipo_armado") && n.sala_id) {
       router.push(`/salas/${n.sala_id}`);
-    } else if (n.tipo === "convocado" || n.tipo === "espera_vencida") {
-      // A postulaciones y no a la obra: es donde están los botones de confirmar, y donde
-      // se explica por qué la espera se cerró.
+    } else if (n.tipo === "convocado") {
+      // Ya no hay paso de aceptación (#131): la sala ya está abierta.
+      router.push("/salas");
+    } else if (n.tipo === "espera_vencida") {
+      // A postulaciones y no a la obra: es donde se explica por qué la espera se cerró.
       router.push("/postulaciones");
     } else if (n.tipo === "match" && n.obra_id) {
       router.push(`/obras/${n.obra_id}`);
@@ -167,8 +169,8 @@ export function ListaNotificaciones({
                       ¡Fuiste convocado!
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      Te quieren sumar a <span className="font-medium">{tituloObra(n)}</span>.
-                      Confirmá que seguís disponible.
+                      Te sumaron a <span className="font-medium">{tituloObra(n)}</span>. Ya
+                      podés hablar en la sala.
                     </p>
                   </>
                 ) : n.tipo === "equipo_armado" ? (

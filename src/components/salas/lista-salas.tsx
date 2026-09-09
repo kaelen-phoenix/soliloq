@@ -13,6 +13,7 @@ import {
 export interface SalaItem {
   salaId: string;
   titulo: string;
+  esEquipo: boolean;
   ultimoMensaje: string | null;
   ultimaActividad: string | null;
   destacadoEn: string | null;
@@ -85,7 +86,16 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
                   <Icono nombre="estrella" relleno className="h-4 w-4 shrink-0 text-coral-700" />
                 )}
                 <div className="min-w-0 flex-1">
-                  <p className="truncate text-base font-medium text-texto">{s.titulo}</p>
+                  <div className="flex items-center gap-2">
+                    <span
+                      className={`inline-block shrink-0 rounded-md px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide ${
+                        s.esEquipo ? "bg-coral text-ink-950" : "bg-brand-600 text-white"
+                      }`}
+                    >
+                      {s.esEquipo ? "Equipo" : "Proyecto"}
+                    </span>
+                    <p className="truncate text-base font-medium text-texto">{s.titulo}</p>
+                  </div>
                   <p className="mt-0.5 truncate text-sm text-texto-tenue">
                     {s.ultimoMensaje ?? "Sala recién creada"}
                   </p>

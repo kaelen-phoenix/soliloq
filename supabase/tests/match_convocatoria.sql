@@ -1,4 +1,4 @@
--- Test del circuito de match/convocatoria (issues #105-#107, migraciones 0054-0057).
+-- Test del circuito de match/convocatoria (issues #105-#107 y #131, migraciones 0054-0059).
 -- Se corre entero dentro de begin/rollback: no deja rastro. Si termina sin error,
 -- pasaron todas las aserciones. Los ids nuevos (match, convocatoria, sala) se guardan en
 -- un temp table `ctx` (sin RLS) para poder leerlos mientras se actúa como un usuario.
@@ -48,22 +48,18 @@ do $$ begin
   assert (select expira_en > now() + interval '6 days' from matches limit 1), 'T2: expira ~7 días';
 end $$;
 
--- T3 · convocar → convocatoria pendiente; no en cierre
+-- T3 · convocar → convocatoria aceptada en el acto (sin paso de aceptación, #131)
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
 select convocar((select v from ctx where k='match'));
 reset role;
 insert into ctx (k, v) select 'conv', id from convocatorias limit 1;
 do $$ begin
-  assert (select count(*) from convocatorias where estado = 'pendiente') = 1, 'T3: 1 pendiente';
-  assert not iniciativa_en_cierre((select v from ctx where k='obra'), null), 'T3: no en cierre';
+  assert (select count(*) from convocatorias where estado = 'aceptada') = 1, 'T3: 1 aceptada';
+  assert (select respondido_en is not null from convocatorias limit 1), 'T3: respondido_en seteado';
 end $$;
 
--- T4 · talento A acepta → entra a la sala; ahora en cierre (cupo 1)
-set local role authenticated;
-set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222"}';
-select responder_convocatoria((select v from ctx where k='conv'), true);
-reset role;
+-- T4 · convocar abrió la sala con creador + talento A; queda en cierre (cupo 1)
 do $$ begin
   assert (select count(*) from sala_integrantes si join salas s on s.id = si.sala_id
           where s.obra_id = (select v from ctx where k='obra')) = 2, 'T4: sala con 2';
@@ -132,11 +128,6 @@ reset role;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
 select convocar((select v from ctx where k='match_b'));
-reset role;
-insert into ctx (k, v) select 'conv_b', id from convocatorias where estado = 'pendiente' limit 1;
-set local role authenticated;
-set local request.jwt.claims = '{"sub":"33333333-3333-3333-3333-333333333333"}';
-select responder_convocatoria((select v from ctx where k='conv_b'), true);
 reset role;
 insert into ctx (k, v) select 'sala', id from salas where obra_id = (select v from ctx where k='obra');
 set local role authenticated;
