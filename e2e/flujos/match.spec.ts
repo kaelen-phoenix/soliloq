@@ -7,7 +7,7 @@ import { createClient } from "@supabase/supabase-js";
  * app corriendo contra esa base. Si falta algo, se saltea.
  *
  * El circuito ya está cubierto a nivel SQL en `supabase/tests/match_convocatoria.sql`;
- * esto valida la capa de UI (swipe, placa, /matches, /convocado).
+ * esto valida la capa de UI (swipe, placa, /matches, /salas).
  */
 const URL = process.env.E2E_SUPABASE_URL;
 const KEY = process.env.E2E_SERVICE_KEY;
@@ -41,7 +41,7 @@ test.describe("circuito de match (UI)", () => {
     //  2. login del talento por /ingresar, ir a "/", swipe derecha sobre la obra.
     //  3. login del creador, /talentos, swipe ❤️ sobre el talento → placa "Hay interés".
     //  4. "Enviar a Convocados" → el talento aparece en /matches como convocado.
-    //  5. login del talento, /convocado → "Aceptar" → queda en /salas y el chat funciona.
+    //  5. login del talento → la sala ya está en /salas (sin paso de aceptación, #131) y el chat funciona.
     expect(admin).not.toBeNull();
   });
 });

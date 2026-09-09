@@ -39,6 +39,7 @@ export default async function SalasPage() {
       return {
         salaId: i.sala_id as string,
         titulo: obra?.titulo ?? equipo?.titulo ?? i.salas?.titulo ?? "Proyecto",
+        esEquipo: !!equipo,
         ultimoMensaje: ultimoMensaje?.contenido ?? null,
         ultimaActividad: (ultimoMensaje?.creado_en as string | undefined) ?? null,
         destacadoEn: destPorSala.get(i.sala_id) ?? null,

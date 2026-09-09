@@ -837,20 +837,6 @@ export interface Database {
         }[];
       };
       convocar: { Args: { p_match_id: string }; Returns: undefined };
-      mis_convocatorias: {
-        Args: Record<string, never>;
-        Returns: {
-          convocatoria_id: string;
-          titulo: string;
-          creador_nombre: string;
-          es_equipo: boolean;
-          creado_en: string;
-        }[];
-      };
-      responder_convocatoria: {
-        Args: { p_convocatoria_id: string; p_aceptar: boolean };
-        Returns: undefined;
-      };
       dar_de_baja_convocado: { Args: { p_convocatoria_id: string }; Returns: undefined };
       mis_convocados: {
         Args: Record<string, never>;
