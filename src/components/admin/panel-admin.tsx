@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useCallback, useEffect, useState } from "react";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
@@ -15,12 +16,44 @@ type Denuncia = Database["public"]["Functions"]["admin_denuncias"]["Returns"][nu
 type Bloqueo = Database["public"]["Functions"]["admin_bloqueos"]["Returns"][number];
 type Mensaje = Database["public"]["Functions"]["admin_mensajes"]["Returns"][number];
 type Sponsor = Database["public"]["Tables"]["sponsors"]["Row"];
+type Publicacion = Database["public"]["Functions"]["admin_publicaciones"]["Returns"][number];
 
 const PAGINA = 50;
-type Pestana = "resumen" | "usuarios" | "denuncias" | "bloqueos" | "mensajes" | "sponsors";
+type Pestana =
+  | "resumen"
+  | "usuarios"
+  | "publicaciones"
+  | "denuncias"
+  | "bloqueos"
+  | "mensajes"
+  | "sponsors";
 
 function fecha(v: string | null) {
   return v ? new Date(v).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+}
+
+/** El enlace para ver un perfil "como en la app": el booking público si está activo, si no
+ *  la ficha interna del rol activo. */
+function hrefPerfil(u: Usuario): string {
+  if (u.enlace_publico_activo && u.enlace_token) return `/p/${u.enlace_token}`;
+  const rol = u.roles.includes(u.modo_activo ?? "")
+    ? u.modo_activo
+    : u.roles.includes("creador")
+      ? "creador"
+      : "talento";
+  return `/${rol === "creador" ? "creadores" : "talentos"}/${u.id}`;
+}
+
+function VerEnApp({ href }: { href: string }) {
+  return (
+    <Link
+      href={href}
+      target="_blank"
+      className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto-tenue transition-colors hover:bg-fondo-sutil"
+    >
+      Ver ↗
+    </Link>
+  );
 }
 
 export function PanelAdmin({
@@ -38,7 +71,9 @@ export function PanelAdmin({
   return (
     <div className="flex flex-col gap-6">
       <nav className="flex flex-wrap gap-1.5">
-        {(["resumen", "usuarios", "denuncias", "bloqueos", "mensajes", "sponsors"] as const).map((p) => (
+        {(
+          ["resumen", "usuarios", "publicaciones", "denuncias", "bloqueos", "mensajes", "sponsors"] as const
+        ).map((p) => (
           <button
             key={p}
             type="button"
@@ -56,6 +91,7 @@ export function PanelAdmin({
       {pestana === "usuarios" && (
         <Usuarios supabase={supabase} iniciales={usuariosIniciales} miId={miId} />
       )}
+      {pestana === "publicaciones" && <Publicaciones supabase={supabase} />}
       {pestana === "denuncias" && <Denuncias supabase={supabase} />}
       {pestana === "bloqueos" && <Bloqueos supabase={supabase} />}
       {pestana === "mensajes" && <Mensajes supabase={supabase} />}
@@ -300,6 +336,12 @@ function Resumen({ metricas }: { metricas: Metricas | null }) {
     { etiqueta: "Suspendidos", valor: metricas.suspendidos },
     { etiqueta: "Bloqueos", valor: metricas.bloqueos },
     { etiqueta: "Denuncias abiertas", valor: metricas.denuncias_abiertas },
+    { etiqueta: "Obras publicadas", valor: metricas.obras_publicadas },
+    { etiqueta: "Equipos activos", valor: metricas.equipos_activos },
+    { etiqueta: "Matches vigentes", valor: metricas.matches_activos },
+    { etiqueta: "Convocatorias aceptadas", valor: metricas.convocatorias_aceptadas },
+    { etiqueta: "Salas", valor: metricas.salas },
+    { etiqueta: "«Me interesa» últimos 7 días", valor: metricas.interes_7d },
   ];
   return (
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
@@ -439,6 +481,7 @@ function Usuarios({
                     {u.email} · {u.roles.join(" + ") || "sin perfil"} · alta {fecha(u.creado_en)}
                   </p>
                 </div>
+                <VerEnApp href={hrefPerfil(u)} />
                 {u.id !== miId && !u.es_admin && (
                   <div className="flex shrink-0 gap-1.5">
                     <button
@@ -479,6 +522,126 @@ function Usuarios({
       {hayMas && (
         <div className="flex justify-center">
           <Boton variante="secundario" cargando={cargando} textoCargando="Cargando…" onClick={() => buscar(offset, texto)}>
+            Cargar más
+          </Boton>
+        </div>
+      )}
+    </div>
+  );
+}
+
+// --- Publicaciones ----------------------------------------------------------------------
+
+const COLOR_PUB: Record<string, string> = {
+  publicada: "bg-accion text-accion-texto",
+  borrador: "bg-ink-100 text-texto-tenue",
+  cerrada: "bg-fondo-sutil text-texto-tenue",
+  activo: "bg-accion text-accion-texto",
+  cerrado: "bg-fondo-sutil text-texto-tenue",
+};
+
+function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const [texto, setTexto] = useState("");
+  const [filas, setFilas] = useState<Publicacion[] | null>(null);
+  const [offset, setOffset] = useState(0);
+  const [hayMas, setHayMas] = useState(false);
+  const [cargando, setCargando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
+
+  const cargar = useCallback(
+    async (nuevoOffset: number, q: string) => {
+      setCargando(true);
+      const { data, error: e } = await supabase.rpc("admin_publicaciones", {
+        p_texto: q.trim() || null,
+        p_limite: PAGINA,
+        p_offset: nuevoOffset,
+      });
+      setCargando(false);
+      if (e) {
+        setError(e.message ?? "No se pudo leer.");
+        return;
+      }
+      setError(null);
+      const nuevas = data ?? [];
+      setFilas((prev) => (nuevoOffset === 0 || prev === null ? nuevas : [...prev, ...nuevas]));
+      setOffset(nuevoOffset + nuevas.length);
+      setHayMas(nuevas.length === PAGINA);
+    },
+    [supabase],
+  );
+
+  useEffect(() => {
+    cargar(0, "");
+  }, [cargar]);
+
+  return (
+    <div className="flex flex-col gap-3">
+      <form
+        onSubmit={(e) => {
+          e.preventDefault();
+          cargar(0, texto);
+        }}
+        className="flex gap-2"
+      >
+        <CampoTexto
+          id="admin-buscar-pub"
+          etiqueta="Buscar"
+          placeholder="Título, dueño o email"
+          value={texto}
+          onChange={(e) => setTexto(e.target.value)}
+        />
+        <div className="self-end">
+          <Boton variante="secundario" type="submit" cargando={cargando} textoCargando="…">
+            Buscar
+          </Boton>
+        </div>
+      </form>
+
+      {error && <p className="text-xs text-error-600">{error}</p>}
+
+      {filas === null ? (
+        <p className="text-sm text-texto-tenue">Cargando publicaciones…</p>
+      ) : filas.length === 0 ? (
+        <EstadoVacio icono="tablero" titulo="Sin publicaciones" detalle="No hay resultados." />
+      ) : (
+        <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
+          {filas.map((p) => (
+            <li key={`${p.tipo}-${p.id}`} className="flex items-center gap-3 p-3.5">
+              <div className="min-w-0 flex-1">
+                <p className="truncate text-sm font-medium text-texto">
+                  <span className="mr-1.5 rounded bg-fondo-sutil px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-texto-tenue">
+                    {p.tipo}
+                  </span>
+                  {p.titulo}
+                  <span
+                    className={`ml-1.5 rounded px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide ${
+                      COLOR_PUB[p.estado] ?? "bg-fondo-sutil text-texto-tenue"
+                    }`}
+                  >
+                    {p.estado}
+                  </span>
+                </p>
+                <p className="truncate text-xs text-texto-tenue">
+                  {p.creador_nombre ?? "(sin nombre)"} · {p.creador_email} · {p.detalle} · {p.fotos}{" "}
+                  {p.fotos === 1 ? "foto" : "fotos"} · {fecha(p.creado_en)}
+                </p>
+              </div>
+              <VerEnApp
+                href={p.tipo === "obra" ? `/obras/${p.id}` : `/creadores/${p.creador_id}`}
+              />
+            </li>
+          ))}
+        </ul>
+      )}
+
+      {hayMas && (
+        <div className="flex justify-center">
+          <Boton
+            variante="secundario"
+            cargando={cargando}
+            textoCargando="Cargando…"
+            onClick={() => cargar(offset, texto)}
+          >
             Cargar más
           </Boton>
         </div>

@@ -1022,6 +1022,12 @@ export interface Database {
           bloqueos: number;
           denuncias_abiertas: number;
           registros_7d: number;
+          obras_publicadas: number;
+          equipos_activos: number;
+          matches_activos: number;
+          convocatorias_aceptadas: number;
+          salas: number;
+          interes_7d: number;
         }[];
       };
       admin_usuarios: {
@@ -1033,8 +1039,26 @@ export interface Database {
           roles: string[];
           suspendido: boolean;
           es_admin: boolean;
+          modo_activo: string | null;
+          enlace_token: string;
+          enlace_publico_activo: boolean;
           creado_en: string;
           ultimo_acceso: string | null;
+        }[];
+      };
+      admin_publicaciones: {
+        Args: { p_texto?: string | null; p_limite?: number; p_offset?: number };
+        Returns: {
+          tipo: "obra" | "equipo";
+          id: string;
+          titulo: string;
+          estado: string;
+          creador_id: string;
+          creador_nombre: string | null;
+          creador_email: string;
+          fotos: number;
+          detalle: string;
+          creado_en: string;
         }[];
       };
       admin_suspender_usuario: {
