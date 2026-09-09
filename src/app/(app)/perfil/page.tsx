@@ -6,7 +6,6 @@ import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
-import { BuscarEquipo } from "@/components/perfil/buscar-equipo";
 import { BotonCompartir } from "@/components/perfil/boton-compartir";
 import { EtiquetasDisciplina } from "@/components/perfil/etiquetas-disciplina";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
@@ -71,15 +70,9 @@ export default async function PerfilPage({
 
   const { data: cuenta } = await supabase
     .from("perfiles")
-    .select("busca_equipo, pitch, enlace_token, enlace_publico_activo")
+    .select("enlace_token, enlace_publico_activo")
     .eq("id", user.id)
     .single();
-
-  // Vive fuera de los dos formularios porque es de la cuenta, no del perfil de talento ni
-  // del de creador: quien tiene los dos se anota una sola vez.
-  const armarEquipo = (
-    <BuscarEquipo buscaEquipo={cuenta?.busca_equipo ?? false} pitchInicial={cuenta?.pitch ?? null} />
-  );
 
   // Ídem: el enlace público es de la cuenta, no de cada perfil. `nombre` se resuelve abajo,
   // según el modo activo, porque `perfiles` no lo tiene.
@@ -128,7 +121,6 @@ export default async function PerfilPage({
           </VistaPerfilPropio>
         )}
         {!editando && perfilTalento && compartir(perfilTalento.nombre)}
-        {!editando && armarEquipo}
         <AccionesCuenta />
       </main>
     );
@@ -206,7 +198,6 @@ export default async function PerfilPage({
       )}
 
       {!editando && perfilCreador && compartir(perfilCreador.nombre)}
-      {!editando && armarEquipo}
       <AccionesCuenta />
     </main>
   );
