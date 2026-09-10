@@ -31,19 +31,22 @@ export default async function MatchesPage() {
     nombre: m.nombre,
     fotoUrl: url(m.foto_path),
     expiraEn: m.expira_en,
-    convocado: m.convocado,
+    esEquipo: m.es_equipo,
+    iniciativaTitulo: m.iniciativa_titulo,
+    iniciativaFotoUrl: url(m.iniciativa_foto),
     cupoLleno: m.cupo_lleno,
   }));
 
   const filasConvocados = (convocados ?? []).map((c) => ({
+    matchId: c.match_id,
     convocatoriaId: c.convocatoria_id,
     talentoId: c.talento_id,
     nombre: c.nombre,
     fotoUrl: url(c.foto_path),
+    esEquipo: c.es_equipo,
+    iniciativaTitulo: c.iniciativa_titulo,
+    estado: c.estado as "en_convocados" | "esperando_confirmacion" | "en_sala",
   }));
-
-  const enCierre =
-    filas.some((f) => f.cupoLleno) || (filas.length === 0 && filasConvocados.length > 0);
 
   return (
     <main className="px-5 py-5">
@@ -51,15 +54,9 @@ export default async function MatchesPage() {
         Matches
       </h1>
       <p className="mb-5 mt-1 text-sm text-texto-tenue">
-        Personas con las que hubo interés mutuo. Tenés 7 días para convocarlas.
+        Interés mutuo. Aceptá el match para sumar a la persona a Convocados; después la
+        convocás en firme.
       </p>
-
-      {enCierre && (
-        <p className="mb-4 rounded-xl border border-coral bg-coral/10 px-3.5 py-3 text-sm text-texto">
-          Llenaste el cupo. Para convocar a alguien más, dá de baja a un convocado y se
-          libera un lugar.
-        </p>
-      )}
 
       {filas.length === 0 ? (
         <EstadoVacio

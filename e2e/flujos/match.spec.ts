@@ -40,8 +40,9 @@ test.describe("circuito de match (UI)", () => {
     //     — o sembrar directo con `admin` para no depender de todo el onboarding.
     //  2. login del talento por /ingresar, ir a "/", swipe derecha sobre la obra.
     //  3. login del creador, /talentos, swipe ❤️ sobre el talento → placa "Hay interés".
-    //  4. "Enviar a Convocados" → el talento aparece en /matches como convocado.
-    //  5. login del talento → la sala ya está en /salas (sin paso de aceptación, #131) y el chat funciona.
+    //  4. placa "Match" → "Aceptar" → el talento aparece en Convocados de /matches.
+    //  5. "Convocar" (definitivo) desde Convocados → notificación al talento.
+    //  6. login del talento → /convocatoria → "Aceptar" → la sala aparece en /salas y el chat funciona (#143).
     expect(admin).not.toBeNull();
   });
 });
