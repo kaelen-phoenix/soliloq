@@ -836,19 +836,44 @@ export interface Database {
           nombre: string;
           foto_path: string | null;
           expira_en: string;
-          convocado: boolean;
+          es_equipo: boolean;
+          iniciativa_titulo: string;
+          iniciativa_foto: string | null;
           cupo_lleno: boolean;
         }[];
       };
+      aceptar_match: { Args: { p_match_id: string }; Returns: undefined };
       convocar: { Args: { p_match_id: string }; Returns: undefined };
+      descartar_convocado: { Args: { p_match_id: string }; Returns: undefined };
       dar_de_baja_convocado: { Args: { p_convocatoria_id: string }; Returns: undefined };
+      responder_convocatoria: {
+        Args: { p_convocatoria_id: string; p_aceptar: boolean };
+        Returns: undefined;
+      };
       mis_convocados: {
         Args: Record<string, never>;
         Returns: {
-          convocatoria_id: string;
+          match_id: string;
+          convocatoria_id: string | null;
           talento_id: string;
           nombre: string;
           foto_path: string | null;
+          es_equipo: boolean;
+          iniciativa_titulo: string;
+          iniciativa_foto: string | null;
+          estado: "en_convocados" | "esperando_confirmacion" | "en_sala";
+        }[];
+      };
+      mis_convocatorias: {
+        Args: Record<string, never>;
+        Returns: {
+          convocatoria_id: string;
+          es_equipo: boolean;
+          iniciativa_titulo: string;
+          creador_nombre: string;
+          talento_foto: string | null;
+          iniciativa_foto: string | null;
+          creado_en: string;
         }[];
       };
       feed_para_talento: {

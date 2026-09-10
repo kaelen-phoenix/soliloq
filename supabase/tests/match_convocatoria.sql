@@ -1,4 +1,4 @@
--- Test del circuito de match/convocatoria (issues #105-#107 y #131, migraciones 0054-0059).
+-- Test del circuito de match/convocatoria (issues #105-#107, #131, #143; migraciones 0054-0063).
 -- Se corre entero dentro de begin/rollback: no deja rastro. Si termina sin error,
 -- pasaron todas las aserciones. Los ids nuevos (match, convocatoria, sala) se guardan en
 -- un temp table `ctx` (sin RLS) para poder leerlos mientras se actúa como un usuario.
@@ -48,25 +48,44 @@ do $$ begin
   assert (select expira_en > now() + interval '6 days' from matches limit 1), 'T2: expira ~7 días';
 end $$;
 
--- T3 · convocar → convocatoria aceptada en el acto (sin paso de aceptación, #131)
+-- T3 · el Creador acepta el Match → pasa a Convocados (sin sala, ocupa cupo, sin notif) — #143
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
+select aceptar_match((select v from ctx where k='match'));
+reset role;
+do $$ begin
+  assert (select aceptado_en is not null from matches where id = (select v from ctx where k='match')), 'T3: match aceptado';
+  assert iniciativa_en_cierre((select v from ctx where k='obra'), null), 'T3: ocupa cupo desde Convocados';
+  assert (select count(*) from salas where obra_id = (select v from ctx where k='obra')) = 0, 'T3: todavía sin sala';
+  assert (select count(*) from notificaciones where destinatario_id = (select v from ctx where k='ta')) = 0, 'T3: talento no notificado';
+end $$;
+
+-- T4 · convocar (definitivo) → convocatoria pendiente + notificación; sigue sin sala
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
 select convocar((select v from ctx where k='match'));
 reset role;
-insert into ctx (k, v) select 'conv', id from convocatorias limit 1;
+insert into ctx (k, v) select 'conv', id from convocatorias where estado = 'pendiente' limit 1;
 do $$ begin
-  assert (select count(*) from convocatorias where estado = 'aceptada') = 1, 'T3: 1 aceptada';
-  assert (select respondido_en is not null from convocatorias limit 1), 'T3: respondido_en seteado';
+  assert (select count(*) from convocatorias where estado = 'pendiente') = 1, 'T4: 1 pendiente';
+  assert (select count(*) from notificaciones where destinatario_id = (select v from ctx where k='ta') and tipo = 'convocado') = 1, 'T4: notificó al talento';
+  assert (select count(*) from salas where obra_id = (select v from ctx where k='obra')) = 0, 'T4: sin sala hasta que acepte';
 end $$;
 
--- T4 · convocar abrió la sala con creador + talento A; queda en cierre (cupo 1)
+-- T5 · el talento A acepta la convocatoria → entra a la sala
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222"}';
+select responder_convocatoria((select v from ctx where k='conv'), true);
+reset role;
+insert into ctx (k, v) select 'sala', id from salas where obra_id = (select v from ctx where k='obra');
 do $$ begin
+  assert (select estado from convocatorias where id = (select v from ctx where k='conv')) = 'aceptada', 'T5: aceptada';
   assert (select count(*) from sala_integrantes si join salas s on s.id = si.sala_id
-          where s.obra_id = (select v from ctx where k='obra')) = 2, 'T4: sala con 2';
-  assert iniciativa_en_cierre((select v from ctx where k='obra'), null), 'T4: en cierre';
+          where s.obra_id = (select v from ctx where k='obra')) = 2, 'T5: sala con 2';
+  assert iniciativa_en_cierre((select v from ctx where k='obra'), null), 'T5: en cierre';
 end $$;
 
--- T5 · con cupo lleno, convocar a otro rebota
+-- T6 · con cupo lleno, aceptar_match de otro rebota
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"33333333-3333-3333-3333-333333333333"}';
 select marcar_interes((select v from ctx where k='creador'), (select v from ctx where k='obra'), null, true);
@@ -76,36 +95,70 @@ reset role;
 insert into ctx (k, v) select 'match_b', id from matches where talento_id = (select v from ctx where k='tb');
 do $$ begin
   begin
-    perform convocar((select v from ctx where k='match_b'));
-    assert false, 'T5: convocar debería rebotar por cupo_lleno';
+    perform aceptar_match((select v from ctx where k='match_b'));
+    assert false, 'T6: aceptar_match debería rebotar por cupo_lleno';
   exception when others then
-    assert sqlerrm like '%cupo_lleno%', 'T5: error inesperado: ' || sqlerrm;
+    assert sqlerrm like '%cupo_lleno%', 'T6: error inesperado: ' || sqlerrm;
   end;
 end $$;
 
--- T6 · RLS de intereses_match — B solo ve lo suyo
+-- T7 · RLS de intereses_match — B solo ve lo suyo
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"33333333-3333-3333-3333-333333333333"}';
 do $$ begin
-  assert (select count(*) from intereses_match) = 1, 'T6: B ve solo su fila';
-  assert (select bool_and(de_perfil = (select v from ctx where k='tb')) from intereses_match), 'T6: sin filas ajenas';
+  assert (select count(*) from intereses_match) = 1, 'T7: B ve solo su fila';
+  assert (select bool_and(de_perfil = (select v from ctx where k='tb')) from intereses_match), 'T7: sin filas ajenas';
 end $$;
 reset role;
 
--- T7 · dar de baja al convocado → libera cupo
+-- T8 · desvincularme_de_sala — el dueño no puede; un integrante sí
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
+do $$ begin
+  begin
+    perform desvincularme_de_sala((select v from ctx where k='sala'));
+    assert false, 'T8: el dueño no debería poder desvincularse';
+  exception when others then
+    assert position('due' in sqlerrm) > 0, 'T8: error inesperado: ' || sqlerrm;
+  end;
+end $$;
+set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222"}';
+select desvincularme_de_sala((select v from ctx where k='sala'));
+reset role;
+do $$ begin
+  assert (select count(*) from sala_integrantes
+          where sala_id = (select v from ctx where k='sala') and perfil_id = (select v from ctx where k='ta')) = 0,
+         'T8: talento A salió de la sala';
+end $$;
+
+-- T9 · dar de baja al convocado → convocatoria en baja, libera cupo
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
 select dar_de_baja_convocado((select v from ctx where k='conv'));
 reset role;
 do $$ begin
-  assert (select estado from convocatorias where id = (select v from ctx where k='conv')) = 'baja', 'T7: en baja';
-  assert not iniciativa_en_cierre((select v from ctx where k='obra'), null), 'T7: cupo liberado';
-  assert (select count(*) from sala_integrantes si join salas s on s.id = si.sala_id
-          where s.obra_id = (select v from ctx where k='obra') and si.perfil_id = (select v from ctx where k='ta')) = 0,
-         'T7: talento A salió de la sala';
+  assert (select estado from convocatorias where id = (select v from ctx where k='conv')) = 'baja', 'T9: en baja';
+  assert not iniciativa_en_cierre((select v from ctx where k='obra'), null), 'T9: cupo liberado';
 end $$;
 
--- T8 · rate limit 20/24h para el talento
+-- T10 · descartar_convocado desde Convocados (antes de que el talento acepte)
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
+select aceptar_match((select v from ctx where k='match_b'));
+select descartar_convocado((select v from ctx where k='match_b'));
+reset role;
+do $$ begin
+  assert (select descartado_en is not null from matches where id = (select v from ctx where k='match_b')), 'T10: match_b descartado';
+  assert not iniciativa_en_cierre((select v from ctx where k='obra'), null), 'T10: cupo liberado tras descartar';
+  assert (select count(*) from matches m
+          where m.creador_id = (select v from ctx where k='creador')
+            and m.aceptado_en is not null and m.descartado_en is null
+            and not exists (select 1 from convocatorias c
+                            where c.match_id = m.id and c.estado in ('rechazada', 'baja'))) = 0,
+         'T10: nadie queda en Convocados';
+end $$;
+
+-- T11 · rate limit 20/24h para el talento (deja 19 filas dummy, va al final)
 insert into auth.users (id, email, aud, role)
 select gen_random_uuid(), 'dummy' || g || '@test.local', 'authenticated', 'authenticated'
 from generate_series(1, 19) g;
@@ -117,37 +170,12 @@ set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222"}';
 do $$ begin
   begin
     perform marcar_interes((select v from ctx where k='tb'), (select v from ctx where k='obra'), null, true);
-    assert false, 'T8: el "Me interesa" #21 debería rebotar';
+    assert false, 'T11: el "Me interesa" #21 debería rebotar';
   exception when others then
-    assert sqlerrm like '%limite_me_interesa%', 'T8: error inesperado: ' || sqlerrm;
+    assert sqlerrm like '%limite_me_interesa%', 'T11: error inesperado: ' || sqlerrm;
   end;
 end $$;
 reset role;
-
--- T9 · desvincularme_de_sala — el dueño no puede; un integrante sí
-set local role authenticated;
-set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
-select convocar((select v from ctx where k='match_b'));
-reset role;
-insert into ctx (k, v) select 'sala', id from salas where obra_id = (select v from ctx where k='obra');
-set local role authenticated;
-set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
-do $$ begin
-  begin
-    perform desvincularme_de_sala((select v from ctx where k='sala'));
-    assert false, 'T9: el dueño no debería poder desvincularse';
-  exception when others then
-    assert position('due' in sqlerrm) > 0, 'T9: error inesperado: ' || sqlerrm;
-  end;
-end $$;
-set local request.jwt.claims = '{"sub":"33333333-3333-3333-3333-333333333333"}';
-select desvincularme_de_sala((select v from ctx where k='sala'));
-reset role;
-do $$ begin
-  assert (select count(*) from sala_integrantes
-          where sala_id = (select v from ctx where k='sala') and perfil_id = (select v from ctx where k='tb')) = 0,
-         'T9: talento B salió de la sala';
-end $$;
 
 select 'TODOS LOS TESTS OK' as resultado;
 

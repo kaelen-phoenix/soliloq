@@ -6,7 +6,26 @@ import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 
 type Resultado = { ok: true } | { ok: false; error: string };
 
-/** El Creador convoca a un talento matcheado (issue #105). */
+/** El Creador acepta el Match → el talento pasa a Convocados. Sin notificación (#143). */
+export async function aceptarMatch(matchId: string): Promise<Resultado> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("aceptar_match", { p_match_id: matchId });
+  if (error) {
+    const m = error.message ?? "";
+    return {
+      ok: false,
+      error: m.includes("cupo_lleno")
+        ? "Ya llenaste el cupo. Liberá un lugar para sumar a otra persona."
+        : m.includes("venció")
+          ? "El match venció."
+          : "No se pudo aceptar. Probá de nuevo.",
+    };
+  }
+  revalidatePath("/matches");
+  return { ok: true };
+}
+
+/** El Creador convoca (definitivo) a alguien de Convocados: recién acá se notifica al talento (#143). */
 export async function convocarMatch(matchId: string): Promise<Resultado> {
   const supabase = createClient();
   const { error } = await supabase.rpc("convocar", { p_match_id: matchId });
@@ -16,11 +35,28 @@ export async function convocarMatch(matchId: string): Promise<Resultado> {
       ok: false,
       error: m.includes("cupo_lleno")
         ? "Ya llenaste el cupo. Liberá un lugar para convocar a otra persona."
-        : m.includes("venció")
-          ? "El match venció."
+        : m.includes("primero aceptá")
+          ? "Primero aceptá el match."
           : m.includes("ya está convocado")
             ? "Ya la convocaste."
             : "No se pudo convocar. Probá de nuevo.",
+    };
+  }
+  revalidatePath("/matches");
+  return { ok: true };
+}
+
+/** El Creador descarta a alguien de Convocados antes de que acepte (#143). */
+export async function descartarConvocado(matchId: string): Promise<Resultado> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("descartar_convocado", { p_match_id: matchId });
+  if (error) {
+    const m = error.message ?? "";
+    return {
+      ok: false,
+      error: m.includes("ya aceptó")
+        ? "Ya aceptó y está en la sala: usá «Dar de baja»."
+        : "No se pudo descartar. Probá de nuevo.",
     };
   }
   revalidatePath("/matches");

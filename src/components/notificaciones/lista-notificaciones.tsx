@@ -101,8 +101,8 @@ export function ListaNotificaciones({
     if ((n.tipo === "sala_creada" || n.tipo === "equipo_armado") && n.sala_id) {
       router.push(`/salas/${n.sala_id}`);
     } else if (n.tipo === "convocado") {
-      // Ya no hay paso de aceptación (#131): la sala ya está abierta.
-      router.push("/salas");
+      // #143: el Talento confirma la convocatoria antes de entrar a la sala.
+      router.push("/convocatoria");
     } else if (n.tipo === "espera_vencida") {
       // A postulaciones y no a la obra: es donde se explica por qué la espera se cerró.
       router.push("/postulaciones");
@@ -166,11 +166,11 @@ export function ListaNotificaciones({
                 ) : n.tipo === "convocado" ? (
                   <>
                     <p className="text-base font-semibold leading-snug text-texto">
-                      ¡Fuiste convocado!
+                      ¡Te convocaron!
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      Te sumaron a <span className="font-medium">{tituloObra(n)}</span>. Ya
-                      podés hablar en la sala.
+                      <span className="font-medium">{tituloObra(n)}</span> te quiere sumar.
+                      Entrá para confirmar.
                     </p>
                   </>
                 ) : n.tipo === "equipo_armado" ? (

@@ -7,7 +7,7 @@ import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { createClient } from "@/lib/supabase/client";
-import { marcarInteresEnTalento, convocarMatch } from "@/app/(app)/matches/acciones";
+import { marcarInteresEnTalento, aceptarMatch } from "@/app/(app)/matches/acciones";
 import type { ResultadoTalento } from "./tarjeta-talento";
 
 export interface IniciativaPlaca {
@@ -89,7 +89,7 @@ export function PilaTalentos({
       // ¿Se formó match? (el trigger lo crea si el interés era mutuo)
       const supabase = createClient();
       const { data } = await supabase.rpc("mis_matches");
-      const m = (data ?? []).find((x) => x.talento_id === t.id && !x.convocado);
+      const m = (data ?? []).find((x) => x.talento_id === t.id);
       if (m) {
         setPlaca({ talento: t, matchId: m.match_id });
         setOcupado(false);
@@ -104,7 +104,7 @@ export function PilaTalentos({
   async function enviarAConvocados() {
     if (!placa) return;
     setOcupado(true);
-    const res = await convocarMatch(placa.matchId);
+    const res = await aceptarMatch(placa.matchId);
     setOcupado(false);
     if (!res.ok) {
       setError(res.error);
@@ -113,7 +113,7 @@ export function PilaTalentos({
     cerrarPlaca();
   }
 
-  /** Cerrar sin convocar: el match queda igual en `/matches`, no se pierde. */
+  /** Cerrar sin aceptar: el match queda igual en `/matches`, no se pierde. */
   function cerrarPlaca() {
     if (!placa) return;
     const id = placa.talento.id;
