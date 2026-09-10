@@ -29,12 +29,13 @@ export const ITEMS_NAVEGACION: Record<RolUsuario, ItemNavegacion[]> = {
     { href: "/salas", clave: "salas", icono: "salas" },
     { href: "/perfil", clave: "perfil", icono: "perfil" },
   ],
+  // #142: Perfil → Proyecto → Matches → Salas. "Buscar talento" sale de la barra y se
+  // ofrece desde la pantalla de Proyecto (`TableroCreador`).
   creador: [
+    { href: "/perfil", clave: "perfil", icono: "perfil" },
     { href: "/", clave: "misProyectos", claveCorto: "misProyectosCorto", icono: "tablero" },
-    { href: "/talentos", clave: "buscarTalento", claveCorto: "buscarTalentoCorto", icono: "buscar" },
     { href: "/matches", clave: "matches", icono: "corazon" },
     { href: "/salas", clave: "salas", icono: "salas" },
-    { href: "/perfil", clave: "perfil", icono: "perfil" },
   ],
 };
 
