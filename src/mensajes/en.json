@@ -13,7 +13,6 @@
   "nav": {
     "convocatorias": "Casting calls",
     "convocatoriasCorto": "Feed",
-    "postulaciones": "Applications",
     "armarEquipo": "Build a team",
     "armarEquipoCorto": "Team",
     "salas": "Rooms",
@@ -27,7 +26,6 @@
     "matches": "Matches"
   },
   "titulos": {
-    "postulaciones": "Applications",
     "armarEquipo": "Build a team",
     "sala": "Room",
     "salas": "Rooms",
@@ -35,7 +33,6 @@
     "nuevoPerfil": "New profile",
     "tuPerfil": "Your profile",
     "nuevaObra": "New production",
-    "postulantes": "Applicants",
     "obra": "Production",
     "perfil": "Profile",
     "buscarTalento": "Find talent",
