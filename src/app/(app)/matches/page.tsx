@@ -1,6 +1,7 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
+import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { MatchesLista } from "@/components/convocatorias/matches-lista";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
@@ -17,13 +18,31 @@ export default async function MatchesPage() {
   const estado = await leerEstadoCuenta(supabase, user.id);
   if (estado.modoActivo !== "creador") notFound();
 
-  const [{ data: matches }, { data: convocados }] = await Promise.all([
+  const iniciativa = await iniciativaActivaDelCreador(supabase, user.id);
+
+  const [{ data: matches }, { data: convocados }, { data: cobertura }] = await Promise.all([
     supabase.rpc("mis_matches"),
     supabase.rpc("mis_convocados"),
+    // Roles del Proyecto activo, para elegir a cuál queda asociado al convocar en firme
+    // (#152). Un Equipo no tiene roles: no hace falta elegir nada.
+    iniciativa?.tipo === "obra"
+      ? supabase.rpc("cobertura_iniciativa", { p_obra_id: iniciativa.id, p_equipo_id: null })
+      : Promise.resolve({ data: null }),
   ]);
 
   const url = (path: string | null) =>
     path ? supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl : null;
+
+  // Un rol ya cubierto (todas sus vacantes con convocatoria pendiente o aceptada) no se
+  // puede elegir de nuevo al convocar.
+  const roles = cobertura
+    ? [...new Map(cobertura.filter((r) => r.rol_id).map((r) => [r.rol_id, r])).values()].map((r) => ({
+        id: r.rol_id as string,
+        nombre: r.rol_nombre as string,
+        disponible:
+          cobertura.filter((x) => x.rol_id === r.rol_id && x.talento_id).length < r.vacantes,
+      }))
+    : null;
 
   const filas = (matches ?? []).map((m) => ({
     matchId: m.match_id,
@@ -68,7 +87,7 @@ export default async function MatchesPage() {
         <MatchesLista filas={filas} />
       )}
 
-      <ConvocadosLista filas={filasConvocados} />
+      <ConvocadosLista filas={filasConvocados} roles={roles} />
     </main>
   );
 }

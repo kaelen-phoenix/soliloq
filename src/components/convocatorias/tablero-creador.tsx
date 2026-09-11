@@ -3,6 +3,7 @@ import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { GestionEquipo } from "@/components/convocatorias/gestion-equipo";
 import { PanelesIniciativa } from "@/components/convocatorias/paneles-iniciativa";
+import type { FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { createClient } from "@/lib/supabase/server";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
@@ -46,9 +47,15 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
     }))
     .sort((a, b) => a.orden - b.orden);
 
-  const { data: interesadosRaw } = equipo
-    ? await supabase.rpc("interesados_en_equipo", { p_equipo_id: equipo.id })
-    : { data: null };
+  const [{ data: interesadosRaw }, { data: coberturaRaw }] = await Promise.all([
+    equipo
+      ? supabase.rpc("interesados_en_equipo", { p_equipo_id: equipo.id })
+      : Promise.resolve({ data: null }),
+    // Quién ya forma parte del equipo, para la sección "Participantes" (#152).
+    equipo
+      ? supabase.rpc("cobertura_iniciativa", { p_obra_id: null, p_equipo_id: equipo.id })
+      : Promise.resolve({ data: null }),
+  ]);
 
   const interesados = (interesadosRaw ?? []).map((i) => ({
     perfil_id: i.perfil_id,
@@ -57,6 +64,18 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
     aceptado: i.aceptado,
     foto_url: i.foto_path
       ? supabase.storage.from("fotos-perfil").getPublicUrl(i.foto_path).data.publicUrl
+      : null,
+  }));
+
+  const coberturaEquipo: FilaCobertura[] = (coberturaRaw ?? []).map((r) => ({
+    rolId: r.rol_id,
+    rolNombre: r.rol_nombre,
+    vacantes: r.vacantes,
+    convocatoriaId: r.convocatoria_id,
+    talentoId: r.talento_id,
+    talentoNombre: r.talento_nombre,
+    talentoFotoUrl: r.talento_foto
+      ? supabase.storage.from("fotos-perfil").getPublicUrl(r.talento_foto).data.publicUrl
       : null,
   }));
 
@@ -141,6 +160,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
             equipo={equipo ?? null}
             fotos={fotosEquipo}
             interesados={interesados}
+            cobertura={coberturaEquipo}
             tieneObraPublicada={tieneObraPublicada}
           />
         }

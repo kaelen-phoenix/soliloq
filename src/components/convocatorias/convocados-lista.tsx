@@ -24,32 +24,62 @@ export interface FilaConvocado {
   estado: Estado;
 }
 
+export interface RolDisponible {
+  id: string;
+  nombre: string;
+  disponible: boolean;
+}
+
 const CHIP: Record<Estado, { texto: string; clase: string }> = {
   en_convocados: { texto: "En convocados", clase: "bg-fondo-sutil text-texto-tenue" },
   esperando_confirmacion: { texto: "Esperando confirmación", clase: "bg-alerta-50 text-alerta-800" },
   en_sala: { texto: "En la sala", clase: "bg-accion text-accion-texto" },
 };
 
-export function ConvocadosLista({ filas: filasIniciales }: { filas: FilaConvocado[] }) {
+export function ConvocadosLista({
+  filas: filasIniciales,
+  roles,
+}: {
+  filas: FilaConvocado[];
+  /** Roles del Proyecto activo, para elegir a cuál queda asociado (#152). `null` en un
+   *  Equipo (no tiene roles) o si el Proyecto no tiene ninguno definido. */
+  roles: RolDisponible[] | null;
+}) {
   const router = useRouter();
   const [filas, setFilas] = useState(filasIniciales);
   const [ocupadoId, setOcupadoId] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState<string | null>(null);
+  const [eligiendoRol, setEligiendoRol] = useState<FilaConvocado | null>(null);
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (filas.length === 0) return null;
 
-  async function convocar(f: FilaConvocado) {
+  async function convocar(f: FilaConvocado, rolId?: string) {
     setOcupadoId(f.matchId);
-    const res = await convocarMatch(f.matchId);
+    const res = await convocarMatch(f.matchId, rolId);
     setOcupadoId(null);
-    if (!res.ok) return setError(res.error);
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
     setError(null);
+    setEligiendoRol(null);
     setFilas((prev) =>
       prev.map((x) => (x.matchId === f.matchId ? { ...x, estado: "esperando_confirmacion" } : x)),
     );
     router.refresh();
+  }
+
+  function alConvocar(f: FilaConvocado) {
+    setError(null);
+    // Con más de un rol hay que elegir a cuál queda asociado; con uno solo (o sin roles,
+    // como un Equipo) se convoca directo (#152).
+    if (roles && roles.length > 1) {
+      setEligiendoRol(f);
+    } else {
+      convocar(f, roles?.[0]?.id);
+    }
   }
 
   async function descartar(f: FilaConvocado) {
@@ -80,7 +110,7 @@ export function ConvocadosLista({ filas: filasIniciales }: { filas: FilaConvocad
       <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
         Convocados ({filas.length})
       </h2>
-      {error && <p className="mt-1 text-xs text-error-600">{error}</p>}
+      {error && !eligiendoRol && <p className="mt-1 text-xs text-error-600">{error}</p>}
       <ul className="mt-2 flex flex-col gap-2">
         {filas.map((f) => (
           <li
@@ -124,7 +154,7 @@ export function ConvocadosLista({ filas: filasIniciales }: { filas: FilaConvocad
                     variante="secundario"
                     cargando={ocupadoId === f.matchId}
                     textoCargando="…"
-                    onClick={() => convocar(f)}
+                    onClick={() => alConvocar(f)}
                   >
                     Convocar
                   </Boton>
@@ -178,6 +208,39 @@ export function ConvocadosLista({ filas: filasIniciales }: { filas: FilaConvocad
           </li>
         ))}
       </ul>
+
+      {eligiendoRol && (
+        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/60 p-4">
+          <div className="w-full max-w-xs rounded-2xl bg-superficie p-5 shadow-tarjeta">
+            <p className="text-base font-medium text-texto">
+              ¿Para qué rol convocás a {eligiendoRol.nombre}?
+            </p>
+            {error && <p className="mt-2 text-xs text-error-600">{error}</p>}
+            <div className="mt-4 flex flex-col gap-1.5">
+              {roles?.map((r) => (
+                <button
+                  key={r.id}
+                  type="button"
+                  disabled={!r.disponible || ocupadoId === eligiendoRol.matchId}
+                  onClick={() => convocar(eligiendoRol, r.id)}
+                  className="rounded-xl border border-borde px-3.5 py-2.5 text-left text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:cursor-not-allowed disabled:opacity-40"
+                >
+                  {r.nombre}
+                  {!r.disponible && <span className="ml-1.5 text-xs text-texto-tenue">— cubierto</span>}
+                </button>
+              ))}
+            </div>
+            <button
+              type="button"
+              disabled={ocupadoId === eligiendoRol.matchId}
+              onClick={() => setEligiendoRol(null)}
+              className="mt-3 w-full py-1.5 text-xs font-medium text-texto-tenue hover:text-texto disabled:opacity-50"
+            >
+              Cancelar
+            </button>
+          </div>
+        </div>
+      )}
 
       {perfilAbierto && (
         <PlacaPerfilTalento talentoId={perfilAbierto} onCerrar={() => setPerfilAbierto(null)} />

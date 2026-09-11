@@ -843,7 +843,21 @@ export interface Database {
         }[];
       };
       aceptar_match: { Args: { p_match_id: string }; Returns: undefined };
-      convocar: { Args: { p_match_id: string }; Returns: undefined };
+      convocar: { Args: { p_match_id: string; p_rol_id?: string | null }; Returns: undefined };
+      /** Quién ocupa cada rol de un Proyecto (o cada lugar de un Equipo) y quién falta
+       *  convocar todavía (#152). Sólo el dueño puede pedirla. */
+      cobertura_iniciativa: {
+        Args: { p_obra_id: string | null; p_equipo_id: string | null };
+        Returns: {
+          rol_id: string | null;
+          rol_nombre: string | null;
+          vacantes: number;
+          convocatoria_id: string | null;
+          talento_id: string | null;
+          talento_nombre: string | null;
+          talento_foto: string | null;
+        }[];
+      };
       descartar_convocado: { Args: { p_match_id: string }; Returns: undefined };
       dar_de_baja_convocado: { Args: { p_convocatoria_id: string }; Returns: undefined };
       responder_convocatoria: {
