@@ -4,7 +4,14 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { Imagen } from "@/components/ui/imagen";
+import { PlacaPerfilTalento } from "@/components/salas/placa-perfil-talento";
 import { notificarMensajeNuevo } from "@/app/acciones-push";
+
+/** Primer nombre: en el chat no hay lugar para nombre y apellido, y desambigua con la
+ *  foto y la placa de perfil, no con el apellido (issue #149). */
+function primerNombre(nombre: string) {
+  return nombre.trim().split(/\s+/)[0] ?? nombre;
+}
 
 export interface Mensaje {
   id: string;
@@ -19,6 +26,8 @@ export interface Integrante {
   nombre: string;
   foto_url: string | null;
   rol_en_obra: string;
+  /** Tiene perfil de Talento: sólo sus mensajes abren la placa de perfil (#149). */
+  esTalento: boolean;
 }
 
 export function SalaChat({
@@ -35,6 +44,7 @@ export function SalaChat({
   const [mensajes, setMensajes] = useState(mensajesIniciales);
   const [texto, setTexto] = useState("");
   const [mostrarIntegrantes, setMostrarIntegrantes] = useState(false);
+  const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const finRef = useRef<HTMLDivElement>(null);
   const ultimoIdRef = useRef<string | null>(mensajesIniciales.at(-1)?.id ?? null);
 
@@ -201,16 +211,54 @@ export function SalaChat({
           {mensajes.map((m) => {
             const autor = integrantePor(m.autor_id);
             const esPropio = m.autor_id === userId;
+            // #149: la foto y el nombre de un Talento abren su placa de perfil, sin salir del chat.
+            const puedeVerPerfil = !esPropio && autor?.esTalento;
             return (
-              <li key={m.id} className={`flex ${esPropio ? "justify-end" : "justify-start"}`}>
+              <li key={m.id} className={`flex items-end gap-1.5 ${esPropio ? "justify-end" : "justify-start"}`}>
+                {!esPropio &&
+                  (puedeVerPerfil ? (
+                    <button
+                      type="button"
+                      onClick={() => setPerfilAbierto(m.autor_id)}
+                      aria-label={`Ver perfil de ${autor?.nombre ?? "integrante"}`}
+                      className="mb-0.5 shrink-0"
+                    >
+                      {autor?.foto_url ? (
+                        <Imagen
+                          src={autor.foto_url}
+                          alt=""
+                          width={28}
+                          height={28}
+                          contenedorClassName="h-7 w-7 rounded-full"
+                        />
+                      ) : (
+                        <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-200 text-2xs font-semibold text-texto-tenue">
+                          {(autor?.nombre ?? "?")[0]}
+                        </span>
+                      )}
+                    </button>
+                  ) : (
+                    <div className="h-7 w-7 shrink-0" />
+                  ))}
                 <div
                   className={`max-w-[78%] rounded-2xl px-3.5 py-2 ${
                     esPropio ? "bg-accion text-accion-texto" : "bg-ink-100 text-texto"
                   }`}
                 >
-                  {!esPropio && (
-                    <p className="text-2xs font-medium opacity-60">{autor?.nombre ?? "Integrante"}</p>
-                  )}
+                  {!esPropio &&
+                    (puedeVerPerfil ? (
+                      <button
+                        type="button"
+                        onClick={() => setPerfilAbierto(m.autor_id)}
+                        className="text-2xs font-medium opacity-60 hover:underline"
+                      >
+                        {primerNombre(autor?.nombre ?? "Integrante")}
+                      </button>
+                    ) : (
+                      <p className="text-2xs font-medium opacity-60">
+                        {primerNombre(autor?.nombre ?? "Integrante")}
+                      </p>
+                    ))}
                   <p className="text-base leading-snug">{m.contenido}</p>
                   <p className="mt-0.5 text-2xs opacity-50">
                     {new Date(m.creado_en).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
@@ -226,6 +274,10 @@ export function SalaChat({
           })}
         </ul>
         <div ref={finRef} />
+
+        {perfilAbierto && (
+          <PlacaPerfilTalento talentoId={perfilAbierto} onCerrar={() => setPerfilAbierto(null)} />
+        )}
       </div>
 
       <form onSubmit={enviar} className="safe-bottom flex gap-2 border-t border-borde bg-superficie p-3">
