@@ -91,7 +91,13 @@ export function IngresarFormulario({ next }: { next?: string }) {
     const supabase = createClient();
     await supabase.auth.signInWithOAuth({
       provider: "google",
-      options: { redirectTo: urlCallback(next) },
+      options: {
+        redirectTo: urlCallback(next),
+        // Sin esto, Google reutiliza en silencio la última cuenta con sesión en el
+        // navegador: después de cerrar sesión en Yalope, "Continuar con Google" volvía a
+        // entrar con la misma cuenta sin dejar elegir otra (issue #147).
+        queryParams: { prompt: "select_account" },
+      },
     });
   }
 
