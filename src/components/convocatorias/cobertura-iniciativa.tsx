@@ -3,6 +3,7 @@
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { Imagen } from "@/components/ui/imagen";
+import { Superposicion } from "@/components/ui/superposicion";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import { darDeBajaConvocado } from "@/app/(app)/matches/acciones";
 
@@ -169,8 +170,8 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
       </ul>
 
       {confirmando && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/60 p-4">
-          <div className="w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
+        <Superposicion onCerrar={() => setConfirmando(null)} etiqueta="Confirmar">
+          <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
             <p className="text-sm text-texto">
               ¿Quitar a esta persona {esEquipo ? "del equipo" : "del rol"}? Sale de la sala y el
               lugar vuelve a quedar disponible.
@@ -194,7 +195,7 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
               </button>
             </div>
           </div>
-        </div>
+        </Superposicion>
       )}
 
       {perfilAbierto && (

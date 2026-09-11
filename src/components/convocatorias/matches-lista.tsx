@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
+import { Superposicion } from "@/components/ui/superposicion";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import { aceptarMatch } from "@/app/(app)/matches/acciones";
 
@@ -106,8 +107,8 @@ export function MatchesLista({ filas: filasIniciales }: { filas: FilaMatch[] }) 
       </ul>
 
       {confirmar && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/60 p-4">
-          <div className="w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
+        <Superposicion onCerrar={() => setConfirmar(null)} etiqueta="Confirmar match">
+          <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
             <p className="text-2xs font-semibold uppercase tracking-wide text-coral-700">Match</p>
             <div className="mt-4 flex items-center justify-center gap-3">
               <Avatar url={confirmar.fotoUrl} nombre={confirmar.nombre} size={64} />
@@ -149,7 +150,7 @@ export function MatchesLista({ filas: filasIniciales }: { filas: FilaMatch[] }) 
               Ahora no
             </button>
           </div>
-        </div>
+        </Superposicion>
       )}
 
       {perfilAbierto && (

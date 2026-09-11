@@ -6,6 +6,7 @@ import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-mo
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { usePrefiereReduccion } from "@/components/ui/movimiento";
+import { Superposicion } from "@/components/ui/superposicion";
 import { createClient } from "@/lib/supabase/client";
 import { marcarInteresEnTalento, aceptarMatch } from "@/app/(app)/matches/acciones";
 import type { ResultadoTalento } from "./tarjeta-talento";
@@ -211,8 +212,8 @@ export function PilaTalentos({
       {error && <p className="text-xs text-error-600">{error}</p>}
 
       {placa && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/60 p-4">
-          <div className="w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
+        <Superposicion onCerrar={cerrarPlaca} etiqueta="Hay interés">
+          <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
             <p className="text-sm font-semibold uppercase tracking-wide text-coral-700">
               Hay interés
             </p>
@@ -266,7 +267,7 @@ export function PilaTalentos({
               Ahora no
             </button>
           </div>
-        </div>
+        </Superposicion>
       )}
     </div>
   );
