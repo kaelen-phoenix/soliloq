@@ -4,7 +4,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { Imagen } from "@/components/ui/imagen";
-import { PlacaPerfilTalento } from "@/components/salas/placa-perfil-talento";
+import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import { notificarMensajeNuevo } from "@/app/acciones-push";
 
 /** Primer nombre: en el chat no hay lugar para nombre y apellido, y desambigua con la
@@ -276,7 +276,11 @@ export function SalaChat({
         <div ref={finRef} />
 
         {perfilAbierto && (
-          <PlacaPerfilTalento talentoId={perfilAbierto} onCerrar={() => setPerfilAbierto(null)} />
+          <PlacaPerfilTalento
+            talentoId={perfilAbierto}
+            onCerrar={() => setPerfilAbierto(null)}
+            textoBoton="Aceptar"
+          />
         )}
       </div>
 

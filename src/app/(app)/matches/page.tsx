@@ -5,7 +5,7 @@ import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { MatchesLista } from "@/components/convocatorias/matches-lista";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 
-export const metadata = { title: "Matches — Yalope" };
+export const metadata = { title: "Call Back — Yalope" };
 
 export default async function MatchesPage() {
   const supabase = createClient();
@@ -51,7 +51,7 @@ export default async function MatchesPage() {
   return (
     <main className="px-5 py-5">
       <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto sm:text-2xl">
-        Matches
+        Call Back
       </h1>
       <p className="mb-5 mt-1 text-sm text-texto-tenue">
         Interés mutuo. Aceptá el match para sumar a la persona a Convocados; después la

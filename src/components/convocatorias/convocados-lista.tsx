@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Boton } from "@/components/ui/boton";
 import { Imagen } from "@/components/ui/imagen";
+import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import {
   convocarMatch,
   descartarConvocado,
@@ -35,6 +35,7 @@ export function ConvocadosLista({ filas: filasIniciales }: { filas: FilaConvocad
   const [filas, setFilas] = useState(filasIniciales);
   const [ocupadoId, setOcupadoId] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState<string | null>(null);
+  const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
   if (filas.length === 0) return null;
@@ -87,7 +88,7 @@ export function ConvocadosLista({ filas: filasIniciales }: { filas: FilaConvocad
             className="flex flex-col rounded-xl border border-borde bg-superficie"
           >
             <div className="flex items-center gap-3 p-3.5">
-              <Link href={`/talentos/${f.talentoId}`} className="shrink-0">
+              <button type="button" className="shrink-0" onClick={() => setPerfilAbierto(f.talentoId)}>
                 {f.fotoUrl ? (
                   <Imagen
                     src={f.fotoUrl}
@@ -101,14 +102,15 @@ export function ConvocadosLista({ filas: filasIniciales }: { filas: FilaConvocad
                     {f.nombre[0]}
                   </span>
                 )}
-              </Link>
+              </button>
               <div className="min-w-0 flex-1">
-                <Link
-                  href={`/talentos/${f.talentoId}`}
-                  className="block truncate text-sm font-medium text-texto hover:underline"
+                <button
+                  type="button"
+                  onClick={() => setPerfilAbierto(f.talentoId)}
+                  className="block w-full truncate text-left text-sm font-medium text-texto hover:underline"
                 >
                   {f.nombre}
-                </Link>
+                </button>
                 <span
                   className={`mt-1 inline-block rounded px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide ${CHIP[f.estado].clase}`}
                 >
@@ -176,6 +178,10 @@ export function ConvocadosLista({ filas: filasIniciales }: { filas: FilaConvocad
           </li>
         ))}
       </ul>
+
+      {perfilAbierto && (
+        <PlacaPerfilTalento talentoId={perfilAbierto} onCerrar={() => setPerfilAbierto(null)} />
+      )}
     </section>
   );
 }

@@ -1,10 +1,10 @@
 "use client";
 
-import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
+import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import { aceptarMatch } from "@/app/(app)/matches/acciones";
 
 export interface FilaMatch {
@@ -49,6 +49,7 @@ export function MatchesLista({ filas: filasIniciales }: { filas: FilaMatch[] }) 
   const router = useRouter();
   const [filas, setFilas] = useState(filasIniciales);
   const [confirmar, setConfirmar] = useState<FilaMatch | null>(null);
+  const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -75,16 +76,18 @@ export function MatchesLista({ filas: filasIniciales }: { filas: FilaMatch[] }) 
             key={f.matchId}
             className="flex items-center gap-3 rounded-xl border border-borde bg-superficie p-3.5"
           >
-            <Link href={`/talentos/${f.talentoId}`} className="shrink-0">
+            {/* #151: consultar el perfil abre una placa sobre Call Back, no navega afuera. */}
+            <button type="button" className="shrink-0" onClick={() => setPerfilAbierto(f.talentoId)}>
               <Avatar url={f.fotoUrl} nombre={f.nombre} size={48} />
-            </Link>
+            </button>
             <div className="min-w-0 flex-1">
-              <Link
-                href={`/talentos/${f.talentoId}`}
-                className="block truncate text-base font-medium text-texto hover:underline"
+              <button
+                type="button"
+                onClick={() => setPerfilAbierto(f.talentoId)}
+                className="block w-full truncate text-left text-base font-medium text-texto hover:underline"
               >
                 {f.nombre}
-              </Link>
+              </button>
               <p className="mt-0.5 text-xs text-texto-tenue">{diasRestantes(f.expiraEn)}</p>
             </div>
             <button
@@ -147,6 +150,10 @@ export function MatchesLista({ filas: filasIniciales }: { filas: FilaMatch[] }) 
             </button>
           </div>
         </div>
+      )}
+
+      {perfilAbierto && (
+        <PlacaPerfilTalento talentoId={perfilAbierto} onCerrar={() => setPerfilAbierto(null)} />
       )}
     </>
   );

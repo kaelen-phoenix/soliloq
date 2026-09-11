@@ -5,12 +5,22 @@ import { createClient } from "@/lib/supabase/client";
 import { PerfilTalentoDetalle, type TalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 
 /**
- * La placa de perfil dentro de la sala (issue #149): el Creador —o cualquier compañero de
- * sala— identifica a quién le escribe sin salir del chat. La política `comparte_sala_con`
- * (0001+) ya deja leer `perfiles_talento` de cualquiera que esté en la misma sala, así que
- * se pide acá mismo en vez de navegar a `/talentos/[id]`.
+ * Placa de perfil reutilizable: sala de chat (#149) y Call Back / Convocados (#151). Pide
+ * el perfil client-side en vez de navegar a `/talentos/[id]`, así quien mira no pierde el
+ * contexto (la conversación, la posición en la lista). RLS resuelve el acceso según por qué
+ * corresponda verlo (compañero de sala, match, o el buscador de talento) — no hace falta que
+ * este componente sepa cuál aplica.
  */
-export function PlacaPerfilTalento({ talentoId, onCerrar }: { talentoId: string; onCerrar: () => void }) {
+export function PlacaPerfilTalento({
+  talentoId,
+  onCerrar,
+  textoBoton = "Cerrar",
+}: {
+  talentoId: string;
+  onCerrar: () => void;
+  /** #149 pide "Aceptar" en la sala de chat; #151 pide "Cerrar" en Call Back. */
+  textoBoton?: string;
+}) {
   const [talento, setTalento] = useState<TalentoDetalle | null>(null);
   const [error, setError] = useState(false);
 
@@ -58,7 +68,7 @@ export function PlacaPerfilTalento({ talentoId, onCerrar }: { talentoId: string;
           onClick={onCerrar}
           className="mt-4 w-full shrink-0 rounded-xl bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto"
         >
-          Aceptar
+          {textoBoton}
         </button>
       </div>
     </div>
