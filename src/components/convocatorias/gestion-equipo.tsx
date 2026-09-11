@@ -7,6 +7,7 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
 import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
 import { InteresadosEquipo, type Interesado } from "@/components/convocatorias/interesados-equipo";
+import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { createClient } from "@/lib/supabase/client";
 
 export interface EquipoActivo {
@@ -104,12 +105,15 @@ export function GestionEquipo({
   equipo,
   fotos,
   interesados,
+  cobertura,
   tieneObraPublicada,
 }: {
   creadorId: string;
   equipo: EquipoActivo | null;
   fotos: FotoEquipo[];
   interesados: Interesado[];
+  /** Quién ya forma parte del equipo, para "Participantes" (#152). */
+  cobertura: FilaCobertura[];
   tieneObraPublicada: boolean;
 }) {
   const router = useRouter();
@@ -223,6 +227,9 @@ export function GestionEquipo({
               </button>
             </div>
             <FotosEquipo equipoId={equipo.id} creadorId={creadorId} fotosIniciales={fotos} />
+            <div className="mt-4">
+              <CoberturaIniciativa filas={cobertura} esEquipo />
+            </div>
             <InteresadosEquipo
               equipoId={equipo.id}
               cupo={equipo.cupo}
