@@ -24,7 +24,7 @@
     "buscarTalentoCorto": "Search",
     "admin": "Admin",
     "ajustes": "Settings",
-    "matches": "Matches"
+    "matches": "Call Back"
   },
   "titulos": {
     "postulaciones": "Applications",
@@ -42,7 +42,9 @@
     "ajustes": "Settings",
     "admin": "Administration",
     "convocatorias": "Casting calls",
-    "misProyectos": "My projects"
+    "misProyectos": "My projects",
+    "matches": "Call Back",
+    "convocatoria": "Invitation"
   },
   "modo": {
     "talento": "Talent",
