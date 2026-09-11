@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { Superposicion } from "@/components/ui/superposicion";
 import { PerfilTalentoDetalle, type TalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 
 /**
@@ -53,8 +54,8 @@ export function PlacaPerfilTalento({
   }, [talentoId]);
 
   return (
-    <div className="fixed inset-0 z-50 flex items-end justify-center bg-ink-950/60 p-0 sm:items-center sm:p-4">
-      <div className="flex max-h-[85vh] w-full max-w-sm flex-col overflow-y-auto rounded-t-2xl bg-superficie p-5 sm:rounded-2xl sm:shadow-tarjeta">
+    <Superposicion onCerrar={onCerrar} posicion="abajo" etiqueta="Perfil del Talento">
+      <div className="mx-auto flex max-h-[85vh] w-full max-w-sm flex-col overflow-y-auto rounded-t-2xl bg-superficie p-5 sm:rounded-2xl sm:shadow-tarjeta">
         {error ? (
           <p className="py-6 text-center text-sm text-texto-tenue">No pudimos cargar este perfil.</p>
         ) : !talento ? (
@@ -71,6 +72,6 @@ export function PlacaPerfilTalento({
           {textoBoton}
         </button>
       </div>
-    </div>
+    </Superposicion>
   );
 }

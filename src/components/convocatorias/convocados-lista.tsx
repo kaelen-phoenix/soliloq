@@ -4,6 +4,7 @@ import { useRouter } from "next/navigation";
 import { useState } from "react";
 import { Boton } from "@/components/ui/boton";
 import { Imagen } from "@/components/ui/imagen";
+import { Superposicion } from "@/components/ui/superposicion";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import {
   convocarMatch,
@@ -210,8 +211,8 @@ export function ConvocadosLista({
       </ul>
 
       {eligiendoRol && (
-        <div className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/60 p-4">
-          <div className="w-full max-w-xs rounded-2xl bg-superficie p-5 shadow-tarjeta">
+        <Superposicion onCerrar={() => setEligiendoRol(null)} etiqueta="Elegir rol">
+          <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 shadow-tarjeta">
             <p className="text-base font-medium text-texto">
               ¿Para qué rol convocás a {eligiendoRol.nombre}?
             </p>
@@ -239,7 +240,7 @@ export function ConvocadosLista({
               Cancelar
             </button>
           </div>
-        </div>
+        </Superposicion>
       )}
 
       {perfilAbierto && (
