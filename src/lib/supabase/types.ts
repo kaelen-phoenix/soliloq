@@ -522,8 +522,10 @@ export interface Database {
           id: string;
           creador_id: string;
           titulo: string;
-          /** Cuántas personas quiere sumar. 1..6. */
+          /** Cuántas personas quiere sumar. 1..10. */
           cupo: number;
+          /** #157: igual que `obras.sinopsis`. */
+          descripcion: string | null;
           activo: boolean;
           creado_en: string;
           actualizado_en: string;
@@ -532,11 +534,13 @@ export interface Database {
           creador_id: string;
           titulo: string;
           cupo: number;
+          descripcion?: string | null;
           activo?: boolean;
         };
         Update: {
           titulo?: string;
           cupo?: number;
+          descripcion?: string | null;
           activo?: boolean;
           actualizado_en?: string;
         };
