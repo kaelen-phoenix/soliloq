@@ -2,6 +2,7 @@ import Link from "next/link";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { GestionEquipo } from "@/components/convocatorias/gestion-equipo";
+import { FormularioObra } from "@/components/convocatorias/formulario-obra";
 import { PanelesIniciativa } from "@/components/convocatorias/paneles-iniciativa";
 import type { FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { createClient } from "@/lib/supabase/server";
@@ -29,7 +30,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
       .order("creado_en", { ascending: false }),
     supabase
       .from("equipos")
-      .select("id, titulo, cupo, activo, fotos_equipo(id, storage_path, orden)")
+      .select("id, titulo, descripcion, cupo, activo, fotos_equipo(id, storage_path, orden)")
       .eq("creador_id", creadorId)
       .eq("activo", true)
       .maybeSingle(),
@@ -90,13 +91,10 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
           perfil de Creador lleva adelante una sola iniciativa a la vez.
         </p>
       ) : (
-        <Link
-          href="/obras/nueva"
-          className="flex items-center justify-center gap-1.5 rounded-xl bg-accion px-4 py-3 text-sm font-medium text-accion-texto transition-colors hover:opacity-90"
-        >
-          <Icono nombre="mas" className="h-4 w-4" />
-          Crear nueva obra
-        </Link>
+        // #157: antes esto llevaba a /obras/nueva — una pantalla aparte, con los roles
+        // agregados de a uno después. Ahora es el mismo formulario inline que ya usa
+        // "Armar equipo": título, descripción, ubicación y roles, todo antes de crear.
+        <FormularioObra creadorId={creadorId} />
       )}
 
       {!hayEquipoActivo && (!obras || obras.length === 0) && (
