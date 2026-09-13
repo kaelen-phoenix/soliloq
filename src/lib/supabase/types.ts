@@ -46,7 +46,9 @@ export type TipoNotificacion =
   /** Interés mutuo entre dos personas, sin proyecto de por medio (0033). */
   | "equipo_armado"
   /** Alguien contactó desde el enlace público del perfil (0037), interés todavía no mutuo. */
-  | "interes_recibido";
+  | "interes_recibido"
+  /** Al Creador: se formó un match nuevo con un Talento (0068/0069, issue #160). */
+  | "nuevo_match";
 
 export type MotivoDenuncia =
   | "acoso"
