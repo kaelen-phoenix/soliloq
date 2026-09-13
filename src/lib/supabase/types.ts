@@ -984,7 +984,7 @@ export interface Database {
         Args: { p_token: string };
         Returns: void;
       };
-      /** Feed de equipos activos con ≥3 fotos para el talento (0046, issue #57). */
+      /** Feed de equipos activos con ≥1 foto para el talento (0046, issue #57; tope en #162). */
       feed_equipos_para_talento: {
         Args: Record<string, never>;
         Returns: {

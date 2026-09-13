@@ -15,13 +15,14 @@ export interface FotoObra {
 
 const TIPOS = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
-const MAX = 6;
-export const MIN_FOTOS_OBRA = 3;
+const MAX = 2;
+export const MIN_FOTOS_OBRA = 1;
 
 /**
- * Carga de fotos del proyecto (issue #57): dan identidad visual a la convocatoria en el
- * feed. La obra ya existe cuando se sube una foto, así que siempre se persiste al toque.
- * La ruta arranca con el uid del creador para que la política de storage de 0010 aplique.
+ * Carga de fotos del proyecto (issue #57, tope ajustado en #162): dan identidad visual a
+ * la convocatoria en el feed. La obra ya existe cuando se sube una foto, así que siempre se
+ * persiste al toque. La ruta arranca con el uid del creador para que la política de storage
+ * de 0010 aplique.
  */
 export function FotosObra({
   obraId,
