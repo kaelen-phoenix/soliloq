@@ -4,10 +4,9 @@ import { FormularioCreador } from "@/components/perfil/formulario-creador";
 import { FormularioTalento } from "@/components/perfil/formulario-talento";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 import { Icono } from "@/components/ui/icono";
-import { Imagen } from "@/components/ui/imagen";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BotonCompartir } from "@/components/perfil/boton-compartir";
-import { EtiquetasDisciplina } from "@/components/perfil/etiquetas-disciplina";
+import { PerfilCreadorDetalle } from "@/components/perfil/perfil-creador-detalle";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
 
@@ -148,52 +147,7 @@ export default async function PerfilPage({
           hrefEditar="/perfil?editar=1"
           aviso="Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
         >
-          <div className="flex items-center gap-4">
-            {perfilCreador.imagen_url ? (
-              <Imagen
-                src={perfilCreador.imagen_url}
-                alt=""
-                width={64}
-                height={64}
-                contenedorClassName="shrink-0 rounded-full"
-                fallback={
-                  <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-texto-tenue">
-                    {perfilCreador.nombre[0]}
-                  </span>
-                }
-              />
-            ) : (
-              <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 text-lg font-semibold text-texto-tenue">
-                {perfilCreador.nombre[0]}
-              </span>
-            )}
-            <div className="min-w-0">
-              <h2 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto">
-                {perfilCreador.nombre}
-              </h2>
-              <EtiquetasDisciplina
-                disciplinas={perfilCreador.disciplinas}
-                otroDetalle={perfilCreador.otro_detalle}
-                className="mt-1.5"
-              />
-              <p className="text-sm text-texto-tenue">{perfilCreador.ubicacion_publica}</p>
-            </div>
-          </div>
-
-          {perfilCreador.descripcion && (
-            <p className="max-w-prose text-sm leading-relaxed text-texto">{perfilCreador.descripcion}</p>
-          )}
-
-          {perfilCreador.biografia && (
-            <div className="mt-2">
-              <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-                Biografía
-              </h3>
-              <p className="mt-1.5 max-w-prose whitespace-pre-line text-sm leading-relaxed text-texto">
-                {perfilCreador.biografia}
-              </p>
-            </div>
-          )}
+          <PerfilCreadorDetalle creador={perfilCreador} />
         </VistaPerfilPropio>
       )}
 
