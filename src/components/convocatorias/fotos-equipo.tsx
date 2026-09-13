@@ -15,14 +15,15 @@ export interface FotoEquipo {
 
 const TIPOS = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
-const MAX = 6;
-export const MIN_FOTOS_EQUIPO = 3;
+const MAX = 2;
+export const MIN_FOTOS_EQUIPO = 1;
 
 /**
- * Carga de fotos del "Armar equipo" del Creador (issue #57). Se recomienda que sean de la
- * persona que arma el equipo, ya que es quien propone. El equipo ya existe cuando se sube
- * una foto, así que siempre se persiste al toque (a diferencia del alta de talento).
- * La ruta arranca con el uid del creador para que la política de storage de 0010 aplique.
+ * Carga de fotos del "Armar equipo" del Creador (issue #57, tope ajustado en #162). Se
+ * recomienda que sean de la persona que arma el equipo, ya que es quien propone. El equipo
+ * ya existe cuando se sube una foto, así que siempre se persiste al toque (a diferencia del
+ * alta de talento). La ruta arranca con el uid del creador para que la política de storage
+ * de 0010 aplique.
  */
 export function FotosEquipo({
   equipoId,

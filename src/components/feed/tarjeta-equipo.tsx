@@ -12,7 +12,7 @@ export interface EquipoFeed {
   creador_id: string;
   creador_nombre: string;
   creador_imagen_url: string | null;
-  /** URLs ya resueltas. Al menos 3 (lo garantiza `feed_equipos_para_talento`). */
+  /** URLs ya resueltas. Al menos 1 (lo garantiza `feed_equipos_para_talento`). */
   fotos: string[];
 }
 
