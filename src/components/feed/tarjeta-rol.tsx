@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
+import { PlacaPerfilCreador } from "@/components/perfil/placa-perfil-creador";
 
 export interface RolFeed {
   rol_id: string;
@@ -28,6 +28,7 @@ export interface RolFeed {
 
 export function TarjetaRol({ rol }: { rol: RolFeed }) {
   const [expandido, setExpandido] = useState(false);
+  const [perfilAbierto, setPerfilAbierto] = useState(false);
 
   const rango =
     rol.edad_minima && rol.edad_maxima ? `${rol.edad_minima}–${rol.edad_maxima} años` : null;
@@ -74,25 +75,34 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
       </div>
 
       <div className="flex items-center gap-2.5 border-b border-borde px-5 py-3">
-        {rol.creador_imagen_url ? (
-          <Imagen
-            src={rol.creador_imagen_url}
-            alt=""
-            width={28}
-            height={28}
-            contenedorClassName="shrink-0 rounded-full"
-            fallback={
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
-                {rol.creador_nombre[0]}
-              </span>
-            }
-          />
-        ) : (
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
-            {rol.creador_nombre[0]}
-          </span>
-        )}
-        <span className="flex-1 truncate text-sm text-texto">{rol.creador_nombre}</span>
+        {/* #159: la foto y el nombre abren el perfil del Creador en una placa, sin sacar al
+            Talento de la tarjeta. En un ejemplo no hay perfil real que mostrar. */}
+        <button
+          type="button"
+          disabled={rol.es_ejemplo}
+          onClick={() => setPerfilAbierto(true)}
+          className="flex min-w-0 flex-1 items-center gap-2.5 disabled:cursor-default"
+        >
+          {rol.creador_imagen_url ? (
+            <Imagen
+              src={rol.creador_imagen_url}
+              alt=""
+              width={28}
+              height={28}
+              contenedorClassName="shrink-0 rounded-full"
+              fallback={
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
+                  {rol.creador_nombre[0]}
+                </span>
+              }
+            />
+          ) : (
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
+              {rol.creador_nombre[0]}
+            </span>
+          )}
+          <span className="min-w-0 flex-1 truncate text-left text-sm text-texto">{rol.creador_nombre}</span>
+        </button>
         <button
           type="button"
           onClick={() => setExpandido((v) => !v)}
@@ -130,18 +140,22 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
               <p>{rol.obra_sinopsis}</p>
             </div>
           )}
-          {/* En un ejemplo no hay perfil que abrir: el `creador_id` es un slug inventado y el
-              link daría 404. */}
+          {/* En un ejemplo no hay perfil real que abrir: el `creador_id` es un slug inventado. */}
           {!rol.es_ejemplo && (
-            <Link
-              href={`/creadores/${rol.creador_id}`}
+            <button
+              type="button"
+              onClick={() => setPerfilAbierto(true)}
               className="inline-flex items-center gap-1 font-medium text-texto hover:underline"
             >
               Ver perfil de {rol.creador_nombre}
               <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
-            </Link>
+            </button>
           )}
         </div>
+      )}
+
+      {perfilAbierto && (
+        <PlacaPerfilCreador creadorId={rol.creador_id} onCerrar={() => setPerfilAbierto(false)} />
       )}
     </article>
   );
