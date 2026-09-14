@@ -20,7 +20,6 @@ export default function robots(): MetadataRoute.Robots {
         "/creadores",
         "/obras",
         "/equipo",
-        "/postulaciones",
         "/completar-perfil",
         "/elegir-rol",
         "/cambiar-clave",

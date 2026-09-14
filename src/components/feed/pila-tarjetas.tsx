@@ -149,34 +149,19 @@ export function PilaTarjetas({
   async function registrarDecision(rol: RolFeed, decision: Decision) {
     const supabase = createClient();
 
-    // "Me interesa" hacia el proyecto (issue #106): alimenta el circuito de match. Va
-    // primero porque puede rebotar por el límite de 20/24 h; si rebota, no se postula.
+    // "Me interesa" / "Paso" hacia el proyecto: es el único registro (circuito de match,
+    // issue #117). Puede rebotar por el límite de 20/24 h.
     const { error: errInteres } = await supabase.rpc("marcar_interes", {
       p_a_perfil: rol.creador_id,
       p_obra_id: rol.obra_id,
       p_equipo_id: null,
       p_interesa: decision === "postular",
     });
-    if (errInteres?.message?.includes("limite_me_interesa")) {
-      setAvisoError("Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde.");
-      setRoles((prev) => [rol, ...prev]);
-      setHistorial((prev) => prev.filter((h) => h.rol.rol_id !== rol.rol_id));
-      return;
-    }
-
-    const tabla = decision === "postular" ? "postulaciones" : "descartes";
-    const { error } = await supabase
-      .from(tabla)
-      .upsert(
-        { rol_id: rol.rol_id, talento_id: talentoId },
-        { onConflict: "rol_id,talento_id", ignoreDuplicates: true }
-      );
-
-    if (error) {
+    if (errInteres) {
       setAvisoError(
-        decision === "postular"
-          ? "No pudimos registrar tu postulación. Probá de nuevo."
-          : "No pudimos guardar el descarte. Probá de nuevo."
+        errInteres.message?.includes("limite_me_interesa")
+          ? "Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde."
+          : "No pudimos registrar tu decisión. Probá de nuevo.",
       );
       setRoles((prev) => [rol, ...prev]);
       setHistorial((prev) => prev.filter((h) => h.rol.rol_id !== rol.rol_id));
@@ -203,26 +188,19 @@ export function PilaTarjetas({
   async function registrarInteresEquipo(equipo: EquipoFeed, decision: Decision) {
     const supabase = createClient();
 
-    // "Me interesa" hacia el equipo (issue #106): alimenta el circuito de match. Va primero
-    // por el límite de 20/24 h.
+    // "Me interesa" / "Paso" hacia el equipo: único registro (circuito de match, #117).
     const { error: errInteres } = await supabase.rpc("marcar_interes", {
       p_a_perfil: equipo.creador_id,
       p_obra_id: null,
       p_equipo_id: equipo.equipo_id,
       p_interesa: decision === "postular",
     });
-    if (errInteres?.message?.includes("limite_me_interesa")) {
-      setAvisoError("Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde.");
-      setEquipos((prev) => [equipo, ...prev]);
-      return;
-    }
-
-    const { error } = await supabase.rpc("interes_en_equipo", {
-      p_equipo_id: equipo.equipo_id,
-      p_interesa: decision === "postular",
-    });
-    if (error) {
-      setAvisoError("No pudimos registrar tu decisión. Probá de nuevo.");
+    if (errInteres) {
+      setAvisoError(
+        errInteres.message?.includes("limite_me_interesa")
+          ? "Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde."
+          : "No pudimos registrar tu decisión. Probá de nuevo.",
+      );
       setEquipos((prev) => [equipo, ...prev]);
     }
   }
@@ -286,14 +264,17 @@ export function PilaTarjetas({
     x.set(0);
 
     const supabase = createClient();
-    const tabla = ultima.decision === "postular" ? "postulaciones" : "descartes";
-    const { error } = await supabase
-      .from(tabla)
-      .delete()
-      .match({ rol_id: ultima.rol.rol_id, talento_id: talentoId });
+    const { error } = await supabase.rpc("deshacer_interes", {
+      p_obra_id: ultima.rol.obra_id,
+      p_equipo_id: null,
+    });
 
     if (error) {
-      setAvisoError("No pudimos deshacer. Probá de nuevo.");
+      setAvisoError(
+        error.message?.includes("match")
+          ? "Ya hay match con ese proyecto: no se puede deshacer."
+          : "No pudimos deshacer. Probá de nuevo.",
+      );
       setHistorial((prev) => [...prev, ultima]);
       setIndice((i) => i + 1);
     }
@@ -387,8 +368,8 @@ export function PilaTarjetas({
         <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-500/5 px-3.5 py-2.5">
           <p className="text-sm font-medium text-texto">Así funciona Yalope</p>
           <p className="mt-0.5 text-xs leading-snug text-texto-tenue">
-            Deslizá a la derecha para postularte, a la izquierda para descartar. Cuando alguien
-            te aprueba se abre una sala con el equipo. Estas {ejemplos.length}{" "}
+            Deslizá a la derecha si te interesa, a la izquierda si no. Cuando el interés es
+            mutuo y te convocan, se abre una sala para hablar. Estas {ejemplos.length}{" "}
             {ejemplos.length === 1 ? "tarjeta es un ejemplo" : "tarjetas son ejemplos"} — después
             siguen las propuestas reales.
           </p>

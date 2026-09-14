@@ -6,7 +6,6 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
 import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
-import { InteresadosEquipo, type Interesado } from "@/components/convocatorias/interesados-equipo";
 import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { createClient } from "@/lib/supabase/client";
 
@@ -122,14 +121,12 @@ export function GestionEquipo({
   creadorId,
   equipo,
   fotos,
-  interesados,
   cobertura,
   tieneObraPublicada,
 }: {
   creadorId: string;
   equipo: EquipoActivo | null;
   fotos: FotoEquipo[];
-  interesados: Interesado[];
   /** Quién ya forma parte del equipo, para "Participantes" (#152). */
   cobertura: FilaCobertura[];
   tieneObraPublicada: boolean;
@@ -256,14 +253,14 @@ export function GestionEquipo({
               </button>
             </div>
             <FotosEquipo equipoId={equipo.id} creadorId={creadorId} fotosIniciales={fotos} />
+            <p className="mt-4 rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
+              Para sumar gente al equipo, buscá talento y deslizá. Cuando el interés es mutuo
+              lo ves en <span className="font-medium text-texto">Matches</span> y desde ahí lo
+              convocás a la sala.
+            </p>
             <div className="mt-4">
               <CoberturaIniciativa filas={cobertura} esEquipo />
             </div>
-            <InteresadosEquipo
-              equipoId={equipo.id}
-              cupo={equipo.cupo}
-              interesadosIniciales={interesados}
-            />
           </>
         )}
       </section>

@@ -103,9 +103,6 @@ export function ListaNotificaciones({
     } else if (n.tipo === "convocado") {
       // #143: el Talento confirma la convocatoria antes de entrar a la sala.
       router.push("/convocatoria");
-    } else if (n.tipo === "espera_vencida") {
-      // A postulaciones y no a la obra: es donde se explica por qué la espera se cerró.
-      router.push("/postulaciones");
     } else if (n.tipo === "match" && n.obra_id) {
       router.push(`/obras/${n.obra_id}`);
     } else if (n.tipo === "interes_recibido" && n.de_perfil) {
