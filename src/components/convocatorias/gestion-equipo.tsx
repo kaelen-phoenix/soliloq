@@ -280,17 +280,24 @@ export function GestionEquipo({
     );
   }
 
-  // Sin nada: invitación a armar el equipo.
+  // Sin nada: invitación a armar el equipo, con la explicación de para qué sirve (#170) —
+  // desaparece apenas se confirma la selección y sólo queda el formulario.
   return abierto ? (
     <section className="rounded-2xl border border-borde bg-superficie p-4">{form}</section>
   ) : (
-    <button
-      type="button"
-      onClick={() => setAbierto(true)}
-      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-borde px-4 py-3 text-sm font-medium text-texto-tenue transition-colors hover:border-texto hover:text-texto"
-    >
-      <Icono nombre="corazon" className="h-4 w-4" />
-      Armar un equipo
-    </button>
+    <div className="flex flex-col gap-2">
+      <p className="text-sm text-texto-tenue">
+        Armá equipo y empezá por conocer a quienes tienen ganas de crear como vos y la idea
+        puede surgir en el camino.
+      </p>
+      <button
+        type="button"
+        onClick={() => setAbierto(true)}
+        className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-borde px-4 py-3 text-sm font-medium text-texto-tenue transition-colors hover:border-texto hover:text-texto"
+      >
+        <Icono nombre="corazon" className="h-4 w-4" />
+        Armar un equipo
+      </button>
+    </div>
   );
 }
