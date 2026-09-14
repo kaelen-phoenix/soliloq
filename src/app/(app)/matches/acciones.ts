@@ -25,21 +25,29 @@ export async function aceptarMatch(matchId: string): Promise<Resultado> {
   return { ok: true };
 }
 
-/** El Creador convoca (definitivo) a alguien de Convocados: recién acá se notifica al talento (#143). */
-export async function convocarMatch(matchId: string): Promise<Resultado> {
+/**
+ * El Creador convoca (definitivo) a alguien de Convocados: recién acá se notifica al
+ * talento (#143). `rolId` es el rol del Proyecto al que queda asociado (#152) — null para
+ * un Equipo, o para un Proyecto con un solo rol donde no hace falta elegir.
+ */
+export async function convocarMatch(matchId: string, rolId?: string): Promise<Resultado> {
   const supabase = createClient();
-  const { error } = await supabase.rpc("convocar", { p_match_id: matchId });
+  const { error } = await supabase.rpc("convocar", { p_match_id: matchId, p_rol_id: rolId ?? null });
   if (error) {
     const m = error.message ?? "";
     return {
       ok: false,
-      error: m.includes("cupo_lleno")
-        ? "Ya llenaste el cupo. Liberá un lugar para convocar a otra persona."
-        : m.includes("primero aceptá")
-          ? "Primero aceptá el match."
-          : m.includes("ya está convocado")
-            ? "Ya la convocaste."
-            : "No se pudo convocar. Probá de nuevo.",
+      error: m.includes("rol_lleno")
+        ? "Ese rol ya está cubierto. Elegí otro."
+        : m.includes("rol inválido")
+          ? "Elegí un rol válido."
+          : m.includes("cupo_lleno")
+            ? "Ya llenaste el cupo. Liberá un lugar para convocar a otra persona."
+            : m.includes("primero aceptá")
+              ? "Primero aceptá el match."
+              : m.includes("ya está convocado")
+                ? "Ya la convocaste."
+                : "No se pudo convocar. Probá de nuevo.",
     };
   }
   revalidatePath("/matches");

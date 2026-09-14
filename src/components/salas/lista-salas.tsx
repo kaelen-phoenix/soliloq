@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Boton } from "@/components/ui/boton";
 import {
@@ -36,6 +36,26 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
   const [confirmando, setConfirmando] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // El menú de "..." se quedaba abierto para siempre salvo que se tocara una opción de
+  // adentro: tocar afuera, o `Esc`, ahora lo cierran — como cualquier menú desplegable.
+  useEffect(() => {
+    if (!menuAbierto) return;
+    function cerrar(e: MouseEvent | KeyboardEvent) {
+      if (e instanceof KeyboardEvent) {
+        if (e.key === "Escape") setMenuAbierto(null);
+        return;
+      }
+      const objetivo = e.target as Element;
+      if (!objetivo.closest(`[data-sala-menu="${menuAbierto}"]`)) setMenuAbierto(null);
+    }
+    document.addEventListener("mousedown", cerrar);
+    document.addEventListener("keydown", cerrar);
+    return () => {
+      document.removeEventListener("mousedown", cerrar);
+      document.removeEventListener("keydown", cerrar);
+    };
+  }, [menuAbierto]);
 
   async function alternarDestacado(s: SalaItem) {
     setOcupado(true);
@@ -104,6 +124,8 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
               <button
                 type="button"
                 aria-label="Opciones del chat"
+                aria-expanded={menuAbierto === s.salaId}
+                data-sala-menu={s.salaId}
                 onClick={() => setMenuAbierto((m) => (m === s.salaId ? null : s.salaId))}
                 className="shrink-0 rounded-lg p-1.5 text-texto-tenue transition-colors hover:bg-fondo-sutil"
               >
@@ -111,7 +133,10 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
               </button>
 
               {menuAbierto === s.salaId && (
-                <div className="absolute right-3 top-12 z-10 w-52 rounded-xl border border-borde bg-superficie py-1 shadow-tarjeta">
+                <div
+                  data-sala-menu={s.salaId}
+                  className="absolute right-3 top-12 z-10 w-52 rounded-xl border border-borde bg-superficie py-1 shadow-tarjeta"
+                >
                   <button
                     type="button"
                     disabled={ocupado}

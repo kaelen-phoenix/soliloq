@@ -107,6 +107,8 @@ export function ListaNotificaciones({
       router.push(`/obras/${n.obra_id}`);
     } else if (n.tipo === "interes_recibido" && n.de_perfil) {
       router.push(`/equipo/responder/${n.de_perfil}`);
+    } else if (n.tipo === "nuevo_match") {
+      router.push("/matches");
     }
   }
 
@@ -183,6 +185,15 @@ export function ListaNotificaciones({
                   <p className="text-base leading-snug text-texto">
                     Alguien quiere contactarte desde tu perfil
                   </p>
+                ) : n.tipo === "nuevo_match" ? (
+                  <>
+                    <p className="text-base font-semibold leading-snug text-texto">
+                      ¡Tenés un nuevo match!
+                    </p>
+                    <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
+                      Alguien se interesó en tu proyecto o equipo. Revisalo en Call Back.
+                    </p>
+                  </>
                 ) : n.tipo === "espera_vencida" ? (
                   <p className="text-base leading-snug text-texto-tenue">
                     Tu postulación a <span className="font-medium">{tituloObra(n)}</span> se cerró

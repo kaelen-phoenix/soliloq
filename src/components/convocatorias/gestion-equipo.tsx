@@ -6,12 +6,14 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
 import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
+import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { createClient } from "@/lib/supabase/client";
 
 export interface EquipoActivo {
   id: string;
   titulo: string;
   cupo: number;
+  descripcion: string | null;
   activo: boolean;
 }
 
@@ -22,6 +24,8 @@ const MAX_TITULO = 80;
 function FormEquipo({
   titulo,
   setTitulo,
+  descripcion,
+  setDescripcion,
   cupo,
   setCupo,
   error,
@@ -32,6 +36,8 @@ function FormEquipo({
 }: {
   titulo: string;
   setTitulo: (v: string) => void;
+  descripcion: string;
+  setDescripcion: (v: string) => void;
   cupo: number;
   setCupo: (v: number) => void;
   error: string | null;
@@ -50,6 +56,19 @@ function FormEquipo({
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
       />
+      <div className="flex flex-col gap-1.5">
+        <label htmlFor="equipo-descripcion" className="text-sm font-medium text-texto">
+          Descripción (opcional)
+        </label>
+        <textarea
+          id="equipo-descripcion"
+          rows={3}
+          maxLength={2000}
+          value={descripcion}
+          onChange={(e) => setDescripcion(e.target.value)}
+          className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
+        />
+      </div>
       <div className="flex flex-col gap-1.5">
         <span className="text-sm font-medium text-texto">Cuántas personas querés sumar</span>
         <div className="flex flex-wrap gap-2">
@@ -102,16 +121,20 @@ export function GestionEquipo({
   creadorId,
   equipo,
   fotos,
+  cobertura,
   tieneObraPublicada,
 }: {
   creadorId: string;
   equipo: EquipoActivo | null;
   fotos: FotoEquipo[];
+  /** Quién ya forma parte del equipo, para "Participantes" (#152). */
+  cobertura: FilaCobertura[];
   tieneObraPublicada: boolean;
 }) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
   const [titulo, setTitulo] = useState(equipo?.titulo ?? "");
+  const [descripcion, setDescripcion] = useState(equipo?.descripcion ?? "");
   const [cupo, setCupo] = useState(equipo?.cupo ?? 4);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
@@ -133,11 +156,16 @@ export function GestionEquipo({
       editando && equipo
         ? await supabase
             .from("equipos")
-            .update({ titulo: titulo.trim(), cupo, actualizado_en: new Date().toISOString() })
+            .update({
+              titulo: titulo.trim(),
+              descripcion: descripcion || null,
+              cupo,
+              actualizado_en: new Date().toISOString(),
+            })
             .eq("id", equipo.id)
         : await supabase
             .from("equipos")
-            .insert({ creador_id: creadorId, titulo: titulo.trim(), cupo });
+            .insert({ creador_id: creadorId, titulo: titulo.trim(), descripcion: descripcion || null, cupo });
 
     setCargando(false);
     if (res.error) {
@@ -173,6 +201,8 @@ export function GestionEquipo({
     <FormEquipo
       titulo={titulo}
       setTitulo={setTitulo}
+      descripcion={descripcion}
+      setDescripcion={setDescripcion}
       cupo={cupo}
       setCupo={setCupo}
       error={error}
@@ -195,6 +225,9 @@ export function GestionEquipo({
           <p className="mt-0.5 text-sm text-texto-tenue">
             Hasta {equipo.cupo} {equipo.cupo === 1 ? "integrante" : "integrantes"}
           </p>
+          {equipo.descripcion && (
+            <p className="mt-2 max-w-prose text-sm leading-relaxed text-texto">{equipo.descripcion}</p>
+          )}
         </div>
 
         {abierto ? (
@@ -220,11 +253,14 @@ export function GestionEquipo({
               </button>
             </div>
             <FotosEquipo equipoId={equipo.id} creadorId={creadorId} fotosIniciales={fotos} />
-            <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
+            <p className="mt-4 rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
               Para sumar gente al equipo, buscá talento y deslizá. Cuando el interés es mutuo
               lo ves en <span className="font-medium text-texto">Matches</span> y desde ahí lo
               convocás a la sala.
             </p>
+            <div className="mt-4">
+              <CoberturaIniciativa filas={cobertura} esEquipo />
+            </div>
           </>
         )}
       </section>
@@ -241,17 +277,24 @@ export function GestionEquipo({
     );
   }
 
-  // Sin nada: invitación a armar el equipo.
+  // Sin nada: invitación a armar el equipo, con la explicación de para qué sirve (#170) —
+  // desaparece apenas se confirma la selección y sólo queda el formulario.
   return abierto ? (
     <section className="rounded-2xl border border-borde bg-superficie p-4">{form}</section>
   ) : (
-    <button
-      type="button"
-      onClick={() => setAbierto(true)}
-      className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-borde px-4 py-3 text-sm font-medium text-texto-tenue transition-colors hover:border-texto hover:text-texto"
-    >
-      <Icono nombre="corazon" className="h-4 w-4" />
-      Armar un equipo
-    </button>
+    <div className="flex flex-col gap-2">
+      <p className="text-sm text-texto-tenue">
+        Armá equipo y empezá por conocer a quienes tienen ganas de crear como vos y la idea
+        puede surgir en el camino.
+      </p>
+      <button
+        type="button"
+        onClick={() => setAbierto(true)}
+        className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-borde px-4 py-3 text-sm font-medium text-texto-tenue transition-colors hover:border-texto hover:text-texto"
+      >
+        <Icono nombre="corazon" className="h-4 w-4" />
+        Armar un equipo
+      </button>
+    </div>
   );
 }

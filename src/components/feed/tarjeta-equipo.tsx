@@ -1,9 +1,9 @@
 "use client";
 
-import Link from "next/link";
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
+import { PlacaPerfilCreador } from "@/components/perfil/placa-perfil-creador";
 
 export interface EquipoFeed {
   equipo_id: string;
@@ -12,7 +12,7 @@ export interface EquipoFeed {
   creador_id: string;
   creador_nombre: string;
   creador_imagen_url: string | null;
-  /** URLs ya resueltas. Al menos 3 (lo garantiza `feed_equipos_para_talento`). */
+  /** URLs ya resueltas. Al menos 1 (lo garantiza `feed_equipos_para_talento`). */
   fotos: string[];
 }
 
@@ -23,6 +23,7 @@ export interface EquipoFeed {
  */
 export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
   const [expandido, setExpandido] = useState(false);
+  const [perfilAbierto, setPerfilAbierto] = useState(false);
 
   return (
     <article className="absolute inset-0 flex flex-col overflow-hidden rounded-2xl border border-borde bg-superficie shadow-tarjeta">
@@ -55,25 +56,33 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
       </div>
 
       <div className="flex items-center gap-2.5 border-b border-borde px-5 py-3">
-        {equipo.creador_imagen_url ? (
-          <Imagen
-            src={equipo.creador_imagen_url}
-            alt=""
-            width={28}
-            height={28}
-            contenedorClassName="shrink-0 rounded-full"
-            fallback={
-              <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
-                {equipo.creador_nombre[0]}
-              </span>
-            }
-          />
-        ) : (
-          <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
-            {equipo.creador_nombre[0]}
-          </span>
-        )}
-        <span className="flex-1 truncate text-sm text-texto">{equipo.creador_nombre}</span>
+        {/* #159: la foto y el nombre abren el perfil del Creador en una placa, sin sacar al
+            Talento de la tarjeta. */}
+        <button
+          type="button"
+          onClick={() => setPerfilAbierto(true)}
+          className="flex min-w-0 flex-1 items-center gap-2.5"
+        >
+          {equipo.creador_imagen_url ? (
+            <Imagen
+              src={equipo.creador_imagen_url}
+              alt=""
+              width={28}
+              height={28}
+              contenedorClassName="shrink-0 rounded-full"
+              fallback={
+                <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
+                  {equipo.creador_nombre[0]}
+                </span>
+              }
+            />
+          ) : (
+            <span className="flex h-7 w-7 items-center justify-center rounded-full bg-ink-100 text-2xs font-semibold text-texto-tenue">
+              {equipo.creador_nombre[0]}
+            </span>
+          )}
+          <span className="min-w-0 flex-1 truncate text-left text-sm text-texto">{equipo.creador_nombre}</span>
+        </button>
         <button
           type="button"
           onClick={() => setExpandido((v) => !v)}
@@ -103,14 +112,19 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
               ))}
             </div>
           )}
-          <Link
-            href={`/creadores/${equipo.creador_id}`}
+          <button
+            type="button"
+            onClick={() => setPerfilAbierto(true)}
             className="inline-flex items-center gap-1 font-medium text-texto hover:underline"
           >
             Ver perfil de {equipo.creador_nombre}
             <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
-          </Link>
+          </button>
         </div>
+      )}
+
+      {perfilAbierto && (
+        <PlacaPerfilCreador creadorId={equipo.creador_id} onCerrar={() => setPerfilAbierto(false)} />
       )}
     </article>
   );

@@ -7,7 +7,7 @@ import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { EstadoObra } from "@/lib/supabase/types";
 
-const MIN_FOTOS = 3;
+const MIN_FOTOS = 1; // issue #162
 
 export function AccionesObra({
   obraId,

@@ -3,6 +3,7 @@
 import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Icono } from "@/components/ui/icono";
+import { Superposicion } from "@/components/ui/superposicion";
 
 // `beforeinstallprompt` no está en las tipas del DOM.
 interface EventoInstalacion extends Event {
@@ -127,17 +128,8 @@ export function BotonInstalar({
       )}
 
       {ayuda ? (
-        <div
-          role="dialog"
-          aria-modal="true"
-          aria-label={titulo}
-          className="fixed inset-0 z-50 flex items-end justify-center bg-black/40 p-4 sm:items-center"
-          onClick={() => setAyuda(null)}
-        >
-          <div
-            className="w-full max-w-sm rounded-2xl bg-superficie p-5 text-texto shadow-tarjeta"
-            onClick={(e) => e.stopPropagation()}
-          >
+        <Superposicion onCerrar={() => setAyuda(null)} posicion="abajo" etiqueta={titulo}>
+          <div className="mx-auto w-full max-w-sm rounded-2xl bg-superficie p-5 text-texto shadow-tarjeta">
             <h3 className="font-display text-lg font-semibold tracking-[-0.02em]">{titulo}</h3>
             <ol className="mt-3 list-decimal space-y-1.5 pl-5 text-sm text-texto-tenue">
               {pasos.map((paso) => (
@@ -152,7 +144,7 @@ export function BotonInstalar({
               {t("iosCerrar")}
             </button>
           </div>
-        </div>
+        </Superposicion>
       ) : null}
     </>
   );

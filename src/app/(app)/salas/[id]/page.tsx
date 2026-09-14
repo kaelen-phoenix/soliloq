@@ -39,7 +39,13 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
 
   const integrantes: Integrante[] = integrantesIds.map((id) => {
     if (creador && id === creador.id) {
-      return { perfil_id: id, nombre: creador.nombre, foto_url: creador.imagen_url, rol_en_obra: "Director/a" };
+      return {
+        perfil_id: id,
+        nombre: creador.nombre,
+        foto_url: creador.imagen_url,
+        rol_en_obra: "Director/a",
+        esTalento: false,
+      };
     }
     const talento = talentos?.find((t) => t.id === id);
     const fotoPrincipal = talento?.fotos_talento?.find((f: any) => f.orden === 0);
@@ -49,6 +55,8 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
       // La sala nace de un interés mutuo + convocatoria, no de un casting con roles.
       rol_en_obra: sala.obra_id ? "Elenco" : "Armando equipo",
+      // #149: sólo los mensajes de quien tiene perfil de Talento abren la placa de perfil.
+      esTalento: !!talento,
     };
   });
 

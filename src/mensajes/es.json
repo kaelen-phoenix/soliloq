@@ -23,7 +23,7 @@
     "buscarTalentoCorto": "Buscar",
     "admin": "Admin",
     "ajustes": "Ajustes",
-    "matches": "Matches"
+    "matches": "Call Back"
   },
   "titulos": {
     "armarEquipo": "Armar equipo",
@@ -32,14 +32,15 @@
     "notificaciones": "Notificaciones",
     "nuevoPerfil": "Nuevo perfil",
     "tuPerfil": "Tu perfil",
-    "nuevaObra": "Nueva obra",
     "obra": "Obra",
     "perfil": "Perfil",
     "buscarTalento": "Buscar talento",
     "ajustes": "Ajustes",
     "admin": "Administración",
     "convocatorias": "Convocatorias",
-    "misProyectos": "Mis proyectos"
+    "misProyectos": "Mis proyectos",
+    "matches": "Call Back",
+    "convocatoria": "Convocatoria"
   },
   "modo": {
     "talento": "Talento",

@@ -23,7 +23,7 @@
     "buscarTalentoCorto": "Search",
     "admin": "Admin",
     "ajustes": "Settings",
-    "matches": "Matches"
+    "matches": "Call Back"
   },
   "titulos": {
     "armarEquipo": "Build a team",
@@ -32,14 +32,15 @@
     "notificaciones": "Notifications",
     "nuevoPerfil": "New profile",
     "tuPerfil": "Your profile",
-    "nuevaObra": "New production",
     "obra": "Production",
     "perfil": "Profile",
     "buscarTalento": "Find talent",
     "ajustes": "Settings",
     "admin": "Administration",
     "convocatorias": "Casting calls",
-    "misProyectos": "My projects"
+    "misProyectos": "My projects",
+    "matches": "Call Back",
+    "convocatoria": "Invitation"
   },
   "modo": {
     "talento": "Talent",

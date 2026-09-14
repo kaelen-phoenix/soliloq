@@ -46,7 +46,9 @@ export type TipoNotificacion =
   /** Interés mutuo entre dos personas, sin proyecto de por medio (0033). */
   | "equipo_armado"
   /** Alguien contactó desde el enlace público del perfil (0037), interés todavía no mutuo. */
-  | "interes_recibido";
+  | "interes_recibido"
+  /** Al Creador: se formó un match nuevo con un Talento (0068/0069, issue #160). */
+  | "nuevo_match";
 
 export type MotivoDenuncia =
   | "acoso"
@@ -522,8 +524,10 @@ export interface Database {
           id: string;
           creador_id: string;
           titulo: string;
-          /** Cuántas personas quiere sumar. 1..6. */
+          /** Cuántas personas quiere sumar. 1..10. */
           cupo: number;
+          /** #157: igual que `obras.sinopsis`. */
+          descripcion: string | null;
           activo: boolean;
           creado_en: string;
           actualizado_en: string;
@@ -532,11 +536,13 @@ export interface Database {
           creador_id: string;
           titulo: string;
           cupo: number;
+          descripcion?: string | null;
           activo?: boolean;
         };
         Update: {
           titulo?: string;
           cupo?: number;
+          descripcion?: string | null;
           activo?: boolean;
           actualizado_en?: string;
         };
@@ -843,7 +849,21 @@ export interface Database {
         }[];
       };
       aceptar_match: { Args: { p_match_id: string }; Returns: undefined };
-      convocar: { Args: { p_match_id: string }; Returns: undefined };
+      convocar: { Args: { p_match_id: string; p_rol_id?: string | null }; Returns: undefined };
+      /** Quién ocupa cada rol de un Proyecto (o cada lugar de un Equipo) y quién falta
+       *  convocar todavía (#152). Sólo el dueño puede pedirla. */
+      cobertura_iniciativa: {
+        Args: { p_obra_id: string | null; p_equipo_id: string | null };
+        Returns: {
+          rol_id: string | null;
+          rol_nombre: string | null;
+          vacantes: number;
+          convocatoria_id: string | null;
+          talento_id: string | null;
+          talento_nombre: string | null;
+          talento_foto: string | null;
+        }[];
+      };
       descartar_convocado: { Args: { p_match_id: string }; Returns: undefined };
       dar_de_baja_convocado: { Args: { p_convocatoria_id: string }; Returns: undefined };
       responder_convocatoria: {
@@ -966,7 +986,7 @@ export interface Database {
         Args: { p_token: string };
         Returns: void;
       };
-      /** Feed de equipos activos con ≥3 fotos para el talento (0046, issue #57). */
+      /** Feed de equipos activos con ≥1 foto para el talento (0046, issue #57; tope en #162). */
       feed_equipos_para_talento: {
         Args: Record<string, never>;
         Returns: {

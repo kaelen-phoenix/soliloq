@@ -15,6 +15,10 @@ export async function middleware(request: NextRequest) {
 
 export const config = {
   matcher: [
-    "/((?!_next/static|_next/image|favicon.ico|manifest.json|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
+    // Rutas de metadata/PWA generadas por convención de archivo (`manifest.ts`, `robots.ts`,
+    // `sitemap.ts`, `icon.tsx`, `apple-icon.tsx`, `opengraph-image.tsx`) y `public/sw.js`: se
+    // sirven sin sesión (crawlers, instaladores de PWA, el navegador registrando el service
+    // worker) y no tienen guarda propia como `/p/`, así que hay que excluirlas acá.
+    "/((?!_next/static|_next/image|favicon.ico|manifest.webmanifest|robots.txt|sitemap.xml|sw.js|apple-icon|icon|opengraph-image|icons/|.*\\.(?:svg|png|jpg|jpeg|gif|webp)$).*)",
   ],
 };
