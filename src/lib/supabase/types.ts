@@ -1027,15 +1027,11 @@ export interface Database {
       metricas_obra: {
         Args: { p_obra_id: string };
         Returns: {
-          rol_id: string;
-          rol_nombre: string;
-          vacantes: number;
           alcance: number;
-          postulaciones: number;
-          pendientes: number;
-          en_duda: number;
-          aprobados: number;
-          rechazados: number;
+          interes_recibido: number;
+          matches: number;
+          convocados: number;
+          cupo: number;
         }[];
       };
       /** Panel de administración (0040). Todas rechazan con `raise exception` si `auth.uid()` no es admin. */
