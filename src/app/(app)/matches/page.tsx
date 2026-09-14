@@ -77,15 +77,14 @@ export default async function MatchesPage() {
         convocás en firme.
       </p>
 
-      {filas.length === 0 ? (
+      {filas.length === 0 && filasConvocados.length === 0 && (
         <EstadoVacio
           icono="corazon"
           titulo="Todavía no hay matches"
           detalle="Cuando marques «Me interesa» en un perfil y esa persona también marque tu proyecto o equipo, aparece acá."
         />
-      ) : (
-        <MatchesLista filas={filas} />
       )}
+      {filas.length > 0 && <MatchesLista filas={filas} />}
 
       <ConvocadosLista filas={filasConvocados} roles={roles} />
     </main>
