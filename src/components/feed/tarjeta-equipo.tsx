@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
-import { PlacaPerfilCreador } from "@/components/perfil/placa-perfil-creador";
+import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 
 export interface EquipoFeed {
   equipo_id: string;
@@ -124,7 +124,7 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
       )}
 
       {perfilAbierto && (
-        <PlacaPerfilCreador creadorId={equipo.creador_id} onCerrar={() => setPerfilAbierto(false)} />
+        <PlacaPerfilTalento talentoId={equipo.creador_id} onCerrar={() => setPerfilAbierto(false)} />
       )}
     </article>
   );

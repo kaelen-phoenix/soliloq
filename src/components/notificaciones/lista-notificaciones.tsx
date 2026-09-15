@@ -7,8 +7,7 @@ import { Imagen } from "@/components/ui/imagen";
 import { createClient } from "@/lib/supabase/client";
 import type { TipoNotificacion } from "@/lib/supabase/types";
 
-type Creador = { nombre: string; imagen_url: string | null };
-type Obra = { titulo: string; perfiles_creador: Creador | Creador[] | null };
+type Obra = { titulo: string };
 
 interface Notificacion {
   id: string;
@@ -21,6 +20,9 @@ interface Notificacion {
   /** Quién generó el interés, para `interes_recibido`. */
   de_perfil: string | null;
   obras: Obra | Obra[] | null;
+  /** Foto del Perfil de Talento del Creador que publicó el proyecto (issue #175), ya
+   *  resuelta a URL pública en el servidor. */
+  proyecto_foto_url: string | null;
 }
 
 /** PostgREST devuelve la relación como objeto o como array según la cardinalidad que infiere. */
@@ -34,8 +36,7 @@ function tituloObra(n: Notificacion): string {
 }
 
 function fotoDelProyecto(n: Notificacion): string | null {
-  // El proyecto no tiene foto propia: su cara es la del creador que lo publica.
-  return primero(primero(n.obras)?.perfiles_creador ?? null)?.imagen_url ?? null;
+  return n.proyecto_foto_url;
 }
 
 /**

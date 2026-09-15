@@ -82,11 +82,12 @@ export async function notificarMensajeNuevo(mensajeId: string) {
   const obra = (Array.isArray(sala.obras) ? sala.obras[0] : sala.obras) as { titulo: string } | null;
   const tituloSala = obra?.titulo ?? sala.titulo ?? "Yalope";
 
-  const [{ data: talento }, { data: creador }] = await Promise.all([
-    supabase.from("perfiles_talento").select("nombre").eq("id", user.id).maybeSingle(),
-    supabase.from("perfiles_creador").select("nombre").eq("id", user.id).maybeSingle(),
-  ]);
-  const remitente = talento?.nombre ?? creador?.nombre ?? "Alguien";
+  const { data: talento } = await supabase
+    .from("perfiles_talento")
+    .select("nombre")
+    .eq("id", user.id)
+    .maybeSingle();
+  const remitente = talento?.nombre ?? "Alguien";
 
   const { data: integrantes } = await supabase
     .from("sala_integrantes")

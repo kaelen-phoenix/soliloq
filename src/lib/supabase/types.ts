@@ -806,7 +806,8 @@ export interface Database {
           obra_creado_en: string;
           creador_id: string;
           creador_nombre: string;
-          creador_imagen_url: string | null;
+          /** Ruta de Storage de la primera foto del Perfil de Talento del dueño (0072). */
+          creador_foto_path: string | null;
           /** Rutas de Storage de las fotos de la obra (0048); `{}` si no tiene. */
           obra_fotos: string[];
         };
@@ -996,7 +997,7 @@ export interface Database {
           creado_en: string;
           creador_id: string;
           creador_nombre: string;
-          creador_imagen_url: string | null;
+          creador_foto_path: string | null;
           fotos: string[];
         }[];
       };

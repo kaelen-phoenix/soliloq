@@ -3,7 +3,7 @@
 import { useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
-import { PlacaPerfilCreador } from "@/components/perfil/placa-perfil-creador";
+import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 
 export interface RolFeed {
   rol_id: string;
@@ -155,7 +155,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
       )}
 
       {perfilAbierto && (
-        <PlacaPerfilCreador creadorId={rol.creador_id} onCerrar={() => setPerfilAbierto(false)} />
+        <PlacaPerfilTalento talentoId={rol.creador_id} onCerrar={() => setPerfilAbierto(false)} />
       )}
     </article>
   );

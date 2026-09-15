@@ -114,7 +114,13 @@ export function PilaTarjetas({
       return;
     }
 
-    const nuevos = data ?? [];
+    const publicUrl = (p: string) =>
+      supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl;
+    const nuevos: RolFeed[] = (data ?? []).map((r) => ({
+      ...r,
+      creador_imagen_url: r.creador_foto_path ? publicUrl(r.creador_foto_path) : null,
+      fotos: (r.obra_fotos ?? []).map(publicUrl),
+    }));
     setRoles(nuevos);
     setIndice(0);
     // El feed cambió entero: lo que había para deshacer ya no está en pantalla.
