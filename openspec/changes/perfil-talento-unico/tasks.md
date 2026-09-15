@@ -1,7 +1,7 @@
 ## 1. Base de datos — backfill (aditivo)
 
 - [ ] 1.1 Migración A: `insert into perfiles_talento (...) select ... from perfiles_creador c where not exists (select 1 from perfiles_talento t where t.id = c.id)`, mapeando `nombre`/`imagen_url`/`ubicacion_*` y dejando en default los campos propios de Talento sin equivalente (`fecha_nacimiento`, `genero`, `habilidades`, `experiencia`). Probar en `begin/rollback` contra prod y verificar que devuelve exactamente 1 fila nueva (la cuenta Creador-sin-Talento real).
-- [ ] 1.2 Aplicar Migración A a prod (Management API + registrar en `supabase_migrations.schema_migrations`, mismo procedimiento que 0061/0070) y confirmar a mano que la cuenta `52090620-…` tiene ahora un Perfil de Talento visible con los datos migrados.
+- [ ] 1.2 Aplicar Migración A a prod (Management API + registrar en `supabase_migrations.schema_migrations`, mismo procedimiento que 0061/0070) y confirmar a mano que la cuenta `2a4dbf6d-…` ("Natalia") tiene ahora un Perfil de Talento visible con los datos migrados.
 
 ## 2. Lectura de identidad — mover de `perfiles_creador` a `perfiles_talento`
 
