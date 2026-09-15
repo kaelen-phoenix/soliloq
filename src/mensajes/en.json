@@ -116,6 +116,10 @@
     "texto": "An administrator suspended access to this account. If you think this is a mistake, get in touch and we'll review it.",
     "cerrarSesion": "Log out"
   },
+  "solicitudPendiente": {
+    "titulo": "Your request is pending approval",
+    "texto": "Yalope is still in an early testing phase, and we're enabling access gradually. We've received your sign-up — you'll be able to log in as soon as it's approved."
+  },
   "apoyar": {
     "titulo": "Support Yalope",
     "intro": "Yalope is a small, self-funded project. Your contribution — a donation or a sponsor spot — helps keep it running and growing.",

@@ -83,6 +83,9 @@ export interface Database {
           es_admin: boolean;
           /** Timestamp de suspensión por un admin, o null si está activa (0040). */
           suspendido_en: string | null;
+          /** Aprobación durante la etapa de prueba (0078): null = pendiente. Las cuentas
+           *  anteriores a este control quedaron todas aprobadas. */
+          aprobado_en: string | null;
           /** Idioma de la interfaz (0041): 'es' | 'en'. */
           idioma: string;
           /** Tema (0041): 'sistema' | 'claro' | 'oscuro'. */
@@ -107,16 +110,33 @@ export interface Database {
           enlace_publico_activo?: boolean;
           es_admin?: boolean;
           suspendido_en?: string | null;
+          aprobado_en?: string | null;
           idioma?: string;
           tema?: string;
         };
+        Relationships: [];
+      };
+      /** Ingreso cerrado durante la prueba de la app (0078); sin políticas, sólo RPC. */
+      invitaciones: {
+        Row: {
+          id: string;
+          email: string;
+          creado_por: string | null;
+          usado_por: string | null;
+          usado_en: string | null;
+          creado_en: string;
+        };
+        Insert: never;
+        Update: never;
         Relationships: [];
       };
       perfiles_talento: {
         Row: {
           id: string;
           nombre: string;
-          fecha_nacimiento: string;
+          /** `null` sólo en cuentas migradas sin dato equivalente (0071, issue #175). El
+           *  alta manual desde el formulario lo sigue pidiendo como obligatorio. */
+          fecha_nacimiento: string | null;
           /** #110: si la edad se muestra en el perfil público. `true` por defecto. */
           edad_visible: boolean;
           ubicacion_texto: string;
@@ -1057,6 +1077,23 @@ export interface Database {
       admin_suspender_usuario: {
         Args: { p_id: string; p_suspender: boolean };
         Returns: void;
+      };
+      /** Ingreso cerrado durante la prueba de la app (0078). */
+      admin_crear_invitacion: {
+        Args: { p_email: string };
+        Returns: void;
+      };
+      admin_aprobar_usuario: {
+        Args: { p_id: string };
+        Returns: void;
+      };
+      admin_solicitudes_pendientes: {
+        Args: { p_limite?: number; p_offset?: number };
+        Returns: { id: string; email: string; creado_en: string | null }[];
+      };
+      admin_invitaciones: {
+        Args: { p_limite?: number; p_offset?: number };
+        Returns: { id: string; email: string; creado_en: string; usado_en: string | null }[];
       };
       admin_denuncias: {
         Args: { p_estado?: string | null; p_limite?: number; p_offset?: number };

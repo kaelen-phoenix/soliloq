@@ -23,7 +23,8 @@ import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } fro
 
 interface DatosIniciales {
   nombre: string;
-  fecha_nacimiento: string;
+  /** `null` en cuentas migradas sin ese dato (issue #175): el formulario lo sigue pidiendo. */
+  fecha_nacimiento: string | null;
   edad_visible: boolean;
   ubicacion_texto: string;
   ubicacion_publica: string;

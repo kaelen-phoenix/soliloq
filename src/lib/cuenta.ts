@@ -10,12 +10,18 @@ export interface EstadoCuenta {
   esAdmin: boolean;
   /** La cuenta está suspendida por un admin. */
   suspendido: boolean;
+  /**
+   * Mientras se prueba la app, nadie entra sin invitación o aprobación manual. `true` para
+   * toda cuenta que ya existía antes de este control (no es retroactivo).
+   */
+  aprobado: boolean;
 }
 
 interface FilaPerfil {
   modo_activo: RolUsuario | null;
   es_admin?: boolean | null;
   suspendido_en?: string | null;
+  aprobado_en?: string | null;
 }
 
 /**
@@ -53,20 +59,25 @@ export function resolverEstadoCuenta(
     tieneAmbosPerfiles: tienePerfilTalento && tienePerfilCreador,
     esAdmin: perfil?.es_admin ?? false,
     suspendido: perfil?.suspendido_en != null,
+    aprobado: perfil?.aprobado_en != null,
   };
 }
 
-export type Destino = "ingresar" | "completar-perfil" | "app";
+export type Destino = "ingresar" | "solicitud-pendiente" | "completar-perfil" | "app";
 
 /**
  * Única fuente de decisión de redirección. Se evalúa en orden y sin ramas
  * cruzadas, que es lo que evita los bucles.
+ *
+ * La aprobación se resuelve antes que el onboarding: mientras la app está en prueba, una
+ * cuenta sin invitación ni aprobación manual no llega ni a completar su Perfil de Talento.
  *
  * El Perfil de Talento es el único perfil personal (issue #175): sin él, el
  * onboarding está incompleto. La función de Creador no tiene alta propia — se
  * activa sola al crear el primer Proyecto o Equipo (0075) y no bloquea nada acá.
  */
 export function destinoSegunEstado(estado: EstadoCuenta): Destino {
+  if (!estado.aprobado) return "solicitud-pendiente";
   if (!estado.tienePerfilTalento) return "completar-perfil";
   return "app";
 }

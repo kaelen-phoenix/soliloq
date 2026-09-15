@@ -6,7 +6,8 @@ import { Icono } from "@/components/ui/icono";
 export interface TalentoDetalle {
   id: string;
   nombre: string;
-  fecha_nacimiento: string;
+  /** `null` en cuentas migradas sin ese dato (issue #175): no se muestra la edad. */
+  fecha_nacimiento: string | null;
   /** #110: si es `false`, la edad no se muestra (salvo en el perfil propio). */
   edad_visible: boolean;
   /** La recortada a barrio/ciudad. Nunca `ubicacion_texto`: puede ser el domicilio. */
@@ -31,7 +32,7 @@ export function PerfilTalentoDetalle({
 }) {
   const fotosOrdenadas = [...talento.fotos].sort((a, b) => a.orden - b.orden);
   const redes = REDES.filter((r) => talento.redes?.[r.clave]);
-  const mostrarEdad = esPropio || talento.edad_visible;
+  const mostrarEdad = !!talento.fecha_nacimiento && (esPropio || talento.edad_visible);
 
   return (
     <div className="flex flex-col gap-4">
@@ -40,7 +41,7 @@ export function PerfilTalentoDetalle({
       <div>
         <h2 className="text-lg font-bold text-texto">{talento.nombre}</h2>
         <p className="text-sm text-texto-tenue">
-          {mostrarEdad && `${calcularEdad(talento.fecha_nacimiento)} años · `}
+          {mostrarEdad && talento.fecha_nacimiento && `${calcularEdad(talento.fecha_nacimiento)} años · `}
           {talento.ubicacion_publica}
         </p>
         <p className="text-sm text-texto-tenue">

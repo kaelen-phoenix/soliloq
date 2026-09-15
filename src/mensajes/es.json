@@ -116,6 +116,10 @@
     "texto": "Un administrador suspendió el acceso a esta cuenta. Si creés que es un error, escribinos y lo revisamos.",
     "cerrarSesion": "Cerrar sesión"
   },
+  "solicitudPendiente": {
+    "titulo": "Tu solicitud está pendiente de aprobación",
+    "texto": "Yalope todavía está en una etapa de prueba y estamos habilitando el acceso de a poco. Ya recibimos tu registro: en cuanto lo aprobemos, vas a poder entrar."
+  },
   "apoyar": {
     "titulo": "Apoyá Yalope",
     "intro": "Yalope es un proyecto chico y autofinanciado. Tu aporte —una donación o un lugar como sponsor— ayuda a que siga en pie y creciendo.",
