@@ -185,59 +185,27 @@ export interface Database {
         };
         Relationships: [];
       };
+      /**
+       * La función de Creador (crear y gestionar Proyectos/Equipos, buscar Talentos,
+       * convocar) — issue #175: ya no tiene identidad propia, sólo lo que describe la
+       * práctica artística. La fila la crea sola un trigger al armar el primer Proyecto o
+       * Equipo (0075); "quién es" esta cuenta sale siempre de `perfiles_talento`.
+       */
       perfiles_creador: {
         Row: {
           id: string;
-          nombre: string;
-          /** #110: opcional; el Creador puede cargar su fecha para mostrar su edad. */
-          fecha_nacimiento: string | null;
-          edad_visible: boolean;
           disciplinas: DisciplinaArtistica[];
           otro_detalle: string | null;
-          ubicacion_texto: string;
-          ubicacion_publica: string;
-          ubicacion_place_id: string | null;
-          ubicacion_lat: number;
-          ubicacion_lng: number;
-          ubicacion_pais: string;
-          descripcion: string | null;
-          /** #132: resumen libre de trayectoria y logros (≤ 2000). */
-          biografia: string | null;
-          imagen_url: string | null;
           actualizado_en: string;
         };
         Insert: {
           id: string;
-          nombre: string;
-          fecha_nacimiento?: string | null;
-          edad_visible?: boolean;
-          disciplinas: DisciplinaArtistica[];
-          otro_detalle?: string | null;
-          ubicacion_texto: string;
-          ubicacion_publica: string;
-          ubicacion_place_id?: string | null;
-          ubicacion_lat: number;
-          ubicacion_lng: number;
-          ubicacion_pais: string;
-          descripcion?: string | null;
-          biografia?: string | null;
-          imagen_url?: string | null;
-        };
-        Update: {
-          nombre?: string;
-          fecha_nacimiento?: string | null;
-          edad_visible?: boolean;
           disciplinas?: DisciplinaArtistica[];
           otro_detalle?: string | null;
-          ubicacion_texto?: string;
-          ubicacion_publica?: string;
-          ubicacion_place_id?: string | null;
-          ubicacion_lat?: number;
-          ubicacion_lng?: number;
-          ubicacion_pais?: string;
-          descripcion?: string | null;
-          biografia?: string | null;
-          imagen_url?: string | null;
+        };
+        Update: {
+          disciplinas?: DisciplinaArtistica[];
+          otro_detalle?: string | null;
         };
         Relationships: [];
       };

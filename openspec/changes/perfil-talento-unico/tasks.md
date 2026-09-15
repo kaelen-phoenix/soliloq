@@ -32,12 +32,13 @@
 
 ## 5. Base de datos — drop (destructivo, al final)
 
-- [ ] 5.1 Confirmar con `grep -rn "perfiles_creador" src/` que sólo quedan referencias a `disciplinas`/`otro_detalle` (nada de `nombre`/`imagen_url`/`descripcion`/`ubicacion_*` de esa tabla).
-- [ ] 5.2 Migración B: `alter table perfiles_creador drop column nombre, drop column imagen_url, drop column descripcion, drop column ubicacion_texto, drop column ubicacion_place_id, drop column ubicacion_lat, drop column ubicacion_lng, drop column ubicacion_pais` (mantener el resto de constraints/índices que no dependan de esas columnas). Probar en `begin/rollback` contra prod primero.
-- [ ] 5.3 Aplicar Migración B a prod y correr `supabase/tests/run.sh` completo para confirmar que nada quedó roto.
+- [x] 5.1 Confirmado con `grep -rn "perfiles_creador" src/`: sólo quedan `disciplinas`/`otro_detalle` (formulario, detalle, `/perfil`) y el chequeo de existencia en `cuenta-servidor.ts`.
+- [x] 5.2 Migración B (0077): también salieron `fecha_nacimiento`, `edad_visible`, `biografia` y `ubicacion_publica` — columnas que aparecieron durante la implementación y no estaban en la lista original de este ítem (0052/0060 les habían sumado a `perfiles_creador` edad y trayectoria propias, además de nombre/foto/ubicación). Sólo quedan `id`, `disciplinas`, `otro_detalle`, `actualizado_en`. Probada en `begin/rollback` contra prod, junto con los dos suites de test (que necesitaron su propio ajuste — ver 5.3).
+- [x] 5.3 Aplicada a prod. `supabase/tests/rls_y_borrados.sql` y `match_convocatoria.sql` insertaban `perfiles_creador` con las columnas que se acaban de borrar (fixtures de prueba, no código de la app) — se ajustaron a `insert into perfiles_creador (id) values (...)`. `supabase/tests/run.sh` completo en verde después.
+- [x] 5.4 (no prevista originalmente) `types.ts`: `perfiles_creador` Row/Insert/Update reducidos a `id`/`disciplinas`/`otro_detalle`/`actualizado_en`.
 
 ## 6. Verificación final
 
-- [ ] 6.1 `tsc --noEmit`, `eslint`, `npm run build` en verde.
-- [ ] 6.2 `supabase/tests/run.sh` en verde con la Migración B ya aplicada.
+- [x] 6.1 `tsc --noEmit`, `eslint`, `npm run build` en verde (31 rutas — confirma que `/creadores/[id]` también cayó).
+- [x] 6.2 `supabase/tests/run.sh` en verde con la Migración B ya aplicada.
 - [ ] 6.3 Verificar en vivo (issue relacionado #122): abrir el perfil del Creador desde una tarjeta de Proyecto/Equipo real y confirmar que muestra el Perfil de Talento del dueño, no un perfil separado.
