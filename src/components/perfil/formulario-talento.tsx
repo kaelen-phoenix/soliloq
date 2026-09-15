@@ -335,7 +335,7 @@ export function FormularioTalento({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Buscador de creadores</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Visibilidad</h2>
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
@@ -346,9 +346,12 @@ export function FormularioTalento({
           <span className="text-sm text-texto">
             Aparecer en el buscador de creadores
             <span className="mt-0.5 block text-xs text-texto-tenue">
-              Los creadores pueden encontrarte por ubicación, edad, género o habilidades.
-              Necesitás al menos una foto para que te encuentren. Podés seguir postulándote
-              aunque esto esté apagado.
+              Los Creadores pueden encontrarte por ubicación, edad, género o habilidades (y
+              necesitás al menos una foto para que te encuentren). Si preferís no aparecer,
+              apagalo: dejás de salir en búsquedas nuevas, pero seguís viendo el feed y
+              podés seguir marcando «Me interesa» con normalidad. Tus Salas y conversaciones
+              actuales tampoco se ven afectadas — esto sólo controla si alguien nuevo te
+              puede encontrar.
             </span>
           </span>
         </label>
