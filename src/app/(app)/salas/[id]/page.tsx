@@ -27,34 +27,24 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
 
   const integrantesIds = (integrantesRaw ?? []).map((i) => i.perfil_id);
 
-  const [{ data: talentos }, { data: creador }] = await Promise.all([
-    supabase
-      .from("perfiles_talento")
-      .select("id, nombre, fotos_talento(storage_path, orden)")
-      .in("id", integrantesIds),
-    obra
-      ? supabase.from("perfiles_creador").select("id, nombre, imagen_url").eq("id", obra.creador_id).maybeSingle()
-      : Promise.resolve({ data: null }),
-  ]);
+  // La identidad de cualquier integrante —incluido el Creador— sale siempre de su Perfil de
+  // Talento (issue #175): el Creador ya no tiene un perfil de identidad aparte, y como es
+  // miembro de su propia sala (`convocar`/`aceptar_match`), esta única consulta ya lo trae.
+  const { data: talentos } = await supabase
+    .from("perfiles_talento")
+    .select("id, nombre, fotos_talento(storage_path, orden)")
+    .in("id", integrantesIds);
 
   const integrantes: Integrante[] = integrantesIds.map((id) => {
-    if (creador && id === creador.id) {
-      return {
-        perfil_id: id,
-        nombre: creador.nombre,
-        foto_url: creador.imagen_url,
-        rol_en_obra: "Director/a",
-        esTalento: false,
-      };
-    }
     const talento = talentos?.find((t) => t.id === id);
     const fotoPrincipal = talento?.fotos_talento?.find((f: any) => f.orden === 0);
+    const esDirector = obra?.creador_id === id;
     return {
       perfil_id: id,
       nombre: talento?.nombre ?? "Integrante",
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
       // La sala nace de un interés mutuo + convocatoria, no de un casting con roles.
-      rol_en_obra: sala.obra_id ? "Elenco" : "Armando equipo",
+      rol_en_obra: esDirector ? "Director/a" : sala.obra_id ? "Elenco" : "Armando equipo",
       // #149: sólo los mensajes de quien tiene perfil de Talento abren la placa de perfil.
       esTalento: !!talento,
     };

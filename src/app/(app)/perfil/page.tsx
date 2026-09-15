@@ -64,94 +64,68 @@ export default async function PerfilPage({
     </Link>
   );
 
-  // Se edita el perfil del modo activo; el otro se edita conmutando de modo.
+  // El Perfil de Talento es la única identidad personal (issue #175): se muestra siempre,
+  // sin importar en qué modo esté operando la cuenta. Si además tiene la función de Creador
+  // activa (creó un Proyecto o Equipo), se suma su perfil artístico como sección aparte.
   const estado = await leerEstadoCuenta(supabase, user.id);
 
-  const { data: cuenta } = await supabase
-    .from("perfiles")
-    .select("enlace_token, enlace_publico_activo")
-    .eq("id", user.id)
-    .single();
-
-  // Ídem: el enlace público es de la cuenta, no de cada perfil. `nombre` se resuelve abajo,
-  // según el modo activo, porque `perfiles` no lo tiene.
-  const compartir = (nombre: string) =>
-    cuenta && (
-      <BotonCompartir
-        userId={user.id}
-        nombre={nombre}
-        tokenInicial={cuenta.enlace_token}
-        activoInicial={cuenta.enlace_publico_activo}
-      />
-    );
-
-  if (estado.modoActivo === "talento") {
-    const [{ data: perfilTalento }, { data: fotos }] = await Promise.all([
+  const [{ data: cuenta }, { data: perfilTalento }, { data: fotos }, { data: perfilCreador }] =
+    await Promise.all([
+      supabase.from("perfiles").select("enlace_token, enlace_publico_activo").eq("id", user.id).single(),
       supabase.from("perfiles_talento").select("*").eq("id", user.id).single(),
       supabase.from("fotos_talento").select("*").eq("talento_id", user.id).order("orden"),
+      estado.tienePerfilCreador
+        ? supabase.from("perfiles_creador").select("disciplinas, otro_detalle").eq("id", user.id).single()
+        : Promise.resolve({ data: null }),
     ]);
 
-    const fotosConUrl = (fotos ?? []).map((f) => ({
-      id: f.id,
-      storage_path: f.storage_path,
-      orden: f.orden,
-      url: supabase.storage.from("fotos-perfil").getPublicUrl(f.storage_path).data.publicUrl,
-      enBd: true,
-    }));
-
-    return (
-      <main className="px-5 py-5">
-        {editando || !perfilTalento ? (
-          <>
-            {perfilTalento && volverAVista}
-            <FormularioTalento
-              userId={user.id}
-              esAlta={false}
-              datosIniciales={perfilTalento ?? undefined}
-              fotosIniciales={fotosConUrl}
-            />
-          </>
-        ) : (
-          <VistaPerfilPropio
-            hrefEditar="/perfil?editar=1"
-            aviso="Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
-          >
-            <PerfilTalentoDetalle talento={{ ...perfilTalento, fotos: fotosConUrl }} esPropio />
-          </VistaPerfilPropio>
-        )}
-        {!editando && perfilTalento && compartir(perfilTalento.nombre)}
-        <AccionesCuenta />
-      </main>
-    );
-  }
-
-  const { data: perfilCreador } = await supabase
-    .from("perfiles_creador")
-    .select("*")
-    .eq("id", user.id)
-    .single();
+  const fotosConUrl = (fotos ?? []).map((f) => ({
+    id: f.id,
+    storage_path: f.storage_path,
+    orden: f.orden,
+    url: supabase.storage.from("fotos-perfil").getPublicUrl(f.storage_path).data.publicUrl,
+    enBd: true,
+  }));
 
   return (
     <main className="px-5 py-5">
-      {editando || !perfilCreador ? (
+      {editando || !perfilTalento ? (
         <>
-          {perfilCreador && volverAVista}
-          <FormularioCreador
+          {perfilTalento && volverAVista}
+          <FormularioTalento
             userId={user.id}
-            esAlta={false}
-            datosIniciales={perfilCreador ?? undefined}
+            esAlta={!perfilTalento}
+            datosIniciales={perfilTalento ?? undefined}
+            fotosIniciales={fotosConUrl}
           />
+          {perfilCreador && (
+            <div className="mt-8 max-w-2xl border-t border-borde pt-6">
+              <FormularioCreador userId={user.id} datosIniciales={perfilCreador} />
+            </div>
+          )}
         </>
       ) : (
         <VistaPerfilPropio
           hrefEditar="/perfil?editar=1"
           aviso="Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
         >
-          <PerfilCreadorDetalle creador={perfilCreador} />
+          <PerfilTalentoDetalle talento={{ ...perfilTalento, fotos: fotosConUrl }} esPropio />
+          {perfilCreador && (
+            <div className="mt-2 border-t border-borde pt-4">
+              <PerfilCreadorDetalle creador={perfilCreador} />
+            </div>
+          )}
         </VistaPerfilPropio>
       )}
 
-      {!editando && perfilCreador && compartir(perfilCreador.nombre)}
+      {!editando && perfilTalento && cuenta && (
+        <BotonCompartir
+          userId={user.id}
+          nombre={perfilTalento.nombre}
+          tokenInicial={cuenta.enlace_token}
+          activoInicial={cuenta.enlace_publico_activo}
+        />
+      )}
       <AccionesCuenta />
     </main>
   );

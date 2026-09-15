@@ -76,25 +76,14 @@ export async function actualizarSesion(request: NextRequest) {
   const estado = await leerEstadoCuenta(supabase, user.id);
   const destino = destinoSegunEstado(estado);
 
-  const enRol = path.startsWith("/elegir-rol");
   const enAltaPerfil = path.startsWith("/completar-perfil");
-  // Alta del segundo perfil: solo tiene sentido con el onboarding ya resuelto.
-  const enPerfilNuevo = path.startsWith("/perfil/nuevo");
-
-  if (destino === "elegir-rol") {
-    return enRol ? response : redirigir(conNext("/elegir-rol", path));
-  }
 
   if (destino === "completar-perfil") {
-    // Se permite volver a /elegir-rol para corregir mientras no exista ningún perfil.
-    return enRol || enAltaPerfil ? response : redirigir(conNext("/completar-perfil", path));
+    return enAltaPerfil ? response : redirigir(conNext("/completar-perfil", path));
   }
 
-  // Con al menos un perfil creado, el onboarding terminó: esas pantallas ya no aplican.
-  if (enRol || enAltaPerfil) return redirigir("/");
-
-  // El alta del segundo perfil es válida solo si falta alguno.
-  if (enPerfilNuevo && estado.tieneAmbosPerfiles) return redirigir("/perfil");
+  // Con el Perfil de Talento creado, el onboarding terminó: esa pantalla ya no aplica.
+  if (enAltaPerfil) return redirigir("/");
 
   return response;
 }

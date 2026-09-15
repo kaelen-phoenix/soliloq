@@ -17,9 +17,11 @@ insert into auth.users (id, email, aud, role) values
   ((select v from ctx where k='ta'), 'ta@test.local', 'authenticated', 'authenticated');
 update perfiles set modo_activo = 'creador' where id in ((select v from ctx where k='ca'), (select v from ctx where k='cb'));
 update perfiles set modo_activo = 'talento', enlace_publico_activo = true where id = (select v from ctx where k='ta');
-insert into perfiles_creador (id, nombre, ubicacion_texto, ubicacion_lat, ubicacion_lng, ubicacion_pais) values
-  ((select v from ctx where k='ca'), 'Creador A', 'x', 0, 0, 'AR'),
-  ((select v from ctx where k='cb'), 'Creador B', 'x', 0, 0, 'AR');
+-- perfiles_creador ya no tiene columnas de identidad (issue #175): la función de Creador se
+-- activa con sólo el id (mismo trigger que la crea sola al armar el primer Proyecto/Equipo).
+insert into perfiles_creador (id) values
+  ((select v from ctx where k='ca')),
+  ((select v from ctx where k='cb'));
 insert into perfiles_talento (id, nombre, fecha_nacimiento, ubicacion_texto, ubicacion_lat, ubicacion_lng, ubicacion_pais, genero, edad_visible)
   values ((select v from ctx where k='ta'), 'Talento A', '1990-06-15', 'x', 0, 0, 'AR', 'sin_especificar', true);
 insert into fotos_talento (talento_id, storage_path, orden)

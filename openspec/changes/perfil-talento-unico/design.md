@@ -4,7 +4,7 @@ Ver `proposal.md` — Why. Estado actual relevante:
 
 - `perfiles_creador` tiene campos de identidad personal — `nombre` ("Nombre personal **o nombre de la compañía**"), `imagen_url`, `descripcion`, `ubicacion_*` — que duplican los de `perfiles_talento`.
 - `perfiles_creador` también tiene `disciplinas disciplina_artistica[]` + `otro_detalle` (0028): qué practica esta persona como artista (dirección, vestuario, etc.). Se usa en la vidriera pública, el flujo 1:1 de armar equipo (`feed-equipo`, `responder-interes`) y el `opengraph-image` del enlace público.
-- 7 cuentas en producción; 1 es Creador-sin-Talento y es dueña de una obra publicada (`f81b4d09…`, "La gaviota").
+- 7 cuentas en producción; 1 es Creador-sin-Talento (`2a4dbf6d…`, "Natalia").
 - Confirmado con el product owner: el Creador nunca vuelve a representar una compañía distinta de la persona — se unifica sin excepción, incluso para cuentas que hoy cargaron un nombre de compañía.
 
 ## Goals / Non-Goals
@@ -44,9 +44,11 @@ El componente agregado en #159/#165 mostraba el perfil de Creador al tocar una t
 
 ## Migration Plan
 
-1. Migración A (aditiva): backfill de `perfiles_talento` para cuentas Creador-sin-Talento. Se prueba en rollback, se aplica, se verifica a mano que la cuenta real (`52090620-…`) tiene ahora un Perfil de Talento coherente.
+1. Migración A (aditiva): backfill de `perfiles_talento` para cuentas Creador-sin-Talento. Se prueba en rollback, se aplica, se verifica a mano que la cuenta real (`2a4dbf6d…`, "Natalia") tiene ahora un Perfil de Talento coherente.
 2. Cambios de aplicación: toda lectura de identidad pasa de `perfiles_creador` a `perfiles_talento` (vistas SQL, componentes, RPCs). Se puede desplegar con la Migración A ya aplicada y `perfiles_creador` todavía con sus columnas viejas (no rompe nada tenerlas de más un rato).
 3. Migración B (destructiva): drop de las columnas de identidad en `perfiles_creador`. Sólo después de confirmar que ningún código en `main` las sigue leyendo (grep + build).
 4. Onboarding: `elegir-rol`/`completar-perfil` dejan de ofrecer alta "sólo Creador"; "convertirse en Creador" pasa a ser simplemente crear un Proyecto o Equipo desde el tablero (ya casi es así desde #157 — el formulario de obra/equipo es inline).
+
+**Ajuste descubierto durante la implementación**: el paso 4 no podía esperar a la Migración B (paso 3) — crear una obra/equipo exige por FK una fila previa en `perfiles_creador`, que hasta acá sólo se creaba en la alta que el paso 4 retira. Se adelantó la nulabilidad de las columnas de identidad (0075, antes que el resto de la Migración B) más un trigger que crea esa fila (sólo `id`) en el mismo insert de la primera obra/equipo. La Migración B (drop de columnas) sigue yendo al final, pero la *nulabilidad* ya está resuelta desde 0075.
 
 Rollback: la Migración A es aditiva (no hay nada que revertir). La Migración B sólo se aplica cuando el paso 2 ya está en producción y verificado; si hiciera falta revertir, hay que restaurar las columnas desde el backfill (no son recuperables por `rollback` una vez mergeado, es el motivo de separarla y verificarla aparte).

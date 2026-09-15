@@ -627,7 +627,7 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
                 </p>
               </div>
               <VerEnApp
-                href={p.tipo === "obra" ? `/obras/${p.id}` : `/creadores/${p.creador_id}`}
+                href={p.tipo === "obra" ? `/obras/${p.id}` : `/talentos/${p.creador_id}`}
               />
             </li>
           ))}

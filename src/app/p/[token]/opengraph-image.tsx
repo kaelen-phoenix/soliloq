@@ -46,12 +46,10 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
     if (perfil) {
       nombre = perfil.nombre;
 
-      // Satori (ImageResponse) no decodifica WebP, y las fotos de talento se guardan en
-      // WebP. Se pide vía la transformación de Storage, que devuelve JPEG. Las de creador
-      // son URLs externas de formato desconocido: para el OG no se arriesgan, va la
-      // tarjeta de solo texto.
+      // Satori (ImageResponse) no decodifica WebP, y las fotos se guardan en WebP: se piden
+      // vía la transformación de Storage, que devuelve JPEG.
       const primera = perfil.fotos?.[0];
-      if (primera && perfil.tipo === "talento") {
+      if (primera) {
         foto = supabase.storage.from("fotos-perfil").getPublicUrl(primera, {
           transform: { width: 600, height: 800, resize: "cover" },
         }).data.publicUrl;
@@ -65,10 +63,11 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
         .filter(Boolean)
         .join("  ·  ");
 
-      oficios =
-        perfil.tipo === "talento"
-          ? (perfil.habilidades ?? []).slice(0, 4).join("  ·  ")
-          : (perfil.disciplinas ?? []).slice(0, 4).map(etiquetaDisciplina).join("  ·  ");
+      // Habilidades de Talento primero; si no cargó ninguna, las disciplinas de Creador
+      // (sólo existen si además tiene esa función activa).
+      oficios = (perfil.habilidades ?? []).length > 0
+        ? perfil.habilidades.slice(0, 4).join("  ·  ")
+        : (perfil.disciplinas ?? []).slice(0, 4).map(etiquetaDisciplina).join("  ·  ");
     }
   } catch {
     // Cae a la tarjeta genérica de abajo.

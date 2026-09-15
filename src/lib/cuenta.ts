@@ -1,8 +1,6 @@
 import type { RolUsuario } from "./supabase/types";
 
 export interface EstadoCuenta {
-  /** Rol con el que arrancó; null si todavía no eligió. */
-  rolInicial: RolUsuario | null;
   tienePerfilTalento: boolean;
   tienePerfilCreador: boolean;
   /** Modo en el que opera efectivamente, ya corregido contra los perfiles que existen. */
@@ -15,7 +13,6 @@ export interface EstadoCuenta {
 }
 
 interface FilaPerfil {
-  rol: RolUsuario | null;
   modo_activo: RolUsuario | null;
   es_admin?: boolean | null;
   suspendido_en?: string | null;
@@ -33,11 +30,12 @@ export function resolverEstadoCuenta(
 ): EstadoCuenta {
   const modoGuardado = perfil?.modo_activo ?? null;
 
-  // El modo guardado puede apuntar a un perfil inexistente si se manipuló la base.
-  // Preferimos degradar al perfil que sí existe antes que dejar a la persona afuera.
-  const modoEsUsable =
-    (modoGuardado === "talento" && tienePerfilTalento) ||
-    (modoGuardado === "creador" && tienePerfilCreador);
+  // El modo `creador` ya no exige que exista la fila de `perfiles_creador`: se activa sola
+  // al crear el primer Proyecto o Equipo (0075), así que entrar a ese modo con las manos
+  // vacías es válido — el tablero muestra el estado inicial para armar el primero. El modo
+  // `talento` sí puede apuntar a un perfil inexistente si se manipuló la base; ahí preferimos
+  // degradar al que sí existe antes que dejar a la persona afuera.
+  const modoEsUsable = modoGuardado === "creador" || (modoGuardado === "talento" && tienePerfilTalento);
 
   let modoActivo: RolUsuario | null = null;
   if (modoEsUsable) {
@@ -49,7 +47,6 @@ export function resolverEstadoCuenta(
   }
 
   return {
-    rolInicial: perfil?.rol ?? null,
     tienePerfilTalento,
     tienePerfilCreador,
     modoActivo,
@@ -59,15 +56,18 @@ export function resolverEstadoCuenta(
   };
 }
 
-export type Destino = "ingresar" | "elegir-rol" | "completar-perfil" | "app";
+export type Destino = "ingresar" | "completar-perfil" | "app";
 
 /**
  * Única fuente de decisión de redirección. Se evalúa en orden y sin ramas
  * cruzadas, que es lo que evita los bucles.
+ *
+ * El Perfil de Talento es el único perfil personal (issue #175): sin él, el
+ * onboarding está incompleto. La función de Creador no tiene alta propia — se
+ * activa sola al crear el primer Proyecto o Equipo (0075) y no bloquea nada acá.
  */
 export function destinoSegunEstado(estado: EstadoCuenta): Destino {
-  if (!estado.rolInicial) return "elegir-rol";
-  if (!estado.tienePerfilTalento && !estado.tienePerfilCreador) return "completar-perfil";
+  if (!estado.tienePerfilTalento) return "completar-perfil";
   return "app";
 }
 
@@ -75,9 +75,3 @@ export function rutaPrincipal(): string {
   return "/";
 }
 
-/** El rol cuyo perfil todavía no existe, o null si ya tiene los dos. */
-export function rolFaltante(estado: EstadoCuenta): RolUsuario | null {
-  if (!estado.tienePerfilTalento) return "talento";
-  if (!estado.tienePerfilCreador) return "creador";
-  return null;
-}

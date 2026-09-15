@@ -25,8 +25,8 @@ insert into auth.users (id, email, aud, role) values
 update perfiles set modo_activo = 'creador' where id = (select v from ctx where k='creador');
 update perfiles set modo_activo = 'talento' where id in
   ((select v from ctx where k='ta'), (select v from ctx where k='tb'), (select v from ctx where k='tc'));
-insert into perfiles_creador (id, nombre, ubicacion_texto, ubicacion_lat, ubicacion_lng, ubicacion_pais)
-  values ((select v from ctx where k='creador'), 'Creador Test', 'x', 0, 0, 'AR');
+-- perfiles_creador ya no tiene columnas de identidad (issue #175).
+insert into perfiles_creador (id) values ((select v from ctx where k='creador'));
 insert into perfiles_talento (id, nombre, fecha_nacimiento, ubicacion_texto, ubicacion_lat, ubicacion_lng, ubicacion_pais, genero) values
   ((select v from ctx where k='ta'), 'Talento A', '1990-01-01', 'x', 0, 0, 'AR', 'sin_especificar'),
   ((select v from ctx where k='tb'), 'Talento B', '1990-01-01', 'x', 0, 0, 'AR', 'sin_especificar'),

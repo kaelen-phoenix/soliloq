@@ -3,7 +3,6 @@ import { BarraLateral } from "@/components/layout/barra-lateral";
 import { BarraNavegacion } from "@/components/layout/barra-navegacion";
 import { Encabezado } from "@/components/layout/encabezado";
 import { TransicionPagina } from "@/components/ui/transicion-pagina";
-import { rolFaltante } from "@/lib/cuenta";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
 
@@ -47,12 +46,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       <BarraLateral rol={estado.modoActivo} esAdmin={estado.esAdmin} />
 
       <div className="min-w-0 flex-1">
-        <Encabezado
-          userId={user.id}
-          modoActivo={estado.modoActivo}
-          tieneAmbosPerfiles={estado.tieneAmbosPerfiles}
-          rolFaltante={rolFaltante(estado)}
-        />
+        <Encabezado userId={user.id} modoActivo={estado.modoActivo} />
         <div className="w-full bg-superficie px-0 sm:min-h-[calc(100vh-9rem)]">
           <TransicionPagina>{children}</TransicionPagina>
         </div>
