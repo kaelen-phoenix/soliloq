@@ -77,13 +77,18 @@ export async function actualizarSesion(request: NextRequest) {
   const destino = destinoSegunEstado(estado);
 
   const enAltaPerfil = path.startsWith("/completar-perfil");
+  const enSolicitudPendiente = path.startsWith("/solicitud-pendiente");
+
+  if (destino === "solicitud-pendiente") {
+    return enSolicitudPendiente ? response : redirigir(conNext("/solicitud-pendiente", path));
+  }
 
   if (destino === "completar-perfil") {
     return enAltaPerfil ? response : redirigir(conNext("/completar-perfil", path));
   }
 
-  // Con el Perfil de Talento creado, el onboarding terminó: esa pantalla ya no aplica.
-  if (enAltaPerfil) return redirigir("/");
+  // Aprobada y con el Perfil de Talento creado: el onboarding terminó, esas pantallas ya no aplican.
+  if (enAltaPerfil || enSolicitudPendiente) return redirigir("/");
 
   return response;
 }

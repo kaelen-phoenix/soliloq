@@ -17,11 +17,14 @@ type Bloqueo = Database["public"]["Functions"]["admin_bloqueos"]["Returns"][numb
 type Mensaje = Database["public"]["Functions"]["admin_mensajes"]["Returns"][number];
 type Sponsor = Database["public"]["Tables"]["sponsors"]["Row"];
 type Publicacion = Database["public"]["Functions"]["admin_publicaciones"]["Returns"][number];
+type Solicitud = Database["public"]["Functions"]["admin_solicitudes_pendientes"]["Returns"][number];
+type Invitacion = Database["public"]["Functions"]["admin_invitaciones"]["Returns"][number];
 
 const PAGINA = 50;
 type Pestana =
   | "resumen"
   | "usuarios"
+  | "acceso"
   | "publicaciones"
   | "denuncias"
   | "bloqueos"
@@ -33,15 +36,10 @@ function fecha(v: string | null) {
 }
 
 /** El enlace para ver un perfil "como en la app": el booking público si está activo, si no
- *  la ficha interna del rol activo. */
+ *  la ficha interna del Perfil de Talento (única identidad desde #175). */
 function hrefPerfil(u: Usuario): string {
   if (u.enlace_publico_activo && u.enlace_token) return `/p/${u.enlace_token}`;
-  const rol = u.roles.includes(u.modo_activo ?? "")
-    ? u.modo_activo
-    : u.roles.includes("creador")
-      ? "creador"
-      : "talento";
-  return `/${rol === "creador" ? "creadores" : "talentos"}/${u.id}`;
+  return `/talentos/${u.id}`;
 }
 
 function VerEnApp({ href }: { href: string }) {
@@ -72,7 +70,7 @@ export function PanelAdmin({
     <div className="flex flex-col gap-6">
       <nav className="flex flex-wrap gap-1.5">
         {(
-          ["resumen", "usuarios", "publicaciones", "denuncias", "bloqueos", "mensajes", "sponsors"] as const
+          ["resumen", "usuarios", "acceso", "publicaciones", "denuncias", "bloqueos", "mensajes", "sponsors"] as const
         ).map((p) => (
           <button
             key={p}
@@ -91,6 +89,7 @@ export function PanelAdmin({
       {pestana === "usuarios" && (
         <Usuarios supabase={supabase} iniciales={usuariosIniciales} miId={miId} />
       )}
+      {pestana === "acceso" && <Acceso supabase={supabase} />}
       {pestana === "publicaciones" && <Publicaciones supabase={supabase} />}
       {pestana === "denuncias" && <Denuncias supabase={supabase} />}
       {pestana === "bloqueos" && <Bloqueos supabase={supabase} />}
@@ -526,6 +525,159 @@ function Usuarios({
           </Boton>
         </div>
       )}
+    </div>
+  );
+}
+
+// --- Acceso (invitaciones + solicitudes pendientes) ---------------------------------------
+//
+// Mientras Yalope está en prueba, nadie entra sin invitación o aprobación manual (issue
+// relacionado a la etapa de preview). Una cuenta invitada de antemano queda aprobada sola
+// al registrarse; sin invitación, queda pendiente y sólo aparece por email (todavía no pudo
+// completar su Perfil de Talento).
+
+function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const [email, setEmail] = useState("");
+  const [invitando, setInvitando] = useState(false);
+  const [pendientes, setPendientes] = useState<Solicitud[] | null>(null);
+  const [invitaciones, setInvitaciones] = useState<Invitacion[] | null>(null);
+  const [aprobandoId, setAprobandoId] = useState<string | null>(null);
+  const [error, setError] = useState<string | null>(null);
+  const [aviso, setAviso] = useState<string | null>(null);
+
+  const cargar = useCallback(async () => {
+    const [{ data: sol, error: eSol }, { data: inv, error: eInv }] = await Promise.all([
+      supabase.rpc("admin_solicitudes_pendientes"),
+      supabase.rpc("admin_invitaciones"),
+    ]);
+    if (eSol || eInv) {
+      setError(eSol?.message ?? eInv?.message ?? "No se pudo leer.");
+      return;
+    }
+    setPendientes(sol ?? []);
+    setInvitaciones(inv ?? []);
+  }, [supabase]);
+
+  useEffect(() => {
+    cargar();
+  }, [cargar]);
+
+  async function invitar(e: React.FormEvent) {
+    e.preventDefault();
+    setInvitando(true);
+    setError(null);
+    setAviso(null);
+    const { error: err } = await supabase.rpc("admin_crear_invitacion", { p_email: email.trim() });
+    setInvitando(false);
+    if (err) {
+      setError(err.message ?? "No se pudo enviar la invitación.");
+      return;
+    }
+    setAviso(`Invitación registrada para ${email.trim()}.`);
+    setEmail("");
+    cargar();
+  }
+
+  async function aprobar(s: Solicitud) {
+    setAprobandoId(s.id);
+    const { error: err } = await supabase.rpc("admin_aprobar_usuario", { p_id: s.id });
+    setAprobandoId(null);
+    if (err) {
+      setError(err.message ?? "No se pudo aprobar.");
+      return;
+    }
+    setError(null);
+    setPendientes((prev) => (prev ?? []).filter((p) => p.id !== s.id));
+  }
+
+  return (
+    <div className="flex flex-col gap-6">
+      {error && <p className="text-xs text-error-600">{error}</p>}
+      {aviso && <p className="text-xs text-brand-600">{aviso}</p>}
+
+      <form onSubmit={invitar} className="rounded-2xl border border-dashed border-borde p-4">
+        <p className="mb-3 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
+          Invitar por email
+        </p>
+        <div className="flex gap-2">
+          <div className="flex-1">
+            <CampoTexto
+              id="acceso-email"
+              etiqueta="Email"
+              type="email"
+              value={email}
+              onChange={(e) => setEmail(e.target.value)}
+            />
+          </div>
+          <div className="self-end">
+            <Boton type="submit" cargando={invitando} textoCargando="…">
+              Invitar
+            </Boton>
+          </div>
+        </div>
+        <p className="mt-2 text-xs text-texto-tenue">
+          Quien se registre con ese email entra directo, sin esperar aprobación.
+        </p>
+      </form>
+
+      <div>
+        <h3 className="mb-2 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
+          Solicitudes pendientes
+        </h3>
+        {pendientes === null ? (
+          <p className="text-sm text-texto-tenue">Cargando…</p>
+        ) : pendientes.length === 0 ? (
+          <EstadoVacio icono="perfil" titulo="Sin solicitudes" detalle="No hay registros esperando aprobación." />
+        ) : (
+          <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
+            {pendientes.map((s) => (
+              <li key={s.id} className="flex items-center gap-3 p-3.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-texto">{s.email}</p>
+                  <p className="text-xs text-texto-tenue">Se registró el {fecha(s.creado_en)}</p>
+                </div>
+                <button
+                  type="button"
+                  onClick={() => aprobar(s)}
+                  disabled={aprobandoId === s.id}
+                  className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
+                >
+                  {aprobandoId === s.id ? "…" : "Habilitar"}
+                </button>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
+
+      <div>
+        <h3 className="mb-2 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
+          Invitaciones enviadas
+        </h3>
+        {invitaciones === null ? (
+          <p className="text-sm text-texto-tenue">Cargando…</p>
+        ) : invitaciones.length === 0 ? (
+          <EstadoVacio icono="perfil" titulo="Sin invitaciones" detalle="Todavía no invitaste a nadie." />
+        ) : (
+          <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
+            {invitaciones.map((i) => (
+              <li key={i.id} className="flex items-center gap-3 p-3.5">
+                <div className="min-w-0 flex-1">
+                  <p className="truncate text-sm font-medium text-texto">{i.email}</p>
+                  <p className="text-xs text-texto-tenue">Enviada el {fecha(i.creado_en)}</p>
+                </div>
+                <span
+                  className={`shrink-0 rounded px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide ${
+                    i.usado_en ? "acento-fondo text-brand-600" : "bg-fondo-sutil text-texto-tenue"
+                  }`}
+                >
+                  {i.usado_en ? "usada" : "pendiente"}
+                </span>
+              </li>
+            ))}
+          </ul>
+        )}
+      </div>
     </div>
   );
 }
