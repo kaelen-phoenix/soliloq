@@ -127,6 +127,9 @@ export default async function BienvenidaPage() {
                 <p className="mt-5 max-w-prose text-lg leading-relaxed text-white/75">
                   {t("heroTexto")}
                 </p>
+                <p className="mt-3 max-w-prose text-base leading-relaxed text-white/60">
+                  {t("heroTextoExpansion")}
+                </p>
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href="/ingresar"

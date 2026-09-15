@@ -6,7 +6,7 @@ test.describe("landing", () => {
   test("carga con la copy del modelo de match", async ({ page }) => {
     await page.goto("/bienvenida");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "El casting teatral, en tu teléfono",
+      "El match de actores y actrices empieza acá",
     );
     // Copy nueva (#129): el match de dos lados, proyecto/equipo, deslizar.
     await expect(page.getByText(/deslizás perfiles y propuestas/i)).toBeVisible();
@@ -19,14 +19,14 @@ test.describe("landing", () => {
 
   test("los CTA llevan a /ingresar", async ({ page }) => {
     await page.goto("/bienvenida");
-    await page.getByRole("link", { name: "Crear mi perfil" }).first().click();
+    await page.getByRole("link", { name: "Crear perfil" }).first().click();
     await expect(page).toHaveURL(/\/ingresar/);
   });
 
   test("/ raíz sirve la landing para anónimos", async ({ page }) => {
     const res = await page.goto("/");
     expect(res?.status()).toBe(200);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("casting teatral");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("match de actores");
   });
 });
 
