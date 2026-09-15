@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { ActualizarAlVolver } from "@/components/layout/actualizar-al-volver";
 import { BarraLateral } from "@/components/layout/barra-lateral";
 import { BarraNavegacion } from "@/components/layout/barra-navegacion";
 import { Encabezado } from "@/components/layout/encabezado";
@@ -12,9 +13,9 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     data: { user },
   } = await supabase.auth.getUser();
   // Sin sesión no se entra al área de la app: se va a la landing, que explica qué es
-  // Yalope y tiene los accesos a "Entrar" y "Crear mi perfil". (El middleware no corre
-  // en este proyecto —vive en la raíz y con `src/` Next lo ignora—, así que el corte
-  // de sesión del área autenticada es este.)
+  // Yalope y tiene los accesos a "Entrar" y "Crear mi perfil". El middleware (src/middleware.ts)
+  // ya cubre esto mismo para casi todas las rutas desde #10, pero este chequeo se mantiene
+  // como segunda línea: es el único gate que corre para lo que se renderiza en este layout.
   if (!user) redirect("/bienvenida");
 
   const estado = await leerEstadoCuenta(supabase, user.id);
@@ -43,6 +44,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       data-rol={estado.modoActivo}
       className="min-h-screen pb-20 sm:bg-fondo-sutil sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
     >
+      <ActualizarAlVolver />
       <BarraLateral rol={estado.modoActivo} esAdmin={estado.esAdmin} />
 
       <div className="min-w-0 flex-1">
