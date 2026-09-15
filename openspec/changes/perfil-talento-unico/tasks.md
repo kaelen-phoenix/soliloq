@@ -23,10 +23,12 @@
 
 ## 4. Componentes de perfil de Creador
 
-- [ ] 4.1 `formulario-creador.tsx`: retirar los campos de identidad (`nombre`, `imagen_url`, `descripcion`, `ubicacion_*`); conservar sólo `disciplinas`/`otro_detalle`, reubicados donde corresponda tras 3.2.
-- [ ] 4.2 `perfil-creador-detalle.tsx` y `vidriera-publica.tsx`: nombre/foto/ubicación/bio se leen de `perfiles_talento`; `disciplinas`/`otro_detalle` se muestran como atributo adicional de esa misma identidad, no como una tarjeta aparte.
-- [ ] 4.3 `src/app/p/[token]/opengraph-image.tsx`: la imagen del enlace público usa la identidad de `perfiles_talento`.
-- [ ] 4.4 `ConmutadorModo`: revisar copy/labels para que se lean como "espacio de trabajo" y no como "quién sos" (el encabezado con nombre/foto ya no cambia al conmutar — confirmar que no hace falta tocar el componente, sólo el texto si asume lo contrario).
+- [x] 4.1 `formulario-creador.tsx` reescrito: sólo `disciplinas`/`otro_detalle`, sin `esAlta` (la fila ya existe siempre por el trigger de 0075, así que sólo actualiza). Se edita desde `/perfil` (ver 4.4), no como alta de un perfil.
+- [x] 4.2 `perfil-creador-detalle.tsx` reescrito: sólo la sección "Perfil artístico" (disciplinas/otro_detalle), sin nombre/foto/ubicación/bio propios. `vidriera-publica.tsx`: se retira la rama `tipo`/`esTalento` — siempre muestra la identidad de Talento (nombre, edad, ubicación, género, videoreel, trayectoria, habilidades) y suma "Perfil artístico" si además hay disciplinas cargadas. Requirió reescribir la RPC `perfil_publico` (0076, drop+create: cambia de dos ramas por `modo_activo` a una sola desde `perfiles_talento` con `left join perfiles_creador` para disciplinas) — se pierden `tipo` y `biografia` (el campo de trayectoria propio de Creador, #161; mismo criterio ya aceptado para el nombre de compañía). Probado en rollback y aplicado a prod.
+- [x] 4.3 `opengraph-image.tsx`: la foto y el nombre ya salen siempre de `perfiles_talento` (vía `perfil_publico`); "oficios" prioriza `habilidades` y cae a `disciplinas` si no hay ninguna cargada.
+- [x] 4.4 `ConmutadorModo` reescrito sin la rama "no se puede conmutar" (ver 3.3). Se retira `placa-perfil-creador.tsx` y la ruta `/creadores/[id]` — sin usos, todo pasa por `PlacaPerfilTalento`/`/talentos/[id]`. `/perfil` (la vista propia) ya no bifurca por `modoActivo`: siempre muestra el Perfil de Talento, y suma la sección de perfil artístico (edición incluida) si la función de Creador está activa.
+
+**Descubierto durante la implementación (fuera de la lista original):** el enlace público de booking (`perfil_publico`, issue #37/#38) también bifurcaba por identidad completa según `modo_activo` — no estaba en el alcance previsto del Grupo 4, pero es la misma clase de problema y quedó resuelto junto con 4.2.
 
 ## 5. Base de datos — drop (destructivo, al final)
 

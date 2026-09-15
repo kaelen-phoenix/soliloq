@@ -959,23 +959,21 @@ export interface Database {
       perfil_publico: {
         Args: { p_token: string };
         Returns: {
-          tipo: "talento" | "creador";
           nombre: string;
           texto: string | null;
           habilidades: string[];
+          /** Sólo si tiene la función de Creador activa; `{}` si no (0076). */
           disciplinas: DisciplinaArtistica[];
           otro_detalle: string | null;
           fotos: string[];
           ubicacion_publica: string | null;
-          /** Solo talento: años cumplidos, calculados en la RPC. Nunca la fecha. */
+          /** Años cumplidos, calculados en la RPC. Nunca la fecha. */
           edad: number | null;
           genero: string | null;
           genero_descripcion: string | null;
           videoreel_url: string | null;
           /** `{ [claveRed]: urlCanonica }`. `{}` si no cargó ninguna. */
           redes: Record<string, string>;
-          /** Solo creador: resumen libre de trayectoria y logros (#132). */
-          biografia: string | null;
         }[];
       };
       /**

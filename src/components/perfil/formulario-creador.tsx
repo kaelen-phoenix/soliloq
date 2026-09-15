@@ -6,121 +6,44 @@ import { createClient } from "@/lib/supabase/client";
 import { AvisoGuardado, useAvisoGuardado } from "@/components/ui/aviso-guardado";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
-import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
-import { ToggleVisibilidad } from "@/components/ui/toggle-visibilidad";
-import { Imagen } from "@/components/ui/imagen";
-import { comprimirImagen } from "@/lib/comprimir-imagen";
-import { aColumnas, desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
 import { clasesDisciplina, DISCIPLINAS, MAX_OTRO_DETALLE } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 interface DatosIniciales {
-  nombre: string;
-  fecha_nacimiento: string | null;
-  edad_visible: boolean;
   disciplinas: DisciplinaArtistica[];
   otro_detalle: string | null;
-  ubicacion_texto: string;
-  ubicacion_publica: string;
-  ubicacion_place_id: string | null;
-  ubicacion_lat: number;
-  ubicacion_lng: number;
-  ubicacion_pais: string;
-  biografia: string | null;
-  imagen_url: string | null;
 }
 
+/**
+ * Edita sólo el perfil artístico (`disciplinas`/`otro_detalle`) de la función de Creador —
+ * issue #175: ya no es el alta de un segundo perfil de identidad (nombre, foto, ubicación),
+ * eso ahora es siempre el Perfil de Talento. La fila de `perfiles_creador` ya existe a esta
+ * altura (la crea el trigger al armar el primer Proyecto o Equipo, 0075), así que este
+ * formulario sólo actualiza, nunca da de alta.
+ */
 export function FormularioCreador({
   userId,
-  esAlta,
   datosIniciales,
-  destinoAlTerminar,
 }: {
   userId: string;
-  esAlta: boolean;
-  datosIniciales?: DatosIniciales;
-  /** A dónde ir tras el alta. Por defecto la home; si venía de un enlace público, vuelve ahí. */
-  destinoAlTerminar?: string;
+  datosIniciales: DatosIniciales;
 }) {
   const router = useRouter();
-  const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
-  const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales?.fecha_nacimiento ?? "");
-  const [edadVisible, setEdadVisible] = useState(datosIniciales?.edad_visible ?? true);
   const [disciplinas, setDisciplinas] = useState<DisciplinaArtistica[]>(
-    datosIniciales?.disciplinas ?? []
+    datosIniciales.disciplinas
   );
-  const [otroDetalle, setOtroDetalle] = useState(datosIniciales?.otro_detalle ?? "");
-  const [ubicacion, setUbicacion] = useState<Ubicacion | null>(
-    desdeColumnas(datosIniciales) ?? null,
-  );
-  const [biografia, setBiografia] = useState(datosIniciales?.biografia ?? "");
-  const [imagenUrl, setImagenUrl] = useState(datosIniciales?.imagen_url ?? "");
-  const [subiendoImagen, setSubiendoImagen] = useState(false);
+  const [otroDetalle, setOtroDetalle] = useState(datosIniciales.otro_detalle ?? "");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
   const [guardado, setGuardado] = useAvisoGuardado();
 
-  async function subirImagen(e: React.ChangeEvent<HTMLInputElement>) {
-    const archivo = e.target.files?.[0];
-    e.target.value = "";
-    if (!archivo) return;
-
-    if (!["image/jpeg", "image/png", "image/webp"].includes(archivo.type)) {
-      setErrores((p) => ({ ...p, imagen: "Solo se admiten imágenes JPEG, PNG o WebP." }));
-      return;
-    }
-
-    setSubiendoImagen(true);
-    setErrores((p) => ({ ...p, imagen: "" }));
-
-    // Si la imagen pesa o mide de más, se comprime acá en vez de rechazarla.
-    let imagen: File;
-    try {
-      imagen = await comprimirImagen(archivo, { maxBytes: 5 * 1024 * 1024 });
-    } catch (err) {
-      setSubiendoImagen(false);
-      setErrores((p) => ({
-        ...p,
-        imagen: err instanceof Error ? err.message : "No pudimos procesar la imagen.",
-      }));
-      return;
-    }
-
-    const supabase = createClient();
-    const extension = (imagen.type.split("/")[1] ?? "jpg").replace("jpeg", "jpg");
-    // Nombre único por subida: evita servir la versión vieja desde la caché del CDN y no
-    // deja huérfano un `perfil.png` cuando la nueva sale `.webp`.
-    const ruta = `${userId}/perfil-${crypto.randomUUID()}.${extension}`;
-
-    const { error: errorSubida } = await supabase.storage
-      .from("fotos-perfil")
-      .upload(ruta, imagen, { contentType: imagen.type });
-
-    if (errorSubida) {
-      setSubiendoImagen(false);
-      setErrores((p) => ({ ...p, imagen: "No pudimos subir la imagen. Probá de nuevo." }));
-      return;
-    }
-
-    // Borra la anterior (best-effort): su path es todo lo que va después de `.../public/fotos-perfil/`.
-    const anterior = imagenUrl.split("/fotos-perfil/")[1];
-    if (anterior) await supabase.storage.from("fotos-perfil").remove([anterior]);
-
-    const { data: publica } = supabase.storage.from("fotos-perfil").getPublicUrl(ruta);
-    setImagenUrl(publica.publicUrl);
-    setSubiendoImagen(false);
-  }
-
   function validar(): boolean {
     const nuevos: Record<string, string> = {};
-    if (nombre.trim().length < 2) nuevos.nombre = "Ingresá el nombre.";
     if (disciplinas.length === 0) nuevos.disciplinas = "Elegí al menos una.";
     if (disciplinas.includes("otro") && otroDetalle.trim().length < 2) {
       nuevos.otroDetalle = "Contanos qué hacés.";
     }
-    if (!ubicacion) nuevos.ubicacion = "Elegí una ubicación de la lista de sugerencias.";
-    if (biografia.length > 2000) nuevos.biografia = "Máximo 2000 caracteres.";
     setErrores((prev) => ({ ...prev, ...nuevos }));
     return Object.keys(nuevos).length === 0;
   }
@@ -134,184 +57,85 @@ export function FormularioCreador({
     setCargando(true);
     const supabase = createClient();
 
-    const campos = {
-      nombre: nombre.trim(),
-      fecha_nacimiento: fechaNacimiento || null,
-      edad_visible: edadVisible,
-      disciplinas,
-      // El detalle solo se guarda si "Otro" sigue elegido: si la persona lo desmarca, el
-      // texto tiene que irse con él en vez de quedar colgado sin nada que lo explique.
-      otro_detalle: disciplinas.includes("otro") ? otroDetalle.trim() : null,
-      ...aColumnas(ubicacion!),
-      biografia: biografia || null,
-      imagen_url: imagenUrl || null,
-    };
-
-    const { error } = esAlta
-      ? await supabase.from("perfiles_creador").insert({ id: userId, ...campos })
-      : await supabase.from("perfiles_creador").update(campos).eq("id", userId);
+    const { error } = await supabase
+      .from("perfiles_creador")
+      .update({
+        disciplinas,
+        // El detalle solo se guarda si "Otro" sigue elegido: si la persona lo desmarca, el
+        // texto tiene que irse con él en vez de quedar colgado sin nada que lo explique.
+        otro_detalle: disciplinas.includes("otro") ? otroDetalle.trim() : null,
+      })
+      .eq("id", userId);
 
     if (error) {
       setCargando(false);
-      setErrorGeneral("No pudimos guardar tu perfil. Intentá de nuevo.");
+      setErrorGeneral("No pudimos guardar los cambios. Probá de nuevo.");
       return;
     }
 
-    if (esAlta) {
-      // El perfil recién creado pasa a ser el modo en el que se opera.
-      await supabase
-        .from("perfiles")
-        .update({ onboarding_completo: true, modo_activo: "creador" })
-        .eq("id", userId);
-      router.replace(destinoAlTerminar ?? "/");
-      router.refresh();
-      // No se apaga `cargando`: la navegación desmonta el formulario.
-      return;
-    }
-
-    // Editar no navega: este formulario ya vive en `/perfil`, así que el `router.replace`
-    // que había acá era a la misma ruta y no desmontaba nada. `cargando` quedaba en `true`
-    // para siempre y el botón se quedaba grisado.
     router.refresh();
     setCargando(false);
     setGuardado(true);
   }
 
   return (
-    <form onSubmit={guardar} className="flex max-w-2xl flex-col gap-6">
-      <section className="flex flex-col gap-4">
-        <CampoTexto
-          id="nombre"
-          etiqueta="Nombre personal o nombre de la compañía"
-          value={nombre}
-          onChange={(e) => setNombre(e.target.value)}
-          error={errores.nombre}
-        />
+    <form onSubmit={guardar} className="flex max-w-2xl flex-col gap-4">
+      {/* Es múltiple porque en el medio se hace más de una cosa: quien dirige también
+          actúa, y obligar a elegir una sola falsea el perfil. */}
+      <fieldset className="flex flex-col gap-2.5">
+        <legend className="text-sm font-medium text-texto">
+          Perfil artístico como Creador
+          <span className="ml-1.5 font-normal text-texto-tenue">Elegí todo lo que hagas</span>
+        </legend>
 
-        {/* Perfil artístico. Es múltiple porque en el medio se hace más de una cosa: quien
-            dirige también actúa, y obligar a elegir una sola falsea el perfil. */}
-        <fieldset className="flex flex-col gap-2.5">
-          <legend className="text-sm font-medium text-texto">
-            Perfil artístico
-            <span className="ml-1.5 font-normal text-texto-tenue">Elegí todo lo que hagas</span>
-          </legend>
+        <div className="flex flex-wrap gap-2">
+          {DISCIPLINAS.map((d) => {
+            const elegida = disciplinas.includes(d.valor);
+            return (
+              <button
+                key={d.valor}
+                type="button"
+                aria-pressed={elegida}
+                onClick={() =>
+                  setDisciplinas((prev) =>
+                    elegida ? prev.filter((v) => v !== d.valor) : [...prev, d.valor]
+                  )
+                }
+                // Elegida toma el color de su familia de oficio, no el negro genérico: así
+                // se ve de un vistazo a qué grupo pertenece lo que estás marcando.
+                className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
+                  elegida
+                    ? `border-transparent font-medium ${clasesDisciplina(d.valor)}`
+                    : "border-borde text-texto-tenue hover:border-ink-300"
+                }`}
+              >
+                {d.etiqueta}
+              </button>
+            );
+          })}
+        </div>
 
-          <div className="flex flex-wrap gap-2">
-            {DISCIPLINAS.map((d) => {
-              const elegida = disciplinas.includes(d.valor);
-              return (
-                <button
-                  key={d.valor}
-                  type="button"
-                  aria-pressed={elegida}
-                  onClick={() =>
-                    setDisciplinas((prev) =>
-                      elegida ? prev.filter((v) => v !== d.valor) : [...prev, d.valor]
-                    )
-                  }
-                  // Elegida toma el color de su familia de oficio, no el negro genérico:
-                  // así se ve desde el alta a qué grupo pertenece lo que estás marcando, y
-                  // el color no aparece recién en el perfil ya publicado.
-                  className={`rounded-full border px-3.5 py-1.5 text-sm transition-colors ${
-                    elegida
-                      ? `border-transparent font-medium ${clasesDisciplina(d.valor)}`
-                      : "border-borde text-texto-tenue hover:border-ink-300"
-                  }`}
-                >
-                  {d.etiqueta}
-                </button>
-              );
-            })}
-          </div>
+        {errores.disciplinas && <p className="text-xs text-error-600">{errores.disciplinas}</p>}
 
-          {errores.disciplinas && (
-            <p className="text-xs text-error-600">{errores.disciplinas}</p>
-          )}
-
-          {disciplinas.includes("otro") && (
-            <CampoTexto
-              id="otro-detalle"
-              etiqueta="¿Qué hacés?"
-              value={otroDetalle}
-              maxLength={MAX_OTRO_DETALLE}
-              placeholder="Por ejemplo: titiritera, técnica de vuelo"
-              onChange={(e) => setOtroDetalle(e.target.value)}
-              error={errores.otroDetalle}
-            />
-          )}
-        </fieldset>
-
-        <CampoUbicacion
-          id="ubicacion"
-          etiqueta="Ubicación"
-          valor={ubicacion}
-          onCambio={setUbicacion}
-          error={errores.ubicacion}
-        />
-
-        <div className="flex flex-col gap-1.5">
+        {disciplinas.includes("otro") && (
           <CampoTexto
-            id="fecha_nacimiento"
-            etiqueta="Fecha de nacimiento (opcional)"
-            type="date"
-            value={fechaNacimiento}
-            onChange={(e) => setFechaNacimiento(e.target.value)}
-            error={errores.fecha_nacimiento}
+            id="otro-detalle"
+            etiqueta="¿Qué hacés?"
+            value={otroDetalle}
+            maxLength={MAX_OTRO_DETALLE}
+            placeholder="Por ejemplo: titiritera, técnica de vuelo"
+            onChange={(e) => setOtroDetalle(e.target.value)}
+            error={errores.otroDetalle}
           />
-          {fechaNacimiento && (
-            <ToggleVisibilidad
-              visible={edadVisible}
-              onCambio={setEdadVisible}
-              textoVisible="Tu edad se muestra en tu perfil"
-              textoOculto="Tu edad está oculta en tu perfil"
-            />
-          )}
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Trayectoria e imagen (opcional)</h2>
-
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="biografia" className="text-sm font-medium text-texto">
-            Trayectoria
-          </label>
-          <textarea
-            id="biografia"
-            rows={6}
-            maxLength={2000}
-            value={biografia}
-            onChange={(e) => setBiografia(e.target.value)}
-            className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
-            placeholder="Contanos sobre tu trayectoria y tus principales logros."
-          />
-          {errores.biografia && <p className="text-xs text-error-600">{errores.biografia}</p>}
-        </div>
-
-        <div className="flex items-center gap-3">
-          {imagenUrl && (
-            <Imagen
-              src={imagenUrl}
-              alt="Imagen de perfil"
-              width={64}
-              height={64}
-              contenedorClassName="shrink-0 rounded-full"
-            />
-          )}
-          <label className="cursor-pointer rounded-xl border border-borde px-3.5 py-2 text-sm hover:bg-fondo-sutil">
-            {subiendoImagen ? "Subiendo…" : "Elegir imagen"}
-            <input type="file" accept="image/jpeg,image/png,image/webp" className="hidden" onChange={subirImagen} />
-          </label>
-        </div>
-        {errores.imagen && <p className="text-xs text-error-600">{errores.imagen}</p>}
-      </section>
+        )}
+      </fieldset>
 
       {errorGeneral && <p className="text-sm text-error-600">{errorGeneral}</p>}
 
       <AvisoGuardado visible={guardado} />
 
       <Boton type="submit" cargando={cargando}>
-        {esAlta ? "Completar perfil" : "Guardar cambios"}
+        Guardar cambios
       </Boton>
     </form>
   );

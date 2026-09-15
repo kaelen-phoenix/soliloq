@@ -6,24 +6,22 @@ import { etiquetaGenero, REDES, type Genero } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 export interface PerfilPublico {
-  tipo: "talento" | "creador";
   nombre: string;
   texto: string | null;
   habilidades: string[];
+  /** Sólo si además tiene la función de Creador activa (issue #175); si no, `[]`. */
   disciplinas: DisciplinaArtistica[];
   otro_detalle: string | null;
-  /** URLs ya resueltas (`getPublicUrl` para talento; ya son URL completa para creador). */
+  /** URLs ya resueltas (`getPublicUrl`). */
   fotos: string[];
   ubicacion_publica: string | null;
-  /** Solo talento: años cumplidos, ya calculados. Nunca la fecha. */
+  /** Años cumplidos, ya calculados. Nunca la fecha. */
   edad: number | null;
   genero: string | null;
   genero_descripcion: string | null;
   videoreel_url: string | null;
   /** `{ [claveRed]: urlCanonica }`. */
   redes: Record<string, string>;
-  /** Solo creador: resumen de trayectoria y logros (#132). */
-  biografia: string | null;
 }
 
 /** Un bloque del booking, con el título en registro de programa de mano. */
@@ -45,8 +43,6 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
  * para eso está "Contactar".
  */
 export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
-  const esTalento = perfil.tipo === "talento";
-
   const generoTexto =
     perfil.genero_descripcion ||
     (perfil.genero && perfil.genero !== "sin_especificar"
@@ -101,42 +97,32 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
         )}
 
         {perfil.texto && (
-          <Seccion titulo={esTalento ? "Trayectoria" : "Sobre el proyecto"}>
+          <Seccion titulo="Trayectoria">
             <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-ink-800">
               {perfil.texto}
             </p>
           </Seccion>
         )}
 
-        {esTalento
-          ? perfil.habilidades.length > 0 && (
-              <Seccion titulo="Habilidades">
-                <div className="flex flex-wrap gap-2">
-                  {perfil.habilidades.map((h) => (
-                    <span
-                      key={h}
-                      className="rounded-full border border-ink-200 px-3 py-1 text-xs font-medium text-ink-700"
-                    >
-                      {h}
-                    </span>
-                  ))}
-                </div>
-              </Seccion>
-            )
-          : perfil.disciplinas.length > 0 && (
-              <Seccion titulo="Perfil artístico">
-                <EtiquetasDisciplina
-                  disciplinas={perfil.disciplinas}
-                  otroDetalle={perfil.otro_detalle}
-                />
-              </Seccion>
-            )}
+        {perfil.habilidades.length > 0 && (
+          <Seccion titulo="Habilidades">
+            <div className="flex flex-wrap gap-2">
+              {perfil.habilidades.map((h) => (
+                <span
+                  key={h}
+                  className="rounded-full border border-ink-200 px-3 py-1 text-xs font-medium text-ink-700"
+                >
+                  {h}
+                </span>
+              ))}
+            </div>
+          </Seccion>
+        )}
 
-        {!esTalento && perfil.biografia && (
-          <Seccion titulo="Biografía">
-            <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-ink-800">
-              {perfil.biografia}
-            </p>
+        {/* Sólo aparece si además tiene la función de Creador activa. */}
+        {perfil.disciplinas.length > 0 && (
+          <Seccion titulo="Perfil artístico">
+            <EtiquetasDisciplina disciplinas={perfil.disciplinas} otroDetalle={perfil.otro_detalle} />
           </Seccion>
         )}
       </div>

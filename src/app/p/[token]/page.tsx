@@ -55,10 +55,8 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
     esDueño = miPerfil?.enlace_token === params.token;
   }
 
-  const fotos = perfil.fotos.map((f) =>
-    perfil.tipo === "talento"
-      ? supabase.storage.from("fotos-perfil").getPublicUrl(f).data.publicUrl
-      : f
+  const fotos = perfil.fotos.map(
+    (f) => supabase.storage.from("fotos-perfil").getPublicUrl(f).data.publicUrl
   );
 
   return (
