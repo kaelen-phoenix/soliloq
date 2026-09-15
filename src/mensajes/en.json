@@ -46,9 +46,7 @@
     "talento": "Talent",
     "creador": "Creator",
     "estasEn": "You're in {rol}",
-    "cambiarA": "Switch to {rol}",
-    "sumarPerfil": "Add a {rol} profile",
-    "cambiarAModo": "Switch to {rol} mode"
+    "cambiarA": "Switch to {rol}"
   },
   "landing": {
     "entrar": "Log in",

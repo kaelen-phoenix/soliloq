@@ -1,46 +1,21 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import Link from "next/link";
 import { useTransition } from "react";
 import { conmutarModo } from "@/app/acciones-modo";
 import { Icono } from "@/components/ui/icono";
 import type { RolUsuario } from "@/lib/supabase/types";
 
-export function ConmutadorModo({
-  modoActivo,
-  tieneAmbosPerfiles,
-  rolFaltante,
-}: {
-  modoActivo: RolUsuario;
-  tieneAmbosPerfiles: boolean;
-  rolFaltante: RolUsuario | null;
-}) {
+/**
+ * Conmuta entre la experiencia de Talento y la de Creador (issue #175: ya no son dos
+ * identidades, es la misma persona en dos espacios de trabajo — por eso siempre se puede ir
+ * y volver, incluso antes de tener ningún Proyecto o Equipo armado: el tablero de Creador
+ * muestra su propio estado inicial para armar el primero).
+ */
+export function ConmutadorModo({ modoActivo }: { modoActivo: RolUsuario }) {
   const t = useTranslations("modo");
   const [pendiente, iniciarTransicion] = useTransition();
   const otro: RolUsuario = modoActivo === "talento" ? "creador" : "talento";
-
-  // Con un solo perfil no hay nada que conmutar: se ofrece crear el que falta.
-  if (!tieneAmbosPerfiles) {
-    return (
-      <div className="flex items-center gap-2.5">
-        <span className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-          {t(modoActivo)}
-        </span>
-        {rolFaltante && (
-          <>
-            <span className="text-ink-200">·</span>
-            <Link
-              href="/perfil/nuevo"
-              className="text-2xs font-medium text-texto-tenue underline decoration-ink-300 underline-offset-2 hover:text-texto"
-            >
-              {t("sumarPerfil", { rol: t(rolFaltante) })}
-            </Link>
-          </>
-        )}
-      </div>
-    );
-  }
 
   // Estado y acción, separados. Antes un solo botón mostraba el modo **actual**
   // ("TALENTO") con un ícono de intercambio: parecía que llevaba *a* Talento cuando en

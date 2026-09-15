@@ -49,4 +49,6 @@ El componente agregado en #159/#165 mostraba el perfil de Creador al tocar una t
 3. Migración B (destructiva): drop de las columnas de identidad en `perfiles_creador`. Sólo después de confirmar que ningún código en `main` las sigue leyendo (grep + build).
 4. Onboarding: `elegir-rol`/`completar-perfil` dejan de ofrecer alta "sólo Creador"; "convertirse en Creador" pasa a ser simplemente crear un Proyecto o Equipo desde el tablero (ya casi es así desde #157 — el formulario de obra/equipo es inline).
 
+**Ajuste descubierto durante la implementación**: el paso 4 no podía esperar a la Migración B (paso 3) — crear una obra/equipo exige por FK una fila previa en `perfiles_creador`, que hasta acá sólo se creaba en la alta que el paso 4 retira. Se adelantó la nulabilidad de las columnas de identidad (0075, antes que el resto de la Migración B) más un trigger que crea esa fila (sólo `id`) en el mismo insert de la primera obra/equipo. La Migración B (drop de columnas) sigue yendo al final, pero la *nulabilidad* ya está resuelta desde 0075.
+
 Rollback: la Migración A es aditiva (no hay nada que revertir). La Migración B sólo se aplica cuando el paso 2 ya está en producción y verificado; si hiciera falta revertir, hay que restaurar las columnas desde el backfill (no son recuperables por `rollback` una vez mergeado, es el motivo de separarla y verificarla aparte).

@@ -16,9 +16,9 @@
 
 ## 3. Onboarding
 
-- [ ] 3.1 `elegir-rol`: retirar la opción de elegir "sólo Creador" como alta inicial; el primer ingreso va directo al alta del Perfil de Talento (ver spec `auth-onboarding` — REMOVED "Elección de rol en el onboarding").
-- [ ] 3.2 `completar-perfil` / `perfil/nuevo`: retirar el flujo de alta de un "perfil de Creador" con sus propios campos de identidad (nombre, foto, ubicación, descripción). Lo único que queda de `perfiles_creador` (`disciplinas`/`otro_detalle`) se edita desde donde tenga sentido (configuración de la cuenta o al crear el primer Proyecto/Equipo), no como alta de un perfil.
-- [ ] 3.3 `middleware`/`leerEstadoCuenta` (gate de onboarding, ver memoria `middleware-no-corre`): el onboarding se considera completo con el Perfil de Talento creado, sin depender de si existe fila en `perfiles_creador`.
+- [x] 3.1 Se borran las rutas `/elegir-rol` y `/perfil/nuevo` enteras (no sólo la opción "Creador"): con un solo perfil personal no hay nada que elegir al empezar, y "el segundo perfil" ya no es una alta — es crear un Proyecto/Equipo. `completar-perfil` ya no redirige a `/elegir-rol` ni depende de `perfiles.rol`.
+- [x] 3.2 `completar-perfil` muestra sólo `FormularioTalento`. Descubierto durante la implementación (no estaba en el design original): crear una obra/equipo exigía por FK una fila previa en `perfiles_creador`, que antes sólo se creaba en la alta que se está retirando. Se agregó 0075: las columnas de identidad de `perfiles_creador` pasan a nullable (adelantando lo que 5.2 iba a hacer para esas mismas columnas) y un trigger en `obras`/`equipos` crea la fila (sólo `id`) en el mismo insert que crea la primera iniciativa. `disciplinas`/`otro_detalle` quedan pendientes de reubicar en el Grupo 4 (`formulario-creador.tsx` todavía los edita ahí).
+- [x] 3.3 `destinoSegunEstado` sólo exige `tienePerfilTalento`. `resolverEstadoCuenta`: el modo `creador` ya no exige que exista la fila (se activa sola, 0075) — sólo el modo `talento` sigue degradando al perfil que exista. `ConmutadorModo` se simplifica: con una sola identidad y el modo Creador siempre alcanzable, no hace falta la rama "falta perfil, no se puede conmutar" — siempre se puede ir y volver.
 - [ ] 3.4 Verificar manualmente (o con Playwright si `e2e/flujos` ya tiene login programático): alta nueva → onboarding sólo pide Talento → crear un Proyecto activa la función de Creador sin pedir nada de identidad.
 
 ## 4. Componentes de perfil de Creador
