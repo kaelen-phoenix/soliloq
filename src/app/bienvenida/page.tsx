@@ -6,9 +6,9 @@ import { BotonInstalar } from "@/components/pwa/boton-instalar";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 
-const TITULO = "Yalope — Casting teatral en tu teléfono";
+const TITULO = "Yalope — El match de actores y actrices empieza acá";
 const DESCRIPCION =
-  "Yalope conecta talento y creadores de teatro con un match rápido y visual: deslizás perfiles y propuestas, y cuando el interés es de los dos lados, se convocan y hablan.";
+  "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat. Armá tu equipo y compartí tu perfil como booking.";
 
 export const metadata: Metadata = {
   title: TITULO,
@@ -16,15 +16,14 @@ export const metadata: Metadata = {
   // La landing se sirve en `/` (rewrite para anónimos), así que esa es la URL canónica.
   alternates: { canonical: "/" },
   keywords: [
-    "casting teatral",
-    "convocatorias de teatro",
-    "audiciones",
-    "actores",
-    "actrices",
-    "elenco",
+    "match de actores",
+    "actores y actrices",
     "casting online",
-    "teatro Argentina",
-    "buscar talento teatro",
+    "booking de actores",
+    "convocatorias artísticas",
+    "buscar talento actoral",
+    "armar equipo artístico",
+    "comunidad artística Argentina",
   ],
   openGraph: {
     type: "website",
