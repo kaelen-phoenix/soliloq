@@ -86,6 +86,8 @@ export interface Database {
           /** Aprobación durante la etapa de prueba (0078): null = pendiente. Las cuentas
            *  anteriores a este control quedaron todas aprobadas. */
           aprobado_en: string | null;
+          /** Aceptación de las Normas de la Comunidad (0079): null = todavía no aceptó. */
+          normas_aceptadas_en: string | null;
           /** Idioma de la interfaz (0041): 'es' | 'en'. */
           idioma: string;
           /** Tema (0041): 'sistema' | 'claro' | 'oscuro'. */
@@ -111,6 +113,7 @@ export interface Database {
           es_admin?: boolean;
           suspendido_en?: string | null;
           aprobado_en?: string | null;
+          normas_aceptadas_en?: string | null;
           idioma?: string;
           tema?: string;
         };

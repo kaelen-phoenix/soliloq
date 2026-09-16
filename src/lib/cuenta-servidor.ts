@@ -14,7 +14,7 @@ export async function leerEstadoCuenta(
   const [{ data: perfil }, { count: talento }, { count: creador }] = await Promise.all([
     supabase
       .from("perfiles")
-      .select("modo_activo, es_admin, suspendido_en, aprobado_en")
+      .select("modo_activo, es_admin, suspendido_en, aprobado_en, normas_aceptadas_en")
       .eq("id", userId)
       .maybeSingle(),
     supabase.from("perfiles_talento").select("id", { count: "exact", head: true }).eq("id", userId),

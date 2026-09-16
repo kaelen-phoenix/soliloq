@@ -29,6 +29,10 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   y `push_suscripciones` (0050, incl. que no se pueda apropiar un `endpoint` ajeno),
   `edad_visible` (0052) en `perfil_publico` y `buscar_talento` (prioriza, no excluye), y
   la cascada de `delete from auth.users` (lo que hace `auth.admin.deleteUser`).
+- **`normas_comunidad.sql`** — aceptación de las Normas de la Comunidad (0079, #180): una
+  cuenta nueva nace con `normas_aceptadas_en` en null, el propio usuario puede marcarla
+  (mismo `update` que usa la server action `aceptarNormas()`), y un tercero no puede tocar
+  la aceptación ajena (RLS de `perfiles_update_propio`).
 
 ## Pendiente
 

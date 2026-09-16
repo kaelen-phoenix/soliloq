@@ -10,10 +10,11 @@ const RUTAS_PUBLICAS = ["/ingresar", "/recuperar", "/auth/callback", "/bienvenid
 // onboarding esté a medias: se llega ahí desde el enlace de recuperación.
 const RUTAS_SIEMPRE_DISPONIBLES = ["/cambiar-clave"];
 
-// El enlace público del perfil (`/p/[token]`) se sirve igual con o sin sesión: a diferencia
-// de `RUTAS_PUBLICAS`, acá un usuario logueado NO se rebota a `/` — la vidriera es para
-// cualquiera, tenga cuenta o no.
-const RUTAS_ABIERTAS = ["/p/"];
+// El enlace público del perfil (`/p/[token]`) y las Normas de la Comunidad (`/normas`) se
+// sirven igual con o sin sesión: a diferencia de `RUTAS_PUBLICAS`, acá un usuario logueado
+// NO se rebota a `/` — hace falta poder abrir `/normas` desde el gate de `/aceptar-normas`
+// sin salir de esa pantalla.
+const RUTAS_ABIERTAS = ["/p/", "/normas"];
 
 /** Solo destinos internos: `next` viaja por la URL y no puede convertirse en un redirect abierto. */
 function conNext(destino: string, next: string): string {
@@ -78,17 +79,22 @@ export async function actualizarSesion(request: NextRequest) {
 
   const enAltaPerfil = path.startsWith("/completar-perfil");
   const enSolicitudPendiente = path.startsWith("/solicitud-pendiente");
+  const enAceptarNormas = path.startsWith("/aceptar-normas");
 
   if (destino === "solicitud-pendiente") {
     return enSolicitudPendiente ? response : redirigir(conNext("/solicitud-pendiente", path));
+  }
+
+  if (destino === "aceptar-normas") {
+    return enAceptarNormas ? response : redirigir(conNext("/aceptar-normas", path));
   }
 
   if (destino === "completar-perfil") {
     return enAltaPerfil ? response : redirigir(conNext("/completar-perfil", path));
   }
 
-  // Aprobada y con el Perfil de Talento creado: el onboarding terminó, esas pantallas ya no aplican.
-  if (enAltaPerfil || enSolicitudPendiente) return redirigir("/");
+  // Onboarding terminado: esas pantallas ya no aplican.
+  if (enAltaPerfil || enSolicitudPendiente || enAceptarNormas) return redirigir("/");
 
   return response;
 }
