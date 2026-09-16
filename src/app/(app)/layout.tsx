@@ -20,6 +20,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
 
   const estado = await leerEstadoCuenta(supabase, user.id);
   if (estado.suspendido) redirect("/suspendido");
+  if (!estado.normasAceptadas) redirect("/aceptar-normas");
   if (!estado.modoActivo) redirect("/completar-perfil");
 
   return (
