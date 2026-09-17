@@ -69,7 +69,7 @@
     "paso3Texto": "When the interest goes both ways, it's a match. The creator invites, the person accepts, and then a room opens to talk. We'll notify you even with the app closed.",
     "cierreTitulo": "Your next cast, or your next role, is one match away.",
     "sumate": "Join Yalope",
-    "pieLema": "Theatre match · Made in Argentina",
+    "pieLema": "Actors' match · Made in Argentina",
     "apoyarEnlace": "Support the project"
   },
   "ajustes": {
@@ -108,7 +108,7 @@
   },
   "auth": {
     "titulo": "Log in to Yalope",
-    "bajada": "Theatre match for talent and creators.",
+    "bajada": "The match for actors and actresses starts here.",
     "enlaceInvalido": "That link expired or was already used. Request a new one."
   },
   "suspendido": {
