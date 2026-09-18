@@ -63,7 +63,7 @@ export function MarcoAcceso({ children }: { children: React.ReactNode }) {
           </ul>
         </div>
 
-        <p className="relative text-2xs text-white/40">Match teatral · Argentina</p>
+        <p className="relative text-2xs text-white/40">Match de actores y actrices · Argentina</p>
       </aside>
 
       {/* Columna del formulario. En móvil ocupa todo y trae el telón claro de fondo; en
