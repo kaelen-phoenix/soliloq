@@ -3,10 +3,10 @@ import { NARANJA, TINTA } from "./_marca-icono";
 
 export default function manifest(): MetadataRoute.Manifest {
   return {
-    name: "Yalope — Match Teatral",
+    name: "Yalope — Match de Actores",
     short_name: "Yalope",
     description:
-      "Conectá talento y creadores de teatro. Postulate a convocatorias y armá elenco con un match rápido y visual.",
+      "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat.",
     start_url: "/",
     display: "standalone",
     background_color: TINTA,

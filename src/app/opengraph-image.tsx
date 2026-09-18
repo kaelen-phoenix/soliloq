@@ -4,7 +4,7 @@ import { TINTA } from "./_marca-icono";
 
 export const size = { width: 1200, height: 630 };
 export const contentType = "image/png";
-export const alt = "Yalope — Match Teatral";
+export const alt = "Yalope — El match de actores y actrices";
 
 export default function OgImage() {
   return new ImageResponse(
