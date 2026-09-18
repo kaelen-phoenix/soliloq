@@ -282,6 +282,9 @@ export default async function BienvenidaPage() {
               </Link>
             </div>
           </div>
+          <p className="mt-6 text-xs text-ink-500">
+            © {new Date().getFullYear()} Yalope. {t("derechos")}
+          </p>
         </div>
       </footer>
     </div>
