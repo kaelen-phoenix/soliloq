@@ -37,13 +37,13 @@ const baloo = Baloo_2({
 });
 
 const DESCRIPCION =
-  "Conectá talento y creadores de teatro. Postulate a convocatorias y armá elenco con un match rápido y visual.";
+  "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat. Armá tu equipo y compartí tu perfil como booking.";
 
 export const metadata: Metadata = {
   // Ancla las URLs relativas de `openGraph`: sin esto, la imagen para compartir se emite
   // como ruta relativa y ninguna plataforma la resuelve.
   metadataBase: new URL("https://yalope.com"),
-  title: "Yalope — Match Teatral",
+  title: "Yalope — El match de actores y actrices",
   description: DESCRIPCION,
   // El `<link rel="manifest">` lo inyecta Next desde `app/manifest.ts`.
   // La imagen para compartir la genera `app/opengraph-image.tsx` (y Next la usa también
@@ -52,12 +52,12 @@ export const metadata: Metadata = {
     type: "website",
     locale: "es_AR",
     siteName: "Yalope",
-    title: "Yalope — Match Teatral",
+    title: "Yalope — El match de actores y actrices",
     description: DESCRIPCION,
   },
   twitter: {
     card: "summary_large_image",
-    title: "Yalope — Match Teatral",
+    title: "Yalope — El match de actores y actrices",
     description: DESCRIPCION,
   },
   appleWebApp: {
