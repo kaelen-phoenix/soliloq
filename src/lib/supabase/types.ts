@@ -838,8 +838,11 @@ export interface Database {
           iniciativa_titulo: string;
           iniciativa_foto: string | null;
           cupo_lleno: boolean;
+          mostrado_en: string | null;
         }[];
       };
+      /** El Creador cierra el aviso de un Match nuevo (issue #194). Idempotente. */
+      marcar_match_mostrado: { Args: { p_match_id: string }; Returns: undefined };
       aceptar_match: { Args: { p_match_id: string }; Returns: undefined };
       convocar: { Args: { p_match_id: string; p_rol_id?: string | null }; Returns: undefined };
       /** Quién ocupa cada rol de un Proyecto (o cada lugar de un Equipo) y quién falta

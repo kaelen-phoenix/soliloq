@@ -5,6 +5,7 @@ import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { MatchesLista } from "@/components/convocatorias/matches-lista";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
+import { ModalNuevoMatch } from "@/components/convocatorias/modal-nuevo-match";
 
 export const metadata = { title: "Call Back — Yalope" };
 
@@ -56,6 +57,19 @@ export default async function MatchesPage() {
     cupoLleno: m.cupo_lleno,
   }));
 
+  // Aviso de "¡Tenés un Match!" (#194): uno por match, la primera vez que este Creador
+  // entra a Call Back después de que se generó.
+  const nuevos = (matches ?? [])
+    .filter((m) => !m.mostrado_en)
+    .map((m) => ({
+      matchId: m.match_id,
+      nombre: m.nombre,
+      fotoUrl: url(m.foto_path),
+      esEquipo: m.es_equipo,
+      iniciativaTitulo: m.iniciativa_titulo,
+      iniciativaFotoUrl: url(m.iniciativa_foto),
+    }));
+
   const filasConvocados = (convocados ?? []).map((c) => ({
     matchId: c.match_id,
     convocatoriaId: c.convocatoria_id,
@@ -87,6 +101,8 @@ export default async function MatchesPage() {
       {filas.length > 0 && <MatchesLista filas={filas} />}
 
       <ConvocadosLista filas={filasConvocados} roles={roles} />
+
+      <ModalNuevoMatch nuevos={nuevos} />
     </main>
   );
 }

@@ -6,6 +6,18 @@ import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 
 type Resultado = { ok: true } | { ok: false; error: string };
 
+/**
+ * El Creador cierra el aviso de "¡Tenés un Match!" (issue #194). Solo marca el aviso como
+ * visto — a diferencia de `aceptarMatch`, no mueve nada a Convocados: el match ya está en
+ * Call Back por el solo hecho de existir.
+ */
+export async function marcarMatchMostrado(matchId: string): Promise<Resultado> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("marcar_match_mostrado", { p_match_id: matchId });
+  if (error) return { ok: false, error: "No se pudo cerrar el aviso." };
+  return { ok: true };
+}
+
 /** El Creador acepta el Match → el talento pasa a Convocados. Sin notificación (#143). */
 export async function aceptarMatch(matchId: string): Promise<Resultado> {
   const supabase = createClient();

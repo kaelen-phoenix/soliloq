@@ -27,7 +27,7 @@ function diasRestantes(expiraEn: string) {
   return `Vence en ${dias} días`;
 }
 
-function Avatar({ url, nombre, size }: { url: string | null; nombre: string; size: number }) {
+export function Avatar({ url, nombre, size }: { url: string | null; nombre: string; size: number }) {
   return url ? (
     <Imagen
       src={url}
