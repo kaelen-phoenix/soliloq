@@ -25,9 +25,11 @@ insert into auth.users (id, email, aud, role) values
 update perfiles set modo_activo = 'creador' where id = (select v from ctx where k='creador');
 update perfiles set modo_activo = 'talento' where id in
   ((select v from ctx where k='ta'), (select v from ctx where k='tb'), (select v from ctx where k='tc'));
--- perfiles_creador ya no tiene columnas de identidad (issue #175).
+-- perfiles_creador ya no tiene columnas de identidad (issue #175): la identidad del
+-- Creador sale de su propio perfil de Talento (cuentas con doble rol).
 insert into perfiles_creador (id) values ((select v from ctx where k='creador'));
 insert into perfiles_talento (id, nombre, fecha_nacimiento, ubicacion_texto, ubicacion_lat, ubicacion_lng, ubicacion_pais, genero) values
+  ((select v from ctx where k='creador'), 'Creador Test', '1985-01-01', 'x', 0, 0, 'AR', 'sin_especificar'),
   ((select v from ctx where k='ta'), 'Talento A', '1990-01-01', 'x', 0, 0, 'AR', 'sin_especificar'),
   ((select v from ctx where k='tb'), 'Talento B', '1990-01-01', 'x', 0, 0, 'AR', 'sin_especificar'),
   ((select v from ctx where k='tc'), 'Talento C', '1990-01-01', 'x', 0, 0, 'AR', 'sin_especificar');
@@ -61,6 +63,16 @@ do $$ begin
           where id = (select v from ctx where k='match')), 'T2: expira ~7 días';
 end $$;
 
+-- T2b · mis_matches() no revienta (#197: dejó de leer perfiles_creador.imagen_url, que no
+-- existe desde 0077) y trae bien el nombre del talento.
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
+do $$ begin
+  assert (select nombre from mis_matches() where match_id = (select v from ctx where k='match')) = 'Talento A',
+         'T2b: mis_matches() ve el match con el nombre correcto';
+end $$;
+reset role;
+
 -- T3 · el Creador acepta el Match → pasa a Convocados (sin sala, ocupa cupo, sin notif) — #143
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
@@ -72,6 +84,15 @@ do $$ begin
   assert (select count(*) from salas where obra_id = (select v from ctx where k='obra')) = 0, 'T3: todavía sin sala';
   assert (select count(*) from notificaciones where destinatario_id = (select v from ctx where k='ta')) = 0, 'T3: talento no notificado';
 end $$;
+
+-- T3b · mis_convocados() no revienta (#197) y ubica el match recién aceptado.
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
+do $$ begin
+  assert (select estado from mis_convocados() where match_id = (select v from ctx where k='match')) = 'en_convocados',
+         'T3b: mis_convocados() ve el match aceptado';
+end $$;
+reset role;
 
 -- T4 · convocar (definitivo), con rol asociado (#152) → convocatoria pendiente + notificación
 set local role authenticated;
@@ -92,6 +113,17 @@ do $$ begin
   -- Todavía no aceptó: el rol figura disponible en la cobertura.
   assert (select talento_id is null from cobertura_iniciativa((select v from ctx where k='obra'), null)
           where rol_id = (select v from ctx where k='rol')), 'T4: rol sin ocupante todavía';
+end $$;
+reset role;
+
+-- T4b · mis_convocatorias() no revienta (#197: leía pc_o.nombre, que no existe desde 0077)
+-- y el talento ve la convocatoria pendiente con el nombre del creador (su perfil de Talento).
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"22222222-2222-2222-2222-222222222222"}';
+do $$ begin
+  assert (select creador_nombre from mis_convocatorias()
+          where convocatoria_id = (select v from ctx where k='conv')) = 'Creador Test',
+         'T4b: mis_convocatorias() ve la convocatoria con el nombre del creador';
 end $$;
 reset role;
 
