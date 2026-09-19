@@ -73,6 +73,38 @@ do $$ begin
 end $$;
 reset role;
 
+-- T2c · aviso de Match nuevo (#194): mostrado_en arranca en null, marcar_match_mostrado lo
+-- setea una vez (idempotente) y no lo saca de mis_matches() (Call Back).
+do $$ begin
+  assert (select mostrado_en is null from matches where id = (select v from ctx where k='match')),
+         'T2c: mostrado_en arranca null';
+end $$;
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
+do $$ begin
+  assert (select mostrado_en is null from mis_matches() where match_id = (select v from ctx where k='match')),
+         'T2c: mis_matches() todavía no lo muestra como visto';
+end $$;
+select marcar_match_mostrado((select v from ctx where k='match'));
+select marcar_match_mostrado((select v from ctx where k='match')); -- idempotente
+do $$ begin
+  assert (select mostrado_en is not null from mis_matches() where match_id = (select v from ctx where k='match')),
+         'T2c: mis_matches() ahora lo ve como mostrado';
+end $$;
+reset role;
+-- quien no es el creador dueño del match no puede tocar mostrado_en (RLS vía `creador_id = auth.uid()`)
+select set_config('test.mostrado_antes', mostrado_en::text, true)
+from matches where id = (select v from ctx where k='match');
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"33333333-3333-3333-3333-333333333333"}';
+select marcar_match_mostrado((select v from ctx where k='match'));
+reset role;
+do $$ begin
+  assert (select mostrado_en::text from matches where id = (select v from ctx where k='match'))
+    = current_setting('test.mostrado_antes'),
+         'T2c: un tercero no puede tocar mostrado_en de un match ajeno';
+end $$;
+
 -- T3 · el Creador acepta el Match → pasa a Convocados (sin sala, ocupa cupo, sin notif) — #143
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"11111111-1111-1111-1111-111111111111"}';
