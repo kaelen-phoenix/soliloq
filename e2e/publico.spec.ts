@@ -28,6 +28,16 @@ test.describe("landing", () => {
     expect(res?.status()).toBe(200);
     await expect(page.getByRole("heading", { level: 1 })).toContainText("match de actores");
   });
+
+  // `page.goto` sigue redirects y devuelve el status de la respuesta final, así que un 307
+  // a `/bienvenida` seguido de un 200 pasa el test de arriba igual — no distingue el rewrite
+  // de `next.config.mjs` (200 directo, indexable) de un redirect. Ya pasó una vez: el
+  // middleware empezó a redirigir "/" antes de que el rewrite pudiera correr. Este test pega
+  // directo a la API sin seguir redirects para que una regresión así no vuelva a colarse.
+  test("/ raíz NO redirige (el rewrite, no el middleware, sirve el contenido)", async ({ request }) => {
+    const res = await request.fetch("/", { maxRedirects: 0 });
+    expect(res.status()).toBe(200);
+  });
 });
 
 test.describe("acceso", () => {
