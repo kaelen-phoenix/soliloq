@@ -65,9 +65,13 @@ export async function actualizarSesion(request: NextRequest) {
   if (esRutaAbierta) return response;
 
   if (!user) {
+    // La raíz para un anónimo la resuelve el rewrite de `next.config.mjs` (sirve el
+    // contenido de `/bienvenida` ahí mismo, con 200 — no un redirect): si acá
+    // redirigiéramos primero, ese rewrite queda muerto porque el middleware corre antes
+    // en la cadena. Dejarla pasar es lo que permite que `/` sea indexable de verdad.
+    if (path === "/") return response;
     if (esRutaPublica) return response;
-    // Sin sesión, la raíz muestra la landing; el resto pide entrar.
-    return redirigir(path === "/" ? "/bienvenida" : "/ingresar");
+    return redirigir("/ingresar");
   }
 
   if (esRutaPublica) return redirigir("/");
