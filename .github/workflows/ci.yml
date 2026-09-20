@@ -67,3 +67,58 @@ jobs:
             echo "Sin cambios en supabase/ — nada que testear."; exit 0
           fi
           bash supabase/tests/run.sh
+
+  # Circuito de match por UI (swipe → placa → aviso de match → Call Back → convocar →
+  # /convocatoria → sala) contra el proyecto de staging (nunca prod). Igual que db-tests: si
+  # no están los secrets (p.ej. un PR desde un fork, que no los recibe) el job termina OK sin
+  # correr nada — ver e2e/README.md.
+  e2e-flujos:
+    runs-on: ubuntu-latest
+    env:
+      E2E_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
+      E2E_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
+      E2E_SERVICE_KEY: ${{ secrets.E2E_SERVICE_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+
+      - uses: actions/setup-node@v4
+        if: env.E2E_SUPABASE_URL != ''
+        with:
+          node-version: 20
+          cache: npm
+
+      - run: npm ci
+        if: env.E2E_SUPABASE_URL != ''
+
+      - name: build contra staging
+        if: env.E2E_SUPABASE_URL != ''
+        run: npm run build
+        env:
+          NEXT_PUBLIC_SUPABASE_URL: ${{ env.E2E_SUPABASE_URL }}
+          NEXT_PUBLIC_SUPABASE_ANON_KEY: ${{ env.E2E_SUPABASE_ANON_KEY }}
+          NEXT_PUBLIC_SITE_URL: http://localhost:3100
+          NEXT_PUBLIC_GOOGLE_MAPS_API_KEY: ci-placeholder-maps-key
+
+      - run: npx playwright install --with-deps chromium
+        if: env.E2E_SUPABASE_URL != ''
+
+      - name: levantar la app contra staging
+        if: env.E2E_SUPABASE_URL != ''
+        run: |
+          npm run start -- --port 3100 &
+          for i in $(seq 1 30); do
+            curl -sf http://localhost:3100/bienvenida > /dev/null && exit 0
+            sleep 1
+          done
+          echo "El server no levantó a tiempo" >&2
+          exit 1
+
+      - name: e2e flujos (staging)
+        if: env.E2E_SUPABASE_URL != ''
+        run: npx playwright test e2e/flujos
+        env:
+          E2E_BASE_URL: http://localhost:3100
+
+      - name: Sin secrets de staging — se saltea
+        if: env.E2E_SUPABASE_URL == ''
+        run: echo "Sin E2E_SUPABASE_URL/E2E_SUPABASE_ANON_KEY/E2E_SERVICE_KEY — se saltea (normal en un PR desde un fork, que no recibe secrets)."
