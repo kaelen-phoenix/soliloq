@@ -84,7 +84,11 @@ jobs:
       - uses: actions/setup-node@v4
         if: env.E2E_SUPABASE_URL != ''
         with:
-          node-version: 20
+          # 22, no 20 como el resto del workflow: el cliente admin de supabase-js (usado acá
+          # para sembrar/limpiar usuarios de prueba) instancia un WebSocket nativo al crear
+          # el client, y Node 20 no lo tiene ("Node.js detected but native WebSocket not
+          # found").
+          node-version: 22
           cache: npm
 
       - run: npm ci
