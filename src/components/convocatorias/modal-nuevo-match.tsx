@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
@@ -25,6 +25,11 @@ export interface MatchNuevo {
 export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
   const [cola, setCola] = useState(nuevos);
   const [ocupado, setOcupado] = useState(false);
+
+  // Mismo motivo que en `ConvocadosLista`/`MatchesLista`: si otra acción de esta misma
+  // pantalla dispara un `router.refresh()` (p.ej. aceptar un match desde la lista) mientras
+  // hay un match nuevo sin mostrar, `useState(nuevos)` no lo recogía por sí solo.
+  useEffect(() => setCola(nuevos), [nuevos]);
 
   if (cola.length === 0) return null;
   const actual = cola[0];
