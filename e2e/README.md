@@ -23,8 +23,12 @@ Los flujos con sesión (circuito de match: swipe → placa → `/matches` → sa
 - `E2E_SUPABASE_URL` + `E2E_SERVICE_KEY` — para sembrar/limpiar usuarios de prueba
   (`auth.admin.createUser` / `deleteUser`).
 
-`flujos/match.spec.ts` tiene el helper de usuarios y el esqueleto del test con los pasos
-todavía por escribir (hoy solo verifica que el cliente admin se pueda crear).
+`flujos/match.spec.ts` recorre el circuito completo por UI: Talento se postula a una Obra
+(swipe), Creador marca "Me interesa" (match en el acto), placa "Hay interés" → "Ahora no",
+aviso "¡Tenés un Match!" (#194) → "Aceptar", Call Back → "Aceptar" (pasa a Convocados),
+"Convocar" en firme, Talento acepta en `/convocatoria` → entra a `/salas`. La aprobación
+manual (#182), las Normas (#180) y el onboarding con ubicación por Google Places se siembran
+directo con el cliente admin en vez de navegarse — ver los comentarios del archivo.
 
 ### El proyecto de staging (2026-09-20)
 
@@ -36,10 +40,10 @@ tiene datos reales de personas: solo lo que crean/borran los tests.
 Credenciales en `~/.soliloq-deploy/` (fuera de git, igual que las de prod):
 `staging-url.txt`, `staging-anon-key.txt`, `staging-service-key.txt`, `staging-db-url.txt`,
 `staging-ref.txt`. Los mismos valores están como secrets del repo, `E2E_SUPABASE_URL` /
-`E2E_SERVICE_KEY`, listos para un job de CI cuando `flujos/match.spec.ts` deje de ser un
-esqueleto.
+`E2E_SERVICE_KEY` (no así el anon key — no hace falta como secret, no es sensible, pero
+tampoco está cableado a un job de CI todavía: correr `flujos/` hoy es manual).
 
-Para correrlo en local contra staging (una vez que el test esté escrito):
+Para correrlo en local contra staging:
 ```
 NEXT_PUBLIC_SUPABASE_URL="$(cat ~/.soliloq-deploy/staging-url.txt)" \
 NEXT_PUBLIC_SUPABASE_ANON_KEY="$(cat ~/.soliloq-deploy/staging-anon-key.txt)" \

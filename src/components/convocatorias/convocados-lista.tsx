@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Boton } from "@/components/ui/boton";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
@@ -53,6 +53,13 @@ export function ConvocadosLista({
   const [eligiendoRol, setEligiendoRol] = useState<FilaConvocado | null>(null);
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
+
+  // `useState(filasIniciales)` solo siembra el estado en el montaje: sin este efecto, un
+  // match que se acepta desde `MatchesLista` (misma pantalla, `router.refresh()`) nunca
+  // aparecía acá — esta lista arrancó vacía (`filas.length === 0 → return null`, más abajo)
+  // y se quedaba en ese estado para siempre, sin importar los props nuevos del servidor.
+  // Encontrado recién en el E2E de #122 (staging), nunca se había ejercido en vivo.
+  useEffect(() => setFilas(filasIniciales), [filasIniciales]);
 
   if (filas.length === 0) return null;
 

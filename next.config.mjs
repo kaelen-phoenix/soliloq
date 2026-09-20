@@ -3,7 +3,18 @@ import createNextIntlPlugin from "next-intl/plugin";
 // Cookie de sesión de Supabase (`sb-<ref>-auth-token`, más los chunks `.0`/`.1` cuando el
 // token es largo). Si NINGUNA está, quien pide `/` es anónimo y se le sirve la landing sin
 // redirect: `yalope.com/` responde 200 con contenido indexable en vez de un 307.
-const COOKIE_SESION = "sb-ydnafjmznntfmzrsijko-auth-token";
+//
+// El `<ref>` sale de `NEXT_PUBLIC_SUPABASE_URL` en vez de ir hardcodeado: hardcodeado al de
+// prod, corriendo contra cualquier otro proyecto (staging, otro Supabase local) la cookie
+// real nunca coincide, la condición "falta la cookie" da siempre verdadero, y `/` termina
+// sirviendo la landing SIEMPRE, con sesión o sin ella (encontrado armando el E2E de
+// staging para #122 — silencioso, porque nada asegura contra una sesión real ahí).
+const REF_SUPABASE = (process.env.NEXT_PUBLIC_SUPABASE_URL ?? "").match(
+  /^https:\/\/([^.]+)\.supabase\.co/
+)?.[1];
+const COOKIE_SESION = REF_SUPABASE
+  ? `sb-${REF_SUPABASE}-auth-token`
+  : "sb-ydnafjmznntfmzrsijko-auth-token";
 
 const withNextIntl = createNextIntlPlugin("./src/i18n/request.ts");
 

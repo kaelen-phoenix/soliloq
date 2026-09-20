@@ -1,7 +1,7 @@
 "use client";
 
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
@@ -53,6 +53,11 @@ export function MatchesLista({ filas: filasIniciales }: { filas: FilaMatch[] }) 
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
+
+  // Mismo motivo que en `ConvocadosLista`: sin resincronizar acá, un match nuevo que
+  // aparece mientras esta pantalla ya está abierta (otro `router.refresh()`, p.ej. desde
+  // `ModalNuevoMatch`) no se agregaba a la lista hasta recargar a mano.
+  useEffect(() => setFilas(filasIniciales), [filasIniciales]);
 
   async function aceptar(f: FilaMatch) {
     setOcupado(true);
