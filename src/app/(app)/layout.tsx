@@ -4,6 +4,7 @@ import { BarraLateral } from "@/components/layout/barra-lateral";
 import { BarraNavegacion } from "@/components/layout/barra-navegacion";
 import { Encabezado } from "@/components/layout/encabezado";
 import { TransicionPagina } from "@/components/ui/transicion-pagina";
+import { AvisoConvocatoria } from "@/components/talento/aviso-convocatoria";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
 
@@ -46,6 +47,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       className="min-h-screen pb-20 sm:bg-fondo-sutil sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
     >
       <ActualizarAlVolver />
+      <AvisoConvocatoria userId={user.id} />
       <BarraLateral rol={estado.modoActivo} esAdmin={estado.esAdmin} />
 
       <div className="min-w-0 flex-1">

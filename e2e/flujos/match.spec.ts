@@ -223,12 +223,12 @@ test.describe("circuito de match (UI)", () => {
     await creadorPage.getByRole("button", { name: "Convocar" }).click();
     await expect(creadorPage.getByText("Esperando confirmación")).toBeVisible({ timeout: 10_000 });
 
-    // 6. El Talento ve la convocatoria y la acepta → entra directo a la sala (#143).
-    // `.first()`: el título aparece dos veces (el texto del párrafo y el alt del avatar
-    // de respaldo de la iniciativa, sin foto).
-    await page.goto("/convocatoria");
-    await expect(page.getByText(tituloObra).first()).toBeVisible({ timeout: 15_000 });
-    await page.getByRole("button", { name: "Aceptar" }).click();
+    // 6. El aviso de convocatoria (#203) aparece SOLO, en cualquier pantalla — no hace
+    // falta navegar a `/convocatoria`. Lo probamos justo en otra pantalla para eso.
+    await page.goto("/perfil");
+    const avisoConvocatoria = page.getByRole("dialog", { name: "Hay proyecto" });
+    await expect(avisoConvocatoria).toBeVisible({ timeout: 15_000 });
+    await avisoConvocatoria.getByRole("button", { name: "Aceptar" }).click();
     await page.waitForURL(/\/salas/, { timeout: 10_000 });
     await expect(page.getByText(tituloObra)).toBeVisible();
 
