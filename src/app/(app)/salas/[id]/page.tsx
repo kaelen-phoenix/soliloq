@@ -1,5 +1,10 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
+import { conmutarModo } from "@/app/acciones-modo";
 import { createClient } from "@/lib/supabase/server";
+import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
+import { Boton } from "@/components/ui/boton";
+import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { SalaChat, type Integrante } from "@/components/salas/sala-chat";
 
 export default async function SalaPage({ params }: { params: { id: string } }) {
@@ -9,16 +14,55 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data: sala } = await supabase.from("salas").select("id, obra_id, titulo, obras(titulo, creador_id)").eq("id", params.id).single();
+  const { data: sala } = await supabase
+    .from("salas")
+    .select("id, obra_id, equipo_id, titulo, obras(titulo, creador_id), equipos(titulo, creador_id)")
+    .eq("id", params.id)
+    .single();
   if (!sala) notFound();
 
-  // La obra puede venir vacía aunque la sala exista: si quien mira bloqueó al creador, la
-  // política restrictiva de 0022 esconde la fila de `obras` y el join queda en null. La sala
-  // sigue siendo suya y sigue teniendo al resto del elenco, así que se muestra igual.
+  // La obra/equipo puede venir vacío aunque la sala exista: si quien mira bloqueó al
+  // creador, la política restrictiva de 0022 esconde esa fila y el join queda en null. La
+  // sala sigue siendo suya y sigue teniendo al resto del elenco, así que se muestra igual.
   const obra = (Array.isArray(sala.obras) ? sala.obras[0] : sala.obras) as
     | { titulo: string; creador_id: string }
     | null
     | undefined;
+  const equipo = (Array.isArray(sala.equipos) ? sala.equipos[0] : sala.equipos) as
+    | { titulo: string; creador_id: string }
+    | null
+    | undefined;
+
+  // #206: la sala de un Proyecto/Equipo propio vive en la experiencia de Creador; en la que
+  // participás como Talento (convocado por otra persona), en la de Talento — mismo criterio
+  // que ya aplica la lista en `/salas`. Las salas sin iniciativa (armar equipo 1:1) no
+  // distinguen: van en cualquiera de los dos modos.
+  const esDeIniciativa = !!(sala.obra_id || sala.equipo_id);
+  const esDueno = obra?.creador_id === user.id || equipo?.creador_id === user.id;
+  const estado = await leerEstadoCuenta(supabase, user.id);
+  const perteneceAModoActual =
+    !esDeIniciativa || (estado.modoActivo === "creador" ? esDueno : !esDueno);
+
+  if (!perteneceAModoActual) {
+    const otro = estado.modoActivo === "creador" ? "talento" : "creador";
+    const t = await getTranslations("modo");
+    return (
+      <main className="px-5 py-5">
+        <EstadoVacio
+          icono="cambiar"
+          titulo="Esta sala es de tu otro modo"
+          detalle={`Cambiá a ${t(otro)} para verla. Después la encontrás en Salas, desde ahí.`}
+          accion={
+            <form action={conmutarModo.bind(null, otro)}>
+              <Boton type="submit" variante="secundario">
+                {t("cambiarA", { rol: t(otro) })}
+              </Boton>
+            </form>
+          }
+        />
+      </main>
+    );
+  }
 
   const [{ data: mensajes }, { data: integrantesRaw }] = await Promise.all([
     supabase.from("mensajes").select("*").eq("sala_id", params.id).order("creado_en"),
@@ -38,13 +82,13 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
   const integrantes: Integrante[] = integrantesIds.map((id) => {
     const talento = talentos?.find((t) => t.id === id);
     const fotoPrincipal = talento?.fotos_talento?.find((f: any) => f.orden === 0);
-    const esDirector = obra?.creador_id === id;
+    const esDirector = obra?.creador_id === id || equipo?.creador_id === id;
     return {
       perfil_id: id,
       nombre: talento?.nombre ?? "Integrante",
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
       // La sala nace de un interés mutuo + convocatoria, no de un casting con roles.
-      rol_en_obra: esDirector ? "Director/a" : sala.obra_id ? "Elenco" : "Armando equipo",
+      rol_en_obra: esDirector ? "Director/a" : esDeIniciativa ? "Elenco" : "Armando equipo",
       // #149: sólo los mensajes de quien tiene perfil de Talento abren la placa de perfil.
       esTalento: !!talento,
     };
@@ -65,12 +109,12 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
     >
       <div className="border-b border-borde px-4 py-2">
         <p className="text-xs font-medium uppercase tracking-wide text-texto-tenue">
-          {sala.obra_id ? "Sala de proyecto" : "Armar equipo"}
+          {sala.obra_id ? "Sala de proyecto" : sala.equipo_id ? "Sala de equipo" : "Armar equipo"}
         </p>
-        {/* Tres títulos posibles: el de la obra, el de una sala sin obra, o el genérico
-            cuando la fila de `obras` está escondida por bloqueo (0022). */}
+        {/* Título de la obra o el equipo; si no, el de una sala sin iniciativa, o el
+            genérico cuando esa fila está escondida por bloqueo (0022). */}
         <h1 className="font-display font-semibold tracking-[-0.02em] text-texto">
-          {obra?.titulo ?? sala.titulo ?? "Proyecto"}
+          {obra?.titulo ?? equipo?.titulo ?? sala.titulo ?? "Proyecto"}
         </h1>
       </div>
       <SalaChat salaId={params.id} userId={user.id} mensajesIniciales={mensajes ?? []} integrantes={integrantes} />

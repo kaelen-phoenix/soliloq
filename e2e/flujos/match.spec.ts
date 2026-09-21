@@ -232,6 +232,26 @@ test.describe("circuito de match (UI)", () => {
     await page.waitForURL(/\/salas/, { timeout: 10_000 });
     await expect(page.getByText(tituloObra)).toBeVisible();
 
+    // 7. Entra a la sala en sí — valida de paso el gate de modo de #206 (esta sala no es
+    // suya como Creador, así que en modo Talento tiene que entrar derecho, sin el aviso
+    // "Esta sala es de tu otro modo").
+    await page.getByText(tituloObra).click();
+    await page.waitForURL(/\/salas\/[^/]+$/, { timeout: 10_000 });
+    await expect(page.getByPlaceholder("Escribí un mensaje…")).toBeVisible({ timeout: 10_000 });
+    const urlSala = page.url();
+
+    // 8. El gate de #206 en sí: el Creador (que también tiene perfil de Talento — toda
+    // cuenta lo tiene, #175) cambia a modo Talento y entra a la MISMA sala por URL directa.
+    // Como ahí no es ni dueño ni integrante-como-talento, tiene que ver el aviso "es de tu
+    // otro modo" en vez del chat.
+    await creadorPage.getByRole("button", { name: "Cambiar a Talento" }).click();
+    await creadorPage.waitForURL("/", { timeout: 10_000 });
+    await creadorPage.goto(urlSala);
+    await expect(creadorPage.getByText("Esta sala es de tu otro modo")).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(creadorPage.getByPlaceholder("Escribí un mensaje…")).toBeHidden();
+
     await creadorCtx.close();
   });
 });
