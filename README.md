@@ -66,3 +66,5 @@ src/lib/supabase/         Clientes de Supabase (browser, server, middleware) y t
 supabase/migrations/      Esquema, RLS, triggers y vistas, en orden de aplicación
 openspec/                 Especificación funcional y técnica del prototipo
 ```
+
+<!-- Prueba de flujo git (commit + push) vía Claude Code -->
