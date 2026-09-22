@@ -1,4 +1,5 @@
 import createNextIntlPlugin from "next-intl/plugin";
+import { withSentryConfig } from "@sentry/nextjs/config";
 
 // Cookie de sesión de Supabase (`sb-<ref>-auth-token`, más los chunks `.0`/`.1` cuando el
 // token es largo). Si NINGUNA está, quien pide `/` es anónimo y se le sirve la landing sin
@@ -50,4 +51,9 @@ const nextConfig = {
   },
 };
 
-export default withNextIntl(nextConfig);
+export default withSentryConfig(withNextIntl(nextConfig), {
+  // Sin org/project/authToken todavía: no sube source maps (harden pendiente, no bloquea
+  // la captura de errores). Sí resuelve el warning de webpack por `require-in-the-middle`
+  // (instrumentación automática de Node de @sentry/nextjs).
+  silent: !process.env.CI,
+});

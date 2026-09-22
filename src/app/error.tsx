@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import * as Sentry from "@sentry/nextjs";
 import { Boton } from "@/components/ui/boton";
 import { PantallaMensaje } from "@/components/ui/pantalla-mensaje";
 
@@ -20,9 +21,9 @@ export default function Error({
   reset: () => void;
 }) {
   useEffect(() => {
-    // Sin servicio de errores todavía: al menos queda en la consola del navegador y en los
-    // logs de Vercel, que es donde se va a mirar cuando alguien reporte algo.
-    console.error("[yalope] error no manejado:", error);
+    // Next.js atrapa el error antes que Sentry acá — sin este captureException manual,
+    // este límite (el más genérico, el que ve cualquiera) no manda nada.
+    Sentry.captureException(error);
   }, [error]);
 
   return (
