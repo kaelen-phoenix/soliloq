@@ -8,6 +8,7 @@ import { Imagen } from "@/components/ui/imagen";
 import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { Superposicion } from "@/components/ui/superposicion";
 import { createClient } from "@/lib/supabase/client";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { marcarInteresEnTalento, aceptarMatch } from "@/app/(app)/matches/acciones";
 import type { ResultadoTalento } from "./tarjeta-talento";
 
@@ -89,7 +90,8 @@ export function PilaTalentos({
     if (interesa) {
       // ¿Se formó match? (el trigger lo crea si el interés era mutuo)
       const supabase = createClient();
-      const { data } = await supabase.rpc("mis_matches");
+      const { data, error } = await supabase.rpc("mis_matches");
+      if (error) reportarErrorSupabase(error, { rpc: "mis_matches", talentoId: t.id });
       const m = (data ?? []).find((x) => x.talento_id === t.id);
       if (m) {
         setPlaca({ talento: t, matchId: m.match_id });

@@ -2,6 +2,7 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { MatchesLista } from "@/components/convocatorias/matches-lista";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
@@ -21,15 +22,24 @@ export default async function MatchesPage() {
 
   const iniciativa = await iniciativaActivaDelCreador(supabase, user.id);
 
-  const [{ data: matches }, { data: convocados }, { data: cobertura }] = await Promise.all([
+  const [
+    { data: matches, error: errorMatches },
+    { data: convocados, error: errorConvocados },
+    { data: cobertura, error: errorCobertura },
+  ] = await Promise.all([
     supabase.rpc("mis_matches"),
     supabase.rpc("mis_convocados"),
     // Roles del Proyecto activo, para elegir a cuál queda asociado al convocar en firme
     // (#152). Un Equipo no tiene roles: no hace falta elegir nada.
     iniciativa?.tipo === "obra"
       ? supabase.rpc("cobertura_iniciativa", { p_obra_id: iniciativa.id, p_equipo_id: null })
-      : Promise.resolve({ data: null }),
+      : Promise.resolve({ data: null, error: null }),
   ]);
+  if (errorMatches) reportarErrorSupabase(errorMatches, { rpc: "mis_matches", userId: user.id });
+  if (errorConvocados)
+    reportarErrorSupabase(errorConvocados, { rpc: "mis_convocados", userId: user.id });
+  if (errorCobertura)
+    reportarErrorSupabase(errorCobertura, { rpc: "cobertura_iniciativa", userId: user.id });
 
   const url = (path: string | null) =>
     path ? supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl : null;

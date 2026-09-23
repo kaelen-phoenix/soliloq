@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ConvocatoriasLista } from "@/components/talento/convocatorias-lista";
 
@@ -11,7 +12,8 @@ export default async function ConvocatoriaPage() {
   } = await supabase.auth.getUser();
   if (!user) return null;
 
-  const { data } = await supabase.rpc("mis_convocatorias");
+  const { data, error } = await supabase.rpc("mis_convocatorias");
+  if (error) reportarErrorSupabase(error, { rpc: "mis_convocatorias", userId: user.id });
 
   const url = (p: string | null) =>
     p ? supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl : null;

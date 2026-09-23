@@ -6,6 +6,7 @@ import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
 import { createClient } from "@/lib/supabase/client";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { responderConvocatoria } from "@/app/(app)/convocatoria/acciones";
 
 interface AvisoFila {
@@ -40,7 +41,8 @@ export function AvisoConvocatoria({ userId }: { userId: string }) {
       path ? supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl : null;
 
     async function cargar() {
-      const { data } = await supabase.rpc("mis_convocatorias");
+      const { data, error } = await supabase.rpc("mis_convocatorias");
+      if (error) reportarErrorSupabase(error, { rpc: "mis_convocatorias", userId });
       const filas: AvisoFila[] = (data ?? []).map((c) => ({
         convocatoriaId: c.convocatoria_id,
         esEquipo: c.es_equipo,
