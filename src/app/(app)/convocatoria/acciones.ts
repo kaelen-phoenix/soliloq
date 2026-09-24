@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 
 type Resultado = { ok: true } | { ok: false; error: string };
 
@@ -16,12 +17,11 @@ export async function responderConvocatoria(
     p_aceptar: aceptar,
   });
   if (error) {
-    return {
-      ok: false,
-      error: error.message?.includes("no encontrada")
-        ? "Esa convocatoria ya no está disponible."
-        : "No se pudo aplicar. Probá de nuevo.",
-    };
+    if (error.message?.includes("no encontrada")) {
+      return { ok: false, error: "Esa convocatoria ya no está disponible." };
+    }
+    reportarErrorSupabase(error, { rpc: "responder_convocatoria", convocatoriaId, aceptar });
+    return { ok: false, error: "No se pudo aplicar. Probá de nuevo." };
   }
   revalidatePath("/convocatoria");
   revalidatePath("/salas");

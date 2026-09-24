@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { PilaTarjetas } from "./pila-tarjetas";
 import type { RolFeed } from "./tarjeta-rol";
 import type { EquipoFeed } from "./tarjeta-equipo";
@@ -15,10 +16,15 @@ export async function FeedTalento({ talentoId }: { talentoId: string }) {
   // El radio viaja a Postgres: el filtro por distancia se resuelve en la query, no acá.
   const radio = perfilTalento?.radio_busqueda_metros ?? null;
 
-  const [{ data: rolesRaw }, { data: equiposRaw }] = await Promise.all([
+  const [
+    { data: rolesRaw, error: errorRoles },
+    { data: equiposRaw, error: errorEquipos },
+  ] = await Promise.all([
     supabase.rpc("feed_para_talento", { p_talento_id: talentoId, p_radio_metros: radio }),
     supabase.rpc("feed_equipos_para_talento"),
   ]);
+  if (errorRoles) reportarErrorSupabase(errorRoles, { rpc: "feed_para_talento", talentoId });
+  if (errorEquipos) reportarErrorSupabase(errorEquipos, { rpc: "feed_equipos_para_talento", talentoId });
 
   const publicUrl = (p: string) =>
     supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl;

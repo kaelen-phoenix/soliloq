@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 
 type Resultado = { ok: true } | { ok: false; error: string };
 
@@ -47,12 +48,11 @@ export async function desvincularmeDeSala(salaId: string): Promise<Resultado> {
   if (!user) return { ok: false, error: "Sin sesión." };
   const { error } = await supabase.rpc("desvincularme_de_sala", { p_sala_id: salaId });
   if (error) {
-    return {
-      ok: false,
-      error: error.message?.includes("dueño")
-        ? "No podés desvincularte de tu propio proyecto o equipo."
-        : "No se pudo aplicar. Probá de nuevo.",
-    };
+    if (error.message?.includes("dueño")) {
+      return { ok: false, error: "No podés desvincularte de tu propio proyecto o equipo." };
+    }
+    reportarErrorSupabase(error, { rpc: "desvincularme_de_sala", salaId, userId: user.id });
+    return { ok: false, error: "No se pudo aplicar. Probá de nuevo." };
   }
   revalidatePath("/salas");
   return { ok: true };

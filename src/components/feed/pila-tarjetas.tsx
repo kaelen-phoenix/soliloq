@@ -5,6 +5,7 @@ import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { Icono } from "@/components/ui/icono";
 import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { createClient } from "@/lib/supabase/client";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { ROLES_EJEMPLO } from "@/lib/onboarding-ejemplo";
 import { opcionesDeRadio, radioMasCercano, type UnidadDistancia } from "@/lib/ubicacion";
 import { TarjetaRol, type RolFeed } from "./tarjeta-rol";
@@ -109,6 +110,7 @@ export function PilaTarjetas({
     });
 
     if (error) {
+      reportarErrorSupabase(error, { rpc: "feed_para_talento", talentoId });
       setRecargando(false);
       setAvisoError("No pudimos actualizar el feed. Probá de nuevo.");
       return;
@@ -129,10 +131,12 @@ export function PilaTarjetas({
     // La consulta de más se paga únicamente en el caso vacío, que es el único donde hay algo
     // que explicar.
     if (nuevos.length === 0 && nuevoRadio !== null) {
-      const { data: sinRadio } = await supabase.rpc("feed_para_talento", {
+      const { data: sinRadio, error: errorSinRadio } = await supabase.rpc("feed_para_talento", {
         p_talento_id: talentoId,
         p_radio_metros: null,
       });
+      if (errorSinRadio)
+        reportarErrorSupabase(errorSinRadio, { rpc: "feed_para_talento", talentoId, sinRadio: true });
       setHayFueraDelRadio((sinRadio ?? []).length > 0);
     } else {
       setHayFueraDelRadio(false);
@@ -164,8 +168,10 @@ export function PilaTarjetas({
       p_interesa: decision === "postular",
     });
     if (errInteres) {
+      const esLimite = errInteres.message?.includes("limite_me_interesa");
+      if (!esLimite) reportarErrorSupabase(errInteres, { rpc: "marcar_interes", rolId: rol.rol_id });
       setAvisoError(
-        errInteres.message?.includes("limite_me_interesa")
+        esLimite
           ? "Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde."
           : "No pudimos registrar tu decisión. Probá de nuevo.",
       );
@@ -202,8 +208,11 @@ export function PilaTarjetas({
       p_interesa: decision === "postular",
     });
     if (errInteres) {
+      const esLimite = errInteres.message?.includes("limite_me_interesa");
+      if (!esLimite)
+        reportarErrorSupabase(errInteres, { rpc: "marcar_interes", equipoId: equipo.equipo_id });
       setAvisoError(
-        errInteres.message?.includes("limite_me_interesa")
+        esLimite
           ? "Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde."
           : "No pudimos registrar tu decisión. Probá de nuevo.",
       );
@@ -276,8 +285,10 @@ export function PilaTarjetas({
     });
 
     if (error) {
+      const esMatch = error.message?.includes("match");
+      if (!esMatch) reportarErrorSupabase(error, { rpc: "deshacer_interes", obraId: ultima.rol.obra_id });
       setAvisoError(
-        error.message?.includes("match")
+        esMatch
           ? "Ya hay match con ese proyecto: no se puede deshacer."
           : "No pudimos deshacer. Probá de nuevo.",
       );

@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { Boton } from "@/components/ui/boton";
 
 /**
@@ -42,6 +43,7 @@ export function BotonContactarPublico({
     setEstado("cargando");
     const supabase = createClient();
     const { error } = await supabase.rpc("contactar_desde_perfil", { p_token: token });
+    if (error) reportarErrorSupabase(error, { rpc: "contactar_desde_perfil", token });
     setEstado(error ? "error" : "exito");
   }
 

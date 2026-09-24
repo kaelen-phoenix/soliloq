@@ -8,6 +8,7 @@ import { Esqueleto } from "@/components/ui/esqueleto";
 import { Icono } from "@/components/ui/icono";
 import { GENEROS_BUSCABLES, HABILIDADES, type Genero } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { opcionesDeRadio, RADIO_INICIAL_METROS, type Ubicacion } from "@/lib/ubicacion";
 import { type ResultadoTalento } from "./tarjeta-talento";
 import { PilaTalentos, type IniciativaPlaca } from "./pila-talentos";
@@ -65,6 +66,8 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
       });
 
       if (corrida !== corridaRef.current) return;
+
+      if (error) reportarErrorSupabase(error, { rpc: "buscar_talento" });
 
       const filas = (error ? [] : ((data ?? []) as Fila[])).map((f) => ({
         id: f.id,

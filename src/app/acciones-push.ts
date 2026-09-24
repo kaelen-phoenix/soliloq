@@ -3,6 +3,7 @@
 import webpush from "web-push";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 
 const VAPID_LISTO =
   !!process.env.VAPID_PRIVATE_KEY &&
@@ -101,7 +102,15 @@ export async function notificarMensajeNuevo(mensajeId: string) {
   // el push igual que ya corta la visibilidad del chat (0022/0023).
   const destinatarios: string[] = [];
   for (const i of integrantes) {
-    const { data: bloqueado } = await supabase.rpc("hay_bloqueo", { p_otro_perfil: i.perfil_id });
+    const { data: bloqueado, error: errorBloqueo } = await supabase.rpc("hay_bloqueo", {
+      p_otro_perfil: i.perfil_id,
+    });
+    if (errorBloqueo) {
+      // Si `hay_bloqueo` falla, no hay forma de saber si el push está bloqueado — mejor no
+      // mandarlo (favor de la privacidad) y que quede reportado.
+      reportarErrorSupabase(errorBloqueo, { rpc: "hay_bloqueo", userId: user.id, salaId });
+      continue;
+    }
     if (!bloqueado) destinatarios.push(i.perfil_id);
   }
   if (destinatarios.length === 0) return;

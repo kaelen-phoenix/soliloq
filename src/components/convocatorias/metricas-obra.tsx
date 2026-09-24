@@ -1,9 +1,11 @@
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 
 export async function MetricasObra({ obraId }: { obraId: string }) {
   const supabase = createClient();
-  const { data } = await supabase.rpc("metricas_obra", { p_obra_id: obraId });
+  const { data, error } = await supabase.rpc("metricas_obra", { p_obra_id: obraId });
+  if (error) reportarErrorSupabase(error, { rpc: "metricas_obra", obraId });
   const m = data?.[0];
 
   if (!m || m.cupo === 0) {
