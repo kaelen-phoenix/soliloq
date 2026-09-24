@@ -6,6 +6,7 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { createClient } from "@/lib/supabase/client";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { adminBorrarUsuario } from "@/app/(app)/admin/acciones";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { Database } from "@/lib/supabase/types";
@@ -107,8 +108,10 @@ function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
 
   const cargar = useCallback(async () => {
     const { data, error: e } = await supabase.rpc("admin_mensajes", { p_limite: 200, p_offset: 0 });
-    if (e) setError(e.message ?? "No se pudo leer.");
-    else setFilas(data ?? []);
+    if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_mensajes" });
+      setError(e.message ?? "No se pudo leer.");
+    } else setFilas(data ?? []);
   }, [supabase]);
 
   useEffect(() => {
@@ -120,8 +123,10 @@ function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       p_id: m.id,
       p_leido: !m.leido,
     });
-    if (e) setError(e.message ?? "No se pudo aplicar.");
-    else setFilas((prev) => (prev ?? []).map((f) => (f.id === m.id ? { ...f, leido: !m.leido } : f)));
+    if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_marcar_mensaje_leido", mensajeId: m.id });
+      setError(e.message ?? "No se pudo aplicar.");
+    } else setFilas((prev) => (prev ?? []).map((f) => (f.id === m.id ? { ...f, leido: !m.leido } : f)));
   }
 
   if (error) return <p className="text-sm text-error-600">{error}</p>;
@@ -193,8 +198,10 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
 
   const cargar = useCallback(async () => {
     const { data, error: e } = await supabase.rpc("admin_sponsors");
-    if (e) setError(e.message ?? "No se pudo leer.");
-    else setFilas(data ?? []);
+    if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_sponsors" });
+      setError(e.message ?? "No se pudo leer.");
+    } else setFilas(data ?? []);
   }, [supabase]);
 
   useEffect(() => {
@@ -213,6 +220,7 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       p_orden: Number(form.orden) || 0,
     });
     if (err) {
+      reportarErrorSupabase(err, { rpc: "admin_guardar_sponsor", sponsorId: form.id });
       setError(err.message ?? "No se pudo guardar.");
       return;
     }
@@ -224,8 +232,10 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
   async function borrar(s: Sponsor) {
     if (!window.confirm(`¿Borrar a ${s.nombre}?`)) return;
     const { error: e } = await supabase.rpc("admin_borrar_sponsor", { p_id: s.id });
-    if (e) setError(e.message ?? "No se pudo borrar.");
-    else setFilas((prev) => (prev ?? []).filter((f) => f.id !== s.id));
+    if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_borrar_sponsor", sponsorId: s.id });
+      setError(e.message ?? "No se pudo borrar.");
+    } else setFilas((prev) => (prev ?? []).filter((f) => f.id !== s.id));
   }
 
   return (
@@ -384,6 +394,7 @@ function Usuarios({
       });
       setCargando(false);
       if (e) {
+        reportarErrorSupabase(e, { rpc: "admin_usuarios", texto: q });
         setError("No se pudo buscar.");
         return;
       }
@@ -410,6 +421,7 @@ function Usuarios({
       p_suspender: suspender,
     });
     if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_suspender_usuario", usuarioId: u.id });
       setError(e.message ?? "No se pudo aplicar.");
       return;
     }
@@ -551,6 +563,8 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       supabase.rpc("admin_invitaciones"),
     ]);
     if (eSol || eInv) {
+      if (eSol) reportarErrorSupabase(eSol, { rpc: "admin_solicitudes_pendientes" });
+      if (eInv) reportarErrorSupabase(eInv, { rpc: "admin_invitaciones" });
       setError(eSol?.message ?? eInv?.message ?? "No se pudo leer.");
       return;
     }
@@ -570,6 +584,7 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { error: err } = await supabase.rpc("admin_crear_invitacion", { p_email: email.trim() });
     setInvitando(false);
     if (err) {
+      reportarErrorSupabase(err, { rpc: "admin_crear_invitacion" });
       setError(err.message ?? "No se pudo enviar la invitación.");
       return;
     }
@@ -583,6 +598,7 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { error: err } = await supabase.rpc("admin_aprobar_usuario", { p_id: s.id });
     setAprobandoId(null);
     if (err) {
+      reportarErrorSupabase(err, { rpc: "admin_aprobar_usuario", solicitudId: s.id });
       setError(err.message ?? "No se pudo aprobar.");
       return;
     }
@@ -710,6 +726,7 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
       });
       setCargando(false);
       if (e) {
+        reportarErrorSupabase(e, { rpc: "admin_publicaciones", texto: q });
         setError(e.message ?? "No se pudo leer.");
         return;
       }
@@ -813,6 +830,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
   const cargar = useCallback(async () => {
     const { data, error: e } = await supabase.rpc("admin_denuncias", { p_limite: 100, p_offset: 0 });
     if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_denuncias" });
       setError(e.message ?? "No se pudo leer.");
       return;
     }
@@ -834,6 +852,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
       p_resolucion: resolucion,
     });
     if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_resolver_denuncia", denunciaId: d.id, estado });
       setError(e.message ?? "No se pudo aplicar.");
       return;
     }
@@ -894,6 +913,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
   const cargar = useCallback(async () => {
     const { data, error: e } = await supabase.rpc("admin_bloqueos", { p_limite: 100, p_offset: 0 });
     if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_bloqueos" });
       setError(e.message ?? "No se pudo leer.");
       return;
     }
@@ -911,6 +931,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       p_mayor: b.perfil_mayor,
     });
     if (e) {
+      reportarErrorSupabase(e, { rpc: "admin_levantar_bloqueo" });
       setError(e.message ?? "No se pudo levantar.");
       return;
     }
@@ -926,6 +947,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       p_motivo: motivo.trim() || null,
     });
     if (err) {
+      reportarErrorSupabase(err, { rpc: "admin_crear_bloqueo" });
       setError(err.message ?? "No se pudo crear.");
       return;
     }

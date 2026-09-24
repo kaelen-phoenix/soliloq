@@ -5,6 +5,7 @@ import { useState } from "react";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { createClient } from "@/lib/supabase/client";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 
 type Tipo = "sugerencia" | "sponsor" | "donacion" | "otro";
 
@@ -26,6 +27,7 @@ export function FormularioContacto({ tipoInicial = "sugerencia" }: { tipoInicial
       p_tipo: tipo,
       p_mensaje: mensaje,
     });
+    if (error) reportarErrorSupabase(error, { rpc: "enviar_mensaje_contacto" });
     setEstado(error ? "error" : "ok");
   }
 

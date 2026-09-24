@@ -3,6 +3,7 @@ import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 import { VidrieraPublica } from "@/components/perfil/vidriera-publica";
 import { BotonContactarPublico } from "@/components/perfil/boton-contactar-publico";
@@ -11,7 +12,8 @@ import { BotonContactarPublico } from "@/components/perfil/boton-contactar-publi
 // mismo token dentro del mismo request.
 const obtenerPerfil = cache(async (token: string) => {
   const supabase = createClient();
-  const { data } = await supabase.rpc("perfil_publico", { p_token: token });
+  const { data, error } = await supabase.rpc("perfil_publico", { p_token: token });
+  if (error) reportarErrorSupabase(error, { rpc: "perfil_publico", token });
   return data?.[0] ?? null;
 });
 

@@ -1,5 +1,6 @@
 import Link from "next/link";
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { FeedEquipo, type PersonaEquipo } from "@/components/equipo/feed-equipo";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 
@@ -38,7 +39,8 @@ export default async function EquipoPage() {
     );
   }
 
-  const { data } = await supabase.rpc("feed_equipo", { p_radio_metros: null });
+  const { data, error } = await supabase.rpc("feed_equipo", { p_radio_metros: null });
+  if (error) reportarErrorSupabase(error, { rpc: "feed_equipo", userId: user.id });
 
   return (
     <main className="px-5 py-5">

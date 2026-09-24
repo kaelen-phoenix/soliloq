@@ -6,6 +6,7 @@ import { FormularioObra } from "@/components/convocatorias/formulario-obra";
 import { PanelesIniciativa } from "@/components/convocatorias/paneles-iniciativa";
 import type { FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 
 const ETIQUETA_ESTADO: Record<string, string> = {
   borrador: "Borrador",
@@ -49,9 +50,11 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
     .sort((a, b) => a.orden - b.orden);
 
   // Quién ya forma parte del equipo, para la sección "Participantes" (#152).
-  const { data: coberturaRaw } = equipo
+  const { data: coberturaRaw, error: errorCobertura } = equipo
     ? await supabase.rpc("cobertura_iniciativa", { p_obra_id: null, p_equipo_id: equipo.id })
-    : { data: null };
+    : { data: null, error: null };
+  if (errorCobertura)
+    reportarErrorSupabase(errorCobertura, { rpc: "cobertura_iniciativa", equipoId: equipo?.id });
 
   const coberturaEquipo: FilaCobertura[] = (coberturaRaw ?? []).map((r) => ({
     rolId: r.rol_id,

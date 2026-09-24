@@ -1,6 +1,7 @@
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { FormularioRol } from "@/components/convocatorias/formulario-rol";
 import { AccionesObra } from "@/components/convocatorias/acciones-obra";
 import { EditarObra } from "@/components/convocatorias/editar-obra";
@@ -41,22 +42,25 @@ export default async function DetalleObraPage({
     );
   }
 
-  const [{ data: roles }, { data: fotosRaw }, { data: coberturaRaw }] = await Promise.all([
-    supabase
-      .from("roles")
-      .select("id, nombre, tipo, edad_minima, edad_maxima, vacantes, generos_buscados")
-      .eq("obra_id", params.id),
-    supabase
-      .from("fotos_obra")
-      .select("id, storage_path, orden")
-      .eq("obra_id", params.id)
-      .order("orden"),
-    // Sólo lectura del dueño: quién ocupa cada rol (#152). `cobertura_iniciativa` rechaza a
-    // cualquier otra persona, así que ni se pide.
-    esDueno
-      ? supabase.rpc("cobertura_iniciativa", { p_obra_id: params.id, p_equipo_id: null })
-      : Promise.resolve({ data: null }),
-  ]);
+  const [{ data: roles }, { data: fotosRaw }, { data: coberturaRaw, error: errorCobertura }] =
+    await Promise.all([
+      supabase
+        .from("roles")
+        .select("id, nombre, tipo, edad_minima, edad_maxima, vacantes, generos_buscados")
+        .eq("obra_id", params.id),
+      supabase
+        .from("fotos_obra")
+        .select("id, storage_path, orden")
+        .eq("obra_id", params.id)
+        .order("orden"),
+      // Sólo lectura del dueño: quién ocupa cada rol (#152). `cobertura_iniciativa` rechaza a
+      // cualquier otra persona, así que ni se pide.
+      esDueno
+        ? supabase.rpc("cobertura_iniciativa", { p_obra_id: params.id, p_equipo_id: null })
+        : Promise.resolve({ data: null, error: null }),
+    ]);
+  if (errorCobertura)
+    reportarErrorSupabase(errorCobertura, { rpc: "cobertura_iniciativa", obraId: params.id });
 
   const cobertura: FilaCobertura[] = (coberturaRaw ?? []).map((r) => ({
     rolId: r.rol_id,

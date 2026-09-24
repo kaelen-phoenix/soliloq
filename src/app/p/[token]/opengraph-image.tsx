@@ -1,5 +1,6 @@
 import { ImageResponse } from "next/og";
 import { createClient } from "@/lib/supabase/server";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { etiquetaDisciplina } from "@/lib/constantes";
 import { CREMA, NARANJA } from "@/app/_marca-icono";
 import { ISOTIPO_TRAZOS, ISOTIPO_VIEWBOX } from "@/lib/marca-isotipo";
@@ -40,7 +41,8 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
 
   try {
     const supabase = createClient();
-    const { data } = await supabase.rpc("perfil_publico", { p_token: params.token });
+    const { data, error } = await supabase.rpc("perfil_publico", { p_token: params.token });
+    if (error) reportarErrorSupabase(error, { rpc: "perfil_publico", token: params.token });
     const perfil = data?.[0];
 
     if (perfil) {
