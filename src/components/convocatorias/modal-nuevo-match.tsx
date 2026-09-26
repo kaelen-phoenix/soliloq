@@ -56,10 +56,10 @@ export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
               alt={actual.iniciativaTitulo}
               width={64}
               height={64}
-              contenedorClassName="h-16 w-16 rounded-xl"
+              contenedorClassName="h-16 w-16 rounded-full"
             />
           ) : (
-            <span className="flex h-16 w-16 items-center justify-center rounded-xl bg-ink-100 p-1 text-2xs font-medium text-texto-tenue">
+            <span className="flex h-16 w-16 items-center justify-center rounded-full bg-ink-100 p-1 text-2xs font-medium text-texto-tenue">
               {actual.iniciativaTitulo}
             </span>
           )}
