@@ -5,7 +5,9 @@ import { BarraNavegacion } from "@/components/layout/barra-navegacion";
 import { Encabezado } from "@/components/layout/encabezado";
 import { TransicionPagina } from "@/components/ui/transicion-pagina";
 import { AvisoConvocatoria } from "@/components/talento/aviso-convocatoria";
+import { ProveedorNoLeidos, type FilaNoLeidos } from "@/components/salas/no-leidos";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { createClient } from "@/lib/supabase/server";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
@@ -23,6 +25,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   if (estado.suspendido) redirect("/suspendido");
   if (!estado.normasAceptadas) redirect("/aceptar-normas");
   if (!estado.modoActivo) redirect("/completar-perfil");
+
+  // Mensajes sin leer de Salas (#216): la primera carga viene de acá para que el badge no
+  // aparezca un instante después; de ahí en más lo mantiene `ProveedorNoLeidos`.
+  const { data: noLeidos, error: errorNoLeidos } = await supabase.rpc("salas_no_leidas");
+  if (errorNoLeidos) reportarErrorSupabase(errorNoLeidos, { rpc: "salas_no_leidas" });
 
   return (
     // El ancho del contenido es **continuo**, no escalonado: ocupa lo que haya hasta un
@@ -42,22 +49,28 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     // barra abajo y una lateral no son la misma forma con otro tamaño.
     // `data-rol` fija el acento de color de toda el área autenticada: encabezado, ítem
     // de navegación activo y anillo de foco leen `--acento` (ver `globals.css`).
-    <div
-      data-rol={estado.modoActivo}
-      className="min-h-screen pb-20 sm:bg-fondo-sutil sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
+    <ProveedorNoLeidos
+      userId={user.id}
+      modo={estado.modoActivo}
+      inicial={(noLeidos ?? []) as FilaNoLeidos[]}
     >
-      <ActualizarAlVolver />
-      <AvisoConvocatoria userId={user.id} />
-      <BarraLateral rol={estado.modoActivo} esAdmin={estado.esAdmin} />
+      <div
+        data-rol={estado.modoActivo}
+        className="min-h-screen pb-20 sm:bg-fondo-sutil sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
+      >
+        <ActualizarAlVolver />
+        <AvisoConvocatoria userId={user.id} />
+        <BarraLateral rol={estado.modoActivo} esAdmin={estado.esAdmin} />
 
-      <div className="min-w-0 flex-1">
-        <Encabezado userId={user.id} modoActivo={estado.modoActivo} />
-        <div className="w-full bg-superficie px-0 sm:min-h-[calc(100vh-9rem)]">
-          <TransicionPagina>{children}</TransicionPagina>
+        <div className="min-w-0 flex-1">
+          <Encabezado userId={user.id} modoActivo={estado.modoActivo} />
+          <div className="w-full bg-superficie px-0 sm:min-h-[calc(100vh-9rem)]">
+            <TransicionPagina>{children}</TransicionPagina>
+          </div>
         </div>
-      </div>
 
-      <BarraNavegacion rol={estado.modoActivo} esAdmin={estado.esAdmin} />
-    </div>
+        <BarraNavegacion rol={estado.modoActivo} esAdmin={estado.esAdmin} />
+      </div>
+    </ProveedorNoLeidos>
   );
 }

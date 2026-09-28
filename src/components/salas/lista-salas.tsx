@@ -1,7 +1,8 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useRouter } from "next/navigation";
+import { useEffect, useRef, useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Boton } from "@/components/ui/boton";
 import {
@@ -9,6 +10,7 @@ import {
   quitarDestacadoChat,
   desvincularmeDeSala,
 } from "@/app/(app)/salas/acciones";
+import { BadgeNoLeidos, useNoLeidos } from "./no-leidos";
 
 export interface SalaItem {
   salaId: string;
@@ -36,6 +38,21 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
   const [confirmando, setConfirmando] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const { porSala: noLeidos, total: totalNoLeidos } = useNoLeidos();
+  const router = useRouter();
+
+  // #216: cuando llega un mensaje la sala se enciende en vivo, pero la vista previa del
+  // último mensaje y el orden por actividad vienen del servidor — se piden de nuevo para
+  // que la tarjeta resaltada no siga diciendo "Sala recién creada".
+  const primerRender = useRef(true);
+  useEffect(() => {
+    if (primerRender.current) {
+      primerRender.current = false;
+      return;
+    }
+    router.refresh();
+  }, [totalNoLeidos, router]);
+  useEffect(() => setSalas(salasIniciales), [salasIniciales]);
 
   // El menú de "..." se quedaba abierto para siempre salvo que se tocara una opción de
   // adentro: tocar afuera, o `Esc`, ahora lo cierran — como cualquier menú desplegable.
@@ -93,11 +110,20 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
     <>
       {error && <p className="mb-2 text-xs text-error-600">{error}</p>}
       <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
-        {salas.map((s) => (
+        {salas.map((s) => {
+          const sinLeer = noLeidos.get(s.salaId) ?? 0;
+          return (
           <li
             key={s.salaId}
-            className={`relative flex flex-col rounded-xl border bg-superficie ${
-              s.destacadoEn ? "border-coral" : "border-borde"
+            data-sin-leer={sinLeer > 0 || undefined}
+            className={`relative flex flex-col rounded-xl border bg-superficie transition-colors ${
+              // #216: una sala con mensajes nuevos se "enciende" — gana sobre el borde de
+              // destacado (la estrella sigue diciendo que está destacada).
+              sinLeer > 0
+                ? "border-brand-500 bg-brand-500/[0.06] shadow-[0_0_18px_-6px] shadow-brand-500/60"
+                : s.destacadoEn
+                  ? "border-coral"
+                  : "border-borde"
             }`}
           >
             <div className="flex items-center gap-2 p-4">
@@ -114,12 +140,24 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
                     >
                       {s.esEquipo ? "Equipo" : "Proyecto"}
                     </span>
-                    <p className="truncate text-base font-medium text-texto">{s.titulo}</p>
+                    <p
+                      className={`truncate text-base text-texto ${sinLeer > 0 ? "font-semibold" : "font-medium"}`}
+                    >
+                      {s.titulo}
+                    </p>
                   </div>
-                  <p className="mt-0.5 truncate text-sm text-texto-tenue">
+                  <p
+                    className={`mt-0.5 truncate text-sm ${sinLeer > 0 ? "font-medium text-texto" : "text-texto-tenue"}`}
+                  >
                     {s.ultimoMensaje ?? "Sala recién creada"}
                   </p>
                 </div>
+                {sinLeer > 0 && (
+                  <>
+                    <span className="sr-only">{`, ${sinLeer} sin leer`}</span>
+                    <BadgeNoLeidos cantidad={sinLeer} className="shrink-0 ring-0" />
+                  </>
+                )}
               </Link>
               <button
                 type="button"
@@ -191,7 +229,8 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
               </div>
             )}
           </li>
-        ))}
+          );
+        })}
       </ul>
     </>
   );

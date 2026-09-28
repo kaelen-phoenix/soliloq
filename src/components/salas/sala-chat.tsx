@@ -2,10 +2,12 @@
 
 import { useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { suscribirConSesion } from "@/lib/supabase/realtime";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { Imagen } from "@/components/ui/imagen";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import { notificarMensajeNuevo } from "@/app/acciones-push";
+import { useNoLeidos } from "./no-leidos";
 
 /** Primer nombre: en el chat no hay lugar para nombre y apellido, y desambigua con la
  *  foto y la placa de perfil, no con el apellido (issue #149). */
@@ -52,6 +54,21 @@ export function SalaChat({
     finRef.current?.scrollIntoView({ block: "end" });
   }, [mensajes]);
 
+  // #216: estar mirando la sala = leerla. Se marca al entrar, con cada mensaje que llega
+  // mientras está a la vista, y al volver a la pestaña — no si llegan con la pantalla
+  // bloqueada: esos siguen contando como nuevos hasta que la persona los vea.
+  const { marcarLeida } = useNoLeidos();
+  useEffect(() => {
+    if (document.visibilityState === "visible") marcarLeida(salaId);
+  }, [salaId, mensajes.length, marcarLeida]);
+  useEffect(() => {
+    function alVolver() {
+      if (document.visibilityState === "visible") marcarLeida(salaId);
+    }
+    document.addEventListener("visibilitychange", alVolver);
+    return () => document.removeEventListener("visibilitychange", alVolver);
+  }, [salaId, marcarLeida]);
+
   // Quiénes se pueden leer en esta sala. `integrantes` ya viene filtrado por RLS, así que
   // alguien bloqueado no está en el conjunto. Es el respaldo del filtro real, que vive en
   // las políticas: si un día Realtime entregara un INSERT sin evaluar RLS, el mensaje de la
@@ -79,25 +96,23 @@ export function SalaChat({
       }
     }
 
-    const canal = supabase
-      .channel(`sala-${salaId}`)
-      .on(
-        "postgres_changes",
-        { event: "INSERT", schema: "public", table: "mensajes", filter: `sala_id=eq.${salaId}` },
-        (payload) => {
-          const nuevo = payload.new as Mensaje;
-          if (!visiblesRef.current.has(nuevo.autor_id)) return;
-          setMensajes((prev) => (prev.some((m) => m.id === nuevo.id) ? prev : [...prev, nuevo]));
-          ultimoIdRef.current = nuevo.id;
-        }
-      )
-      .subscribe((estado) => {
-        if (estado === "SUBSCRIBED") recuperarPerdidos();
-      });
-
-    return () => {
-      supabase.removeChannel(canal);
-    };
+    return suscribirConSesion(supabase, () =>
+      supabase
+        .channel(`sala-${salaId}`)
+        .on(
+          "postgres_changes",
+          { event: "INSERT", schema: "public", table: "mensajes", filter: `sala_id=eq.${salaId}` },
+          (payload) => {
+            const nuevo = payload.new as Mensaje;
+            if (!visiblesRef.current.has(nuevo.autor_id)) return;
+            setMensajes((prev) => (prev.some((m) => m.id === nuevo.id) ? prev : [...prev, nuevo]));
+            ultimoIdRef.current = nuevo.id;
+          }
+        )
+        .subscribe((estado) => {
+          if (estado === "SUBSCRIBED") recuperarPerdidos();
+        })
+    );
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [salaId]);
 

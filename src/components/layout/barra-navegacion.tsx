@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
+import { BadgeNoLeidos, useNoLeidos } from "@/components/salas/no-leidos";
 import { itemsParaNavegacion } from "./items-navegacion";
 import type { RolUsuario } from "@/lib/supabase/types";
 
@@ -23,22 +24,28 @@ export function BarraNavegacion({
   const pathname = usePathname();
   const t = useTranslations("nav");
   const items = itemsParaNavegacion(rol, { esAdmin });
+  const { total: noLeidos } = useNoLeidos();
 
   return (
     <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-borde bg-superficie/85 backdrop-blur-xl lg:hidden">
       <ul className="mx-auto flex max-w-lg items-stretch">
         {items.map((item) => {
           const activo = pathname === item.href;
+          const badge = item.href === "/salas" ? noLeidos : 0;
           return (
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
                 aria-current={activo ? "page" : undefined}
+                aria-label={badge > 0 ? `${t(item.clave)}, ${badge} sin leer` : undefined}
                 className={`flex flex-col items-center gap-1 pb-1.5 pt-2.5 text-2xs font-medium transition-colors ${
                   activo ? "acento-texto" : "text-texto-tenue hover:text-texto-tenue"
                 }`}
               >
-                <Icono nombre={item.icono} className="h-[22px] w-[22px]" />
+                <span className="relative">
+                  <Icono nombre={item.icono} className="h-[22px] w-[22px]" />
+                  <BadgeNoLeidos cantidad={badge} className="absolute -right-2 -top-1.5" />
+                </span>
                 {t(item.claveCorto ?? item.clave)}
               </Link>
             </li>

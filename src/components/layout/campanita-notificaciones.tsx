@@ -4,6 +4,7 @@ import Link from "next/link";
 import { useEffect, useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
+import { suscribirConSesion } from "@/lib/supabase/realtime";
 
 export function CampanitaNotificaciones({ userId }: { userId: string }) {
   const [noLeidas, setNoLeidas] = useState(0);
@@ -22,18 +23,16 @@ export function CampanitaNotificaciones({ userId }: { userId: string }) {
 
     cargarConteo();
 
-    const canal = supabase
-      .channel(`notificaciones-badge-${userId}`)
-      .on(
-        "postgres_changes",
-        { event: "*", schema: "public", table: "notificaciones", filter: `destinatario_id=eq.${userId}` },
-        () => cargarConteo()
-      )
-      .subscribe();
-
-    return () => {
-      supabase.removeChannel(canal);
-    };
+    return suscribirConSesion(supabase, () =>
+      supabase
+        .channel(`notificaciones-badge-${userId}`)
+        .on(
+          "postgres_changes",
+          { event: "*", schema: "public", table: "notificaciones", filter: `destinatario_id=eq.${userId}` },
+          () => cargarConteo()
+        )
+        .subscribe()
+    );
   }, [userId]);
 
   return (

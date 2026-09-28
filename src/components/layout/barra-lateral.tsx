@@ -5,6 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
 import { LogotipoInline } from "@/components/ui/logotipo";
+import { BadgeNoLeidos, useNoLeidos } from "@/components/salas/no-leidos";
 import { itemsParaNavegacion } from "./items-navegacion";
 import type { RolUsuario } from "@/lib/supabase/types";
 
@@ -21,6 +22,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
   const pathname = usePathname();
   const t = useTranslations("nav");
   const items = itemsParaNavegacion(rol, { esAdmin });
+  const { total: noLeidos } = useNoLeidos();
 
   return (
     <aside className="hidden shrink-0 lg:sticky lg:top-0 lg:flex lg:h-screen lg:w-60 lg:flex-col lg:border-r lg:border-borde lg:bg-superficie lg:px-4 lg:py-6">
@@ -32,11 +34,13 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
         <ul className="flex flex-col gap-1">
           {items.map((item) => {
             const activo = pathname === item.href;
+            const badge = item.href === "/salas" ? noLeidos : 0;
             return (
               <li key={item.href}>
                 <Link
                   href={item.href}
                   aria-current={activo ? "page" : undefined}
+                  aria-label={badge > 0 ? `${t(item.clave)}, ${badge} sin leer` : undefined}
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                     activo
                       ? "acento-fondo acento-texto"
@@ -44,7 +48,8 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
                   }`}
                 >
                   <Icono nombre={item.icono} className="h-[18px] w-[18px]" />
-                  {t(item.clave)}
+                  <span className="flex-1">{t(item.clave)}</span>
+                  <BadgeNoLeidos cantidad={badge} className="ring-0" />
                 </Link>
               </li>
             );
