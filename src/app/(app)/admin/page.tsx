@@ -1,19 +1,17 @@
 import { notFound } from "next/navigation";
 import { PanelAdmin } from "@/components/admin/panel-admin";
-import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
+import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
 export const metadata = { title: "Admin — Yalope", robots: { index: false, follow: false } };
 
 export default async function AdminPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) notFound();
 
-  const estado = await leerEstadoCuenta(supabase, user.id);
+  const estado = await estadoCuentaDeLaRequest(user.id);
   // 404 y no "no autorizado": no se confirma que la ruta exista para quien no es admin.
   if (!estado.esAdmin) notFound();
 

@@ -8,29 +8,29 @@ import { TransicionPagina } from "@/components/ui/transicion-pagina";
 import { AvisoConvocatoria } from "@/components/talento/aviso-convocatoria";
 import { ProveedorNoLeidos, type FilaNoLeidos } from "@/components/salas/no-leidos";
 import { TourGuiado } from "@/components/tour/tour-guiado";
-import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { createClient } from "@/lib/supabase/server";
+import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
 export default async function AppLayout({ children }: { children: React.ReactNode }) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   // Sin sesión no se entra al área de la app: se va a la landing, que explica qué es
   // Yalope y tiene los accesos a "Entrar" y "Crear mi perfil". El middleware (src/middleware.ts)
   // ya cubre esto mismo para casi todas las rutas desde #10, pero este chequeo se mantiene
   // como segunda línea: es el único gate que corre para lo que se renderiza en este layout.
   if (!user) redirect("/bienvenida");
 
-  const estado = await leerEstadoCuenta(supabase, user.id);
+  // Mensajes sin leer de Salas (#216): la primera carga viene de acá para que el badge no
+  // aparezca un instante después; de ahí en más lo mantiene `ProveedorNoLeidos`. Sale en
+  // paralelo con el estado de la cuenta: son dos viajes a la base que no dependen uno del otro.
+  const [estado, { data: noLeidos, error: errorNoLeidos }] = await Promise.all([
+    estadoCuentaDeLaRequest(user.id),
+    supabase.rpc("salas_no_leidas"),
+  ]);
   if (estado.suspendido) redirect("/suspendido");
   if (!estado.normasAceptadas) redirect("/aceptar-normas");
   if (!estado.modoActivo) redirect("/completar-perfil");
-
-  // Mensajes sin leer de Salas (#216): la primera carga viene de acá para que el badge no
-  // aparezca un instante después; de ahí en más lo mantiene `ProveedorNoLeidos`.
-  const { data: noLeidos, error: errorNoLeidos } = await supabase.rpc("salas_no_leidas");
   if (errorNoLeidos) reportarErrorSupabase(errorNoLeidos, { rpc: "salas_no_leidas" });
 
   return (

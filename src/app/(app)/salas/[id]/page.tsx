@@ -2,16 +2,14 @@ import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { conmutarModo } from "@/app/acciones-modo";
 import { createClient } from "@/lib/supabase/server";
-import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { Boton } from "@/components/ui/boton";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { SalaChat, type Integrante } from "@/components/salas/sala-chat";
+import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
 export default async function SalaPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) return null;
 
   const { data: sala } = await supabase
@@ -39,7 +37,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
   // distinguen: van en cualquiera de los dos modos.
   const esDeIniciativa = !!(sala.obra_id || sala.equipo_id);
   const esDueno = obra?.creador_id === user.id || equipo?.creador_id === user.id;
-  const estado = await leerEstadoCuenta(supabase, user.id);
+  const estado = await estadoCuentaDeLaRequest(user.id);
   const perteneceAModoActual =
     !esDeIniciativa || (estado.modoActivo === "creador" ? esDueno : !esDueno);
 

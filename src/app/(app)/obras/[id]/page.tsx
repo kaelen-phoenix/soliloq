@@ -10,6 +10,7 @@ import { MetricasObra } from "@/components/convocatorias/metricas-obra";
 import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { Icono } from "@/components/ui/icono";
 import { etiquetaGenero } from "@/lib/constantes";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 const ETIQUETA_TIPO: Record<string, string> = { actuacion: "Actuación", tecnica: "Técnica" };
 
@@ -25,9 +26,7 @@ export default async function DetalleObraPage({
   const { data: obra } = await supabase.from("obras").select("*").eq("id", params.id).single();
   if (!obra) notFound();
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   const esDueno = user?.id === obra.creador_id;
   const editando = esDueno && searchParams.editar === "1";
 

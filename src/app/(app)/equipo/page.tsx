@@ -3,12 +3,11 @@ import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { FeedEquipo, type PersonaEquipo } from "@/components/equipo/feed-equipo";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 export default async function EquipoPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) return null;
 
   const { data: perfil } = await supabase
