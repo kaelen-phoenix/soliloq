@@ -26,8 +26,8 @@ test.describe("landing", () => {
   // #226: la portada enlaza «Apoyá el proyecto» y robots/sitemap la declaran pública, pero
   // el middleware la mandaba a /ingresar a quien no tenía sesión.
   test("«Apoyar» se ve sin sesión (no redirige a /ingresar)", async ({ page }) => {
-    await page.goto("/bienvenida");
-    await page.getByRole("link", { name: "Apoyá el proyecto" }).click();
+    const res = await page.goto("/apoyar");
+    expect(res?.status()).toBe(200);
     await expect(page).toHaveURL(/\/apoyar$/);
     await expect(page.getByRole("heading", { level: 1, name: "Apoyá Yalope" })).toBeVisible();
   });
