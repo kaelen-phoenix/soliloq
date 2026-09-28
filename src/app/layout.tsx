@@ -3,6 +3,7 @@ import { Baloo_2, Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
+import { SplashMarca } from "@/components/ui/splash-marca";
 
 // Se auto-hospeda en el build: sin request a un dominio externo en runtime.
 const inter = Inter({
@@ -77,6 +78,12 @@ export const viewport: Viewport = {
 // al tema que quedó, para que en claro no quede una franja negra arriba.
 const SCRIPT_TEMA = `(function(){var d=document.documentElement,mq=window.matchMedia('(prefers-color-scheme: light)'),actual=null;function aplicar(t){var claro=t==='claro'||(t==='sistema'&&mq.matches);d.dataset.tema=claro?'light':'dark';var m=document.getElementById('tema-color');if(!m){m=document.createElement('meta');m.id='tema-color';m.name='theme-color';document.head.appendChild(m);}m.content=claro?'#ffffff':'#0c0a0b';}window.__tema=function(t){actual=t;aplicar(t);};var alCambiar=function(){if(actual==='sistema')aplicar(actual);};if(mq.addEventListener)mq.addEventListener('change',alCambiar);else if(mq.addListener)mq.addListener(alCambiar);try{var c=document.cookie.match(/(?:^|; )tema=([^;]+)/);window.__tema(c&&c[1]);}catch(e){d.dataset.tema='dark';}})();`;
 
+// Splash de apertura (#245): se muestra una vez por pestaña. Antes del primer pintado, lo
+// omite si ya se vio en esta sesión o si el navegador está automatizado (los e2e no tienen
+// por qué esperarlo); si `sessionStorage` no está disponible, también (mejor sin splash que
+// con uno en cada navegación). "Reducir movimiento" lo resuelve el CSS.
+const SCRIPT_SPLASH = `(function(){var d=document.documentElement;try{if(navigator.webdriver||sessionStorage.getItem('splash')){d.dataset.splash='omitir';}else{sessionStorage.setItem('splash','1');}}catch(e){d.dataset.splash='omitir';}})();`;
+
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
@@ -90,8 +97,10 @@ export default async function RootLayout({ children }: { children: React.ReactNo
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
+        <script dangerouslySetInnerHTML={{ __html: SCRIPT_SPLASH }} />
       </head>
       <body className="min-h-screen">
+        <SplashMarca />
         <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
       </body>
     </html>

@@ -180,3 +180,115 @@
     scroll-behavior: auto !important;
   }
 }
+
+/* Splash de apertura (#245, `ui/splash-marca.tsx`). Fuera de las capas de Tailwind a
+   propósito: son animaciones con nombre, no utilidades. Todo el recorrido dura ~1,3 s y el
+   splash se va solo (`splash-salida` lo deja invisible y sin atrapar clics), sin JS. */
+.splash-marca {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  background-color: #0c0a0b;
+  /* No atrapa toques: si alguien toca apurado mientras dura, el toque llega a la app. */
+  pointer-events: none;
+  animation: splash-salida 0.4s ease-in 0.95s forwards;
+}
+
+/* `SCRIPT_SPLASH` (layout.tsx): ya visto en esta pestaña, o navegador automatizado. */
+html[data-splash="omitir"] .splash-marca {
+  display: none;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .splash-marca {
+    display: none;
+  }
+}
+
+.splash-marca__isotipo {
+  position: relative;
+  width: 96px;
+  height: auto;
+  overflow: visible;
+}
+
+/* La luz de reflector detrás del isotipo. */
+.splash-marca__luz {
+  position: absolute;
+  width: 320px;
+  height: 320px;
+  border-radius: 9999px;
+  background: radial-gradient(circle, rgb(242 87 30 / 0.42), transparent 65%);
+  opacity: 0;
+  animation: splash-luz 1.1s ease-out 0.1s forwards;
+}
+
+.splash-marca__brazo {
+  transform-box: fill-box;
+  transform-origin: 50% 100%;
+  opacity: 0;
+  animation: splash-brazo 0.5s cubic-bezier(0.2, 0.8, 0.2, 1) forwards;
+}
+
+.splash-marca__mano {
+  transform-box: fill-box;
+  opacity: 0;
+  animation: splash-mano 0.45s cubic-bezier(0.2, 0.8, 0.2, 1) 0.3s forwards;
+}
+
+/* Las manos se abren desde donde se unen al brazo. */
+.splash-marca__mano--izq {
+  --giro: 28deg;
+  transform-origin: 100% 100%;
+}
+
+.splash-marca__mano--der {
+  --giro: -28deg;
+  transform-origin: 0% 100%;
+}
+
+@keyframes splash-brazo {
+  from {
+    opacity: 0;
+    transform: translateY(16%) scaleY(0.86);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes splash-mano {
+  from {
+    opacity: 0;
+    transform: rotate(var(--giro)) scale(0.6);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+@keyframes splash-luz {
+  0% {
+    opacity: 0;
+    transform: scale(0.6);
+  }
+  55% {
+    opacity: 1;
+  }
+  100% {
+    opacity: 0.55;
+    transform: scale(1.1);
+  }
+}
+
+@keyframes splash-salida {
+  to {
+    opacity: 0;
+    visibility: hidden;
+  }
+}
