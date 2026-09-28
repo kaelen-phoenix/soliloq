@@ -29,16 +29,18 @@ export async function adminBorrarUsuario(idObjetivo: string): Promise<Resultado>
   // `perfiles_select_propio` (0001) solo deja leer la fila propia: con el cliente de
   // sesión, mirar el perfil de otra persona siempre da null, sea quien sea. Hace falta el
   // service-role para chequear si el objetivo es admin.
-  const admin = createAdminClient();
-  const { data: objetivo } = await admin
-    .from("perfiles")
-    .select("es_admin")
-    .eq("id", idObjetivo)
-    .maybeSingle();
-  if (!objetivo) return { ok: false, error: "Ese usuario no existe." };
-  if (objetivo.es_admin) return { ok: false, error: "No podés borrar a otro admin." };
-
+  // Todo en el `try`: `createAdminClient()` también tira (p. ej. sin la clave de servicio),
+  // y una excepción acá dejaba el panel trabado en «Borrando…» (#229).
   try {
+    const admin = createAdminClient();
+    const { data: objetivo } = await admin
+      .from("perfiles")
+      .select("es_admin")
+      .eq("id", idObjetivo)
+      .maybeSingle();
+    if (!objetivo) return { ok: false, error: "Ese usuario no existe." };
+    if (objetivo.es_admin) return { ok: false, error: "No podés borrar a otro admin." };
+
     await borrarUsuarioYArchivos(idObjetivo);
   } catch (e) {
     return { ok: false, error: e instanceof Error ? e.message : "No se pudo borrar." };

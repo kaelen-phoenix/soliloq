@@ -91,6 +91,7 @@
     "borrarCuentaConfirmar": "Escribí {palabra} para confirmar.",
     "borrarCuentaDefinitivo": "Borrar mi cuenta",
     "borrarCuentaEnCurso": "Borrando…",
+    "borrarCuentaError": "No pudimos borrar tu cuenta. Probá de nuevo en un rato.",
     "cancelar": "Cancelar"
   },
   "instalar": {

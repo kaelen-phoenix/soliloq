@@ -108,6 +108,10 @@ jobs:
 
       - name: levantar la app contra staging
         if: env.E2E_SUPABASE_URL != ''
+        # La clave de servicio del server (borrar cuenta, admin): sin ella esos flujos fallan
+        # (#229). Es la de staging, la misma que usan los tests para sembrar.
+        env:
+          SUPABASE_SERVICE_ROLE_KEY: ${{ env.E2E_SERVICE_KEY }}
         run: |
           npm run start -- --port 3100 &
           for i in $(seq 1 30); do

@@ -10,11 +10,18 @@ export function BorrarCuenta() {
   const t = useTranslations("ajustes");
   const [abierto, setAbierto] = useState(false);
   const [enviando, setEnviando] = useState(false);
+  const [error, setError] = useState<string | null>(null);
 
   async function confirmar() {
+    setError(null);
     setEnviando(true);
-    await borrarCuenta();
-    // Sin `setEnviando(false)`: si llega hasta acá, ya redirigió a /bienvenida.
+    // Si sale bien, la acción redirige a /bienvenida y esto no vuelve. Si falla —porque la
+    // acción devolvió el error o porque tiró—, se muestra y se puede reintentar (#229).
+    const res = await borrarCuenta().catch(() => ({ ok: false as const }));
+    if (res && !res.ok) {
+      setError(t("borrarCuentaError"));
+      setEnviando(false);
+    }
   }
 
   return (
@@ -31,15 +38,22 @@ export function BorrarCuenta() {
           {t("borrarCuenta")}
         </Boton>
       ) : (
-        <ConfirmarBorrado
-          mensaje={t("borrarCuentaConfirmar", { palabra: "BORRAR" })}
-          textoBoton={t("borrarCuentaDefinitivo")}
-          textoCargando={t("borrarCuentaEnCurso")}
-          textoCancelar={t("cancelar")}
-          cargando={enviando}
-          onConfirmar={confirmar}
-          onCancelar={() => setAbierto(false)}
-        />
+        <>
+          {error && (
+            <p role="alert" className="mb-2 text-xs text-error-600">
+              {error}
+            </p>
+          )}
+          <ConfirmarBorrado
+            mensaje={t("borrarCuentaConfirmar", { palabra: "BORRAR" })}
+            textoBoton={t("borrarCuentaDefinitivo")}
+            textoCargando={t("borrarCuentaEnCurso")}
+            textoCancelar={t("cancelar")}
+            cargando={enviando}
+            onConfirmar={confirmar}
+            onCancelar={() => setAbierto(false)}
+          />
+        </>
       )}
     </section>
   );
