@@ -29,9 +29,6 @@ export default async function ConvocatoriaPage() {
 
   return (
     <main className="px-5 py-5">
-      <h1 className="mb-1 font-display text-xl font-semibold tracking-[-0.02em] text-texto sm:text-2xl">
-        Convocatoria
-      </h1>
       <p className="mb-5 text-sm text-texto-tenue">
         Te convocaron a un proyecto o equipo. Aceptá para entrar a la sala.
       </p>
