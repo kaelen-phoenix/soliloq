@@ -42,6 +42,13 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   la sala (con sus mensajes) se va con la iniciativa — también la de un Equipo, que antes
   quedaba huérfana. Un Creador no puede borrar el Equipo de otro, y borrar una iniciativa no
   toca las demás ni el perfil del Talento.
+- **`contactar_equipo.sql`** — «Contactar» entre personas y la sala 1:1 (#101, #241, 0085):
+  `nombre_de_perfil`, `feed_equipo`, `perfil_para_responder` y la sala que abre el trigger
+  `al_marcar_interes` cuando el interés es mutuo.
+- **`funciones_validas.sql`** — re-crea cada función `language sql` de `public` (en la
+  transacción que se descarta) y falla si alguna no compila contra las tablas de hoy. Una
+  función SQL no se revalida cuando se borra una columna que usa: así quedaron rotas tres
+  con 0077 (#241) sin que nadie se enterara.
 
 ## Pendiente
 
