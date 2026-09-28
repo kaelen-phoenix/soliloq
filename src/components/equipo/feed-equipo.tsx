@@ -162,7 +162,7 @@ export function FeedEquipo({ personasIniciales }: { personasIniciales: PersonaEq
         <button
           type="button"
           onClick={() => decidir(actual, true)}
-          className="flex h-16 w-16 items-center justify-center rounded-full bg-brand-500 text-white shadow-tarjeta transition-colors hover:bg-brand-600"
+          className="flex h-16 w-16 items-center justify-center rounded-full bg-accion text-white brillo-accion transition hover:brightness-110"
           aria-label="Me interesa"
         >
           <Icono nombre="corazon" className="h-7 w-7" relleno />

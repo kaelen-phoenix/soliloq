@@ -139,7 +139,7 @@ export function BotonInstalar({
             <button
               type="button"
               onClick={() => setAyuda(null)}
-              className="mt-5 w-full rounded-xl bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto"
+              className="mt-5 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto"
             >
               {t("iosCerrar")}
             </button>
