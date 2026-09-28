@@ -3,10 +3,12 @@
 import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/boton";
+import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
 import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
 import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
+import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/client";
 
 export interface EquipoActivo {
@@ -138,6 +140,7 @@ export function GestionEquipo({
   const [cupo, setCupo] = useState(equipo?.cupo ?? 4);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
+  const [confirmarBorrado, setConfirmarBorrado] = useState(false);
 
   const editando = equipo !== null;
 
@@ -194,6 +197,47 @@ export function GestionEquipo({
       setError("No pudimos cerrar el equipo. Probá de nuevo.");
       return;
     }
+    router.refresh();
+  }
+
+  // #215: eliminar el equipo de verdad (no "cerrarlo"). Por cascada se van los intereses,
+  // matches y convocatorias —con eso sus Talentos vuelven a Buscar Talentos— y la sala con
+  // sus mensajes (0083). Mismo recorrido que "Borrar proyecto" en `AccionesObra`.
+  async function borrar() {
+    if (!equipo) return;
+    setError(null);
+    setCargando(true);
+    const supabase = createClient();
+    // Las rutas se piden antes de borrar: `fotos_equipo` cae en cascada con el equipo y
+    // después ya no habría de dónde sacarlas. Si esta consulta falla, no se borra nada.
+    const { data: fotosActuales, error: errorFotos } = await supabase
+      .from("fotos_equipo")
+      .select("storage_path")
+      .eq("equipo_id", equipo.id);
+    if (errorFotos) {
+      setCargando(false);
+      setError("No se pudo eliminar el equipo. Probá de nuevo.");
+      return;
+    }
+    // Primero la fila y después el Storage (no cascadea): si el borrado de la fila falla, el
+    // equipo queda entero con sus fotos, en vez de vivo y sin fotos.
+    const { error: errorBd } = await supabase.from("equipos").delete().eq("id", equipo.id);
+    if (errorBd) {
+      setCargando(false);
+      setError("No se pudo eliminar el equipo. Probá de nuevo.");
+      return;
+    }
+    const rutas = (fotosActuales ?? []).map((f) => f.storage_path);
+    if (rutas.length > 0) {
+      // Un archivo que no se borre queda huérfano en el Storage, pero el equipo ya no
+      // existe: no se le muestra error a la persona, se reporta.
+      const { error: errorStorage } = await supabase.storage.from("fotos-perfil").remove(rutas);
+      if (errorStorage) {
+        Sentry.captureException(errorStorage, { tags: { origen: "eliminar-equipo" } });
+      }
+    }
+    setConfirmarBorrado(false);
+    setCargando(false);
     router.refresh();
   }
 
@@ -260,6 +304,29 @@ export function GestionEquipo({
             </p>
             <div className="mt-4">
               <CoberturaIniciativa filas={cobertura} esEquipo />
+            </div>
+            <div className="mt-4 border-t border-borde pt-4">
+              {error && !abierto && <p className="mb-2 text-xs text-error-600">{error}</p>}
+              {!confirmarBorrado ? (
+                <Boton
+                  variante="fantasma"
+                  className="!px-0 text-error-600 hover:!bg-transparent hover:underline"
+                  onClick={() => {
+                    setError(null);
+                    setConfirmarBorrado(true);
+                  }}
+                >
+                  Eliminar equipo
+                </Boton>
+              ) : (
+                <ConfirmarBorrado
+                  mensaje="Se elimina el equipo con sus fotos y su sala de chat. Los Talentos que convocaste vuelven a aparecer en Buscar Talentos. No se puede deshacer. Escribí BORRAR para confirmar."
+                  textoBoton="Eliminar definitivamente"
+                  cargando={cargando}
+                  onConfirmar={borrar}
+                  onCancelar={() => setConfirmarBorrado(false)}
+                />
+              )}
             </div>
           </>
         )}
