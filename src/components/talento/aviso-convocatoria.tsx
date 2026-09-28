@@ -6,6 +6,7 @@ import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
 import { createClient } from "@/lib/supabase/client";
+import { suscribirConSesion } from "@/lib/supabase/realtime";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { responderConvocatoria } from "@/app/(app)/convocatoria/acciones";
 
@@ -60,24 +61,26 @@ export function AvisoConvocatoria({ userId }: { userId: string }) {
 
     // El propio `convocar()` inserta esta notificación (0063) — reusarla evita un canal
     // Realtime nuevo, ya probado en vivo por `CampanitaNotificaciones`.
-    const canal = supabase
-      .channel(`convocatorias-aviso-${userId}`)
-      .on(
-        "postgres_changes",
-        {
-          event: "INSERT",
-          schema: "public",
-          table: "notificaciones",
-          filter: `destinatario_id=eq.${userId}`,
-        },
-        (payload) => {
-          if ((payload.new as { tipo?: string }).tipo === "convocado") cargar();
-        },
-      )
-      .subscribe();
+    const cerrarCanal = suscribirConSesion(supabase, () =>
+      supabase
+        .channel(`convocatorias-aviso-${userId}`)
+        .on(
+          "postgres_changes",
+          {
+            event: "INSERT",
+            schema: "public",
+            table: "notificaciones",
+            filter: `destinatario_id=eq.${userId}`,
+          },
+          (payload) => {
+            if ((payload.new as { tipo?: string }).tipo === "convocado") cargar();
+          },
+        )
+        .subscribe(),
+    );
 
     return () => {
-      supabase.removeChannel(canal);
+      cerrarCanal();
     };
   }, [userId]);
 

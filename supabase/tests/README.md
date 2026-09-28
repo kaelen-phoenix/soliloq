@@ -33,6 +33,10 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   cuenta nueva nace con `normas_aceptadas_en` en null, el propio usuario puede marcarla
   (mismo `update` que usa la server action `aceptarNormas()`), y un tercero no puede tocar
   la aceptación ajena (RLS de `perfiles_update_propio`).
+- **`salas_no_leidos.sql`** — mensajes sin leer en Salas (0082, #216): `salas_no_leidas`
+  cuenta solo lo de otros posterior a `leido_hasta` (o a `incorporado_en` si nunca abrió la
+  sala), `marcar_sala_leida` toca solo la marca propia y no suma a un ajeno a la sala, y un
+  bloqueo saca los mensajes del conteo (la función es SECURITY INVOKER a propósito).
 
 ## Pendiente
 

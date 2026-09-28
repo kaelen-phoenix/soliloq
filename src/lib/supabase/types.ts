@@ -634,6 +634,8 @@ export interface Database {
           sala_id: string;
           perfil_id: string;
           incorporado_en: string;
+          /** Hasta cuándo leyó la sala este integrante (#216). Se escribe con `marcar_sala_leida`. */
+          leido_hasta: string | null;
         };
         Insert: {
           sala_id: string;
@@ -843,6 +845,17 @@ export interface Database {
       };
       /** El Creador cierra el aviso de un Match nuevo (issue #194). Idempotente. */
       marcar_match_mostrado: { Args: { p_match_id: string }; Returns: undefined };
+      /** Salas propias con mensajes de otros sin leer (#216); solo vienen las que tienen alguno. */
+      salas_no_leidas: {
+        Args: Record<string, never>;
+        Returns: {
+          sala_id: string;
+          no_leidos: number;
+          es_de_iniciativa: boolean;
+          es_dueno: boolean;
+        }[];
+      };
+      marcar_sala_leida: { Args: { p_sala_id: string }; Returns: undefined };
       aceptar_match: { Args: { p_match_id: string }; Returns: undefined };
       convocar: { Args: { p_match_id: string; p_rol_id?: string | null }; Returns: undefined };
       /** Quién ocupa cada rol de un Proyecto (o cada lugar de un Equipo) y quién falta

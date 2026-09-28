@@ -30,6 +30,11 @@ aviso "¡Tenés un Match!" (#194) → "Aceptar", Call Back → "Aceptar" (pasa a
 manual (#182), las Normas (#180) y el onboarding con ubicación por Google Places se siembran
 directo con el cliente admin en vez de navegarse — ver los comentarios del archivo.
 
+`flujos/salas-no-leidos.spec.ts` (#216, #222): un mensaje nuevo enciende la sala en
+`/salas` y el badge de "Salas" en vivo; entrar la marca leída y queda así al volver; y una
+sala abierta con carga completa recibe en vivo los mensajes de los demás (el canal de
+Realtime espera la sesión, `suscribirConSesion`).
+
 ### El proyecto de staging (2026-09-20)
 
 Existe `soliloq-staging` (ref `rcjjdguldfrkpmxgkazn`, mismo org de Supabase, plan free) con
