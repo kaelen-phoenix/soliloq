@@ -121,6 +121,7 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
       {/* #142: "Buscar talento" salió de la barra inferior; su acceso vive acá. */}
       <Link
         href="/talentos"
+        data-tour="buscar-talento"
         className="brillo-accion mb-4 flex items-center justify-center gap-1.5 rounded-full bg-accion px-4 py-3 text-sm font-semibold text-accion-texto transition hover:brightness-110"
       >
         <Icono nombre="buscar" className="h-4 w-4" />

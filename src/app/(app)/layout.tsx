@@ -1,4 +1,5 @@
 import { redirect } from "next/navigation";
+import { Suspense } from "react";
 import { ActualizarAlVolver } from "@/components/layout/actualizar-al-volver";
 import { BarraLateral } from "@/components/layout/barra-lateral";
 import { BarraNavegacion } from "@/components/layout/barra-navegacion";
@@ -6,6 +7,7 @@ import { Encabezado } from "@/components/layout/encabezado";
 import { TransicionPagina } from "@/components/ui/transicion-pagina";
 import { AvisoConvocatoria } from "@/components/talento/aviso-convocatoria";
 import { ProveedorNoLeidos, type FilaNoLeidos } from "@/components/salas/no-leidos";
+import { TourGuiado } from "@/components/tour/tour-guiado";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { createClient } from "@/lib/supabase/server";
@@ -70,6 +72,15 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
 
         <BarraNavegacion rol={estado.modoActivo} esAdmin={estado.esAdmin} />
+        {/* Suspense: el tour lee `?tour=1` con useSearchParams. */}
+        <Suspense fallback={null}>
+          <TourGuiado
+            userId={user.id}
+            modo={estado.modoActivo}
+            vistoTalento={estado.tourTalentoVisto}
+            vistoCreador={estado.tourCreadorVisto}
+          />
+        </Suspense>
       </div>
     </ProveedorNoLeidos>
   );

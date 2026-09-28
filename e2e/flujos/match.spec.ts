@@ -74,6 +74,9 @@ test.describe("circuito de match (UI)", () => {
       .update({
         aprobado_en: new Date().toISOString(),
         normas_aceptadas_en: new Date().toISOString(),
+        // El tour guiado (#231) taparía la pantalla: los tests que no lo prueban lo dan por visto.
+        tour_talento_visto_en: new Date().toISOString(),
+        tour_creador_visto_en: new Date().toISOString(),
         modo_activo: "talento",
         onboarding_completo: true,
       })
@@ -109,6 +112,9 @@ test.describe("circuito de match (UI)", () => {
       .update({
         aprobado_en: new Date().toISOString(),
         normas_aceptadas_en: new Date().toISOString(),
+        // El tour guiado (#231) taparía la pantalla: los tests que no lo prueban lo dan por visto.
+        tour_talento_visto_en: new Date().toISOString(),
+        tour_creador_visto_en: new Date().toISOString(),
         modo_activo: "creador",
       })
       .eq("id", id);

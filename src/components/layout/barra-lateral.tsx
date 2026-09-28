@@ -6,7 +6,7 @@ import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
 import { LogotipoInline } from "@/components/ui/logotipo";
 import { BadgeNoLeidos, useNoLeidos } from "@/components/salas/no-leidos";
-import { itemsParaNavegacion } from "./items-navegacion";
+import { idTourNav, itemsParaNavegacion } from "./items-navegacion";
 import type { RolUsuario } from "@/lib/supabase/types";
 
 /**
@@ -39,6 +39,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
               <li key={item.href}>
                 <Link
                   href={item.href}
+                  data-tour={idTourNav(item.href)}
                   aria-current={activo ? "page" : undefined}
                   aria-label={badge > 0 ? `${t(item.clave)}, ${badge} sin leer` : undefined}
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${

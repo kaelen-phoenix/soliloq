@@ -38,6 +38,7 @@ export function CampanitaNotificaciones({ userId }: { userId: string }) {
   return (
     <Link
       href="/notificaciones"
+      data-tour="campanita"
       aria-label={noLeidas > 0 ? `Notificaciones, ${noLeidas} sin leer` : "Notificaciones"}
       className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-texto-tenue transition-colors hover:bg-fondo-sutil hover:text-texto"
     >

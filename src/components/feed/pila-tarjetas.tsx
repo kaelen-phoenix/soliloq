@@ -494,6 +494,7 @@ export function PilaTarjetas({
             disabled={recargando}
             className="flex h-16 w-16 items-center justify-center rounded-full bg-accion text-white brillo-accion transition hover:brightness-110 disabled:opacity-50"
             aria-label="Postularme"
+            data-tour="me-interesa"
           >
             <Icono nombre="corazon" className="h-7 w-7" relleno />
           </button>

@@ -58,3 +58,8 @@ export function itemsParaNavegacion(
 ): ItemNavegacion[] {
   return esAdmin ? [...ITEMS_NAVEGACION[rol], ITEM_ADMIN] : ITEMS_NAVEGACION[rol];
 }
+
+/** Ancla del tour guiado (#231) para un ítem: `nav-inicio`, `nav-salas`, `nav-matches`… */
+export function idTourNav(href: string) {
+  return href === "/" ? "nav-inicio" : `nav-${href.slice(1)}`;
+}

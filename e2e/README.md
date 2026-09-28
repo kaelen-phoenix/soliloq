@@ -46,6 +46,14 @@ visor de fotos, «Borrar mi cuenta», «Borrar proyecto», borrar un usuario des
 límite de 20 «Me interesa» por día. Los borrados usan la clave de servicio del server:
 levantar la app con `SUPABASE_SERVICE_ROLE_KEY` (ver abajo).
 
+`flujos/tour-guiado.spec.ts` (#231), en teléfono: el tour de la primera vez — recorrido con
+«Siguiente» hasta «Entendido», «Omitir», un tour por experiencia para quien tiene los dos
+roles (sin repetir el paso de Perfil) y «Ver el recorrido de nuevo» desde Ajustes.
+
+Ojo al sembrar usuarios en cualquier otro spec: una cuenta nueva ve el tour y la capa tapa
+la pantalla. Por eso todos los helpers marcan `tour_talento_visto_en` y
+`tour_creador_visto_en` junto con `normas_aceptadas_en`.
+
 ### El proyecto de staging (2026-09-20)
 
 Existe `soliloq-staging` (ref `rcjjdguldfrkpmxgkazn`, mismo org de Supabase, plan free) con
