@@ -13,8 +13,10 @@ const RUTAS_SIEMPRE_DISPONIBLES = ["/cambiar-clave"];
 // El enlace público del perfil (`/p/[token]`) y las Normas de la Comunidad (`/normas`) se
 // sirven igual con o sin sesión: a diferencia de `RUTAS_PUBLICAS`, acá un usuario logueado
 // NO se rebota a `/` — hace falta poder abrir `/normas` desde el gate de `/aceptar-normas`
-// sin salir de esa pantalla.
-const RUTAS_ABIERTAS = ["/p/", "/normas"];
+// sin salir de esa pantalla. «Apoyar» (`/apoyar`) también: la enlaza la portada y la declaran
+// pública `robots.ts` y `sitemap.ts`, pero faltaba acá y a quien no tenía sesión lo mandaba a
+// `/ingresar` (#226).
+const RUTAS_ABIERTAS = ["/p/", "/normas", "/apoyar"];
 
 /** Solo destinos internos: `next` viaja por la URL y no puede convertirse en un redirect abierto. */
 function conNext(destino: string, next: string): string {

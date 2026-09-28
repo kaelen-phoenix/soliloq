@@ -51,7 +51,7 @@
   "landing": {
     "entrar": "Log in",
     "crearPerfil": "Create profile",
-    "heroTitulo": "The match for actors starts here.",
+    "heroTitulo": "The match for <d>actors</d> starts here.",
     "heroTexto": "Yalope connects actors and creators with a fast, visual match: swipe through profiles and proposals, and when the interest goes both ways, you connect and a chat opens. Find people to share a project with and build your team. Your profile also works as a shareable booking.",
     "heroTextoExpansion": "Yalope started to connect talent from the acting world, and is expanding to the whole artistic community: musicians, dancers, photographers, directors, producers, and more.",
     "verComoFunciona": "See how it works",

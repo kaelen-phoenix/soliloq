@@ -20,8 +20,10 @@
      la identidad visual— y el claro es la variante:
        - `:root` = oscuro, para quien no eligió nada.
        - `[data-tema="light"]` = claro: lo pone el script de `layout.tsx` si en Ajustes se
-         eligió "Claro" (o "Sistema" con el teléfono en claro), y lo usan como subárbol las
-         páginas de marca que siguen siendo claras (portada, «Apoyar»).
+         eligió "Claro" (o "Sistema" con el teléfono en claro). También funciona en un
+         subárbol. Las páginas de marca (portada, «Apoyar») fijan `data-tema="dark"`: son la
+         cara de la identidad y van siempre en el negro de escena, elija lo que elija quien
+         entra.
      Solo se redefinen acá; los componentes usan `bg-superficie`, `text-texto`,
      `border-borde`, `bg-fondo-sutil` (y `ink-50/100/200`, que también son variables). */
   :root,
