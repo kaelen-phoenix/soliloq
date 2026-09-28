@@ -51,7 +51,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
         <EstadoVacio
           icono="cambiar"
           titulo="Esta sala es de tu otro modo"
-          detalle={`Cambiá a ${t(otro)} para verla. Después la encontrás en Salas, desde ahí.`}
+          detalle={`Cambiá a ${t(otro)} para verla. Después la encontrás en Chats, desde ahí.`}
           accion={
             <form action={conmutarModo.bind(null, otro)}>
               <Boton type="submit" variante="secundario">
