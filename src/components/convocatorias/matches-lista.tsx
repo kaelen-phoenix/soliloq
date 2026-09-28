@@ -142,7 +142,7 @@ export function MatchesLista({ filas: filasIniciales }: { filas: FilaMatch[] }) 
               type="button"
               disabled={ocupado}
               onClick={() => aceptar(confirmar)}
-              className="mt-4 w-full rounded-xl bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto disabled:opacity-50"
+              className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
             >
               {ocupado ? "…" : "Aceptar"}
             </button>

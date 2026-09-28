@@ -67,7 +67,7 @@ export function PlacaPerfilTalento({
         <button
           type="button"
           onClick={onCerrar}
-          className="mt-4 w-full shrink-0 rounded-xl bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto"
+          className="mt-4 w-full shrink-0 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto"
         >
           {textoBoton}
         </button>

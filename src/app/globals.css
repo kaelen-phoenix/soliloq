@@ -15,87 +15,45 @@
     @apply tracking-ajustado antialiased;
   }
 
-  /* Tema claro/oscuro. Colores **semánticos** como variables (canal RGB, para poder
-     usar `/ <alpha-value>` en Tailwind). Tres estados, igual que `--acento`:
-       - `:root` = claro por defecto.
-       - `@media (prefers-color-scheme: dark)` (salvo override manual a claro) = sigue al
-         sistema.
-       - `:root[data-tema="dark"]` / `[data-tema="light"]` = override desde Ajustes.
+  /* Tema. Colores **semánticos** como variables (canal RGB, para poder usar
+     `/ <alpha-value>` en Tailwind). Desde #217 la base es **oscura** —el negro de escena de
+     la identidad visual— y el claro es la variante:
+       - `:root` = oscuro, para quien no eligió nada.
+       - `[data-tema="light"]` = claro: lo pone el script de `layout.tsx` si en Ajustes se
+         eligió "Claro" (o "Sistema" con el teléfono en claro), y lo usan como subárbol las
+         páginas de marca que siguen siendo claras (portada, «Apoyar»).
      Solo se redefinen acá; los componentes usan `bg-superficie`, `text-texto`,
      `border-borde`, `bg-fondo-sutil` (y `ink-50/100/200`, que también son variables). */
-  :root {
-    --superficie: 255 255 255;
-    --fondo-sutil: 247 246 248;
-    --texto: 24 22 26;
-    /* Texto secundario: más oscuro que antes para que no compita en contraste con el
-       fondo (AA cómodo sobre blanco y sobre la crema de la portada). */
-    --texto-tenue: 92 87 96;
-    --borde: 224 221 226;
-    --ink-50: 247 246 248;
-    --ink-100: 238 236 240;
-    --ink-200: 224 221 226;
-    /* Cajas y distintivos de estado: en oscuro dejan de ser bloques casi blancos. */
-    --error-50: 253 242 242;
-    --error-800: 143 29 29;
-    --alerta-50: 253 247 236;
-    --alerta-800: 124 61 7;
-    --exito-50: 240 247 242;
-    --exito-800: 31 86 54;
-    /* Acción primaria y estado seleccionado: contraste fuerte contra la superficie.
-       En claro es tinta sobre blanco; en oscuro se invierte para no desaparecer. */
-    --accion: 24 22 26;
-    --accion-texto: 255 255 255;
-  }
-
-  @media (prefers-color-scheme: dark) {
-    :root:not([data-tema="light"]) {
-      --superficie: 22 20 24;
-      --fondo-sutil: 32 30 35;
-      --texto: 240 238 242;
-      --texto-tenue: 170 164 174;
-      --borde: 84 80 90;
-      --ink-50: 32 30 35;
-      --ink-100: 44 41 48;
-      --ink-200: 64 60 68;
-      --error-50: 48 26 28;
-      --error-800: 240 168 168;
-      --alerta-50: 46 34 20;
-      --alerta-800: 240 200 140;
-      --exito-50: 22 40 30;
-      --exito-800: 150 214 170;
-      --accion: 240 238 242;
-      --accion-texto: 22 20 24;
-    }
-  }
-
-  :root[data-tema="dark"] {
-    --superficie: 22 20 24;
-    --fondo-sutil: 32 30 35;
-    --texto: 240 238 242;
-    --texto-tenue: 170 164 174;
-    --borde: 84 80 90;
-    --ink-50: 32 30 35;
-    --ink-100: 44 41 48;
-    --ink-200: 64 60 68;
-    --error-50: 48 26 28;
+  :root,
+  [data-tema="dark"] {
+    color-scheme: dark;
+    /* Negro con un matiz cálido apenas perceptible, como el de un escenario apagado; las
+       tarjetas suben un escalón (`fondo-sutil`) y el borde es un gris tibio, no azulado. */
+    --superficie: 12 10 11;
+    --fondo-sutil: 26 21 23;
+    --texto: 247 244 243;
+    --texto-tenue: 170 160 160;
+    --borde: 56 46 48;
+    --ink-50: 26 21 23;
+    --ink-100: 38 32 34;
+    --ink-200: 58 49 51;
+    --error-50: 48 22 22;
     --error-800: 240 168 168;
     --alerta-50: 46 34 20;
     --alerta-800: 240 200 140;
-    --exito-50: 22 40 30;
+    --exito-50: 20 40 29;
     --exito-800: 150 214 170;
-    --accion: 240 238 242;
-    --accion-texto: 22 20 24;
+    /* Acción primaria: el rojo-naranja de marca, con el degradé de `.bg-accion` encima. */
+    --accion: 198 39 3;
+    --accion-texto: 255 255 255;
   }
 
-  /* Fuerza el tema claro para un subárbol (no solo en `:root`). Lo usan las páginas de
-     marca —portada y «Apoyar»—, que son superficies branded siempre claras: sin esto, sus
-     hijos que usan tokens semánticos (`FormularioContacto`, `BannerSponsors`) se volvían
-     oscuros con el sistema y quedaban ilegibles sobre las tarjetas blancas de la página. */
   [data-tema="light"] {
     color-scheme: light;
     --superficie: 255 255 255;
     --fondo-sutil: 247 246 248;
     --texto: 24 22 26;
+    /* Texto secundario: AA cómodo sobre blanco y sobre la crema de la portada. */
     --texto-tenue: 92 87 96;
     --borde: 224 221 226;
     --ink-50: 247 246 248;
@@ -107,28 +65,29 @@
     --alerta-800: 124 61 7;
     --exito-50: 240 247 242;
     --exito-800: 31 86 54;
-    --accion: 24 22 26;
+    --accion: 198 39 3;
     --accion-texto: 255 255 255;
   }
 
-  /* Acento por rol. Un único punto de verdad: el layout de `(app)` pone
-     `data-rol` en su contenedor y todo lo que quiera acento lee estas variables
-     (utilidades `acento-*` más abajo, y el anillo de foco). Por defecto es `brand`,
-     así las pantallas fuera del área autenticada no cambian. */
-  :root {
+  /* Acento. Un único punto de verdad: el layout de `(app)` pone `data-rol` en su
+     contenedor y todo lo que quiera acento lee estas variables (utilidades `acento-*` más
+     abajo, y el anillo de foco).
+     #217: Talento y Creador comparten el acento de marca —la referencia visual es una sola
+     identidad naranja/roja— y el modo se distingue por el rótulo «Estás en…» del
+     encabezado. El mecanismo por rol queda por si algún día vuelven a separarse. En oscuro
+     el acento es el naranja del isotipo (`brand-400`, 5.8:1 sobre el negro); en claro, el
+     rojo (`brand-500`), que sobre blanco lee mejor. */
+  :root,
+  [data-tema="dark"] {
+    --acento: theme("colors.brand.400");
+    /* Fondo suave del acento: un tinte sobre la superficie actual, así funciona igual en
+       claro y en oscuro. */
+    --acento-suave: color-mix(in srgb, var(--acento) 14%, rgb(var(--superficie)));
+  }
+
+  [data-tema="light"] {
     --acento: theme("colors.brand.500");
-    /* Fondo suave del acento: un tinte del acento sobre la superficie actual, así funciona
-       igual en claro y en oscuro (antes era un `brand-50` casi blanco fijo, que en oscuro
-       quedaba como un bloque brillante). */
-    --acento-suave: color-mix(in srgb, var(--acento) 13%, rgb(var(--superficie)));
-  }
-
-  [data-rol="talento"] {
-    --acento: theme("colors.talento.500");
-  }
-
-  [data-rol="creador"] {
-    --acento: theme("colors.creador.500");
+    --acento-suave: color-mix(in srgb, var(--acento) 12%, rgb(var(--superficie)));
   }
 
   /* Los títulos ganan peso por tamaño y tracking, no por sombras ni adornos. */
@@ -169,8 +128,33 @@
     border-color: var(--acento);
   }
 
-  /* Degradé sutil, solo para superficies grandes (encabezado de portada). Nunca en
-     botones: las acciones primarias siguen sólidas en `brand`. */
+  /* Acción primaria (#217): degradé naranja → rojo de la identidad, sobre el
+     `background-color` sólido que ya pone Tailwind con `bg-accion` (queda de respaldo).
+     Los dos extremos pasan AA con texto blanco: 4.6:1 el naranja, 6.6:1 el rojo — los
+     naranjas más vivos del logo (#f2571e, #ff7a1a) no, por eso no van debajo de texto.
+     Las variantes con opacidad (`bg-accion/10`) son otra clase y siguen siendo un tinte. */
+  .bg-accion {
+    background-image: linear-gradient(100deg, #d4430f 0%, #b3260a 100%);
+  }
+
+  /* Brillo de escena para la acción principal de cada pantalla (CTA, ❤️ del swipe): una
+     luz naranja debajo, como la de un reflector. Uno por pantalla, no en cada botón. */
+  .brillo-accion {
+    box-shadow: 0 10px 30px -10px rgb(242 87 30 / 0.65);
+  }
+
+  /* Palabra destacada de un título ("Explorar **Talentos**"): el degradé vivo del logo.
+     Solo en títulos grandes (`xl` para arriba), donde el contraste de texto grande
+     alcanza con 3:1. */
+  .texto-degrade {
+    background-image: linear-gradient(100deg, #ff7a1a 0%, #f2571e 45%, #e62d03 100%);
+    -webkit-background-clip: text;
+    background-clip: text;
+    color: transparent;
+  }
+
+  /* Degradé sutil, solo para superficies grandes (encabezado). En oscuro es una luz
+     cálida que cae desde arriba, como la de la referencia visual (#217). */
   .superficie-portada {
     background-image: linear-gradient(
       180deg,

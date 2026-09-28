@@ -205,7 +205,7 @@ export function PilaTalentos({
           aria-label="Me interesa"
           disabled={ocupado}
           onClick={() => decidir(true)}
-          className={`${btnRedondo} border-coral text-coral-700`}
+          className={`${btnRedondo} brillo-accion border-transparent bg-accion text-white`}
         >
           <Icono nombre="corazon" relleno className="h-6 w-6" />
         </button>
@@ -256,7 +256,7 @@ export function PilaTalentos({
               type="button"
               disabled={ocupado}
               onClick={enviarAConvocados}
-              className="mt-4 w-full rounded-xl bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto disabled:opacity-50"
+              className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
             >
               {ocupado ? "…" : "Enviar a Convocados"}
             </button>

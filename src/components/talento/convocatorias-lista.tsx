@@ -83,7 +83,7 @@ export function ConvocatoriasLista({ filas: filasIniciales }: { filas: FilaConvo
               type="button"
               disabled={ocupadoId === f.convocatoriaId}
               onClick={() => responder(f, true)}
-              className="mt-4 w-full rounded-xl bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto disabled:opacity-50"
+              className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
             >
               {ocupadoId === f.convocatoriaId ? "…" : "Aceptar"}
             </button>

@@ -68,10 +68,8 @@ export const metadata: Metadata = {
 };
 
 export const viewport: Viewport = {
-  themeColor: [
-    { media: "(prefers-color-scheme: light)", color: "#ffffff" },
-    { media: "(prefers-color-scheme: dark)", color: "#18161a" },
-  ],
+  // Sin `themeColor` acá: el meta lo maneja `SCRIPT_TEMA` según el tema que quedó (#217).
+  // Si lo declara Next, al hidratar vuelve a insertar el suyo y quedan dos.
   width: "device-width",
   initialScale: 1,
   maximumScale: 1,
@@ -83,17 +81,27 @@ export const viewport: Viewport = {
   interactiveWidget: "resizes-content",
 };
 
-// Fija `data-tema` antes del primer paint según la cookie, para que el override manual
-// (Ajustes) no muestre un flash del tema del sistema. Sin cookie o con 'sistema', no pone
-// el atributo y manda `prefers-color-scheme`.
-const SCRIPT_TEMA = `(function(){try{var m=document.cookie.match(/(?:^|; )tema=([^;]+)/);var t=m&&m[1];if(t==='oscuro')document.documentElement.dataset.tema='dark';else if(t==='claro')document.documentElement.dataset.tema='light';}catch(e){}})();`;
+// Fija `data-tema` antes del primer paint según la cookie de Ajustes, para que no haya un
+// flash del tema equivocado. #217: sin elección guardada la app es **oscura** (el `<html>`
+// ya sale con `data-tema="dark"`); "Claro" pasa a claro, y "Sistema" —solo si alguien lo
+// eligió a propósito— sigue al teléfono, también si cambia con la app abierta.
+//
+// Deja `window.__tema(t)` para que Ajustes aplique un cambio al toque con la misma regla,
+// y es el único dueño del meta `theme-color` (la barra del navegador): lo crea y lo acomoda
+// al tema que quedó, para que en claro no quede una franja negra arriba.
+const SCRIPT_TEMA = `(function(){var d=document.documentElement,mq=window.matchMedia('(prefers-color-scheme: light)'),actual=null;function aplicar(t){var claro=t==='claro'||(t==='sistema'&&mq.matches);d.dataset.tema=claro?'light':'dark';var m=document.getElementById('tema-color');if(!m){m=document.createElement('meta');m.id='tema-color';m.name='theme-color';document.head.appendChild(m);}m.content=claro?'#ffffff':'#0c0a0b';}window.__tema=function(t){actual=t;aplicar(t);};var alCambiar=function(){if(actual==='sistema')aplicar(actual);};if(mq.addEventListener)mq.addEventListener('change',alCambiar);else if(mq.addListener)mq.addListener(alCambiar);try{var c=document.cookie.match(/(?:^|; )tema=([^;]+)/);window.__tema(c&&c[1]);}catch(e){d.dataset.tema='dark';}})();`;
 
 export default async function RootLayout({ children }: { children: React.ReactNode }) {
   const locale = await getLocale();
   const messages = await getMessages();
 
   return (
-    <html lang={locale} className={`${inter.variable} ${fraunces.variable} ${baloo.variable}`}>
+    <html
+      lang={locale}
+      data-tema="dark"
+      suppressHydrationWarning
+      className={`${inter.variable} ${fraunces.variable} ${baloo.variable}`}
+    >
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
       </head>

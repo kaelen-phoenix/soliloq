@@ -31,7 +31,7 @@ export function PanelesIniciativa({
       role="tab"
       aria-selected={modo === m}
       onClick={() => setModo(m)}
-      className={`flex-1 rounded-lg px-3 py-2 text-sm font-medium transition-colors ${
+      className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
         modo === m ? activo : "text-texto-tenue hover:text-texto"
       }`}
     >
@@ -44,10 +44,12 @@ export function PanelesIniciativa({
       <div
         role="tablist"
         aria-label="Tipo de iniciativa"
-        className="mb-5 flex gap-1 rounded-xl border border-borde bg-fondo-sutil p-1"
+        className="mb-5 flex gap-1 rounded-full border border-borde bg-fondo-sutil p-1"
       >
-        {tab("proyecto", "Armar proyecto", "bg-brand-600 text-white")}
-        {tab("equipo", "Armar equipo", "bg-coral text-ink-950")}
+        {/* #217: selector segmentado como el de la referencia — la pestaña activa lleva el
+            degradé de acción, en las dos opciones. */}
+        {tab("proyecto", "Armar proyecto", "bg-accion font-semibold text-accion-texto")}
+        {tab("equipo", "Armar equipo", "bg-accion font-semibold text-accion-texto")}
       </div>
       <div role="tabpanel">{modo === "proyecto" ? panelProyecto : panelEquipo}</div>
     </>
