@@ -6,6 +6,7 @@ import { redirect } from "next/navigation";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { borrarUsuarioYArchivos } from "@/lib/supabase/borrar-usuario";
 
 const UN_AÑO = 60 * 60 * 24 * 365;
@@ -41,12 +42,17 @@ export async function guardarTema(tema: "sistema" | "claro" | "oscuro") {
 export async function volverAVerTour() {
   const { supabase, user } = await usuario();
   const { modoActivo } = await leerEstadoCuenta(supabase, user.id);
-  await supabase
+  const { error } = await supabase
     .from("perfiles")
     .update(modoActivo === "creador" ? { tour_creador_visto_en: null } : { tour_talento_visto_en: null })
     .eq("id", user.id);
+  // Si no se pudo borrar la marca, ir a `/` no mostraría nada: se queda en Ajustes.
+  if (error) {
+    reportarErrorSupabase(error, { accion: "volver a ver el tour" });
+    return;
+  }
   revalidatePath("/", "layout");
-  redirect("/");
+  redirect("/?tour=1");
 }
 
 /**

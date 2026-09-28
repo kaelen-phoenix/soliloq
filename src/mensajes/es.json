@@ -274,6 +274,8 @@
         "titulo": "Tu perfil",
         "texto": "Tu información personal y artística. Es la misma en las dos experiencias."
       }
-    }
+    },
+    "errorGuardar": "No pudimos guardarlo. Probá de nuevo.",
+    "guardando": "Guardando…"
   }
 }

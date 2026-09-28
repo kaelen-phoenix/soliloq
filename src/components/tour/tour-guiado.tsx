@@ -1,7 +1,7 @@
 "use client";
 
 import { useTranslations } from "next-intl";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter, useSearchParams } from "next/navigation";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { Boton } from "@/components/ui/boton";
 import { createClient } from "@/lib/supabase/client";
@@ -72,6 +72,10 @@ export function TourGuiado({
 }) {
   const t = useTranslations("tour");
   const pathname = usePathname();
+  const router = useRouter();
+  // «Ver el recorrido de nuevo» llega con `?tour=1`: lo abre sin depender de que el layout
+  // ya tenga la marca nueva (un `router.refresh()` anterior puede llegar tarde con la vieja).
+  const forzado = useSearchParams().get("tour") === "1";
   const visto = modo === "talento" ? vistoTalento : vistoCreador;
   const vioElOtro = modo === "talento" ? vistoCreador : vistoTalento;
   const pasos = PASOS[modo].filter((p) => !(p.soloSiNoVioElOtro && vioElOtro));
@@ -83,8 +87,10 @@ export function TourGuiado({
   const globoRef = useRef<HTMLDivElement>(null);
   const botonRef = useRef<HTMLButtonElement>(null);
   const [altoGlobo, setAltoGlobo] = useState(0);
+  const [guardando, setGuardando] = useState(false);
+  const [errorGuardado, setErrorGuardado] = useState(false);
 
-  const activo = !visto && !cerrado && pathname === "/";
+  const activo = (!visto || forzado) && !cerrado && pathname === "/";
   const paso = pasos[indice];
 
   // Se espera a que la pantalla termine de pintar: las anclas (tarjetas del feed, el
@@ -95,13 +101,13 @@ export function TourGuiado({
     return () => clearTimeout(id);
   }, [activo]);
 
-  // Si cambia la marca desde el servidor (p. ej. «Ver el recorrido de nuevo»), arranca de cero.
+  // Si cambia la marca desde el servidor, o se pide verlo de nuevo, arranca de cero.
   useEffect(() => {
-    if (!visto) {
+    if (!visto || forzado) {
       setCerrado(false);
       setIndice(0);
     }
-  }, [visto, modo]);
+  }, [visto, modo, forzado]);
 
   const medir = useCallback(() => {
     if (!paso?.ancla) {
@@ -129,24 +135,76 @@ export function TourGuiado({
     botonRef.current?.focus();
   }, [indice, listo, rect]);
 
+  // Se cierra recién con la marca guardada: si falla, el tour sigue abierto con un aviso y
+  // se puede reintentar, en vez de cerrarse "visto" sin estarlo. `router.refresh()` trae la
+  // marca nueva al layout, así «Ver el recorrido de nuevo» (que la vuelve a null) se nota
+  // como un cambio y el tour arranca otra vez sin recargar la página.
   const terminar = useCallback(async () => {
-    setCerrado(true);
+    if (guardando) return;
+    setGuardando(true);
+    setErrorGuardado(false);
     const ahora = new Date().toISOString();
     const { error } = await createClient()
       .from("perfiles")
       .update(modo === "talento" ? { tour_talento_visto_en: ahora } : { tour_creador_visto_en: ahora })
       .eq("id", userId);
-    if (error) reportarErrorSupabase(error, { accion: "marcar tour visto", modo });
-  }, [modo, userId]);
+    setGuardando(false);
+    if (error) {
+      reportarErrorSupabase(error, { accion: "marcar tour visto", modo });
+      setErrorGuardado(true);
+      return;
+    }
+    setCerrado(true);
+    if (forzado) router.replace("/");
+    router.refresh();
+  }, [guardando, modo, userId, router, forzado]);
 
+  // Mientras está abierto: Esc = omitir; Tab no sale del globo; y las flechas no llegan a la
+  // app — el feed descarta o marca «Me interesa» con ← / →, y eso no puede pasar detrás del
+  // globo. Va en captura sobre `window` para correr antes que esos atajos.
   useEffect(() => {
     if (!activo || !listo) return;
     function alTeclear(e: KeyboardEvent) {
-      if (e.key === "Escape") terminar();
+      if (e.key === "Escape") {
+        e.preventDefault();
+        terminar();
+        return;
+      }
+      if (e.key.startsWith("Arrow")) {
+        e.preventDefault();
+        e.stopImmediatePropagation();
+        return;
+      }
+      if (e.key === "Tab" && globoRef.current) {
+        const enfocables = Array.from(
+          globoRef.current.querySelectorAll<HTMLElement>("button:not([disabled])"),
+        );
+        if (enfocables.length === 0) return;
+        const primero = enfocables[0];
+        const ultimo = enfocables[enfocables.length - 1];
+        const actual = document.activeElement;
+        if (!globoRef.current.contains(actual)) {
+          e.preventDefault();
+          primero.focus();
+        } else if (e.shiftKey && actual === primero) {
+          e.preventDefault();
+          ultimo.focus();
+        } else if (!e.shiftKey && actual === ultimo) {
+          e.preventDefault();
+          primero.focus();
+        }
+      }
     }
-    document.addEventListener("keydown", alTeclear);
-    return () => document.removeEventListener("keydown", alTeclear);
+    window.addEventListener("keydown", alTeclear, true);
+    return () => window.removeEventListener("keydown", alTeclear, true);
   }, [activo, listo, terminar]);
+
+  // Al cerrar, el foco vuelve adonde estaba antes de abrir.
+  useEffect(() => {
+    if (!activo || !listo) return;
+    const previo = document.activeElement as HTMLElement | null;
+    return () => previo?.focus?.();
+  }, [activo, listo]);
 
   if (!activo || !listo || !paso) return null;
 
@@ -210,6 +268,11 @@ export function TourGuiado({
         <p id="tour-texto" className="mt-1.5 text-sm leading-relaxed text-texto-tenue">
           {t(`${base}.texto`)}
         </p>
+        {errorGuardado && (
+          <p role="alert" className="mt-2 text-xs text-error-600">
+            {t("errorGuardar")}
+          </p>
+        )}
         <div className="mt-4 flex items-center justify-between gap-2">
           {!esUltimo ? (
             <button
@@ -224,6 +287,8 @@ export function TourGuiado({
           )}
           <Boton
             ref={botonRef}
+            cargando={guardando}
+            textoCargando={t("guardando")}
             onClick={() => (esUltimo ? terminar() : setIndice((i) => i + 1))}
           >
             {esUltimo ? t("entendido") : t("siguiente")}

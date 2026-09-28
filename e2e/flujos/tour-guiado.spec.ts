@@ -143,6 +143,41 @@ test.describe("tour guiado (UI)", () => {
     await expect(tour(page)).toHaveCount(0);
   });
 
+  test("Las flechas del teclado no actúan sobre el feed detrás del tour", async ({ page }) => {
+    const cuenta = await cuentaNueva("Talento Flechas");
+    // Una obra en el feed, para que ← / → tengan algo que descartar o marcar.
+    const creador = await cuentaNueva("Creadora Flechas");
+    await admin!
+      .from("perfiles")
+      .update({ tour_talento_visto_en: new Date().toISOString(), tour_creador_visto_en: new Date().toISOString() })
+      .eq("id", creador.id);
+    const { data: obra, error } = await admin!
+      .from("obras")
+      .insert({
+        creador_id: creador.id,
+        titulo: "Obra de las flechas",
+        estado: "publicada",
+        ubicacion_texto: "Buenos Aires, Argentina",
+        ubicacion_lat: -34.6037,
+        ubicacion_lng: -58.3816,
+        ubicacion_pais: "AR",
+      })
+      .select("id")
+      .single();
+    if (error) throw error;
+    await admin!.from("roles").insert({ obra_id: obra.id, nombre: "Protagonista", tipo: "actuacion", vacantes: 1 });
+
+    await login(page, cuenta.email);
+    await page.goto("/");
+    await expect(tour(page)).toBeVisible({ timeout: 15_000 });
+    await page.keyboard.press("ArrowRight");
+    await page.keyboard.press("ArrowLeft");
+    await page.waitForTimeout(1_000);
+    const { data } = await admin!.from("intereses_match").select("id").eq("de_perfil", cuenta.id);
+    expect(data).toHaveLength(0);
+    await expect(tour(page)).toBeVisible();
+  });
+
   test("Talento + Creador: cada experiencia tiene su tour y el Perfil no se repite", async ({
     page,
   }) => {
@@ -173,7 +208,10 @@ test.describe("tour guiado (UI)", () => {
     await tour(page).getByRole("button", { name: "Omitir" }).click();
     await expect.poll(async () => (await marcas(cuenta.id)).talento, { timeout: 10_000 }).toBe(true);
 
-    await page.goto("/ajustes");
+    // Navegación en la misma página (sin recargar): el componente del tour sigue montado con
+    // su estado de "cerrado", y tiene que volver a abrirse igual (review de #236).
+    await page.getByRole("link", { name: "Ajustes" }).first().click();
+    await page.waitForURL(/\/ajustes/);
     await page.getByRole("button", { name: "Ver el recorrido de nuevo" }).click();
     await page.waitForURL((u) => u.pathname === "/", { timeout: 15_000 });
     await expect(tour(page)).toBeVisible({ timeout: 15_000 });

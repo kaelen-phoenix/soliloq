@@ -274,6 +274,8 @@
         "titulo": "Your profile",
         "texto": "Your personal and artistic info. It's the same in both experiences."
       }
-    }
+    },
+    "errorGuardar": "We couldn't save it. Please try again.",
+    "guardando": "Saving…"
   }
 }
