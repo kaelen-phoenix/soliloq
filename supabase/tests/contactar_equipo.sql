@@ -78,6 +78,14 @@ do $$ begin
   ), 'T4: el interés mutuo debería abrir la sala 1:1 con el nombre de los dos';
 end $$;
 
+-- ── T5 · nombre_de_perfil no se puede llamar desde la API (0086) ─────────────
+do $$ begin
+  if has_function_privilege('anon', 'public.nombre_de_perfil(uuid)', 'execute')
+     or has_function_privilege('authenticated', 'public.nombre_de_perfil(uuid)', 'execute') then
+    raise exception 'T5: anon/authenticated no deberían poder ejecutar nombre_de_perfil';
+  end if;
+end $$;
+
 select 'TODOS LOS TESTS OK' as resultado;
 
 rollback;

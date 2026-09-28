@@ -46,7 +46,11 @@ declare
   lista text;
 begin
   select string_agg(funcion || ': ' || error, E'\n') into lista from rotas;
-  assert lista is null, E'Funciones SQL que no compilan contra el esquema actual:\n' || lista;
+  -- `raise` y no `assert`: con `plpgsql.check_asserts = off` un assert no corre y el test
+  -- pasaría en silencio (review de #242).
+  if lista is not null then
+    raise exception 'Funciones SQL que no compilan contra el esquema actual:%', E'\n' || lista;
+  end if;
 end $$;
 
 select 'TODOS LOS TESTS OK' as resultado;
