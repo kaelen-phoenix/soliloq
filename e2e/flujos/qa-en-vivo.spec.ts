@@ -396,6 +396,35 @@ test.describe("QA en vivo (#122, teléfono)", () => {
       .toEqual({ edadVisible: false, disciplinas: ["actuacion", "direccion"] });
   });
 
+  test("Editar perfil con menos de 3 fotos: guarda igual y avisa", async ({ page }) => {
+    // #243: la regla de 3 fotos es para el alta; al editar, trabar el guardado dejaba a
+    // cuentas viejas (1 foto) sin poder cambiar nada y sin ver por qué.
+    const cuenta = await nuevoUsuario(`Una Foto ${sufijo()}`, "talento", { fotos: 1 });
+    await hecho(
+      admin!.from("perfiles_creador").insert({ id: cuenta.id, disciplinas: ["actuacion"] }),
+    );
+
+    await login(page, cuenta.email);
+    await page.goto("/perfil?editar=1");
+    await expect(page.getByText("Te recomendamos tener al menos 3 fotos")).toBeVisible();
+    await page
+      .getByRole("group", { name: /Perfil artístico como Creador/ })
+      .getByRole("button", { name: "Dirección", exact: true })
+      .click();
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect
+      .poll(
+        async () =>
+          [
+            ...((
+              await admin!.from("perfiles_creador").select("disciplinas").eq("id", cuenta.id).single()
+            ).data?.disciplinas ?? []),
+          ].sort(),
+        { timeout: 15_000 },
+      )
+      .toEqual(["actuacion", "direccion"]);
+  });
+
   test("Editar perfil: un Creador sin disciplinas cargadas puede guardar igual", async ({ page }) => {
     // La fila de Creador la crea un trigger sin disciplinas (0075): unificar el formulario no
     // puede dejar a esas cuentas sin poder guardar el resto del perfil (#234).

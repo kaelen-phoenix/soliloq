@@ -117,7 +117,10 @@ export function FormularioTalento({
     if (generoDescripcion.length > MAX_GENERO_DESCRIPCION) {
       nuevos.genero_descripcion = `Máximo ${MAX_GENERO_DESCRIPCION} caracteres.`;
     }
-    if (fotos.length < MIN_FOTOS) nuevos.fotos = `Cargá al menos ${MIN_FOTOS} fotos.`;
+    // El mínimo de fotos es para **completar** el perfil (el alta). Al editar no bloquea: las
+    // fotos se guardan solas al subirlas o borrarlas, y trabar el resto del formulario por eso
+    // dejaba a cuentas viejas sin poder guardar nada (#243). Se avisa abajo de las fotos.
+    if (esAlta && fotos.length < MIN_FOTOS) nuevos.fotos = `Cargá al menos ${MIN_FOTOS} fotos.`;
     if (videoreelUrl && !esVideoreelValido(videoreelUrl)) {
       nuevos.videoreel_url =
         "No reconocemos ese enlace. Pegá el link de un video de YouTube o Vimeo.";
@@ -146,7 +149,17 @@ export function FormularioTalento({
     e.preventDefault();
     setErrorGeneral(null);
     setGuardado(false);
-    if (!validar()) return;
+    if (!validar()) {
+      // El error puede estar lejos del botón (arriba, en las fotos o la fecha): se avisa acá
+      // y se lleva la pantalla hasta el primer campo marcado (#243).
+      setErrorGeneral("Revisá los campos marcados en rojo.");
+      requestAnimationFrame(() =>
+        document
+          .querySelector("[data-formulario-talento] .text-error-600")
+          ?.scrollIntoView({ behavior: "smooth", block: "center" }),
+      );
+      return;
+    }
 
     setCargando(true);
     const supabase = createClient();
@@ -224,7 +237,7 @@ export function FormularioTalento({
   }
 
   return (
-    <form onSubmit={guardar} className="flex max-w-2xl flex-col gap-6">
+    <form onSubmit={guardar} data-formulario-talento className="flex max-w-2xl flex-col gap-6">
       <section className="flex flex-col gap-4">
         <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Ficha básica</h2>
         <CampoTexto
@@ -302,6 +315,11 @@ export function FormularioTalento({
         <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Portfolio de fotos</h2>
         <SubirFotos talentoId={userId} fotos={fotos} onCambio={setFotos} persistir={!esAlta} />
         {errores.fotos && <p className="text-xs text-error-600">{errores.fotos}</p>}
+        {!esAlta && fotos.length < MIN_FOTOS && (
+          <p className="text-xs text-alerta-800">
+            Te recomendamos tener al menos {MIN_FOTOS} fotos: así tu perfil se ve completo.
+          </p>
+        )}
       </section>
 
       <section className="flex flex-col gap-4">
