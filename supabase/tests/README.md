@@ -37,6 +37,11 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   cuenta solo lo de otros posterior a `leido_hasta` (o a `incorporado_en` si nunca abrió la
   sala), `marcar_sala_leida` toca solo la marca propia y no suma a un ajeno a la sala, y un
   bloqueo saca los mensajes del conteo (la función es SECURITY INVOKER a propósito).
+- **`borrar_iniciativa.sql`** — eliminar un Proyecto o un Equipo (#215, 0083): mientras
+  existe, `buscar_talento` no muestra al Talento convocado; al borrarlo vuelve a aparecer, y
+  la sala (con sus mensajes) se va con la iniciativa — también la de un Equipo, que antes
+  quedaba huérfana. Un Creador no puede borrar el Equipo de otro, y borrar una iniciativa no
+  toca las demás ni el perfil del Talento.
 
 ## Pendiente
 

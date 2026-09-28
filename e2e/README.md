@@ -35,6 +35,9 @@ directo con el cliente admin en vez de navegarse — ver los comentarios del arc
 sala abierta con carga completa recibe en vivo los mensajes de los demás (el canal de
 Realtime espera la sesión, `suscribirConSesion`).
 
+`flujos/eliminar-equipo.spec.ts` (#215): el Creador elimina su Equipo desde el tablero y el
+Talento que había convocado vuelve a aparecer en Buscar Talentos; la sala del equipo se borra.
+
 ### El proyecto de staging (2026-09-20)
 
 Existe `soliloq-staging` (ref `rcjjdguldfrkpmxgkazn`, mismo org de Supabase, plan free) con
