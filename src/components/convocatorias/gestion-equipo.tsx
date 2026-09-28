@@ -8,6 +8,7 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
 import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
 import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
+import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/client";
 
 export interface EquipoActivo {
@@ -207,19 +208,33 @@ export function GestionEquipo({
     setError(null);
     setCargando(true);
     const supabase = createClient();
-    // Primero el Storage (no cascadea con la fila). Las rutas se piden en el momento: las
-    // fotos pueden haber cambiado desde que se cargó la pantalla.
-    const { data: fotosActuales } = await supabase
+    // Las rutas se piden antes de borrar: `fotos_equipo` cae en cascada con el equipo y
+    // después ya no habría de dónde sacarlas. Si esta consulta falla, no se borra nada.
+    const { data: fotosActuales, error: errorFotos } = await supabase
       .from("fotos_equipo")
       .select("storage_path")
       .eq("equipo_id", equipo.id);
-    const rutas = (fotosActuales ?? []).map((f) => f.storage_path);
-    if (rutas.length > 0) await supabase.storage.from("fotos-perfil").remove(rutas);
+    if (errorFotos) {
+      setCargando(false);
+      setError("No se pudo eliminar el equipo. Probá de nuevo.");
+      return;
+    }
+    // Primero la fila y después el Storage (no cascadea): si el borrado de la fila falla, el
+    // equipo queda entero con sus fotos, en vez de vivo y sin fotos.
     const { error: errorBd } = await supabase.from("equipos").delete().eq("id", equipo.id);
     if (errorBd) {
       setCargando(false);
       setError("No se pudo eliminar el equipo. Probá de nuevo.");
       return;
+    }
+    const rutas = (fotosActuales ?? []).map((f) => f.storage_path);
+    if (rutas.length > 0) {
+      // Un archivo que no se borre queda huérfano en el Storage, pero el equipo ya no
+      // existe: no se le muestra error a la persona, se reporta.
+      const { error: errorStorage } = await supabase.storage.from("fotos-perfil").remove(rutas);
+      if (errorStorage) {
+        Sentry.captureException(errorStorage, { tags: { origen: "eliminar-equipo" } });
+      }
     }
     setConfirmarBorrado(false);
     setCargando(false);
