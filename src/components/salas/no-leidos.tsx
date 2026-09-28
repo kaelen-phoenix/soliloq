@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { createContext, useCallback, useContext, useEffect, useMemo, useState } from "react";
+import { createContext, useCallback, useContext, useEffect, useMemo, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
@@ -20,12 +20,16 @@ interface ValorNoLeidos {
   porSala: Map<string, number>;
   /** Suma de todas las salas del modo activo: es el número del badge de "Salas". */
   total: number;
+  /** Sube con cada mensaje nuevo de cualquier sala propia, aunque no cambie el total: la
+   *  lista de `/salas` lo usa para refrescar la vista previa y el orden por actividad. */
+  revision: number;
   marcarLeida: (salaId: string) => void;
 }
 
 const ContextoNoLeidos = createContext<ValorNoLeidos>({
   porSala: new Map(),
   total: 0,
+  revision: 0,
   marcarLeida: () => {},
 });
 
@@ -46,6 +50,10 @@ export function ProveedorNoLeidos({
   children: React.ReactNode;
 }) {
   const [filas, setFilas] = useState(inicial);
+  const [revision, setRevision] = useState(0);
+  // Generación de las recargas: marcar una sala leída la sube, así una recarga que salió
+  // antes de la marca (y trae el `leido_hasta` viejo) no vuelve a encender la sala.
+  const generacion = useRef(0);
   const pathname = usePathname();
   // La sala que está abierta no cuenta: el chat la marca leída a medida que llegan
   // mensajes, y sin esto el badge parpadearía entre el INSERT y esa marca.
@@ -53,7 +61,9 @@ export function ProveedorNoLeidos({
 
   const recargar = useCallback(async () => {
     const supabase = createClient();
+    const mia = ++generacion.current;
     const { data, error } = await supabase.rpc("salas_no_leidas");
+    if (mia !== generacion.current) return;
     if (error) {
       reportarErrorSupabase(error, { rpc: "salas_no_leidas" });
       return;
@@ -68,6 +78,7 @@ export function ProveedorNoLeidos({
       supabase
         .channel(`no-leidos-${userId}`)
         .on("postgres_changes", { event: "INSERT", schema: "public", table: "mensajes" }, (p) => {
+          setRevision((r) => r + 1);
           if ((p.new as { autor_id?: string }).autor_id !== userId) recargar();
         })
         // Lo que llegó entre el render del servidor y que el canal quedó escuchando no pasa
@@ -89,14 +100,20 @@ export function ProveedorNoLeidos({
     };
   }, [userId, recargar]);
 
-  const marcarLeida = useCallback((salaId: string) => {
-    setFilas((prev) => prev.filter((f) => f.sala_id !== salaId));
-    createClient()
-      .rpc("marcar_sala_leida", { p_sala_id: salaId })
-      .then(({ error }) => {
-        if (error) reportarErrorSupabase(error, { rpc: "marcar_sala_leida", salaId });
-      });
-  }, []);
+  const marcarLeida = useCallback(
+    (salaId: string) => {
+      generacion.current++;
+      setFilas((prev) => prev.filter((f) => f.sala_id !== salaId));
+      createClient()
+        .rpc("marcar_sala_leida", { p_sala_id: salaId })
+        .then(({ error }) => {
+          if (error) reportarErrorSupabase(error, { rpc: "marcar_sala_leida", salaId });
+          // Con la marca ya escrita, el conteo del servidor es la fuente de verdad.
+          recargar();
+        });
+    },
+    [recargar],
+  );
 
   const valor = useMemo(() => {
     const porSala = new Map<string, number>();
@@ -110,8 +127,8 @@ export function ProveedorNoLeidos({
     }
     let total = 0;
     porSala.forEach((n) => (total += n));
-    return { porSala, total, marcarLeida };
-  }, [filas, modo, salaAbierta, marcarLeida]);
+    return { porSala, total, revision, marcarLeida };
+  }, [filas, modo, salaAbierta, revision, marcarLeida]);
 
   return <ContextoNoLeidos.Provider value={valor}>{children}</ContextoNoLeidos.Provider>;
 }

@@ -38,12 +38,12 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
   const [confirmando, setConfirmando] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const { porSala: noLeidos, total: totalNoLeidos } = useNoLeidos();
+  const { porSala: noLeidos, revision } = useNoLeidos();
   const router = useRouter();
 
   // #216: cuando llega un mensaje la sala se enciende en vivo, pero la vista previa del
-  // último mensaje y el orden por actividad vienen del servidor — se piden de nuevo para
-  // que la tarjeta resaltada no siga diciendo "Sala recién creada".
+  // último mensaje y el orden por actividad vienen del servidor — se piden de nuevo con
+  // cada mensaje (`revision`), cambie o no el total de no leídos.
   const primerRender = useRef(true);
   useEffect(() => {
     if (primerRender.current) {
@@ -51,7 +51,7 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
       return;
     }
     router.refresh();
-  }, [totalNoLeidos, router]);
+  }, [revision, router]);
   useEffect(() => setSalas(salasIniciales), [salasIniciales]);
 
   // El menú de "..." se quedaba abierto para siempre salvo que se tocara una opción de

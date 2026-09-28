@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import type { RealtimeChannel, SupabaseClient } from "@supabase/supabase-js";
 
 /**
@@ -22,7 +23,11 @@ export function suscribirConSesion(
     await supabase.auth.getSession();
     await supabase.realtime.setAuth();
     if (!cancelado) canal = abrir();
-  })();
+  })().catch((error) => {
+    // Sin sesión confirmada no se abre el canal: unirse igual sería volver al join anónimo
+    // que no recibe nada. La pantalla sigue andando con lo que cargó; solo pierde el vivo.
+    Sentry.captureException(error, { tags: { origen: "realtime" } });
+  });
 
   return () => {
     cancelado = true;
