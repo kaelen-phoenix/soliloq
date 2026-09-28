@@ -41,12 +41,14 @@ async function listarUsuarios(admin: SupabaseClient): Promise<User[]> {
   }
 }
 
+/** `remove` acepta hasta 1000 objetos por llamada: se borra por lotes. */
 async function borrarFotos(admin: SupabaseClient, nombres: string[]) {
-  if (nombres.length === 0) return;
-  const { error } = await admin.storage
-    .from(BUCKET)
-    .remove(nombres.map((n) => `${CARPETA}/${n}`));
-  if (error) throw error;
+  for (let i = 0; i < nombres.length; i += PAGINA) {
+    const { error } = await admin.storage
+      .from(BUCKET)
+      .remove(nombres.slice(i, i + PAGINA).map((n) => `${CARPETA}/${n}`));
+    if (error) throw error;
+  }
 }
 
 /** Borra los usuarios y sus fotos. Cada ID sale de `ids` recién cuando quedó limpio, así un
