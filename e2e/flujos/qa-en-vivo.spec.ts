@@ -78,6 +78,9 @@ test.describe("QA en vivo (#122, teléfono)", () => {
         .update({
           aprobado_en: new Date().toISOString(),
           normas_aceptadas_en: new Date().toISOString(),
+          // El tour guiado (#231) taparía la pantalla: los tests que no lo prueban lo dan por visto.
+          tour_talento_visto_en: new Date().toISOString(),
+          tour_creador_visto_en: new Date().toISOString(),
           modo_activo: modo,
           es_admin: opciones.esAdmin ?? false,
           enlace_publico_activo: opciones.enlacePublico ?? false,

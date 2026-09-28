@@ -17,6 +17,9 @@ export interface EstadoCuenta {
   aprobado: boolean;
   /** Aceptó las Normas de la Comunidad (issue #180). No es retroactivo. */
   normasAceptadas: boolean;
+  /** Ya vio (u omitió) el tour guiado de cada experiencia (#231, 0084). */
+  tourTalentoVisto: boolean;
+  tourCreadorVisto: boolean;
 }
 
 interface FilaPerfil {
@@ -25,6 +28,8 @@ interface FilaPerfil {
   suspendido_en?: string | null;
   aprobado_en?: string | null;
   normas_aceptadas_en?: string | null;
+  tour_talento_visto_en?: string | null;
+  tour_creador_visto_en?: string | null;
 }
 
 /**
@@ -64,6 +69,9 @@ export function resolverEstadoCuenta(
     suspendido: perfil?.suspendido_en != null,
     aprobado: perfil?.aprobado_en != null,
     normasAceptadas: perfil?.normas_aceptadas_en != null,
+    // Sin fila de perfil no hay a quién mostrarle nada: se toma como visto.
+    tourTalentoVisto: perfil ? perfil.tour_talento_visto_en != null : true,
+    tourCreadorVisto: perfil ? perfil.tour_creador_visto_en != null : true,
   };
 }
 

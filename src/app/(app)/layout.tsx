@@ -6,6 +6,7 @@ import { Encabezado } from "@/components/layout/encabezado";
 import { TransicionPagina } from "@/components/ui/transicion-pagina";
 import { AvisoConvocatoria } from "@/components/talento/aviso-convocatoria";
 import { ProveedorNoLeidos, type FilaNoLeidos } from "@/components/salas/no-leidos";
+import { TourGuiado } from "@/components/tour/tour-guiado";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { createClient } from "@/lib/supabase/server";
@@ -70,6 +71,12 @@ export default async function AppLayout({ children }: { children: React.ReactNod
         </div>
 
         <BarraNavegacion rol={estado.modoActivo} esAdmin={estado.esAdmin} />
+        <TourGuiado
+          userId={user.id}
+          modo={estado.modoActivo}
+          vistoTalento={estado.tourTalentoVisto}
+          vistoCreador={estado.tourCreadorVisto}
+        />
       </div>
     </ProveedorNoLeidos>
   );

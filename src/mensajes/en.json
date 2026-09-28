@@ -92,7 +92,10 @@
     "borrarCuentaDefinitivo": "Delete my account",
     "borrarCuentaEnCurso": "Deleting…",
     "borrarCuentaError": "We couldn't delete your account. Please try again in a while.",
-    "cancelar": "Cancel"
+    "cancelar": "Cancel",
+    "recorrido": "Guided tour",
+    "recorridoAyuda": "The walkthrough of the main sections shown the first time.",
+    "recorridoVer": "See the tour again"
   },
   "instalar": {
     "titulo": "Install the app",
@@ -205,5 +208,72 @@
     "desactivar": "Turn off notifications",
     "aplicando": "One moment…",
     "error": "Couldn't do that. Try again."
+  },
+  "tour": {
+    "siguiente": "Next",
+    "omitir": "Skip",
+    "entendido": "Got it",
+    "paso": "Step {n} of {total}",
+    "etiqueta": "Guided tour",
+    "talento": {
+      "bienvenida": {
+        "titulo": "Welcome to Yalope",
+        "texto": "We'll show you how it works in a minute. You can skip it anytime."
+      },
+      "explorar": {
+        "titulo": "Explore",
+        "texto": "This is where you discover Projects and Teams looking for people like you. Swipe to see the next one."
+      },
+      "meInteresa": {
+        "titulo": "I'm interested",
+        "texto": "Tap the heart on anything you like. If they're interested in your profile too, it's a Match."
+      },
+      "match": {
+        "titulo": "Match and casting call",
+        "texto": "With a Match, the person behind the project can cast you. If you accept, you join the room to talk with everyone."
+      },
+      "chats": {
+        "titulo": "Chats",
+        "texto": "Here are the rooms of the Projects and Teams you're part of. Open one to chat."
+      },
+      "notificaciones": {
+        "titulo": "Notifications",
+        "texto": "The bell lets you know what's new: a match, a casting call, or someone who wants to reach you."
+      },
+      "perfil": {
+        "titulo": "Your profile",
+        "texto": "Fill in and edit your personal and artistic info. It's what people looking for talent see."
+      }
+    },
+    "creador": {
+      "bienvenida": {
+        "titulo": "Your Creator space",
+        "texto": "We'll show you in a minute how to set up your Project or Team and find the people you're looking for."
+      },
+      "misProyectos": {
+        "titulo": "My projects",
+        "texto": "Create and manage your Project or Team here: title, roles, photos and who's already in."
+      },
+      "buscar": {
+        "titulo": "Find talent",
+        "texto": "Find artists by name, skill or area. Tap the heart on anyone you're interested in."
+      },
+      "callBack": {
+        "titulo": "Call Back",
+        "texto": "When the interest is mutual, the Match shows up here. Accept it to move that person to Cast."
+      },
+      "convocar": {
+        "titulo": "Cast",
+        "texto": "From Cast, send the final casting call. When the Talent accepts, they join your project's room."
+      },
+      "chats": {
+        "titulo": "Chats",
+        "texto": "Here are the rooms of your Projects and Teams, with the people who accepted the casting call."
+      },
+      "perfil": {
+        "titulo": "Your profile",
+        "texto": "Your personal and artistic info. It's the same in both experiences."
+      }
+    }
   }
 }

@@ -5,7 +5,7 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
 import { BadgeNoLeidos, useNoLeidos } from "@/components/salas/no-leidos";
-import { itemsParaNavegacion } from "./items-navegacion";
+import { idTourNav, itemsParaNavegacion } from "./items-navegacion";
 import type { RolUsuario } from "@/lib/supabase/types";
 
 /**
@@ -36,6 +36,7 @@ export function BarraNavegacion({
             <li key={item.href} className="flex-1">
               <Link
                 href={item.href}
+                data-tour={idTourNav(item.href)}
                 aria-current={activo ? "page" : undefined}
                 aria-label={badge > 0 ? `${t(item.clave)}, ${badge} sin leer` : undefined}
                 className={`flex flex-col items-center gap-1 pb-1.5 pt-2.5 text-2xs font-medium transition-colors ${

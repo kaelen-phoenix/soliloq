@@ -88,6 +88,9 @@ export interface Database {
           aprobado_en: string | null;
           /** Aceptación de las Normas de la Comunidad (0079): null = todavía no aceptó. */
           normas_aceptadas_en: string | null;
+          /** Tour guiado de cada experiencia (#231, 0084): null = todavía no lo vio. */
+          tour_talento_visto_en: string | null;
+          tour_creador_visto_en: string | null;
           /** Idioma de la interfaz (0041): 'es' | 'en'. */
           idioma: string;
           /** Tema (0041): 'sistema' | 'claro' | 'oscuro'. */
@@ -114,6 +117,8 @@ export interface Database {
           suspendido_en?: string | null;
           aprobado_en?: string | null;
           normas_aceptadas_en?: string | null;
+          tour_talento_visto_en?: string | null;
+          tour_creador_visto_en?: string | null;
           idioma?: string;
           tema?: string;
         };

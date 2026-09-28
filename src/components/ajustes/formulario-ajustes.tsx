@@ -2,10 +2,11 @@
 
 import { useTranslations } from "next-intl";
 import { useTransition } from "react";
-import { guardarIdioma, guardarTema } from "@/app/acciones-ajustes";
+import { guardarIdioma, guardarTema, volverAVerTour } from "@/app/acciones-ajustes";
 import { BotonInstalar } from "@/components/pwa/boton-instalar";
 import { BotonNotificaciones } from "@/components/pwa/boton-notificaciones";
 import { BorrarCuenta } from "@/components/ajustes/borrar-cuenta";
+import { Boton } from "@/components/ui/boton";
 
 type Idioma = "es" | "en";
 type Tema = "sistema" | "claro" | "oscuro";
@@ -97,6 +98,16 @@ export function FormularioAjustes({
       <BotonInstalar conSeccion />
 
       <BotonNotificaciones />
+
+      <section>
+        <h2 className="text-sm font-medium text-texto">{t("recorrido")}</h2>
+        <p className="mb-3 mt-0.5 text-xs text-texto-tenue">{t("recorridoAyuda")}</p>
+        <form action={volverAVerTour}>
+          <Boton type="submit" variante="secundario">
+            {t("recorridoVer")}
+          </Boton>
+        </form>
+      </section>
 
       <BorrarCuenta />
     </div>

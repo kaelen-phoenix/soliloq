@@ -92,7 +92,10 @@
     "borrarCuentaDefinitivo": "Borrar mi cuenta",
     "borrarCuentaEnCurso": "Borrando…",
     "borrarCuentaError": "No pudimos borrar tu cuenta. Probá de nuevo en un rato.",
-    "cancelar": "Cancelar"
+    "cancelar": "Cancelar",
+    "recorrido": "Recorrido guiado",
+    "recorridoAyuda": "El paseo por las secciones principales que se muestra la primera vez.",
+    "recorridoVer": "Ver el recorrido de nuevo"
   },
   "instalar": {
     "titulo": "Instalar la app",
@@ -205,5 +208,72 @@
     "desactivar": "Desactivar notificaciones",
     "aplicando": "Un momento…",
     "error": "No se pudo aplicar. Probá de nuevo."
+  },
+  "tour": {
+    "siguiente": "Siguiente",
+    "omitir": "Omitir",
+    "entendido": "Entendido",
+    "paso": "Paso {n} de {total}",
+    "etiqueta": "Recorrido guiado",
+    "talento": {
+      "bienvenida": {
+        "titulo": "Te damos la bienvenida a Yalope",
+        "texto": "En un minuto te mostramos cómo funciona. Podés omitirlo cuando quieras."
+      },
+      "explorar": {
+        "titulo": "Explorar",
+        "texto": "Acá descubrís Proyectos y Equipos que buscan gente como vos. Deslizá para pasar al siguiente."
+      },
+      "meInteresa": {
+        "titulo": "Me interesa",
+        "texto": "Tocá el corazón en lo que te interese. Si del otro lado también les interesa tu perfil, hay Match."
+      },
+      "match": {
+        "titulo": "Match y convocatoria",
+        "texto": "Con el Match, quien armó el proyecto puede convocarte. Si aceptás, entrás a la sala para conversar con el resto."
+      },
+      "chats": {
+        "titulo": "Chats",
+        "texto": "Acá están las salas de los Proyectos y Equipos donde participás. Entrá a una para conversar."
+      },
+      "notificaciones": {
+        "titulo": "Notificaciones",
+        "texto": "La campanita te avisa de las novedades: un match, una convocatoria o alguien que quiere contactarte."
+      },
+      "perfil": {
+        "titulo": "Tu perfil",
+        "texto": "Completá y editá tu información personal y artística. Es lo que ven quienes buscan talento."
+      }
+    },
+    "creador": {
+      "bienvenida": {
+        "titulo": "Tu espacio de Creador",
+        "texto": "En un minuto te mostramos cómo armar tu Proyecto o Equipo y encontrar a la gente que buscás."
+      },
+      "misProyectos": {
+        "titulo": "Mis proyectos",
+        "texto": "Acá creás y administrás tu Proyecto o tu Equipo: título, roles, fotos y quién ya forma parte."
+      },
+      "buscar": {
+        "titulo": "Buscar talento",
+        "texto": "Encontrá artistas por nombre, habilidad o zona. Tocá el corazón en quien te interese."
+      },
+      "callBack": {
+        "titulo": "Call Back",
+        "texto": "Cuando el interés es mutuo, el Match aparece acá. Aceptalo para pasar a esa persona a Convocados."
+      },
+      "convocar": {
+        "titulo": "Convocar",
+        "texto": "Desde Convocados, convocá en firme. Cuando el Talento acepta, entra a la sala de tu proyecto."
+      },
+      "chats": {
+        "titulo": "Chats",
+        "texto": "Acá están las salas de tus Proyectos y Equipos, con quienes aceptaron la convocatoria."
+      },
+      "perfil": {
+        "titulo": "Tu perfil",
+        "texto": "Tu información personal y artística. Es la misma en las dos experiencias."
+      }
+    }
   }
 }

@@ -5,6 +5,7 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
+import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { borrarUsuarioYArchivos } from "@/lib/supabase/borrar-usuario";
 
 const UN_AÑO = 60 * 60 * 24 * 365;
@@ -31,6 +32,21 @@ export async function guardarTema(tema: "sistema" | "claro" | "oscuro") {
   await supabase.from("perfiles").update({ tema }).eq("id", user.id);
   cookies().set("tema", tema, { maxAge: UN_AÑO, sameSite: "lax", path: "/" });
   revalidatePath("/", "layout");
+}
+
+/**
+ * «Ver el recorrido de nuevo» (#231): borra la marca del tour de la experiencia en la que
+ * se está y vuelve a la pantalla principal, donde el tour arranca solo.
+ */
+export async function volverAVerTour() {
+  const { supabase, user } = await usuario();
+  const { modoActivo } = await leerEstadoCuenta(supabase, user.id);
+  await supabase
+    .from("perfiles")
+    .update(modoActivo === "creador" ? { tour_creador_visto_en: null } : { tour_talento_visto_en: null })
+    .eq("id", user.id);
+  revalidatePath("/", "layout");
+  redirect("/");
 }
 
 /**
