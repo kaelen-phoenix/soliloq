@@ -26,7 +26,7 @@ export default async function ApoyarPage() {
   const destinos = [t("destino1"), t("destino2"), t("destino3")];
 
   return (
-    <div data-tema="light" className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
+    <div data-tema="dark" className="flex min-h-screen flex-col bg-superficie text-texto">
       {/* Cabecera: el mismo escenario oscuro que la portada. */}
       <section className="relative overflow-hidden bg-ink-950 text-white">
         <div
@@ -81,14 +81,14 @@ export default async function ApoyarPage() {
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 pb-16 pt-10">
         {/* Donación */}
-        <section className="rounded-2xl border border-ink-100 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
+        <section className="rounded-2xl border border-borde bg-fondo-sutil p-6">
           <h2 className="font-display text-xl font-semibold tracking-[-0.02em]">{t("donarTitulo")}</h2>
-          <p className="mt-1.5 text-sm leading-relaxed text-ink-700">{t("donarTexto")}</p>
+          <p className="mt-1.5 text-sm leading-relaxed text-texto-tenue">{t("donarTexto")}</p>
           <a
             href={DONACION_URL}
             target="_blank"
             rel="noopener noreferrer"
-            className="mt-4 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+            className="brillo-accion mt-4 inline-flex items-center gap-2 rounded-full bg-accion px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"
           >
             {t("donarCta")}
             <Icono nombre="flecha-derecha" className="h-4 w-4" />
@@ -98,28 +98,28 @@ export default async function ApoyarPage() {
         {/* Sponsors */}
         <section className="mt-10">
           <h2 className="font-display text-xl font-semibold tracking-[-0.02em]">{t("sponsorsTitulo")}</h2>
-          <p className="mt-1.5 max-w-prose text-sm leading-relaxed text-ink-700">{t("sponsorsTexto")}</p>
+          <p className="mt-1.5 max-w-prose text-sm leading-relaxed text-texto-tenue">{t("sponsorsTexto")}</p>
           <div className="mt-4 grid gap-3 sm:grid-cols-3">
             {NIVELES.map((n, i) => (
               <div
                 key={n}
                 className={`flex flex-col rounded-2xl border p-5 ${
-                  i === 2 ? "border-brand-500/40 bg-brand-500/5" : "border-ink-100 bg-white"
+                  i === 2 ? "border-brand-400/50 bg-brand-400/5" : "border-borde bg-fondo-sutil"
                 }`}
               >
-                <p className="font-display text-lg font-semibold text-ink-900">{t(`nivel_${n}_nombre`)}</p>
-                <p className="mt-0.5 text-sm font-semibold text-brand-600">{t(`nivel_${n}_precio`)}</p>
-                <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-700">{t(`nivel_${n}_beneficio`)}</p>
+                <p className="font-display text-lg font-semibold text-texto">{t(`nivel_${n}_nombre`)}</p>
+                <p className="mt-0.5 acento-texto text-sm font-semibold">{t(`nivel_${n}_precio`)}</p>
+                <p className="mt-2 flex-1 text-sm leading-relaxed text-texto-tenue">{t(`nivel_${n}_beneficio`)}</p>
               </div>
             ))}
           </div>
-          <p className="mt-3 text-xs text-ink-700">{t("sponsorsComo")}</p>
+          <p className="mt-3 text-xs text-texto-tenue">{t("sponsorsComo")}</p>
         </section>
 
         {/* Contacto */}
-        <section className="mt-10 rounded-2xl border border-ink-100 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
+        <section className="mt-10 rounded-2xl border border-borde bg-fondo-sutil p-6">
           <h2 className="font-display text-xl font-semibold tracking-[-0.02em]">{t("contactoTitulo")}</h2>
-          <p className="mb-4 mt-1.5 text-sm leading-relaxed text-ink-700">{t("contactoTexto")}</p>
+          <p className="mb-4 mt-1.5 text-sm leading-relaxed text-texto-tenue">{t("contactoTexto")}</p>
           <FormularioContacto />
         </section>
 
@@ -129,9 +129,9 @@ export default async function ApoyarPage() {
         </section>
       </main>
 
-      <footer className="border-t border-ink-100 bg-[#fbfaf7]">
+      <footer className="border-t border-borde bg-superficie">
         <div className="mx-auto w-full max-w-3xl px-5 py-6 text-sm">
-          <Link href="/" className="font-medium text-ink-900 hover:text-brand-600">
+          <Link href="/" className="font-medium text-texto hover:text-brand-400">
             {t("volverInicio")}
           </Link>
         </div>

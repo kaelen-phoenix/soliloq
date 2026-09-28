@@ -23,6 +23,15 @@ test.describe("landing", () => {
     await expect(page).toHaveURL(/\/ingresar/);
   });
 
+  // #226: la portada enlaza «Apoyá el proyecto» y robots/sitemap la declaran pública, pero
+  // el middleware la mandaba a /ingresar a quien no tenía sesión.
+  test("«Apoyar» se ve sin sesión (no redirige a /ingresar)", async ({ page }) => {
+    await page.goto("/bienvenida");
+    await page.getByRole("link", { name: "Apoyá el proyecto" }).click();
+    await expect(page).toHaveURL(/\/apoyar$/);
+    await expect(page.getByRole("heading", { level: 1, name: "Apoyá Yalope" })).toBeVisible();
+  });
+
   test("/ raíz sirve la landing para anónimos", async ({ page }) => {
     const res = await page.goto("/");
     expect(res?.status()).toBe(200);

@@ -66,7 +66,10 @@ const JSON_LD = {
 export default async function BienvenidaPage() {
   const t = await getTranslations("landing");
   return (
-    <div data-tema="light" className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
+    // #217: la portada pasa al negro de escena, como la primera pantalla de la referencia
+    // (`docs/marca/referencias/interfaz-yalope-217.png`). Antes era una superficie de marca
+    // clara fija; ahora usa los tokens del tema oscuro, igual que el resto de la app.
+    <div data-tema="dark" className="flex min-h-screen flex-col bg-superficie text-texto">
       <script
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
@@ -104,13 +107,13 @@ export default async function BienvenidaPage() {
               <nav className="flex items-center gap-2">
                 <Link
                   href="/ingresar"
-                  className="rounded-xl px-3.5 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
+                  className="rounded-full px-3.5 py-2 text-sm font-medium text-white/80 transition-colors hover:bg-white/10 hover:text-white"
                 >
                   {t("entrar")}
                 </Link>
                 <Link
                   href="/ingresar"
-                  className="rounded-xl border border-white/30 px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
+                  className="rounded-full border border-white/30 px-3.5 py-2 text-sm font-semibold text-white transition-colors hover:bg-white/10"
                 >
                   {t("crearPerfil")}
                 </Link>
@@ -121,7 +124,9 @@ export default async function BienvenidaPage() {
               <div>
                 <MarcaYalope className="h-9 w-9 text-brand-400" />
                 <h1 className="mt-5 font-display text-[2.6rem] font-semibold leading-[1.03] tracking-[-0.02em] md:text-[3.4rem]">
-                  {t("heroTitulo")}
+                  {t.rich("heroTitulo", {
+                    d: (texto) => <span className="texto-degrade">{texto}</span>,
+                  })}
                 </h1>
                 <p className="mt-5 max-w-prose text-lg leading-relaxed text-white/75">
                   {t("heroTexto")}
@@ -132,30 +137,30 @@ export default async function BienvenidaPage() {
                 <div className="mt-8 flex flex-wrap gap-3">
                   <Link
                     href="/ingresar"
-                    className="inline-flex items-center gap-2 rounded-xl bg-brand-500 px-5 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+                    className="brillo-accion inline-flex items-center gap-2 rounded-full bg-accion px-5 py-3 text-sm font-semibold text-white transition hover:brightness-110"
                   >
                     {t("crearPerfil")}
                     <Icono nombre="flecha-derecha" className="h-4 w-4" />
                   </Link>
                   <a
                     href="#como-funciona"
-                    className="inline-flex items-center rounded-xl border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
+                    className="inline-flex items-center rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
                   >
                     {t("verComoFunciona")}
                   </a>
-                  <BotonInstalar className="inline-flex items-center gap-2 rounded-xl border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10" />
+                  <BotonInstalar className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10" />
                 </div>
               </div>
 
               {/* El programa de mano: una tarjeta de talento estilizada. */}
               <div className="relative mx-auto w-full max-w-[300px]">
-                <div className="rotate-1 rounded-[1.75rem] bg-[#fbfaf7] p-3 shadow-[0_24px_64px_-24px_rgba(0,0,0,0.55)] ring-1 ring-black/10">
+                <div className="rotate-1 rounded-[1.75rem] bg-fondo-sutil p-3 shadow-[0_24px_64px_-24px_rgba(0,0,0,0.75)] ring-1 ring-borde">
                   <div className="relative aspect-[3/4] overflow-hidden rounded-2xl bg-gradient-to-b from-ink-800 to-ink-950">
                     <div
                       className="absolute inset-x-0 bottom-0 h-1/2"
                       style={{
                         background:
-                          "radial-gradient(ellipse at 50% 130%, rgba(254,128,100,0.40), transparent 70%)",
+                          "radial-gradient(ellipse at 50% 130%, rgba(242,87,30,0.45), transparent 70%)",
                       }}
                     />
                     <MarcaYalope className="absolute left-1/2 top-1/2 h-16 w-16 -translate-x-1/2 -translate-y-1/2 text-white/85" />
@@ -166,10 +171,10 @@ export default async function BienvenidaPage() {
                       <div className="mt-2 h-2.5 w-16 rounded-full bg-ink-100" />
                     </div>
                     <div className="flex items-center gap-2">
-                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-ink-200 text-ink-500">
+                      <div className="flex h-10 w-10 items-center justify-center rounded-full border border-borde text-texto-tenue">
                         <Icono nombre="cruz" className="h-4 w-4" />
                       </div>
-                      <div className="flex h-11 w-11 items-center justify-center rounded-full border-2 border-coral text-coral-700">
+                      <div className="brillo-accion flex h-11 w-11 items-center justify-center rounded-full bg-accion text-white">
                         <Icono nombre="corazon" className="h-5 w-5" relleno />
                       </div>
                     </div>
@@ -184,37 +189,37 @@ export default async function BienvenidaPage() {
         {/* Para quién */}
         <section className="mx-auto w-full max-w-5xl px-5 py-16">
           <div className="grid gap-4 md:grid-cols-2">
-            <div className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-brand-500 text-white">
+            <div className="flex flex-col rounded-2xl border border-borde bg-fondo-sutil p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-accion text-white">
                 <Icono nombre="corazon" className="h-5 w-5" />
               </span>
               <h2 className="mt-4 font-display text-xl font-semibold tracking-[-0.02em]">
                 {t("paraArtistasTitulo")}
               </h2>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-700">
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-texto-tenue">
                 {t("paraArtistasTexto")}
               </p>
               <Link
                 href="/ingresar"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-brand-600 hover:text-brand-700"
+                className="acento-texto mt-4 inline-flex items-center gap-1.5 text-sm font-semibold hover:underline"
               >
                 {t("crearPerfil")}
                 <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
               </Link>
             </div>
-            <div className="flex flex-col rounded-2xl border border-ink-100 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
-              <span className="flex h-11 w-11 items-center justify-center rounded-xl bg-ink-900 text-white">
+            <div className="flex flex-col rounded-2xl border border-borde bg-fondo-sutil p-6">
+              <span className="flex h-11 w-11 items-center justify-center rounded-xl border border-borde bg-superficie text-texto">
                 <Icono nombre="buscar" className="h-5 w-5" />
               </span>
               <h2 className="mt-4 font-display text-xl font-semibold tracking-[-0.02em]">
                 {t("paraCreadoresTitulo")}
               </h2>
-              <p className="mt-2 flex-1 text-sm leading-relaxed text-ink-700">
+              <p className="mt-2 flex-1 text-sm leading-relaxed text-texto-tenue">
                 {t("paraCreadoresTexto")}
               </p>
               <Link
                 href="/ingresar"
-                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-ink-900 hover:text-ink-700"
+                className="mt-4 inline-flex items-center gap-1.5 text-sm font-semibold text-texto hover:underline"
               >
                 {t("publicarConvocatoria")}
                 <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
@@ -223,8 +228,8 @@ export default async function BienvenidaPage() {
           </div>
         </section>
 
-        {/* Cómo funciona: banda neutra, con los números en rojo de marquesina. */}
-        <section id="como-funciona" className="border-y border-ink-100 bg-[#f4f1ea]">
+        {/* Cómo funciona: banda un escalón arriba del fondo, con los números encendidos. */}
+        <section id="como-funciona" className="border-y border-borde bg-fondo-sutil">
           <div className="mx-auto w-full max-w-5xl px-5 py-16">
             <h2 className="font-display text-2xl font-semibold tracking-[-0.02em]">
               {t("comoFunciona")}
@@ -232,17 +237,25 @@ export default async function BienvenidaPage() {
             <div className="mt-8 grid gap-8 md:grid-cols-3">
               {(["1", "2", "3"] as const).map((n) => (
                 <div key={n}>
-                  <span className="font-display text-3xl font-semibold text-brand-600">0{n}</span>
-                  <h3 className="mt-1 text-base font-semibold text-ink-900">{t(`paso${n}Titulo`)}</h3>
-                  <p className="mt-1.5 text-sm leading-relaxed text-ink-700">{t(`paso${n}Texto`)}</p>
+                  <span className="texto-degrade font-display text-3xl font-semibold">0{n}</span>
+                  <h3 className="mt-1 text-base font-semibold text-texto">{t(`paso${n}Titulo`)}</h3>
+                  <p className="mt-1.5 text-sm leading-relaxed text-texto-tenue">{t(`paso${n}Texto`)}</p>
                 </div>
               ))}
             </div>
           </div>
         </section>
 
-        {/* Cierre: telón de nuevo, cerrando la función. */}
-        <section className="relative overflow-hidden bg-brand-700 text-white">
+        {/* Cierre: telón de nuevo, cerrando la función — negro con la luz de marca subiendo. */}
+        <section className="relative overflow-hidden bg-ink-950 text-white">
+          <div
+            className="pointer-events-none absolute inset-x-0 bottom-0 h-full"
+            style={{
+              background:
+                "radial-gradient(ellipse at 50% 110%, rgba(230,45,3,0.45), transparent 65%)",
+            }}
+            aria-hidden="true"
+          />
           <div
             className="pointer-events-none absolute inset-0 opacity-25"
             style={{
@@ -258,7 +271,7 @@ export default async function BienvenidaPage() {
             </h2>
             <Link
               href="/ingresar"
-              className="mt-7 inline-flex items-center gap-2 rounded-xl bg-brand-500 px-6 py-3 text-sm font-semibold text-white transition-colors hover:bg-brand-600"
+              className="brillo-accion mt-7 inline-flex items-center gap-2 rounded-full bg-accion px-6 py-3 text-sm font-semibold text-white transition hover:brightness-110"
             >
               {t("sumate")}
               <Icono nombre="flecha-derecha" className="h-4 w-4" />
@@ -267,22 +280,22 @@ export default async function BienvenidaPage() {
         </section>
       </main>
 
-      <footer className="border-t border-ink-100 bg-[#fbfaf7]">
+      <footer className="border-t border-borde bg-superficie">
         <div className="mx-auto w-full max-w-5xl px-5 py-8">
           <BannerSponsors niveles={["produccion"]} className="mb-6" />
-          <div className="flex flex-col items-start gap-3 text-sm text-ink-700 sm:flex-row sm:items-center sm:justify-between">
-            <Logotipo tamano="sm" />
+          <div className="flex flex-col items-start gap-3 text-sm text-texto-tenue sm:flex-row sm:items-center sm:justify-between">
+            <Logotipo tamano="sm" tono="claro" />
             <p>{t("pieLema")}</p>
             <div className="flex gap-4">
-              <Link href="/apoyar" className="font-medium text-ink-900 hover:text-brand-600">
+              <Link href="/apoyar" className="font-medium text-texto hover:text-brand-400">
                 {t("apoyarEnlace")}
               </Link>
-              <Link href="/ingresar" className="font-medium text-ink-900 hover:text-brand-600">
+              <Link href="/ingresar" className="font-medium text-texto hover:text-brand-400">
                 {t("entrar")}
               </Link>
             </div>
           </div>
-          <p className="mt-6 text-xs text-ink-500">
+          <p className="mt-6 text-xs text-texto-tenue">
             © {new Date().getFullYear()} Yalope. {t("derechos")}
           </p>
         </div>
