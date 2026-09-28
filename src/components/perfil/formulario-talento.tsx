@@ -349,7 +349,7 @@ export function FormularioTalento({
               Los Creadores pueden encontrarte por ubicación, edad, género o habilidades (y
               necesitás al menos una foto para que te encuentren). Si preferís no aparecer,
               apagalo: dejás de salir en búsquedas nuevas, pero seguís viendo el feed y
-              podés seguir marcando «Me interesa» con normalidad. Tus Salas y conversaciones
+              podés seguir marcando «Me interesa» con normalidad. Tus chats y conversaciones
               actuales tampoco se ven afectadas — esto sólo controla si alguien nuevo te
               puede encontrar.
             </span>

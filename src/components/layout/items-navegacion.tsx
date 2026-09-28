@@ -29,13 +29,15 @@ export const ITEMS_NAVEGACION: Record<RolUsuario, ItemNavegacion[]> = {
     { href: "/salas", clave: "salas", icono: "salas" },
     { href: "/perfil", clave: "perfil", icono: "perfil" },
   ],
-  // #142: Perfil → Proyecto → Matches → Salas. "Buscar talento" sale de la barra y se
-  // ofrece desde la pantalla de Proyecto (`TableroCreador`).
+  // #217: la acción principal primero y Perfil al final, igual que en Talento (antes, por
+  // #142, Perfil iba primero). "Buscar talento" sale de la barra y se ofrece desde la
+  // pantalla de Proyecto (`TableroCreador`). "Salas" se muestra como "Chats" (i18n); la
+  // ruta sigue siendo `/salas`.
   creador: [
-    { href: "/perfil", clave: "perfil", icono: "perfil" },
     { href: "/", clave: "misProyectos", claveCorto: "misProyectosCorto", icono: "tablero" },
     { href: "/matches", clave: "matches", icono: "corazon" },
     { href: "/salas", clave: "salas", icono: "salas" },
+    { href: "/perfil", clave: "perfil", icono: "perfil" },
   ],
 };
 

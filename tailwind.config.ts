@@ -142,9 +142,10 @@ const config: Config = {
       },
       fontFamily: {
         sans: ["var(--font-sans)", "system-ui", "sans-serif"],
-        // Reservada para los títulos de portada y de pantalla. Si aparece en un botón o
-        // en un label, está mal usada: la interfaz es toda `sans`.
-        display: ["var(--font-display)", "Georgia", "serif"],
+        // Títulos de portada y de pantalla. Desde #217 es Inter —la referencia visual usa una
+        // sans pesada—; queda como familia aparte para poder cambiarla en un solo lugar. Si
+        // aparece en un botón o en un label, está mal usada.
+        display: ["var(--font-sans)", "system-ui", "sans-serif"],
         // Solo el wordmark «yalope». No usar en ningún otro lado.
         marca: ["var(--font-marca)", "system-ui", "sans-serif"],
       },

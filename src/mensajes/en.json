@@ -15,7 +15,7 @@
     "convocatoriasCorto": "Feed",
     "armarEquipo": "Build a team",
     "armarEquipoCorto": "Team",
-    "salas": "Rooms",
+    "salas": "Chats",
     "perfil": "Profile",
     "misProyectos": "My projects",
     "misProyectosCorto": "Projects",
@@ -28,7 +28,7 @@
   "titulos": {
     "armarEquipo": "Build a team",
     "sala": "Room",
-    "salas": "Rooms",
+    "salas": "Chats",
     "notificaciones": "Notifications",
     "nuevoPerfil": "New profile",
     "tuPerfil": "Your profile",

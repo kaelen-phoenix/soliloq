@@ -4,7 +4,7 @@ import { barrerRestos, borrarUsuarios } from "./limpieza";
 
 /**
  * Indicador de mensajes nuevos en Salas (#216, migración 0082): llega un mensaje → la sala
- * se resalta en `/salas` y "Salas" muestra el badge en la navegación; al entrar a la sala,
+ * se resalta en `/salas` y "Chats" muestra el badge en la navegación; al entrar a la sala,
  * los dos se apagan y siguen apagados al volver. Mismas condiciones que el resto de
  * `flujos/`: se saltea sin staging. Ver `e2e/README.md`.
  */
@@ -106,7 +106,7 @@ test.describe("mensajes sin leer en Salas (UI)", () => {
     const tarjeta = page.locator("li", { hasText: titulo });
     await expect(tarjeta).toBeVisible({ timeout: 10_000 });
     await expect(tarjeta).not.toHaveAttribute("data-sin-leer", /.*/);
-    await expect(page.getByRole("link", { name: /Salas, \d+ sin leer/ })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Chats, \d+ sin leer/ })).toHaveCount(0);
 
     // 1. Llega un mensaje con la lista abierta: se enciende en vivo, sin recargar.
     const { error: eMsg } = await admin!
@@ -114,18 +114,18 @@ test.describe("mensajes sin leer en Salas (UI)", () => {
       .insert({ sala_id: sala.id, autor_id: autor.id, contenido: "¿Ensayamos el sábado?" });
     if (eMsg) throw eMsg;
     await expect(tarjeta).toHaveAttribute("data-sin-leer", "true", { timeout: 15_000 });
-    await expect(page.getByRole("link", { name: "Salas, 1 sin leer" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Chats, 1 sin leer" })).toBeVisible();
 
     // 2. Entrar a la sala la marca leída.
     await tarjeta.getByRole("link").first().click();
     await expect(page.getByText("¿Ensayamos el sábado?")).toBeVisible({ timeout: 10_000 });
-    await expect(page.getByRole("link", { name: /Salas, \d+ sin leer/ })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Chats, \d+ sin leer/ })).toHaveCount(0);
 
     // 3. Y queda leída al volver (persiste en la base, no es solo estado del cliente).
     await page.goto("/salas");
     await expect(page.locator("li", { hasText: titulo })).toBeVisible({ timeout: 10_000 });
     await expect(page.locator("li", { hasText: titulo })).not.toHaveAttribute("data-sin-leer", /.*/);
-    await expect(page.getByRole("link", { name: /Salas, \d+ sin leer/ })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: /Chats, \d+ sin leer/ })).toHaveCount(0);
 
     // 4. Con el canal ya escuchando, otro mensaje llega por Realtime (el paso 1 lo puede
     // haber levantado la recarga que se hace al suscribirse). La espera es para que la
@@ -138,7 +138,7 @@ test.describe("mensajes sin leer en Salas (UI)", () => {
     await expect(page.locator("li", { hasText: titulo })).toHaveAttribute("data-sin-leer", "true", {
       timeout: 15_000,
     });
-    await expect(page.getByRole("link", { name: "Salas, 1 sin leer" })).toBeVisible();
+    await expect(page.getByRole("link", { name: "Chats, 1 sin leer" })).toBeVisible();
     // Y la vista previa se actualiza con el último mensaje (router.refresh de la lista).
     await expect(page.locator("li", { hasText: titulo })).toContainText("Traigan el guion", {
       timeout: 10_000,

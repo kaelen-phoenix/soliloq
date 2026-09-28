@@ -31,7 +31,7 @@ manual (#182), las Normas (#180) y el onboarding con ubicación por Google Place
 directo con el cliente admin en vez de navegarse — ver los comentarios del archivo.
 
 `flujos/salas-no-leidos.spec.ts` (#216, #222): un mensaje nuevo enciende la sala en
-`/salas` y el badge de "Salas" en vivo; entrar la marca leída y queda así al volver; y una
+`/salas` y el badge de "Chats" en vivo; entrar la marca leída y queda así al volver; y una
 sala abierta con carga completa recibe en vivo los mensajes de los demás (el canal de
 Realtime espera la sesión, `suscribirConSesion`).
 

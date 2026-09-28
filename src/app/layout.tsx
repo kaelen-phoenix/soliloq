@@ -1,5 +1,5 @@
 import type { Metadata, Viewport } from "next";
-import { Baloo_2, Fraunces, Inter } from "next/font/google";
+import { Baloo_2, Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
 import { getLocale, getMessages } from "next-intl/server";
 import "./globals.css";
@@ -11,24 +11,10 @@ const inter = Inter({
   variable: "--font-sans",
 });
 
-// Solo para la marca y los títulos de portada. Fraunces es una serif de display con
-// contraste alto: es lo que le da el aire de marquesina y programa de mano que Inter,
-// pensada para interfaz, no puede dar.
-//
-// Va como fuente variable (sin `weight`) y sin ejes extra: declarar un peso fijo la
-// convierte en estática, y ahí `axes` deja de ser válido. Los ejes decorativos de Fraunces
-// (SOFT, WONK) suman bytes que no se justifican para el puñado de lugares donde aparece.
-const fraunces = Fraunces({
-  subsets: ["latin"],
-  display: "swap",
-  variable: "--font-display",
-  style: ["normal"],
-});
-
 // Solo para el wordmark de la marca: «yalope» en minúscula, en la sans redondeada y pesada
 // del logotipo (ver `docs/marca/logotipo-yalope.svg`). Baloo 2 es la que más se acerca a
-// esas terminaciones redondas. No es una fuente de interfaz ni de títulos — esos siguen en
-// Inter y Fraunces. Un solo peso: el wordmark siempre va en 800.
+// esas terminaciones redondas. No es una fuente de interfaz ni de títulos — esos van en
+// Inter (desde #217 los títulos también: la referencia usa una sans pesada, no una serif). Un solo peso: el wordmark siempre va en 800.
 const baloo = Baloo_2({
   subsets: ["latin"],
   display: "swap",
@@ -100,7 +86,7 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       lang={locale}
       data-tema="dark"
       suppressHydrationWarning
-      className={`${inter.variable} ${fraunces.variable} ${baloo.variable}`}
+      className={`${inter.variable} ${baloo.variable}`}
     >
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />

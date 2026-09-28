@@ -15,7 +15,7 @@
     "convocatoriasCorto": "Explorar",
     "armarEquipo": "Armar equipo",
     "armarEquipoCorto": "Equipo",
-    "salas": "Salas",
+    "salas": "Chats",
     "perfil": "Perfil",
     "misProyectos": "Mis proyectos",
     "misProyectosCorto": "Proyectos",
@@ -28,7 +28,7 @@
   "titulos": {
     "armarEquipo": "Armar equipo",
     "sala": "Sala",
-    "salas": "Salas",
+    "salas": "Chats",
     "notificaciones": "Notificaciones",
     "nuevoPerfil": "Nuevo perfil",
     "tuPerfil": "Tu perfil",
