@@ -3,6 +3,7 @@ import { createClient } from "@supabase/supabase-js";
 import fs from "node:fs";
 import os from "node:os";
 import path from "node:path";
+import { borrarUsuarios } from "../flujos/limpieza";
 
 /**
  * Notificaciones push de punta a punta (#232): el receptor activa las notificaciones en
@@ -21,8 +22,16 @@ const PASS = "test-1234-abcd";
 
 test.describe("push de punta a punta (Chrome real, local)", () => {
   test.skip(
-    process.env.E2E_PUSH_CHROME !== "1" || !URL || !KEY || !BASE,
-    "solo local: E2E_PUSH_CHROME=1 + staging (E2E_SUPABASE_URL/E2E_SERVICE_KEY/E2E_BASE_URL) y la app levantada con claves VAPID",
+    process.env.E2E_PUSH_CHROME !== "1" ||
+      !URL ||
+      !KEY ||
+      !BASE ||
+      // Las mismas claves con las que se levantó la app (README): sin ellas, el botón
+      // «Activar notificaciones» no puede suscribir y el test fallaría por configuración.
+      !process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY ||
+      !process.env.VAPID_PRIVATE_KEY ||
+      !process.env.VAPID_SUBJECT,
+    "solo local: E2E_PUSH_CHROME=1 + staging (E2E_SUPABASE_URL/E2E_SERVICE_KEY/E2E_BASE_URL) + las claves VAPID con las que se levantó la app",
   );
   test.setTimeout(120_000);
 
@@ -147,8 +156,12 @@ test.describe("push de punta a punta (Chrome real, local)", () => {
         });
     } finally {
       if (chrome) await chrome.close();
-      if (salaId) await admin!.from("salas").delete().eq("id", salaId);
-      for (const id of ids) await admin!.auth.admin.deleteUser(id);
+      // Limpieza que revisa errores: si algo queda en staging, el test lo dice.
+      if (salaId) {
+        const { error } = await admin!.from("salas").delete().eq("id", salaId);
+        if (error) throw error;
+      }
+      await borrarUsuarios(admin!, ids);
       fs.rmSync(perfilChrome, { recursive: true, force: true });
     }
   });
