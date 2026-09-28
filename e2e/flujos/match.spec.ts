@@ -1,5 +1,6 @@
 import { test, expect, type Page } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
+import { barrerRestos, borrarUsuarios } from "./limpieza";
 
 /**
  * Flujo de match end to end en la UI. NECESITA un proyecto Supabase de **staging** (nunca
@@ -40,9 +41,6 @@ test.describe("circuito de match (UI)", () => {
 
   const admin = URL && KEY ? createClient(URL, KEY, { auth: { persistSession: false } }) : null;
   const usuariosCreados: string[] = [];
-  // Borrar el usuario no borra los objetos que subió a Storage (no hay cascade ahí) — sin
-  // esto, cada corrida deja fotos huérfanas acumulándose en el bucket de staging.
-  const fotosSubidas: string[] = [];
 
   async function nuevoUsuario() {
     const email = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 8)}@test.local`;
@@ -62,7 +60,6 @@ test.describe("circuito de match (UI)", () => {
       .from("fotos-perfil")
       .upload(path, PNG_1X1, { contentType: "image/png", upsert: true });
     if (eSubida) throw eSubida;
-    fotosSubidas.push(path);
     const { error: eFila } = await admin!
       .from("fotos_talento")
       .insert({ talento_id: id, storage_path: path, orden: 0 });
@@ -154,9 +151,12 @@ test.describe("circuito de match (UI)", () => {
     if (e4) throw e4;
   }
 
-  test.afterAll(async () => {
-    for (const id of usuariosCreados) await admin?.auth.admin.deleteUser(id).catch(() => {});
-    if (fotosSubidas.length > 0) await admin?.storage.from("fotos-perfil").remove(fotosSubidas);
+  test.beforeAll(async () => {
+    await barrerRestos(admin!);
+  });
+
+  test.afterEach(async () => {
+    await borrarUsuarios(admin!, usuariosCreados);
   });
 
   async function login(page: Page, email: string) {
@@ -174,10 +174,12 @@ test.describe("circuito de match (UI)", () => {
     // (nada mockeado): el timeout por default de Playwright (30s) se queda corto.
     test.setTimeout(90_000);
 
-    const tituloObra = `Obra E2E ${Date.now()}`;
+    const sufijo = Date.now().toString(36);
+    const tituloObra = `Obra E2E ${sufijo}`;
+    const nombreTalento = `Talento E2E ${sufijo}`;
     const talento = await nuevoUsuario();
     const creador = await nuevoUsuario();
-    await sembrarTalento(talento.id, "Talento E2E");
+    await sembrarTalento(talento.id, nombreTalento);
     await sembrarCreadorConObra(creador.id, "Creador E2E", tituloObra);
 
     // 1. El Talento entra, ve la Obra en su feed y se postula (swipe derecha ≡ "Postularme").
@@ -193,7 +195,10 @@ test.describe("circuito de match (UI)", () => {
     const creadorPage = await creadorCtx.newPage();
     await login(creadorPage, creador.email);
     await creadorPage.goto("/talentos");
-    await expect(creadorPage.getByText("Talento E2E")).toBeVisible({ timeout: 15_000 });
+    // Filtrado por nombre: staging puede tener otros usuarios de prueba (otro spec en
+    // paralelo) y la pila mostraría primero a cualquiera de ellos.
+    await creadorPage.getByRole("textbox", { name: "Buscar" }).fill(sufijo);
+    await expect(creadorPage.getByText(nombreTalento)).toBeVisible({ timeout: 15_000 });
     // `exact` porque si no, "Me interesa" matchea por substring dentro de "No me interesa".
     await creadorPage.getByRole("button", { name: "Me interesa", exact: true }).click();
 

@@ -93,10 +93,7 @@ export default async function MatchesPage() {
 
   return (
     <main className="px-5 py-5">
-      <h1 className="font-display text-xl font-semibold tracking-[-0.02em] text-texto sm:text-2xl">
-        Call Back
-      </h1>
-      <p className="mb-5 mt-1 text-sm text-texto-tenue">
+      <p className="mb-5 text-sm text-texto-tenue">
         Interés mutuo. Aceptá el match para sumar a la persona a Convocados; después la
         convocás en firme.
       </p>
