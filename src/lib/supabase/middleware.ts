@@ -16,6 +16,29 @@ const RUTAS_SIEMPRE_DISPONIBLES = ["/cambiar-clave"];
 // sin salir de esa pantalla. «Apoyar» (`/apoyar`) también: la enlaza la portada y la declaran
 // pública `robots.ts` y `sitemap.ts`, pero faltaba acá y a quien no tenía sesión lo mandaba a
 // `/ingresar` (#226).
+/**
+ * Páginas de marca que ven igual todos los visitantes sin sesión (#237): la portada (`/` la
+ * sirve por rewrite), «Apoyar» y las Normas. Para un anónimo se cachean en la CDN de Vercel
+ * (ver `cachearParaAnonimos`) en vez de generarse en cada visita.
+ */
+const PAGINAS_CACHEABLES_SIN_SESION = ["/", "/bienvenida", "/apoyar", "/normas"];
+
+/**
+ * Deja que la CDN de Vercel guarde la respuesta unos minutos. `Vercel-CDN-Cache-Control`
+ * solo lo lee la CDN (no llega al navegador) y manda sobre el `Cache-Control: no-store` que
+ * pone Next a las páginas dinámicas.
+ *
+ * `Vary: Accept-Language, Cookie` hace que la CDN guarde una copia por cada idioma pedido y
+ * por cada juego de cookies: el idioma sale de `NEXT_LOCALE` o de `Accept-Language`
+ * (`src/i18n/request.ts`), así que nadie puede recibir la copia de otro idioma. Si la
+ * respuesta trae `Set-Cookie` (p. ej. Supabase limpiando una sesión vencida), la CDN no la
+ * guarda.
+ */
+function cachearParaAnonimos(response: NextResponse) {
+  response.headers.set("Vercel-CDN-Cache-Control", "max-age=300, stale-while-revalidate=86400");
+  response.headers.append("Vary", "Accept-Language, Cookie");
+}
+
 const RUTAS_ABIERTAS = ["/p/", "/normas", "/apoyar"];
 
 /** Solo destinos internos: `next` viaja por la URL y no puede convertirse en un redirect abierto. */
@@ -63,6 +86,8 @@ export async function actualizarSesion(request: NextRequest) {
     url.search = search ? `?${search}` : "";
     return NextResponse.redirect(url);
   };
+
+  if (!user && PAGINAS_CACHEABLES_SIN_SESION.includes(path)) cachearParaAnonimos(response);
 
   if (esRutaAbierta) return response;
 
