@@ -357,6 +357,62 @@ test.describe("QA en vivo (#122, teléfono)", () => {
     await anonimo.close();
   });
 
+  test("Editar perfil con Talento y Creador: un solo «Guardar cambios» guarda las dos partes", async ({
+    page,
+  }) => {
+    const s = sufijo();
+    const cuenta = await nuevoUsuario(`Doble Rol ${s}`, "talento", { fotos: 3 });
+    await hecho(
+      admin!.from("perfiles_creador").insert({ id: cuenta.id, disciplinas: ["actuacion"] }),
+    );
+
+    await login(page, cuenta.email);
+    await page.goto("/perfil?editar=1");
+    // #234: antes había dos formularios, cada uno con su «Guardar cambios».
+    await expect(page.getByRole("button", { name: "Guardar cambios" })).toHaveCount(1);
+
+    // Un cambio de cada parte, y un solo guardado.
+    await page.getByRole("switch", { name: "Tu edad se muestra en tu perfil" }).click();
+    await page
+      .getByRole("group", { name: /Perfil artístico como Creador/ })
+      .getByRole("button", { name: "Dirección", exact: true })
+      .click();
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+
+    await expect
+      .poll(
+        async () => {
+          const [{ data: t }, { data: c }] = await Promise.all([
+            admin!.from("perfiles_talento").select("edad_visible").eq("id", cuenta.id).single(),
+            admin!.from("perfiles_creador").select("disciplinas").eq("id", cuenta.id).single(),
+          ]);
+          return { edadVisible: t?.edad_visible, disciplinas: [...(c?.disciplinas ?? [])].sort() };
+        },
+        { timeout: 15_000 },
+      )
+      .toEqual({ edadVisible: false, disciplinas: ["actuacion", "direccion"] });
+  });
+
+  test("Editar perfil: un Creador sin disciplinas cargadas puede guardar igual", async ({ page }) => {
+    // La fila de Creador la crea un trigger sin disciplinas (0075): unificar el formulario no
+    // puede dejar a esas cuentas sin poder guardar el resto del perfil (#234).
+    const cuenta = await nuevoUsuario(`Creador Sin Disciplinas ${sufijo()}`, "talento", { fotos: 3 });
+    await hecho(admin!.from("perfiles_creador").insert({ id: cuenta.id }));
+
+    await login(page, cuenta.email);
+    await page.goto("/perfil?editar=1");
+    await page.getByRole("switch", { name: "Tu edad se muestra en tu perfil" }).click();
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect
+      .poll(
+        async () =>
+          (await admin!.from("perfiles_talento").select("edad_visible").eq("id", cuenta.id).single())
+            .data?.edad_visible,
+        { timeout: 15_000 },
+      )
+      .toBe(false);
+  });
+
   test("Visor de fotos: se pasa de foto deslizando con el dedo", async ({ page }) => {
     const s = sufijo();
     const talento = await nuevoUsuario(`Talento Fotos ${s}`, "talento", { fotos: 3 });

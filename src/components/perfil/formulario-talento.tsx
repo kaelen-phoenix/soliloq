@@ -9,6 +9,11 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { ToggleVisibilidad } from "@/components/ui/toggle-visibilidad";
 import {
+  CamposCreador,
+  validarCreador,
+  type DatosCreador,
+} from "@/components/perfil/formulario-creador";
+import {
   GENEROS,
   HABILIDADES,
   MAX_GENERO_DESCRIPCION,
@@ -47,6 +52,7 @@ export function FormularioTalento({
   datosIniciales,
   fotosIniciales,
   destinoAlTerminar,
+  datosCreador,
 }: {
   userId: string;
   esAlta: boolean;
@@ -54,6 +60,9 @@ export function FormularioTalento({
   fotosIniciales: FotoTalento[];
   /** A dónde ir tras el alta. Por defecto la home; si venía de un enlace público, vuelve ahí. */
   destinoAlTerminar?: string;
+  /** Perfil artístico de Creador, si la cuenta lo tiene: se edita y se guarda acá mismo, con
+   *  el mismo botón, en vez de en un formulario aparte (#234). */
+  datosCreador?: DatosCreador;
 }) {
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
@@ -75,6 +84,8 @@ export function FormularioTalento({
     datosIniciales?.aparece_en_buscador ?? true,
   );
   const [fotos, setFotos] = useState<FotoTalento[]>(fotosIniciales);
+  const [disciplinas, setDisciplinas] = useState(datosCreador?.disciplinas ?? []);
+  const [otroDetalle, setOtroDetalle] = useState(datosCreador?.otro_detalle ?? "");
   const [errores, setErrores] = useState<Record<string, string>>({});
   const [cargando, setCargando] = useState(false);
   const [guardado, setGuardado] = useAvisoGuardado();
@@ -116,6 +127,15 @@ export function FormularioTalento({
     const { errores: erroresRedes } = validarRedes(redes);
     for (const [clave, mensaje] of Object.entries(erroresRedes)) {
       nuevos[`redes_${clave}`] = mensaje;
+    }
+
+    if (datosCreador) {
+      Object.assign(
+        nuevos,
+        validarCreador(disciplinas, otroDetalle, {
+          exigirUna: datosCreador.disciplinas.length > 0,
+        }),
+      );
     }
 
     setErrores(nuevos);
@@ -174,6 +194,25 @@ export function FormularioTalento({
       // No se apaga `cargando`: la navegación desmonta el formulario, y apagarlo acá haría
       // parpadear el botón a "Guardar" durante el viaje.
       return;
+    }
+
+    if (datosCreador) {
+      const { error: errorCreador } = await supabase
+        .from("perfiles_creador")
+        .update({
+          disciplinas,
+          // El detalle solo se guarda si "Otro" sigue elegido: si la persona lo desmarca, el
+          // texto tiene que irse con él en vez de quedar colgado sin nada que lo explique.
+          otro_detalle: disciplinas.includes("otro") ? otroDetalle.trim() : null,
+        })
+        .eq("id", userId);
+      if (errorCreador) {
+        setCargando(false);
+        setErrorGeneral(
+          "Guardamos tu perfil, pero no el perfil artístico como Creador. Probá de nuevo.",
+        );
+        return;
+      }
     }
 
     // Editar no navega: este formulario ya vive en `/perfil`, así que el `router.replace`
@@ -356,6 +395,18 @@ export function FormularioTalento({
           </span>
         </label>
       </section>
+
+      {datosCreador && (
+        <section className="border-t border-borde pt-6">
+          <CamposCreador
+            disciplinas={disciplinas}
+            setDisciplinas={setDisciplinas}
+            otroDetalle={otroDetalle}
+            setOtroDetalle={setOtroDetalle}
+            errores={errores}
+          />
+        </section>
+      )}
 
       {errorGeneral && <p className="text-sm text-error-600">{errorGeneral}</p>}
       <AvisoGuardado visible={guardado} />
