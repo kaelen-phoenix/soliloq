@@ -84,3 +84,21 @@ con el mismo PAT (el token es de cuenta, no de proyecto).
 El mismo circuito de match ya está cubierto a nivel SQL en
 `supabase/tests/match_convocatoria.sql` (corre contra prod en CI, `db-tests`) — `flujos/`
 suma la capa de UI que eso no toca (swipe, placa, `/matches`, `/salas`).
+
+## `local/` — solo en una PC, no en CI
+
+`local/push-chrome.spec.ts` (#232): notificaciones push de punta a punta. El receptor activa
+las notificaciones en Ajustes, sale de la app, otra persona le escribe y la notificación llega
+a su service worker con título, texto y la URL de la sala. Necesita **Google Chrome
+instalado**: el Chromium de Playwright no trae servicio de push, y por eso no corre en CI
+(que solo corre `publico.spec.ts` y `flujos/`). Se saltea sin `E2E_PUSH_CHROME=1`. Abre una
+ventana de Chrome de verdad, y la notificación puede aparecer en el sistema.
+
+La app tiene que levantarse con claves VAPID. Sirve un par descartable, que no hace falta
+guardar en ningún lado:
+```
+node -e 'const k=require("web-push").generateVAPIDKeys();console.log(`export NEXT_PUBLIC_VAPID_PUBLIC_KEY="${k.publicKey}"\nexport VAPID_PRIVATE_KEY="${k.privateKey}"\nexport VAPID_SUBJECT="mailto:qa@yalope.test"`)' > /tmp/vapid.sh
+. /tmp/vapid.sh   # antes del build (la pública se hornea en el bundle) y del start
+# … mismo build/start contra staging que arriba …
+E2E_PUSH_CHROME=1 npx playwright test e2e/local
+```
