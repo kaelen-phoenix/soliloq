@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { FormularioAjustes } from "@/components/ajustes/formulario-ajustes";
 import { createClient } from "@/lib/supabase/server";
 import { resolverIdioma } from "@/i18n/request";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 export async function generateMetadata() {
   const t = await getTranslations("titulos");
@@ -21,9 +22,7 @@ function temaVigente(): Tema {
 
 export default async function AjustesPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) return null;
 
   const { data: perfil } = await supabase

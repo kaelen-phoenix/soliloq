@@ -1,23 +1,21 @@
 import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
-import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { MatchesLista } from "@/components/convocatorias/matches-lista";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 import { ModalNuevoMatch } from "@/components/convocatorias/modal-nuevo-match";
+import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
 export const metadata = { title: "Call Back — Yalope" };
 
 export default async function MatchesPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) return null;
 
-  const estado = await leerEstadoCuenta(supabase, user.id);
+  const estado = await estadoCuentaDeLaRequest(user.id);
   if (estado.modoActivo !== "creador") notFound();
 
   const iniciativa = await iniciativaActivaDelCreador(supabase, user.id);

@@ -1,8 +1,8 @@
 import { redirect } from "next/navigation";
 import { BuscadorTalento } from "@/components/talento/buscador-talento";
-import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 import { createClient } from "@/lib/supabase/server";
+import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
 /**
  * Buscador de talento: la única superficie donde el creador sale a buscar gente por
@@ -11,12 +11,10 @@ import { createClient } from "@/lib/supabase/server";
  */
 export default async function BuscarTalentoPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) redirect("/ingresar");
 
-  const estado = await leerEstadoCuenta(supabase, user.id);
+  const estado = await estadoCuentaDeLaRequest(user.id);
   if (estado.modoActivo !== "creador") redirect("/");
 
   // Para el swipe (#124): a qué iniciativa se marca el interés, y su foto para la placa.

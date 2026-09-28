@@ -6,8 +6,8 @@ import { Icono } from "@/components/ui/icono";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BotonCompartir } from "@/components/perfil/boton-compartir";
 import { PerfilCreadorDetalle } from "@/components/perfil/perfil-creador-detalle";
-import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
+import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
 function AccionesCuenta() {
   return (
@@ -41,9 +41,7 @@ export default async function PerfilPage({
   searchParams: { editar?: string };
 }) {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) return null;
 
   // El formulario está detrás de `?editar=1`: por defecto se ve el perfil como lo ve el
@@ -66,7 +64,7 @@ export default async function PerfilPage({
   // El Perfil de Talento es la única identidad personal (issue #175): se muestra siempre,
   // sin importar en qué modo esté operando la cuenta. Si además tiene la función de Creador
   // activa (creó un Proyecto o Equipo), se suma su perfil artístico como sección aparte.
-  const estado = await leerEstadoCuenta(supabase, user.id);
+  const estado = await estadoCuentaDeLaRequest(user.id);
 
   const [{ data: cuenta }, { data: perfilTalento }, { data: fotos }, { data: perfilCreador }] =
     await Promise.all([

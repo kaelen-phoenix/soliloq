@@ -1,11 +1,10 @@
 import { createClient } from "@/lib/supabase/server";
 import { ListaNotificaciones } from "@/components/notificaciones/lista-notificaciones";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 export default async function NotificacionesPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) return null;
 
   const { data: notificacionesRaw } = await supabase

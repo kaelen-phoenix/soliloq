@@ -1,16 +1,14 @@
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ListaSalas } from "@/components/salas/lista-salas";
-import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { createClient } from "@/lib/supabase/server";
+import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
 export default async function SalasPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) return null;
 
-  const estado = await leerEstadoCuenta(supabase, user.id);
+  const estado = await estadoCuentaDeLaRequest(user.id);
 
   const [{ data: integraciones }, { data: destacados }] = await Promise.all([
     supabase

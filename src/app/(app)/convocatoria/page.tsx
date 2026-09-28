@@ -2,14 +2,13 @@ import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ConvocatoriasLista } from "@/components/talento/convocatorias-lista";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 export const metadata = { title: "Convocatoria — Yalope" };
 
 export default async function ConvocatoriaPage() {
   const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  const user = await usuarioDeLaRequest();
   if (!user) return null;
 
   const { data, error } = await supabase.rpc("mis_convocatorias");
