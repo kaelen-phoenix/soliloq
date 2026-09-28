@@ -57,11 +57,9 @@ export function FormularioAjustes({
   // action re-renderiza esta pantalla con el valor nuevo.
   function aplicarTema(tema: Tema) {
     // El data-attr se refleja al toque para que el cambio de tema no espere al round-trip.
-    // Misma regla que `SCRIPT_TEMA` en `layout.tsx`: "Sistema" resuelve contra el teléfono.
-    const claro =
-      tema === "claro" ||
-      (tema === "sistema" && window.matchMedia("(prefers-color-scheme: light)").matches);
-    document.documentElement.dataset.tema = claro ? "light" : "dark";
+    // `window.__tema` lo deja `SCRIPT_TEMA` (`layout.tsx`): misma regla, `theme-color` y
+    // seguimiento del teléfono en "Sistema".
+    (window as Window & { __tema?: (t: Tema) => void }).__tema?.(tema);
     iniciar(() => guardarTema(tema));
   }
 
