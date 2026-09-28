@@ -192,6 +192,8 @@
   align-items: center;
   justify-content: center;
   background-color: #0c0a0b;
+  /* No atrapa toques: si alguien toca apurado mientras dura, el toque llega a la app. */
+  pointer-events: none;
   animation: splash-salida 0.4s ease-in 0.95s forwards;
 }
 
