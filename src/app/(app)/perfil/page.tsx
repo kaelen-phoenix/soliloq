@@ -1,6 +1,5 @@
 import Link from "next/link";
 import { CerrarSesionBoton } from "@/components/cerrar-sesion-boton";
-import { FormularioCreador } from "@/components/perfil/formulario-creador";
 import { FormularioTalento } from "@/components/perfil/formulario-talento";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 import { Icono } from "@/components/ui/icono";
@@ -97,12 +96,8 @@ export default async function PerfilPage({
             esAlta={!perfilTalento}
             datosIniciales={perfilTalento ?? undefined}
             fotosIniciales={fotosConUrl}
+            datosCreador={perfilCreador ?? undefined}
           />
-          {perfilCreador && (
-            <div className="mt-8 max-w-2xl border-t border-borde pt-6">
-              <FormularioCreador userId={user.id} datosIniciales={perfilCreador} />
-            </div>
-          )}
         </>
       ) : (
         <VistaPerfilPropio
