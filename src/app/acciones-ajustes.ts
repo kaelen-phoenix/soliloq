@@ -3,6 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
+import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { borrarUsuarioYArchivos } from "@/lib/supabase/borrar-usuario";
 
@@ -36,10 +37,18 @@ export async function guardarTema(tema: "sistema" | "claro" | "oscuro") {
  * Borra la cuenta propia y todo lo que cuelga de ella. Irreversible.
  * La cascada y la limpieza de Storage viven en `borrarUsuarioYArchivos`.
  */
-export async function borrarCuenta() {
+export async function borrarCuenta(): Promise<{ ok: false } | void> {
   const { supabase, user } = await usuario();
 
-  await borrarUsuarioYArchivos(user.id);
+  // Si falla, se devuelve el error en vez de tirar: una excepción en la server action dejaba
+  // la pantalla trabada en «Borrando…» sin decir nada (#229).
+  try {
+    await borrarUsuarioYArchivos(user.id);
+  } catch (e) {
+    Sentry.captureException(e, { tags: { origen: "borrar-cuenta" } });
+    // El texto lo pone el cliente, en el idioma de quien lo ve.
+    return { ok: false };
+  }
 
   // La sesión ya quedó huérfana; alcanza con limpiar las cookies de este dispositivo.
   await supabase.auth.signOut({ scope: "local" });

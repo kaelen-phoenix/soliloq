@@ -38,6 +38,14 @@ Realtime espera la sesión, `suscribirConSesion`).
 `flujos/eliminar-equipo.spec.ts` (#215): el Creador elimina su Equipo desde el tablero y el
 Talento que había convocado vuelve a aparecer en Buscar Talentos; la sala del equipo se borra.
 
+`flujos/qa-en-vivo.spec.ts` (#122), en teléfono (Pixel 7): la caminata de QA que antes se
+pedía a mano — «Cupo lleno» en Call Back, «Dar de baja» un convocado, el feed no repite una
+obra donde ya entraste, estados vacíos de Call Back y `/convocatoria`, destacar y
+desvincularse en Chats, ocultar la edad (y que el enlace público la respete), deslizar en el
+visor de fotos, «Borrar mi cuenta», «Borrar proyecto», borrar un usuario desde Admin y el
+límite de 20 «Me interesa» por día. Los borrados usan la clave de servicio del server:
+levantar la app con `SUPABASE_SERVICE_ROLE_KEY` (ver abajo).
+
 ### El proyecto de staging (2026-09-20)
 
 Existe `soliloq-staging` (ref `rcjjdguldfrkpmxgkazn`, mismo org de Supabase, plan free) con
@@ -57,6 +65,7 @@ NEXT_PUBLIC_SUPABASE_URL="$(cat ~/.soliloq-deploy/staging-url.txt)" \
 NEXT_PUBLIC_SUPABASE_ANON_KEY="$(cat ~/.soliloq-deploy/staging-anon-key.txt)" \
 E2E_SUPABASE_URL="$(cat ~/.soliloq-deploy/staging-url.txt)" \
 E2E_SERVICE_KEY="$(cat ~/.soliloq-deploy/staging-service-key.txt)" \
+SUPABASE_SERVICE_ROLE_KEY="$(cat ~/.soliloq-deploy/staging-service-key.txt)" \
 E2E_BASE_URL="http://localhost:3100" \
 npm run build && npm run start -- --port 3100 &
 npx playwright test e2e/flujos

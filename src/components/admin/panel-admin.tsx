@@ -431,7 +431,11 @@ function Usuarios({
 
   async function borrar(u: Usuario) {
     setBorrandoId(u.id);
-    const res = await adminBorrarUsuario(u.id);
+    // Si la acción tira (red, servidor), también hay que salir de «Borrando…» (#229).
+    const res = await adminBorrarUsuario(u.id).catch(() => ({
+      ok: false as const,
+      error: "No se pudo borrar. Probá de nuevo.",
+    }));
     setBorrandoId(null);
     if (!res.ok) {
       setError(res.error);
