@@ -28,7 +28,7 @@ export function FormularioContacto({ tipoInicial = "sugerencia" }: { tipoInicial
       p_mensaje: mensaje,
     });
     // El tope de 0087 (#252) no es una falla: se explica y no se reporta.
-    if (error?.message === "demasiados_mensajes") return setEstado("limite");
+    if (error?.message?.includes("demasiados_mensajes")) return setEstado("limite");
     if (error) reportarErrorSupabase(error, { rpc: "enviar_mensaje_contacto" });
     setEstado(error ? "error" : "ok");
   }
