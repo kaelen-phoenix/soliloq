@@ -198,7 +198,8 @@
     "enviar": "Send",
     "enviando": "Sending…",
     "enviadoOk": "Thanks! We got your message and we'll get back to you.",
-    "enviadoError": "We couldn't send the message. Try again."
+    "enviadoError": "We couldn't send the message. Try again.",
+    "enviadoLimite": "We already got several messages from you in the last hour. Wait a while and write again."
   },
   "notificacionesPush": {
     "titulo": "Notifications",
