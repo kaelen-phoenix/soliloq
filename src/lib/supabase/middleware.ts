@@ -46,9 +46,14 @@ export async function actualizarSesion(request: NextRequest) {
     }
   );
 
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
+  // #237: la sesión se valida acá mismo con la clave pública del proyecto (el token es un JWT
+  // ES256; las claves se bajan una vez y quedan en caché) en vez de preguntarle a Supabase
+  // Auth en cada navegación. El middleware corre en el borde, cerca de la persona, y ese
+  // viaje hasta la base en Oregon era ~180 ms. `getClaims` renueva el token si venció, igual
+  // que `getUser`. Lo único que cambia: un logout en otro dispositivo se nota acá cuando vence
+  // el token (≤ 1 h) y no al instante; las páginas y la base siguen validando por su cuenta.
+  const { data: sesion } = await supabase.auth.getClaims();
+  const userId = sesion?.claims?.sub ?? null;
 
   const path = request.nextUrl.pathname;
   const esRutaPublica = RUTAS_PUBLICAS.some((r) => path.startsWith(r));
@@ -66,7 +71,7 @@ export async function actualizarSesion(request: NextRequest) {
 
   if (esRutaAbierta) return response;
 
-  if (!user) {
+  if (!userId) {
     // La raíz para un anónimo la resuelve el rewrite de `next.config.mjs` (sirve el
     // contenido de `/bienvenida` ahí mismo, con 200 — no un redirect): si acá
     // redirigiéramos primero, ese rewrite queda muerto porque el middleware corre antes
@@ -80,7 +85,7 @@ export async function actualizarSesion(request: NextRequest) {
 
   if (RUTAS_SIEMPRE_DISPONIBLES.some((r) => path.startsWith(r))) return response;
 
-  const estado = await leerEstadoCuenta(supabase, user.id);
+  const estado = await leerEstadoCuenta(supabase, userId);
   const destino = destinoSegunEstado(estado);
 
   const enAltaPerfil = path.startsWith("/completar-perfil");
