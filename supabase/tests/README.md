@@ -53,6 +53,10 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   como anon, 3 mensajes por email por hora (sin importar mayúsculas), el 4.º se rechaza con
   `demasiados_mensajes`, otro email sigue pasando, 60 en la hora cortan a todos, y lo de
   hace más de una hora no cuenta.
+- **`columnas_protegidas.sql`** — nadie se hace admin ni se aprueba solo (#257, 0088): como
+  `authenticated`, `update` de `es_admin`, `aprobado_en`, `suspendido_en` o `creado_en` sobre la
+  fila propia falla con `columna_protegida`; el resto de lo propio se sigue editando, y
+  `admin_aprobar_usuario` / `admin_suspender_usuario` siguen andando.
 
 ## Pendiente
 
