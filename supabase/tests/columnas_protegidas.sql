@@ -31,7 +31,8 @@ begin
     'es_admin = true',
     'aprobado_en = now()',
     'suspendido_en = null',
-    'creado_en = now() - interval ''1 year'''
+    'creado_en = now() - interval ''1 year''',
+    'id = gen_random_uuid()'
   ] loop
     begin
       execute format('update perfiles set %s where id = auth.uid()', cambio);
