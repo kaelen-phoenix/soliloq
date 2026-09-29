@@ -198,7 +198,8 @@
     "enviar": "Enviar",
     "enviando": "Enviando…",
     "enviadoOk": "¡Gracias! Recibimos tu mensaje y te vamos a responder.",
-    "enviadoError": "No pudimos enviar el mensaje. Probá de nuevo."
+    "enviadoError": "No pudimos enviar el mensaje. Probá de nuevo.",
+    "enviadoLimite": "Ya recibimos varios mensajes tuyos en la última hora. Esperá un rato y volvé a escribirnos."
   },
   "notificacionesPush": {
     "titulo": "Notificaciones",

@@ -49,6 +49,10 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   transacción que se descarta) y falla si alguna no compila contra las tablas de hoy. Una
   función SQL no se revalida cuando se borra una columna que usa: así quedaron rotas tres
   con 0077 (#241) sin que nadie se enterara.
+- **`limite_contacto.sql`** — tope del formulario de contacto de «Apoyar» (#252, 0087):
+  como anon, 3 mensajes por email por hora (sin importar mayúsculas), el 4.º se rechaza con
+  `demasiados_mensajes`, otro email sigue pasando, 60 en la hora cortan a todos, y lo de
+  hace más de una hora no cuenta.
 
 ## Pendiente
 

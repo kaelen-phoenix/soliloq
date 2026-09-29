@@ -15,7 +15,7 @@ export function FormularioContacto({ tipoInicial = "sugerencia" }: { tipoInicial
   const [email, setEmail] = useState("");
   const [tipo, setTipo] = useState<Tipo>(tipoInicial);
   const [mensaje, setMensaje] = useState("");
-  const [estado, setEstado] = useState<"inicial" | "enviando" | "ok" | "error">("inicial");
+  const [estado, setEstado] = useState<"inicial" | "enviando" | "ok" | "error" | "limite">("inicial");
 
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
@@ -27,6 +27,8 @@ export function FormularioContacto({ tipoInicial = "sugerencia" }: { tipoInicial
       p_tipo: tipo,
       p_mensaje: mensaje,
     });
+    // El tope de 0087 (#252) no es una falla: se explica y no se reporta.
+    if (error?.message?.includes("demasiados_mensajes")) return setEstado("limite");
     if (error) reportarErrorSupabase(error, { rpc: "enviar_mensaje_contacto" });
     setEstado(error ? "error" : "ok");
   }
@@ -82,7 +84,8 @@ export function FormularioContacto({ tipoInicial = "sugerencia" }: { tipoInicial
         />
       </div>
 
-      {estado === "error" && <p className="text-xs text-error-600">{t("enviadoError")}</p>}
+      {estado === "error" && <p role="alert" className="text-xs text-error-600">{t("enviadoError")}</p>}
+      {estado === "limite" && <p role="alert" className="text-xs text-error-600">{t("enviadoLimite")}</p>}
 
       <div>
         <Boton type="submit" cargando={estado === "enviando"} textoCargando={t("enviando")}>
