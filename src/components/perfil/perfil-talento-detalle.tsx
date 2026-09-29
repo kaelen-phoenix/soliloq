@@ -8,7 +8,7 @@ export interface TalentoDetalle {
   nombre: string;
   /** `null` en cuentas migradas sin ese dato (issue #175): no se muestra la edad. */
   fecha_nacimiento: string | null;
-  /** #110: si es `false`, la edad no se muestra (salvo en el perfil propio). */
+  /** #110: si es `false`, la edad no se muestra (tampoco en el perfil propio, #250). */
   edad_visible: boolean;
   /** La recortada a barrio/ciudad. Nunca `ubicacion_texto`: puede ser el domicilio. */
   ubicacion_publica: string;
@@ -27,12 +27,16 @@ export function PerfilTalentoDetalle({
   esPropio = false,
 }: {
   talento: TalentoDetalle;
-  /** El dueño ve su edad siempre; el resto solo si `edad_visible`. */
+  /**
+   * En el perfil propio la edad oculta tampoco se muestra (#250: si no, la persona ve su edad
+   * y cree que la opción no anda); en su lugar va un aviso de que está oculta.
+   */
   esPropio?: boolean;
 }) {
   const fotosOrdenadas = [...talento.fotos].sort((a, b) => a.orden - b.orden);
   const redes = REDES.filter((r) => talento.redes?.[r.clave]);
-  const mostrarEdad = !!talento.fecha_nacimiento && (esPropio || talento.edad_visible);
+  const mostrarEdad = !!talento.fecha_nacimiento && talento.edad_visible;
+  const avisoEdadOculta = esPropio && !!talento.fecha_nacimiento && !talento.edad_visible;
 
   return (
     <div className="flex flex-col gap-4">
@@ -44,6 +48,7 @@ export function PerfilTalentoDetalle({
           {mostrarEdad && talento.fecha_nacimiento && `${calcularEdad(talento.fecha_nacimiento)} años · `}
           {talento.ubicacion_publica}
         </p>
+        {avisoEdadOculta && <p className="text-xs text-texto-tenue">Tu edad está oculta: nadie más la ve.</p>}
         <p className="text-sm text-texto-tenue">
           {talento.genero_descripcion || etiquetaGenero(talento.genero)}
         </p>
