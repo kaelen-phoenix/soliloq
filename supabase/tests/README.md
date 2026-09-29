@@ -57,6 +57,11 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   `authenticated`, `update` de `es_admin`, `aprobado_en`, `suspendido_en` o `creado_en` sobre la
   fila propia falla con `columna_protegida`; el resto de lo propio se sigue editando, y
   `admin_aprobar_usuario` / `admin_suspender_usuario` siguen andando.
+- **`admin_invisible.sql`** — el perfil de un Administrador no se ve (#249, 0089): para otra
+  cuenta no aparece su Perfil de Talento/Creador, fotos, Proyecto ni Equipo, ni en
+  `buscar_talento`, `feed_equipo` o `perfil_publico` (tampoco sin sesión); no se le puede marcar
+  interés ni contactar. Se ve a sí misma, la ve quien comparte sala con ella, y si deja de ser
+  admin vuelve a verse. Un Talento común sigue saliendo (control).
 
 ## Pendiente
 

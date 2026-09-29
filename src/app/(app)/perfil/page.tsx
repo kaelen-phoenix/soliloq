@@ -100,7 +100,12 @@ export default async function PerfilPage({
       ) : (
         <VistaPerfilPropio
           hrefEditar="/perfil?editar=1"
-          aviso="Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
+          aviso={
+            estado.esAdmin
+              ? // #249: mientras sea Administrador, nadie más ve este perfil (0089).
+                "Sos Administrador: tu perfil está oculto para el resto de la comunidad."
+              : "Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
+          }
         >
           <PerfilTalentoDetalle talento={{ ...perfilTalento, fotos: fotosConUrl }} esPropio />
           {perfilCreador && (
@@ -111,7 +116,8 @@ export default async function PerfilPage({
         </VistaPerfilPropio>
       )}
 
-      {!editando && perfilTalento && cuenta && (
+      {/* A un Administrador el enlace no le sirve: `perfil_publico` no lo muestra (#249). */}
+      {!editando && perfilTalento && cuenta && !estado.esAdmin && (
         <BotonCompartir
           userId={user.id}
           nombre={perfilTalento.nombre}
