@@ -24,10 +24,10 @@ const TRAZO_ESTRELLA =
   "M5 0C5.6 3.4 6.6 4.4 10 5C6.6 5.6 5.6 6.6 5 10C4.4 6.6 3.4 5.6 0 5C3.4 4.4 4.4 3.4 5 0Z";
 
 const ESTRELLAS = [
-  { angulo: 20, radio: 78, tamano: 10, tinta: "#f2571e", demora: 0.05 },
-  { angulo: 115, radio: 70, tamano: 7, tinta: "#ffe4d6", demora: 0.15 },
-  { angulo: 205, radio: 82, tamano: 9, tinta: "#f2571e", demora: 0.1 },
-  { angulo: 295, radio: 66, tamano: 6, tinta: "#ffe4d6", demora: 0.2 },
+  { angulo: 20, radio: 92, tamano: 18, tinta: "#f2571e", demora: 0.05 },
+  { angulo: 115, radio: 84, tamano: 13, tinta: "#ffe4d6", demora: 0.15 },
+  { angulo: 205, radio: 98, tamano: 16, tinta: "#f2571e", demora: 0.1 },
+  { angulo: 295, radio: 80, tamano: 12, tinta: "#ffe4d6", demora: 0.2 },
 ] as const;
 
 export function SplashMarca() {
