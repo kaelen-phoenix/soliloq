@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
+import { COLUMNAS_PUBLICAS_TALENTO } from "@/lib/constantes";
 import { Superposicion } from "@/components/ui/superposicion";
 import { PerfilTalentoDetalle, type TalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 
@@ -29,9 +30,11 @@ export function PlacaPerfilTalento({
     let cancelado = false;
     async function cargar() {
       const supabase = createClient();
-      const [{ data: perfil }, { data: fotos }] = await Promise.all([
-        supabase.from("perfiles_talento").select("*").eq("id", talentoId).single(),
+      // Solo lo público: la fecha y la ubicación exacta no salen de la base (#255).
+      const [{ data: perfil }, { data: fotos }, { data: edad }] = await Promise.all([
+        supabase.from("perfiles_talento").select(COLUMNAS_PUBLICAS_TALENTO).eq("id", talentoId).single(),
         supabase.from("fotos_talento").select("*").eq("talento_id", talentoId).order("orden"),
+        supabase.rpc("edad_publica", { p_perfil: talentoId }),
       ]);
       if (cancelado) return;
       if (!perfil) {
@@ -40,6 +43,7 @@ export function PlacaPerfilTalento({
       }
       setTalento({
         ...perfil,
+        edad: edad ?? null,
         fotos: (fotos ?? []).map((f) => ({
           id: f.id,
           orden: f.orden,
