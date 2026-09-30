@@ -5,6 +5,7 @@ import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle
 import { Icono } from "@/components/ui/icono";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BotonCompartir } from "@/components/perfil/boton-compartir";
+import { InvitacionComunidad } from "@/components/comunidad/invitacion-comunidad";
 import { PerfilCreadorDetalle } from "@/components/perfil/perfil-creador-detalle";
 import { calcularEdad } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/server";
@@ -134,6 +135,7 @@ export default async function PerfilPage({
           activoInicial={cuenta.enlace_publico_activo}
         />
       )}
+      {!editando && <InvitacionComunidad variante="seccion" />}
       <AccionesCuenta />
     </main>
   );
