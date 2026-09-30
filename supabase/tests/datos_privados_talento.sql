@@ -20,7 +20,8 @@ insert into ctx (k, v) values
   ('a', '9aaaaaaa-1111-1111-1111-11111111aaaa'),
   ('b', '9bbbbbbb-2222-2222-2222-22222222bbbb'),
   ('c', '9ccccccc-3333-3333-3333-33333333cccc'),
-  ('sala', '9ccccccc-0000-0000-0000-00000000cccc');
+  ('sala', '9ccccccc-0000-0000-0000-00000000cccc'),
+  ('obra', '9ddddddd-4444-4444-4444-44444444dddd');
 
 insert into auth.users (id, email, aud, role) values
   ((select v from ctx where k='a'), 'dp-a@test.local', 'authenticated', 'authenticated'),
@@ -28,7 +29,9 @@ insert into auth.users (id, email, aud, role) values
   ((select v from ctx where k='c'), 'dp-c@test.local', 'authenticated', 'authenticated');
 insert into perfiles_talento (id, nombre, fecha_nacimiento, edad_visible, aparece_en_buscador, ubicacion_texto, ubicacion_place_id, ubicacion_publica, ubicacion_lat, ubicacion_lng, ubicacion_pais, genero) values
   ((select v from ctx where k='a'), 'Ana Privada', (current_date - interval '30 years 10 days')::date, false, true, 'Calle Falsa 123', 'place-a', 'Palermo', -34.58, -58.42, 'AR', 'sin_especificar'),
-  ((select v from ctx where k='c'), 'Ciro Privado', (current_date - interval '40 years 10 days')::date, true, false, 'Otra Calle 456', 'place-c', 'Almagro', -34.60, -58.42, 'AR', 'sin_especificar');
+  ((select v from ctx where k='c'), 'Ciro Privado', (current_date - interval '40 years 10 days')::date, true, false, 'Otra Calle 456', 'place-c', 'Almagro', -34.60, -58.42, 'AR', 'sin_especificar'),
+  -- B también es Talento: el feed (`feed_talento`) muestra al creador por su Perfil de Talento.
+  ((select v from ctx where k='b'), 'Beto Creador', '1985-01-01', true, false, 'x', null, 'Caballito', -34.61, -58.44, 'AR', 'sin_especificar');
 insert into perfiles_creador (id, disciplinas) values ((select v from ctx where k='b'), '{direccion}');
 insert into fotos_talento (talento_id, storage_path, orden) values
   ((select v from ctx where k='a'), (select v from ctx where k='a') || '/f.jpg', 0),
@@ -113,13 +116,20 @@ do $$ begin
   end if;
 end $$;
 
--- ── T5 · feed_para_talento: el propio corre, el de otro no da nada ──────────
+-- ── T5 · feed_para_talento: el propio trae el rol de B, el de otro no da nada ──
+insert into obras (id, creador_id, titulo, ubicacion_texto, ubicacion_lat, ubicacion_lng, ubicacion_pais, estado)
+  values ((select v from ctx where k='obra'), (select v from ctx where k='b'), 'Obra feed DP', 'x', -34.6, -58.4, 'AR', 'publicada');
+insert into roles (obra_id, nombre, tipo, vacantes)
+  values ((select v from ctx where k='obra'), 'Rol feed DP', 'actuacion', 1);
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"9aaaaaaa-1111-1111-1111-11111111aaaa"}';
 create temp table t5_propio as select * from public.feed_para_talento((select v from ctx where k='a'), null);
 create temp table t5_ajeno as select * from public.feed_para_talento((select v from ctx where k='c'), null);
 reset role;
 do $$ begin
+  if not exists (select 1 from t5_propio where obra_id = (select v from ctx where k='obra')) then
+    raise exception 'T5: A tendría que recibir el rol de B en su feed';
+  end if;
   if exists (select 1 from t5_ajeno) then
     raise exception 'T5: feed_para_talento no tendría que devolver nada para otro talento';
   end if;
