@@ -102,7 +102,12 @@ export default async function PerfilPage({
       ) : (
         <VistaPerfilPropio
           hrefEditar="/perfil?editar=1"
-          aviso="Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
+          aviso={
+            perfilTalento.aparece_en_buscador
+              ? "Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
+              : // #265: la opción «Ocultar mi perfil a personas nuevas» está tildada.
+                "Tu perfil está oculto a personas nuevas: solo te ven tus chats abiertos."
+          }
         >
           <PerfilTalentoDetalle
             talento={{
@@ -120,7 +125,8 @@ export default async function PerfilPage({
         </VistaPerfilPropio>
       )}
 
-      {!editando && perfilTalento && cuenta && (
+      {/* Con el perfil oculto el enlace no muestra nada (#265, `perfil_publico`): no se ofrece. */}
+      {!editando && perfilTalento && cuenta && perfilTalento.aparece_en_buscador && (
         <BotonCompartir
           userId={user.id}
           nombre={perfilTalento.nombre}

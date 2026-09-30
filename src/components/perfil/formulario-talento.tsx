@@ -393,22 +393,22 @@ export function FormularioTalento({
 
       <section className="flex flex-col gap-3">
         <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Visibilidad</h2>
+        {/* #265: se tilda para ocultarse. En la base sigue siendo `aparece_en_buscador`
+            (invertido); 0090 lo aplica a todo contacto nuevo, no solo al buscador. */}
         <label className="flex items-start gap-3">
           <input
             type="checkbox"
-            checked={apareceEnBuscador}
-            onChange={(e) => setApareceEnBuscador(e.target.checked)}
+            checked={!apareceEnBuscador}
+            onChange={(e) => setApareceEnBuscador(!e.target.checked)}
             className="mt-0.5 h-4 w-4 rounded border-ink-300 text-texto focus:ring-accion"
           />
           <span className="text-sm text-texto">
-            Aparecer en el buscador de creadores
+            Ocultar mi perfil a personas nuevas
             <span className="mt-0.5 block text-xs text-texto-tenue">
-              Los Creadores pueden encontrarte por ubicación, edad, género o habilidades (y
-              necesitás al menos una foto para que te encuentren). Si preferís no aparecer,
-              apagalo: dejás de salir en búsquedas nuevas, pero seguís viendo el feed y
-              podés seguir marcando «Me interesa» con normalidad. Tus chats y conversaciones
-              actuales tampoco se ven afectadas — esto sólo controla si alguien nuevo te
-              puede encontrar.
+              Nadie nuevo te va a poder encontrar ni contactar: no salís en el buscador de
+              Creadores ni en «Armar equipo», y tu enlace público deja de mostrar tu perfil.
+              Tus chats abiertos siguen igual, tus Proyectos y Equipos publicados siguen
+              recibiendo interesados, y vos podés seguir buscando y marcando «Me interesa».
             </span>
           </span>
         </label>
