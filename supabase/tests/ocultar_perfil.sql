@@ -1,4 +1,4 @@
--- «Ocultar mi perfil a personas nuevas» (#265, 0090).
+-- «Ocultar mi perfil a personas nuevas» (#265, 0090 y 0091).
 -- Se corre entero dentro de begin/rollback: no deja rastro.
 --   supabase/tests/run.sh ocultar_perfil.sql
 --
@@ -97,6 +97,12 @@ begin
   end;
   -- Descartar sí (no la contacta).
   insert into intereses_equipo (de_perfil, a_perfil, interesa) values (auth.uid(), h, false);
+  -- …pero ese descarte no se puede pasar a contacto después (0091).
+  begin
+    update intereses_equipo set interesa = true where de_perfil = auth.uid() and a_perfil = h;
+    raise exception 'T2: pasar el descarte a contacto con un update tenía que rechazarse';
+  exception when insufficient_privilege then null;
+  end;
   -- Interesarse en el Proyecto publicado de H sí: el interés va a la iniciativa.
   perform public.marcar_interes(h, (select v from ctx where k='obra_h'), null, true);
 end $$;
