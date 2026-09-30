@@ -62,6 +62,10 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   coordenadas (ni con `select *`); `edad_publica` da la edad solo si es visible;
   `buscar_talento` sigue filtrando por texto, edad y radio y respeta «Aparecer en el buscador»;
   `mi_perfil_talento()` trae la fila propia entera; `feed_para_talento` solo para uno mismo.
+- **`ocultar_perfil.sql`** — «Ocultar mi perfil a personas nuevas» (#265, 0090): para alguien
+  nuevo, quien se ocultó no sale en «Armar equipo», el buscador ni su enlace; no se la puede
+  contactar ni marcarle interés como talento (sí interesarse en su Proyecto); quien comparte
+  sala la sigue viendo; si vuelve a mostrarse se ve; y si ella escribe primero, se le responde.
 
 ## Pendiente
 
