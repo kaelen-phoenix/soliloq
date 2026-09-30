@@ -1,13 +1,17 @@
 import { VideoreelEmbed } from "./videoreel-embed";
-import { calcularEdad, etiquetaGenero, REDES, type Genero } from "@/lib/constantes";
+import { etiquetaGenero, REDES, type Genero } from "@/lib/constantes";
 import { GaleriaFotos } from "@/components/ui/galeria-fotos";
 import { Icono } from "@/components/ui/icono";
 
 export interface TalentoDetalle {
   id: string;
   nombre: string;
-  /** `null` en cuentas migradas sin ese dato (issue #175): no se muestra la edad. */
-  fecha_nacimiento: string | null;
+  /**
+   * Ya calculada: la fecha de nacimiento no sale de la base para otras cuentas (#255). En el
+   * perfil propio es la edad real; en uno ajeno, `edad_publica()` (null si la ocultó). `null`
+   * también en cuentas migradas sin fecha (#175).
+   */
+  edad: number | null;
   /** #110: si es `false`, la edad no se muestra (tampoco en el perfil propio, #250). */
   edad_visible: boolean;
   /** La recortada a barrio/ciudad. Nunca `ubicacion_texto`: puede ser el domicilio. */
@@ -35,8 +39,8 @@ export function PerfilTalentoDetalle({
 }) {
   const fotosOrdenadas = [...talento.fotos].sort((a, b) => a.orden - b.orden);
   const redes = REDES.filter((r) => talento.redes?.[r.clave]);
-  const mostrarEdad = !!talento.fecha_nacimiento && talento.edad_visible;
-  const avisoEdadOculta = esPropio && !!talento.fecha_nacimiento && !talento.edad_visible;
+  const mostrarEdad = talento.edad != null && talento.edad_visible;
+  const avisoEdadOculta = esPropio && talento.edad != null && !talento.edad_visible;
 
   return (
     <div className="flex flex-col gap-4">
@@ -45,7 +49,7 @@ export function PerfilTalentoDetalle({
       <div>
         <h2 className="text-lg font-bold text-texto">{talento.nombre}</h2>
         <p className="text-sm text-texto-tenue">
-          {mostrarEdad && talento.fecha_nacimiento && `${calcularEdad(talento.fecha_nacimiento)} años · `}
+          {mostrarEdad && `${talento.edad} años · `}
           {talento.ubicacion_publica}
         </p>
         {avisoEdadOculta && <p className="text-xs text-texto-tenue">Tu edad está oculta: nadie más la ve.</p>}
