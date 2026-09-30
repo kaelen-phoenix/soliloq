@@ -1,5 +1,6 @@
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ListaSalas } from "@/components/salas/lista-salas";
+import { InvitacionComunidad } from "@/components/comunidad/invitacion-comunidad";
 import { createClient } from "@/lib/supabase/server";
 import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
@@ -62,6 +63,7 @@ export default async function SalasPage() {
 
   return (
     <main className="px-5 py-5">
+      <InvitacionComunidad variante="compacta" />
       {salasVisibles.length === 0 ? (
         <EstadoVacio
           icono="salas"
