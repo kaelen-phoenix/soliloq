@@ -57,6 +57,11 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   `authenticated`, `update` de `es_admin`, `aprobado_en`, `suspendido_en` o `creado_en` sobre la
   fila propia falla con `columna_protegida`; el resto de lo propio se sigue editando, y
   `admin_aprobar_usuario` / `admin_suspender_usuario` siguen andando.
+- **`datos_privados_talento.sql`** — fecha de nacimiento y ubicación exacta privadas (#255, 0089):
+  otra cuenta no puede leer `fecha_nacimiento`, `ubicacion_texto`, `ubicacion_place_id` ni las
+  coordenadas (ni con `select *`); `edad_publica` da la edad solo si es visible;
+  `buscar_talento` sigue filtrando por texto, edad y radio y respeta «Aparecer en el buscador»;
+  `mi_perfil_talento()` trae la fila propia entera; `feed_para_talento` solo para uno mismo.
 
 ## Pendiente
 

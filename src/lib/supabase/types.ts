@@ -851,6 +851,13 @@ export interface Database {
       /** El Creador cierra el aviso de un Match nuevo (issue #194). Idempotente. */
       marcar_match_mostrado: { Args: { p_match_id: string }; Returns: undefined };
       /** Salas propias con mensajes de otros sin leer (#216); solo vienen las que tienen alguno. */
+      /** La fila propia entera de `perfiles_talento`, con las columnas privadas (#255, 0089). */
+      mi_perfil_talento: {
+        Args: Record<string, never>;
+        Returns: Database["public"]["Tables"]["perfiles_talento"]["Row"][];
+      };
+      /** La edad de otra persona, o `null` si la ocultó (#255, 0089). Nunca la fecha. */
+      edad_publica: { Args: { p_perfil: string }; Returns: number | null };
       salas_no_leidas: {
         Args: Record<string, never>;
         Returns: {

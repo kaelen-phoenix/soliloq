@@ -2,13 +2,16 @@ import { notFound } from "next/navigation";
 import { createClient } from "@/lib/supabase/server";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
+import { COLUMNAS_PUBLICAS_TALENTO } from "@/lib/constantes";
 
 export default async function PerfilTalentoPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
 
-  const [{ data: talento }, { data: fotos }] = await Promise.all([
-    supabase.from("perfiles_talento").select("*").eq("id", params.id).single(),
+  // Solo lo público: la fecha y la ubicación exacta no salen de la base (#255).
+  const [{ data: talento }, { data: fotos }, { data: edad }] = await Promise.all([
+    supabase.from("perfiles_talento").select(COLUMNAS_PUBLICAS_TALENTO).eq("id", params.id).single(),
     supabase.from("fotos_talento").select("*").eq("talento_id", params.id).order("orden"),
+    supabase.rpc("edad_publica", { p_perfil: params.id }),
   ]);
 
   if (!talento) notFound();
@@ -22,7 +25,7 @@ export default async function PerfilTalentoPage({ params }: { params: { id: stri
   return (
     <main className="px-5 py-5">
       {/* Solo visualización: el interés se marca desde la pila de `/talentos` (#124). */}
-      <PerfilTalentoDetalle talento={{ ...talento, fotos: fotosConUrl }} />
+      <PerfilTalentoDetalle talento={{ ...talento, edad: edad ?? null, fotos: fotosConUrl }} />
 
       <div className="mt-8">
         <BotonDenuncia perfilDenunciadoId={talento.id} queSeDenuncia={`a ${talento.nombre}`} />

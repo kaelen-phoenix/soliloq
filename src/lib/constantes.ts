@@ -193,6 +193,15 @@ export const REDES: Red[] = [
   },
 ];
 
+/**
+ * Las columnas de `perfiles_talento` que puede leer cualquiera que vea el perfil (#255).
+ * `fecha_nacimiento`, `ubicacion_texto`, `ubicacion_place_id` y las coordenadas no: la base
+ * las niega a las sesiones de usuario (0089). Lo propio se lee con `mi_perfil_talento()` y
+ * la edad ajena con `edad_publica()`.
+ */
+export const COLUMNAS_PUBLICAS_TALENTO =
+  "id, nombre, edad_visible, ubicacion_publica, ubicacion_pais, genero, genero_descripcion, videoreel_url, experiencia, habilidades, redes, aparece_en_buscador";
+
 export function calcularEdad(fechaNacimiento: string): number {
   const nacimiento = new Date(fechaNacimiento);
   const hoy = new Date();

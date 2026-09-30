@@ -6,6 +6,7 @@ import { Icono } from "@/components/ui/icono";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BotonCompartir } from "@/components/perfil/boton-compartir";
 import { PerfilCreadorDetalle } from "@/components/perfil/perfil-creador-detalle";
+import { calcularEdad } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/server";
 import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
@@ -69,7 +70,8 @@ export default async function PerfilPage({
   const [{ data: cuenta }, { data: perfilTalento }, { data: fotos }, { data: perfilCreador }] =
     await Promise.all([
       supabase.from("perfiles").select("enlace_token, enlace_publico_activo").eq("id", user.id).single(),
-      supabase.from("perfiles_talento").select("*").eq("id", user.id).single(),
+      // La fila propia entera, con fecha y ubicación exacta: por `select` la base ya no las da (#255).
+      supabase.rpc("mi_perfil_talento").maybeSingle(),
       supabase.from("fotos_talento").select("*").eq("talento_id", user.id).order("orden"),
       estado.tienePerfilCreador
         ? supabase.from("perfiles_creador").select("disciplinas, otro_detalle").eq("id", user.id).single()
@@ -102,7 +104,14 @@ export default async function PerfilPage({
           hrefEditar="/perfil?editar=1"
           aviso="Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
         >
-          <PerfilTalentoDetalle talento={{ ...perfilTalento, fotos: fotosConUrl }} esPropio />
+          <PerfilTalentoDetalle
+            talento={{
+              ...perfilTalento,
+              edad: perfilTalento.fecha_nacimiento ? calcularEdad(perfilTalento.fecha_nacimiento) : null,
+              fotos: fotosConUrl,
+            }}
+            esPropio
+          />
           {perfilCreador && (
             <div className="mt-2 border-t border-borde pt-4">
               <PerfilCreadorDetalle creador={perfilCreador} />
