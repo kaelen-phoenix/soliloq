@@ -73,6 +73,15 @@ test.describe("equipo, admin y notificaciones (UI)", () => {
       .eq("id", id);
     if (e1) throw e1;
 
+    // Aprobarla le deja el aviso `acceso_habilitado` (0092, #247): es ruido de la siembra, y
+    // contaría en la campanita de los tests que miran «N sin leer». Se da por leído.
+    const { error: eAviso } = await admin!
+      .from("notificaciones")
+      .update({ leida_en: new Date().toISOString() })
+      .eq("destinatario_id", id)
+      .eq("tipo", "acceso_habilitado");
+    if (eAviso) throw eAviso;
+
     const { error: e2 } = await admin!.from("perfiles_talento").insert({
       id,
       nombre,

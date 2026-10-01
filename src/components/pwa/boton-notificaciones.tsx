@@ -24,8 +24,11 @@ type Estado = "sin-soporte" | "cargando" | "inactivo" | "activo" | "denegado";
  *
  * Sin soporte del navegador (falta `PushManager` o `Notification`) no se renderiza nada —
  * Safari desktop viejo, algunos navegadores de escritorio embebidos, etc.
+ *
+ * `titulo` y `ayuda` reemplazan los textos de Ajustes donde el motivo es otro (p. ej. en
+ * `/solicitud-pendiente`: avisar cuando habiliten la cuenta, #247).
  */
-export function BotonNotificaciones() {
+export function BotonNotificaciones({ titulo, ayuda }: { titulo?: string; ayuda?: string } = {}) {
   const t = useTranslations("notificacionesPush");
   const [estado, setEstado] = useState<Estado>("cargando");
   const [cargando, setCargando] = useState(false);
@@ -106,9 +109,9 @@ export function BotonNotificaciones() {
 
   return (
     <section>
-      <h2 className="text-sm font-medium text-texto">{t("titulo")}</h2>
+      <h2 className="text-sm font-medium text-texto">{titulo ?? t("titulo")}</h2>
       <p className="mb-3 mt-0.5 text-xs text-texto-tenue">
-        {estado === "denegado" ? t("denegadoAyuda") : t("ayuda")}
+        {estado === "denegado" ? t("denegadoAyuda") : (ayuda ?? t("ayuda"))}
       </p>
       {error && <p className="mb-2 text-xs text-error-600">{error}</p>}
       {estado === "denegado" ? null : estado === "activo" ? (

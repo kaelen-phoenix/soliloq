@@ -3,6 +3,8 @@ import { getTranslations } from "next-intl/server";
 import { CerrarSesionBoton } from "@/components/cerrar-sesion-boton";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo } from "@/components/ui/logotipo";
+import { BotonNotificaciones } from "@/components/pwa/boton-notificaciones";
+import { despacharAvisosDeAcceso } from "@/app/acciones-push";
 
 export const metadata: Metadata = {
   title: "Solicitud pendiente — Yalope",
@@ -16,6 +18,9 @@ export const metadata: Metadata = {
  */
 export default async function SolicitudPendientePage() {
   const t = await getTranslations("solicitudPendiente");
+  // Recién registrada, la base ya dejó el aviso a los admins en la campanita (0092): acá
+  // sale el push. Si ya salió, no hace nada.
+  await despacharAvisosDeAcceso();
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-12">
       <Logotipo tamano="sm" />
@@ -26,6 +31,9 @@ export default async function SolicitudPendientePage() {
         {t("titulo")}
       </h1>
       <p className="mt-2 text-base leading-relaxed text-texto-tenue">{t("texto")}</p>
+      <div className="mt-7">
+        <BotonNotificaciones titulo={t("avisoTitulo")} ayuda={t("avisoAyuda")} />
+      </div>
       <div className="mt-7">
         <CerrarSesionBoton />
       </div>

@@ -123,7 +123,9 @@
   },
   "solicitudPendiente": {
     "titulo": "Tu solicitud está pendiente de aprobación",
-    "texto": "Yalope todavía está en una etapa de prueba y estamos habilitando el acceso de a poco. Ya recibimos tu registro: en cuanto lo aprobemos, vas a poder entrar."
+    "texto": "Yalope todavía está en una etapa de prueba y estamos habilitando el acceso de a poco. Ya recibimos tu registro: en cuanto lo aprobemos, vas a poder entrar.",
+    "avisoTitulo": "Avisame cuando me habiliten",
+    "avisoAyuda": "Activá las notificaciones en este dispositivo y te avisamos apenas aprueben tu cuenta, aunque no tengas Yalope abierta."
   },
   "aceptarNormas": {
     "titulo": "Normas de la Comunidad",

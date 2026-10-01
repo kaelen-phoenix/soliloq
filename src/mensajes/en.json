@@ -123,7 +123,9 @@
   },
   "solicitudPendiente": {
     "titulo": "Your request is pending approval",
-    "texto": "Yalope is still in an early testing phase, and we're enabling access gradually. We've received your sign-up — you'll be able to log in as soon as it's approved."
+    "texto": "Yalope is still in an early testing phase, and we're enabling access gradually. We've received your sign-up — you'll be able to log in as soon as it's approved.",
+    "avisoTitulo": "Let me know when I am in",
+    "avisoAyuda": "Turn on notifications on this device and we will let you know as soon as your account is approved, even with Yalope closed."
   },
   "aceptarNormas": {
     "titulo": "Community Guidelines",
