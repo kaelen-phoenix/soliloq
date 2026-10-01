@@ -48,7 +48,11 @@ export type TipoNotificacion =
   /** Alguien contactó desde el enlace público del perfil (0037), interés todavía no mutuo. */
   | "interes_recibido"
   /** Al Creador: se formó un match nuevo con un Talento (0068/0069, issue #160). */
-  | "nuevo_match";
+  | "nuevo_match"
+  /** A cada admin: alguien sin invitación pidió entrar (0092, #248). `de_perfil` = quién. */
+  | "solicitud_acceso"
+  /** A la persona: un admin la habilitó (0092, #247). */
+  | "acceso_habilitado";
 
 export type MotivoDenuncia =
   | "acoso"
@@ -578,6 +582,8 @@ export interface Database {
           de_perfil: string | null;
           leida_en: string | null;
           creado_en: string;
+          /** Cuándo salió el push de este aviso (0092). `null` = todavía no, o no lleva push. */
+          push_enviado_en: string | null;
         };
         Insert: {
           destinatario_id: string;
@@ -589,6 +595,8 @@ export interface Database {
         };
         Update: {
           leida_en?: string | null;
+          /** Solo lo escribe el servidor con la clave de servicio (`despacharAvisosDeAcceso`). */
+          push_enviado_en?: string | null;
         };
         Relationships: [
           {

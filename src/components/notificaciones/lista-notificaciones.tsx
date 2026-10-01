@@ -110,6 +110,10 @@ export function ListaNotificaciones({
       router.push(`/equipo/responder/${n.de_perfil}`);
     } else if (n.tipo === "nuevo_match") {
       router.push("/matches");
+    } else if (n.tipo === "solicitud_acceso") {
+      router.push("/admin");
+    } else if (n.tipo === "acceso_habilitado") {
+      router.push("/perfil");
     }
   }
 
@@ -193,6 +197,24 @@ export function ListaNotificaciones({
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
                       Alguien se interesó en tu proyecto o equipo. Revisalo en Call Back.
+                    </p>
+                  </>
+                ) : n.tipo === "solicitud_acceso" ? (
+                  <>
+                    <p className="text-base font-semibold leading-snug text-texto">
+                      Nueva solicitud de acceso
+                    </p>
+                    <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
+                      Alguien pidió entrar a Yalope. Revisala en el panel de administración.
+                    </p>
+                  </>
+                ) : n.tipo === "acceso_habilitado" ? (
+                  <>
+                    <p className="text-base font-semibold leading-snug text-texto">
+                      ¡Ya tenés acceso a Yalope!
+                    </p>
+                    <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
+                      Tu solicitud fue aprobada. Te damos la bienvenida a la comunidad.
                     </p>
                   </>
                 ) : n.tipo === "espera_vencida" ? (

@@ -115,27 +115,52 @@ export async function notificarMensajeNuevo(mensajeId: string) {
   }
   if (destinatarios.length === 0) return;
 
-  const admin = createAdminClient();
-  const { data: suscripciones } = await admin
-    .from("push_suscripciones")
-    .select("id, endpoint, p256dh, auth")
-    .in("perfil_id", destinatarios);
-  if (!suscripciones || suscripciones.length === 0) return;
-
-  const payload = JSON.stringify({
+  await enviarPush(destinatarios, {
     title: `${remitente} — ${tituloSala}`,
     body: contenido.length > 140 ? `${contenido.slice(0, 140)}…` : contenido,
     url: `/salas/${salaId}`,
     tag: `sala-${salaId}`,
   });
+}
 
-  await Promise.all(
+interface AvisoPush {
+  title: string;
+  body: string;
+  /** A dónde lleva el toque en la notificación (lo abre `sw.js`). */
+  url: string;
+  /** Mismo `tag` = el aviso nuevo reemplaza al anterior en vez de apilarse. */
+  tag: string;
+}
+
+/**
+ * Manda un push a todos los dispositivos de esas cuentas. Con la clave de servicio: quien
+ * llama ya decidió que el aviso corresponde. Las suscripciones muertas (404/410) se borran.
+ *
+ * Devuelve `false` si hubo un error que vale reintentar (no se pudieron leer las
+ * suscripciones, o un envío falló por otra cosa que una suscripción muerta); `true` si no
+ * queda nada por hacer (entregado, o la cuenta no tiene notificaciones activadas). Cada envío
+ * tiene un tope de 5 s: un servicio de push colgado no puede trabar a quien llama.
+ */
+async function enviarPush(perfilIds: string[], aviso: AvisoPush): Promise<boolean> {
+  const admin = createAdminClient();
+  const { data: suscripciones, error } = await admin
+    .from("push_suscripciones")
+    .select("id, endpoint, p256dh, auth")
+    .in("perfil_id", perfilIds);
+  if (error) return false;
+  if (!suscripciones || suscripciones.length === 0) return true;
+
+  const payload = JSON.stringify(aviso);
+
+  const resultados = await Promise.all(
     suscripciones.map(async (s) => {
       try {
         await webpush.sendNotification(
           { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          payload
+          payload,
+          { timeout: 5_000 }
         );
+        return true;
       } catch (err) {
         // 404/410: el navegador o el usuario dieron de baja la suscripción de su lado
         // (desinstaló, borró datos, revocó el permiso). Se limpia para no seguir
@@ -143,8 +168,77 @@ export async function notificarMensajeNuevo(mensajeId: string) {
         const codigo = (err as { statusCode?: number }).statusCode;
         if (codigo === 404 || codigo === 410) {
           await admin.from("push_suscripciones").delete().eq("id", s.id);
+          return true;
         }
+        return false;
       }
+    })
+  );
+  return resultados.every(Boolean);
+}
+
+/**
+ * Los avisos de acceso por push (#247, #248, 0092). La base ya creó la notificación de la
+ * campanita (`solicitud_acceso` a cada admin, `acceso_habilitado` a la persona); esto manda
+ * el push de las que todavía no lo tienen. Se llama desde `/solicitud-pendiente` (después
+ * de pedir acceso) y desde el panel de admin (después de aprobar o invitar).
+ *
+ * Cada aviso se «reclama» marcando `push_enviado_en` en el mismo `update` que lo lee, así
+ * dos llamadas a la vez no lo mandan dos veces; si el envío falla por algo temporal, se
+ * libera para que lo reintente la próxima llamada. Solo toma avisos sin leer (una solicitud
+ * ya resuelta queda leída —0092—, y lo que se vio en la campanita no necesita push) y de las
+ * últimas 24 h (un aviso viejo ya no tiene sentido como push; en la campanita sigue).
+ * No hace nada que no corresponda aunque cualquiera lo llame: solo despacha avisos que la
+ * base ya decidió.
+ */
+export async function despacharAvisosDeAcceso() {
+  if (!VAPID_LISTO) return;
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return;
+
+  const admin = createAdminClient();
+  const { data: avisos, error } = await admin
+    .from("notificaciones")
+    .update({ push_enviado_en: new Date().toISOString() })
+    .in("tipo", ["solicitud_acceso", "acceso_habilitado"])
+    .is("push_enviado_en", null)
+    .is("leida_en", null)
+    .gte("creado_en", new Date(Date.now() - 24 * 3600_000).toISOString())
+    .select("id, destinatario_id, tipo, de_perfil");
+  if (error) {
+    reportarErrorSupabase(error, { accion: "despacharAvisosDeAcceso" });
+    return;
+  }
+  if (!avisos || avisos.length === 0) return;
+
+  await Promise.all(
+    avisos.map(async (a) => {
+      let enviado: boolean;
+      if (a.tipo === "acceso_habilitado") {
+        enviado = await enviarPush([a.destinatario_id], {
+          title: "¡Ya tenés acceso a Yalope!",
+          body: "Tu solicitud fue aprobada. Entrá y completá tu perfil.",
+          url: "/",
+          tag: "acceso-habilitado",
+        });
+      } else {
+        // Solicitud: a los admins les sirve saber quién es, y lo único que hay es el email.
+        const { data: solicitante } = a.de_perfil
+          ? await admin.auth.admin.getUserById(a.de_perfil)
+          : { data: null };
+        const email = solicitante?.user?.email;
+        enviado = await enviarPush([a.destinatario_id], {
+          title: "Nueva solicitud de acceso",
+          body: email ? `${email} pidió entrar a Yalope.` : "Alguien pidió entrar a Yalope.",
+          url: "/admin",
+          tag: `solicitud-${a.de_perfil ?? "acceso"}`,
+        });
+      }
+      // Falla temporal: se libera para que lo reintente la próxima llamada.
+      if (!enviado) await admin.from("notificaciones").update({ push_enviado_en: null }).eq("id", a.id);
     })
   );
 }

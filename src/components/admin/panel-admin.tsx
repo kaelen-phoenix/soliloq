@@ -8,6 +8,7 @@ import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { adminBorrarUsuario } from "@/app/(app)/admin/acciones";
+import { despacharAvisosDeAcceso } from "@/app/acciones-push";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { Database } from "@/lib/supabase/types";
 
@@ -595,6 +596,8 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     setAviso(`Invitación registrada para ${email.trim()}.`);
     setEmail("");
     cargar();
+    // Si ese email ya estaba esperando, la invitación lo habilitó: sale su push (#247).
+    void despacharAvisosDeAcceso();
   }
 
   async function aprobar(s: Solicitud) {
@@ -608,6 +611,8 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     }
     setError(null);
     setPendientes((prev) => (prev ?? []).filter((p) => p.id !== s.id));
+    // La base ya le dejó el aviso en la campanita (0092); acá sale el push (#247).
+    void despacharAvisosDeAcceso();
   }
 
   return (

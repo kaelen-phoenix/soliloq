@@ -66,6 +66,10 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   nuevo, quien se ocultó no sale en «Armar equipo», el buscador ni su enlace; no se la puede
   contactar ni marcarle interés como talento (sí interesarse en su Proyecto); quien comparte
   sala la sigue viendo; si vuelve a mostrarse se ve; y si ella escribe primero, se le responde.
+- **`avisos_acceso.sql`** — avisos de acceso en la campanita (#247, #248, 0092): cada admin activo
+  (no los suspendidos) recibe `solicitud_acceso` por quien se registra sin invitación; quien
+  llega invitado no genera avisos; aprobar o invitar a alguien pendiente le deja
+  `acceso_habilitado` (una sola vez) y marca leída su solicitud; el push nace sin marcar.
 
 ## Pendiente
 

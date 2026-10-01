@@ -102,6 +102,12 @@ instalado**: el Chromium de Playwright no trae servicio de push, y por eso no co
 (que solo corre `publico.spec.ts` y `flujos/`). Se saltea sin `E2E_PUSH_CHROME=1`. Abre una
 ventana de Chrome de verdad, y la notificación puede aparecer en el sistema.
 
+`local/push-acceso.spec.ts` (#247, #248): los avisos de acceso por push. Un admin con las
+notificaciones activadas recibe «Nueva solicitud de acceso» cuando alguien se registra sin
+invitación; esa persona toca «Avisame cuando me habiliten» en `/solicitud-pendiente`, el admin
+la habilita desde el panel y le llega «¡Ya tenés acceso a Yalope!». Abre dos Chrome, uno por
+cuenta. Mismas condiciones que el anterior.
+
 La app tiene que levantarse con claves VAPID. Sirve un par descartable, que no hace falta
 guardar en ningún lado:
 ```
