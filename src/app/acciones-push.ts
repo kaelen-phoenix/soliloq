@@ -135,24 +135,32 @@ interface AvisoPush {
 /**
  * Manda un push a todos los dispositivos de esas cuentas. Con la clave de servicio: quien
  * llama ya decidió que el aviso corresponde. Las suscripciones muertas (404/410) se borran.
+ *
+ * Devuelve `false` si hubo un error que vale reintentar (no se pudieron leer las
+ * suscripciones, o un envío falló por otra cosa que una suscripción muerta); `true` si no
+ * queda nada por hacer (entregado, o la cuenta no tiene notificaciones activadas). Cada envío
+ * tiene un tope de 5 s: un servicio de push colgado no puede trabar a quien llama.
  */
-async function enviarPush(perfilIds: string[], aviso: AvisoPush) {
+async function enviarPush(perfilIds: string[], aviso: AvisoPush): Promise<boolean> {
   const admin = createAdminClient();
-  const { data: suscripciones } = await admin
+  const { data: suscripciones, error } = await admin
     .from("push_suscripciones")
     .select("id, endpoint, p256dh, auth")
     .in("perfil_id", perfilIds);
-  if (!suscripciones || suscripciones.length === 0) return;
+  if (error) return false;
+  if (!suscripciones || suscripciones.length === 0) return true;
 
   const payload = JSON.stringify(aviso);
 
-  await Promise.all(
+  const resultados = await Promise.all(
     suscripciones.map(async (s) => {
       try {
         await webpush.sendNotification(
           { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          payload
+          payload,
+          { timeout: 5_000 }
         );
+        return true;
       } catch (err) {
         // 404/410: el navegador o el usuario dieron de baja la suscripción de su lado
         // (desinstaló, borró datos, revocó el permiso). Se limpia para no seguir
@@ -160,10 +168,13 @@ async function enviarPush(perfilIds: string[], aviso: AvisoPush) {
         const codigo = (err as { statusCode?: number }).statusCode;
         if (codigo === 404 || codigo === 410) {
           await admin.from("push_suscripciones").delete().eq("id", s.id);
+          return true;
         }
+        return false;
       }
     })
   );
+  return resultados.every(Boolean);
 }
 
 /**
@@ -173,8 +184,10 @@ async function enviarPush(perfilIds: string[], aviso: AvisoPush) {
  * de pedir acceso) y desde el panel de admin (después de aprobar o invitar).
  *
  * Cada aviso se «reclama» marcando `push_enviado_en` en el mismo `update` que lo lee, así
- * dos llamadas a la vez no lo mandan dos veces. Solo mira las últimas 24 h: un aviso viejo
- * que no salió (p. ej. sin VAPID) ya no tiene sentido como push; en la campanita sigue.
+ * dos llamadas a la vez no lo mandan dos veces; si el envío falla por algo temporal, se
+ * libera para que lo reintente la próxima llamada. Solo toma avisos sin leer (una solicitud
+ * ya resuelta queda leída —0092—, y lo que se vio en la campanita no necesita push) y de las
+ * últimas 24 h (un aviso viejo ya no tiene sentido como push; en la campanita sigue).
  * No hace nada que no corresponda aunque cualquiera lo llame: solo despacha avisos que la
  * base ya decidió.
  */
@@ -192,8 +205,9 @@ export async function despacharAvisosDeAcceso() {
     .update({ push_enviado_en: new Date().toISOString() })
     .in("tipo", ["solicitud_acceso", "acceso_habilitado"])
     .is("push_enviado_en", null)
+    .is("leida_en", null)
     .gte("creado_en", new Date(Date.now() - 24 * 3600_000).toISOString())
-    .select("destinatario_id, tipo, de_perfil");
+    .select("id, destinatario_id, tipo, de_perfil");
   if (error) {
     reportarErrorSupabase(error, { accion: "despacharAvisosDeAcceso" });
     return;
@@ -202,26 +216,29 @@ export async function despacharAvisosDeAcceso() {
 
   await Promise.all(
     avisos.map(async (a) => {
+      let enviado: boolean;
       if (a.tipo === "acceso_habilitado") {
-        await enviarPush([a.destinatario_id], {
+        enviado = await enviarPush([a.destinatario_id], {
           title: "¡Ya tenés acceso a Yalope!",
           body: "Tu solicitud fue aprobada. Entrá y completá tu perfil.",
           url: "/",
           tag: "acceso-habilitado",
         });
-        return;
+      } else {
+        // Solicitud: a los admins les sirve saber quién es, y lo único que hay es el email.
+        const { data: solicitante } = a.de_perfil
+          ? await admin.auth.admin.getUserById(a.de_perfil)
+          : { data: null };
+        const email = solicitante?.user?.email;
+        enviado = await enviarPush([a.destinatario_id], {
+          title: "Nueva solicitud de acceso",
+          body: email ? `${email} pidió entrar a Yalope.` : "Alguien pidió entrar a Yalope.",
+          url: "/admin",
+          tag: `solicitud-${a.de_perfil ?? "acceso"}`,
+        });
       }
-      // Solicitud: a los admins les sirve saber quién es, y lo único que hay es el email.
-      const { data: solicitante } = a.de_perfil
-        ? await admin.auth.admin.getUserById(a.de_perfil)
-        : { data: null };
-      const email = solicitante?.user?.email;
-      await enviarPush([a.destinatario_id], {
-        title: "Nueva solicitud de acceso",
-        body: email ? `${email} pidió entrar a Yalope.` : "Alguien pidió entrar a Yalope.",
-        url: "/admin",
-        tag: `solicitud-${a.de_perfil ?? "acceso"}`,
-      });
+      // Falla temporal: se libera para que lo reintente la próxima llamada.
+      if (!enviado) await admin.from("notificaciones").update({ push_enviado_en: null }).eq("id", a.id);
     })
   );
 }
