@@ -133,7 +133,7 @@ type Overwrite = { id: string; type: 0 | 1; allow: string; deny: string };
 export async function sincronizarEspacio(salaId: string): Promise<boolean> {
   if (!discordConfigurado()) return false;
   const sala = await leerSala(salaId);
-  if (!sala?.discord_canal_id) return false;
+  if (!sala?.discord_canal_id && !sala?.discord_voz_id) return false;
 
   // Sin el id del bot no se toca nada: si no, su propio permiso quedaría entre los que hay
   // que borrar y perdería el acceso al canal.
@@ -143,6 +143,7 @@ export async function sincronizarEspacio(salaId: string): Promise<boolean> {
   const allow = (sala.cerrada ? SOLO_LECTURA : INTEGRANTE).toString();
   const deny = (sala.cerrada ? CERRADO_DENEGADO : 0).toString();
   let alguno = false;
+  const fallos: string[] = [];
 
   for (const [columna, canalId] of [
     ["discord_canal_id", sala.discord_canal_id],
@@ -163,18 +164,24 @@ export async function sincronizarEspacio(salaId: string): Promise<boolean> {
 
     // Quien ya no está en la sala, afuera.
     for (const o of actuales) {
-      if (!quienes.has(o.id)) await api(`/channels/${canalId}/permissions/${o.id}`, { method: "DELETE" });
+      if (quienes.has(o.id)) continue;
+      const r = await api(`/channels/${canalId}/permissions/${o.id}`, { method: "DELETE" });
+      if (!r.ok && r.status !== 404) fallos.push(`quitar ${o.id} de ${canalId}: ${r.status}`);
     }
     // Quien está, adentro (o con los permisos de iniciativa cerrada).
     for (const id of Array.from(quienes)) {
       const o = actuales.find((x) => x.id === id);
       if (o && o.allow === allow && o.deny === deny) continue;
-      await api(`/channels/${canalId}/permissions/${id}`, {
+      const r = await api(`/channels/${canalId}/permissions/${id}`, {
         method: "PUT",
         body: JSON.stringify({ type: 1, allow, deny }),
       });
+      if (!r.ok) fallos.push(`dar acceso a ${id} en ${canalId}: ${r.status}`);
     }
   }
+  // Se intentan todos los cambios y recién después se avisa: una revocación que falla no
+  // puede pasar como hecha (la persona conservaría el acceso).
+  if (fallos.length) throw new Error(`Discord: ${fallos.join("; ")}`);
   return alguno;
 }
 
@@ -252,8 +259,12 @@ async function salasConEspacio(ids: { obraId?: string | null; equipoId?: string 
   const consulta = createAdminClient()
     .from("salas")
     .select("id, discord_canal_id, discord_voz_id")
-    .not("discord_canal_id", "is", null);
-  const { data } = ids.obraId ? await consulta.eq("obra_id", ids.obraId) : await consulta.eq("equipo_id", ids.equipoId!);
+    .or("discord_canal_id.not.is.null,discord_voz_id.not.is.null");
+  const { data, error } = ids.obraId
+    ? await consulta.eq("obra_id", ids.obraId)
+    : await consulta.eq("equipo_id", ids.equipoId!);
+  // Una lista vacía tiene que querer decir «no hay espacios», no «falló la consulta».
+  if (error) throw new Error(`salas: ${error.message}`);
   return data ?? [];
 }
 
@@ -263,12 +274,38 @@ export async function sincronizarEspaciosDeIniciativa(ids: { obraId?: string | n
   for (const s of await salasConEspacio(ids)) await sincronizarEspacio(s.id);
 }
 
-/** Antes de borrar una iniciativa (la sala cae en cascada): borra sus canales en Discord. */
-export async function borrarEspaciosDeIniciativa(ids: { obraId?: string | null; equipoId?: string | null }) {
-  if (!discordConfigurado()) return;
-  for (const s of await salasConEspacio(ids)) {
-    for (const canal of [s.discord_canal_id, s.discord_voz_id]) {
-      if (canal) await api(`/channels/${canal}`, { method: "DELETE" });
-    }
+/**
+ * Los canales de una iniciativa, para borrarlos después de borrarla (la sala cae en cascada y
+ * con ella los ids). Se piden antes del borrado y se borran recién cuando se confirmó.
+ */
+export async function canalesDeIniciativa(ids: { obraId?: string | null; equipoId?: string | null }) {
+  if (!discordConfigurado()) return [];
+  return (await salasConEspacio(ids)).flatMap((s) => [s.discord_canal_id, s.discord_voz_id]).filter((c): c is string => !!c);
+}
+
+/**
+ * Borra canales que quedaron huérfanos: solo si ya no los usa ninguna sala y están en una de
+ * las categorías de Yalope (así nadie puede borrar otro canal del servidor pasando su id).
+ */
+export async function borrarCanalesHuerfanos(canales: string[]) {
+  if (!discordConfigurado() || canales.length === 0) return;
+  const admin = createAdminClient();
+  const lista = canales.join(",");
+  const { data: enUso, error } = await admin
+    .from("salas")
+    .select("discord_canal_id, discord_voz_id")
+    .or(`discord_canal_id.in.(${lista}),discord_voz_id.in.(${lista})`);
+  if (error) throw new Error(`salas: ${error.message}`);
+  const usados = new Set((enUso ?? []).flatMap((s) => [s.discord_canal_id, s.discord_voz_id]));
+  const categorias = [process.env.DISCORD_CATEGORIA_PROYECTOS, process.env.DISCORD_CATEGORIA_EQUIPOS];
+  const fallos: string[] = [];
+  for (const canal of canales) {
+    if (!/^\d+$/.test(canal) || usados.has(canal)) continue;
+    const info = await api<{ parent_id: string | null }>(`/channels/${canal}`);
+    if (info.status === 404) continue;
+    if (!info.datos || !categorias.includes(info.datos.parent_id ?? undefined)) continue;
+    const r = await api(`/channels/${canal}`, { method: "DELETE" });
+    if (!r.ok && r.status !== 404) fallos.push(`${canal}: ${r.status}`);
   }
+  if (fallos.length) throw new Error(`Discord: no se pudieron borrar ${fallos.join("; ")}`);
 }

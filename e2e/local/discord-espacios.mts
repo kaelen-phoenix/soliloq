@@ -15,7 +15,7 @@
  */
 import { createClient } from "@supabase/supabase-js";
 const base = "../../src/lib/";
-const { abrirEspacio, sincronizarEspacio, sincronizarEspaciosDeIniciativa, borrarEspaciosDeIniciativa } = await import(
+const { abrirEspacio, sincronizarEspacio, sincronizarEspaciosDeIniciativa, canalesDeIniciativa, borrarCanalesHuerfanos } = await import(
   base + "discord-servidor.ts"
 );
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
@@ -65,7 +65,11 @@ try {
   const m3 = (await d(`/channels/${canales[0]}`)).permission_overwrites.find((o: any) => o.id === owner);
   ok(!!m3 && (Number(m3.allow) & SEND) !== 0 && (Number(m3.deny) & SEND) === 0, "proyecto reabierto: se vuelve a poder escribir");
 
-  await borrarEspaciosDeIniciativa({ obraId: obra!.id });
+  const aBorrar = await canalesDeIniciativa({ obraId: obra!.id });
+  await borrarCanalesHuerfanos(aBorrar);
+  ok((await d(`/channels/${canales[0]}`))?.id === canales[0], "mientras la sala existe, sus canales no se borran como huérfanos");
+  await admin.from("salas").delete().eq("id", salaId);
+  await borrarCanalesHuerfanos(aBorrar);
   for (const c of canales) ok((await d(`/channels/${c}`))?.code === 10003, "al borrar el proyecto se borran sus canales");
 } finally {
   for (const c of canales) await d(`/channels/${c}`, { method: "DELETE" });

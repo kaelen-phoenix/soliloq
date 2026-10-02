@@ -6,7 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
   abrirEspacio,
-  borrarEspaciosDeIniciativa,
+  borrarCanalesHuerfanos,
+  canalesDeIniciativa,
   sincronizarEspacio,
   sincronizarEspaciosDe,
   sincronizarEspaciosDeIniciativa,
@@ -104,12 +105,28 @@ export async function sincronizarEspacioDeIniciativa(ids: Iniciativa) {
   }
 }
 
-/** Antes de borrar un Proyecto/Equipo: sus canales en Discord no quedan huérfanos. */
-export async function borrarEspacioDeIniciativa(ids: Iniciativa) {
-  if (!(await esDueno(ids))) return;
+/**
+ * Antes de borrar un Proyecto/Equipo: los ids de sus canales, para borrarlos después. Se
+ * borran recién cuando se confirmó el borrado de la iniciativa (`borrarCanalesDeIniciativa`):
+ * si el borrado de la fila falla, la iniciativa conserva su espacio.
+ */
+export async function canalesParaBorrar(ids: Iniciativa): Promise<string[]> {
+  if (!(await esDueno(ids))) return [];
   try {
-    await borrarEspaciosDeIniciativa(ids);
+    return await canalesDeIniciativa(ids);
   } catch (e) {
-    reportar(e, "borrarEspacioDeIniciativa");
+    reportar(e, "canalesParaBorrar");
+    return [];
+  }
+}
+
+/** Después de borrar la iniciativa: borra sus canales, que ya no usa ninguna sala. */
+export async function borrarCanalesDeIniciativa(canales: string[]) {
+  const { user } = await usuarioActual();
+  if (!user) return;
+  try {
+    await borrarCanalesHuerfanos(canales);
+  } catch (e) {
+    reportar(e, "borrarCanalesDeIniciativa");
   }
 }

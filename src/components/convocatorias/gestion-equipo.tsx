@@ -4,7 +4,11 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
-import { borrarEspacioDeIniciativa, sincronizarEspacioDeIniciativa } from "@/app/acciones-discord";
+import {
+  borrarCanalesDeIniciativa,
+  canalesParaBorrar,
+  sincronizarEspacioDeIniciativa,
+} from "@/app/acciones-discord";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
 import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
@@ -224,14 +228,16 @@ export function GestionEquipo({
     }
     // Primero la fila y después el Storage (no cascadea): si el borrado de la fila falla, el
     // equipo queda entero con sus fotos, en vez de vivo y sin fotos.
-    // Los canales de Discord se borran antes: la sala cae en cascada con el equipo (#269).
-    await borrarEspacioDeIniciativa({ equipoId: equipo.id }).catch(() => {});
+    // Los ids de sus canales de Discord, antes de que la sala caiga en cascada (#269).
+    const canales = await canalesParaBorrar({ equipoId: equipo.id }).catch(() => [] as string[]);
     const { error: errorBd } = await supabase.from("equipos").delete().eq("id", equipo.id);
     if (errorBd) {
       setCargando(false);
       setError("No se pudo eliminar el equipo. Probá de nuevo.");
       return;
     }
+    // Recién con el equipo borrado se borran sus canales.
+    await borrarCanalesDeIniciativa(canales).catch(() => {});
     const rutas = (fotosActuales ?? []).map((f) => f.storage_path);
     if (rutas.length > 0) {
       // Un archivo que no se borre queda huérfano en el Storage, pero el equipo ya no
