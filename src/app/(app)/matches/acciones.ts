@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sincronizarEspaciosDe } from "@/lib/discord-servidor";
 import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 
@@ -92,6 +93,12 @@ export async function darDeBajaConvocado(convocatoriaId: string): Promise<Result
     reportarErrorSupabase(error, { rpc: "dar_de_baja_convocado", convocatoriaId });
     return { ok: false, error: "No se pudo dar de baja. Probá de nuevo." };
   }
+  // Quien da de baja es el dueño, que está en todas sus salas: sincronizar las suyas saca a
+  // la persona dada de baja del espacio en Discord (#269).
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (user) await sincronizarEspaciosDe(user.id).catch(() => {});
   revalidatePath("/matches");
   revalidatePath("/salas");
   return { ok: true };

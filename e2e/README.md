@@ -108,6 +108,10 @@ invitación; esa persona toca «Avisame cuando me habiliten» en `/solicitud-pen
 la habilita desde el panel y le llega «¡Ya tenés acceso a Yalope!». Abre dos Chrome, uno por
 cuenta. Mismas condiciones que el anterior.
 
+`local/discord-espacios.mts` (#269): los espacios privados en Discord contra el servidor real (no es
+Playwright: se corre con `npx tsx`). Crea y borra canales de prueba; las instrucciones están en
+el encabezado del archivo.
+
 La app tiene que levantarse con claves VAPID. Sirve un par descartable, que no hace falta
 guardar en ningún lado:
 ```

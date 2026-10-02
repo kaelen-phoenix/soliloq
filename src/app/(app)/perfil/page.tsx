@@ -6,6 +6,8 @@ import { Icono } from "@/components/ui/icono";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BotonCompartir } from "@/components/perfil/boton-compartir";
 import { InvitacionComunidad } from "@/components/comunidad/invitacion-comunidad";
+import { VincularDiscord } from "@/components/comunidad/vincular-discord";
+import { discordConfigurado } from "@/lib/discord-servidor";
 import { PerfilCreadorDetalle } from "@/components/perfil/perfil-creador-detalle";
 import { calcularEdad } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/server";
@@ -40,7 +42,7 @@ function AccionesCuenta() {
 export default async function PerfilPage({
   searchParams,
 }: {
-  searchParams: { editar?: string };
+  searchParams: { editar?: string; discord?: string };
 }) {
   const supabase = createClient();
   const user = await usuarioDeLaRequest();
@@ -70,7 +72,11 @@ export default async function PerfilPage({
 
   const [{ data: cuenta }, { data: perfilTalento }, { data: fotos }, { data: perfilCreador }] =
     await Promise.all([
-      supabase.from("perfiles").select("enlace_token, enlace_publico_activo").eq("id", user.id).single(),
+      supabase
+        .from("perfiles")
+        .select("enlace_token, enlace_publico_activo, discord_usuario")
+        .eq("id", user.id)
+        .single(),
       // La fila propia entera, con fecha y ubicación exacta: por `select` la base ya no las da (#255).
       supabase.rpc("mi_perfil_talento").maybeSingle(),
       supabase.from("fotos_talento").select("*").eq("talento_id", user.id).order("orden"),
@@ -135,7 +141,13 @@ export default async function PerfilPage({
           activoInicial={cuenta.enlace_publico_activo}
         />
       )}
-      {!editando && <InvitacionComunidad variante="seccion" />}
+      {!editando && (
+        <InvitacionComunidad variante="seccion">
+          {discordConfigurado() && (
+            <VincularDiscord usuario={cuenta?.discord_usuario ?? null} resultado={searchParams.discord} />
+          )}
+        </InvitacionComunidad>
+      )}
       <AccionesCuenta />
     </main>
   );
