@@ -97,6 +97,9 @@ export interface Database {
           tour_creador_visto_en: string | null;
           /** Mail de bienvenida (0093, #272): null = todavía no salió. Lo escribe solo el servidor. */
           bienvenida_enviada_en: string | null;
+          /** Cuenta de Discord vinculada (0094, #269). La escribe solo el servidor tras el OAuth. */
+          discord_user_id: string | null;
+          discord_usuario: string | null;
           /** Idioma de la interfaz (0041): 'es' | 'en'. */
           idioma: string;
           /** Tema (0041): 'sistema' | 'claro' | 'oscuro'. */
@@ -126,6 +129,8 @@ export interface Database {
           tour_talento_visto_en?: string | null;
           tour_creador_visto_en?: string | null;
           bienvenida_enviada_en?: string | null;
+          discord_user_id?: string | null;
+          discord_usuario?: string | null;
           idioma?: string;
           tema?: string;
         };
@@ -632,13 +637,20 @@ export interface Database {
           /** Solo para salas sin obra; con obra, el título lo presta ella. */
           titulo: string | null;
           creado_en: string;
+          /** Espacio privado en Discord (0094, #269): canal de texto y de voz. Los escribe el servidor. */
+          discord_canal_id: string | null;
+          discord_voz_id: string | null;
         };
         Insert: {
           obra_id?: string | null;
           equipo_id?: string | null;
           titulo?: string | null;
         };
-        Update: Record<string, never>;
+        Update: {
+          /** Solo el servidor con la clave de servicio (la tabla no tiene política de update). */
+          discord_canal_id?: string | null;
+          discord_voz_id?: string | null;
+        };
         Relationships: [
           {
             foreignKeyName: "salas_obra_id_fkey";

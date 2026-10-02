@@ -6,6 +6,11 @@ import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { EstadoObra } from "@/lib/supabase/types";
+import {
+  borrarCanalesDeIniciativa,
+  canalesParaBorrar,
+  sincronizarEspacioDeIniciativa,
+} from "@/app/acciones-discord";
 
 const MIN_FOTOS = 1; // issue #162
 
@@ -43,6 +48,8 @@ export function AccionesObra({
     setCargando(true);
     const supabase = createClient();
     await supabase.from("obras").update({ estado: "publicada" }).eq("id", obraId);
+    // Si se reabre, su espacio en Discord vuelve a ser de escritura (#269).
+    await sincronizarEspacioDeIniciativa({ obraId }).catch(() => {});
     setCargando(false);
     router.refresh();
   }
@@ -51,6 +58,8 @@ export function AccionesObra({
     setCargando(true);
     const supabase = createClient();
     await supabase.from("obras").update({ estado: "cerrada" }).eq("id", obraId);
+    // Cerrado: su espacio en Discord queda de solo lectura (#269).
+    await sincronizarEspacioDeIniciativa({ obraId }).catch(() => {});
     setCargando(false);
     router.refresh();
   }
@@ -64,12 +73,16 @@ export function AccionesObra({
     if (fotosPaths.length > 0) {
       await supabase.storage.from("fotos-perfil").remove(fotosPaths);
     }
+    // Los ids de sus canales de Discord, antes de que la sala caiga en cascada (#269).
+    const canales = await canalesParaBorrar({ obraId }).catch(() => null);
     const { error: errorBd } = await supabase.from("obras").delete().eq("id", obraId);
     if (errorBd) {
       setCargando(false);
       setError("No se pudo borrar el proyecto. Probá de nuevo.");
       return;
     }
+    // Recién con el proyecto borrado se borran sus canales.
+    await borrarCanalesDeIniciativa(canales).catch(() => {});
     // Sin `setCargando(false)`: la pantalla ya se va.
     router.replace("/");
     router.refresh();

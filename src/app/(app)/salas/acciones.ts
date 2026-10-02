@@ -2,6 +2,7 @@
 
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
+import { sincronizarEspacio } from "@/lib/discord-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 
 type Resultado = { ok: true } | { ok: false; error: string };
@@ -54,6 +55,8 @@ export async function desvincularmeDeSala(salaId: string): Promise<Resultado> {
     reportarErrorSupabase(error, { rpc: "desvincularme_de_sala", salaId, userId: user.id });
     return { ok: false, error: "No se pudo aplicar. Probá de nuevo." };
   }
+  // Ya no está en la sala: pierde el acceso a su espacio en Discord (#269).
+  await sincronizarEspacio(salaId).catch(() => {});
   revalidatePath("/salas");
   return { ok: true };
 }

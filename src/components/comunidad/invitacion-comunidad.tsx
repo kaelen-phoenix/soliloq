@@ -12,7 +12,14 @@ import { Icono } from "@/components/ui/icono";
  * `compacta`: una franja arriba de la lista de Chats. `seccion`: el bloque de Perfil, con el
  * mismo formato que «Compartir mi perfil».
  */
-export function InvitacionComunidad({ variante }: { variante: "compacta" | "seccion" }) {
+export function InvitacionComunidad({
+  variante,
+  children,
+}: {
+  variante: "compacta" | "seccion";
+  /** Debajo del botón, en la sección del perfil (p. ej. «Vincular mi Discord», #269). */
+  children?: React.ReactNode;
+}) {
   const url = process.env.NEXT_PUBLIC_DISCORD_INVITACION;
   if (!url) return null;
 
@@ -56,6 +63,7 @@ export function InvitacionComunidad({ variante }: { variante: "compacta" | "secc
         Unite a la comunidad
         <Icono nombre="enlace" className="h-4 w-4" />
       </a>
+      {children}
     </section>
   );
 }
