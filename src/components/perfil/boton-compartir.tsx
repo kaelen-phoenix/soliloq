@@ -131,8 +131,8 @@ export function BotonCompartir({
           <h2 className="text-base font-medium text-texto">Compartir mi perfil</h2>
           <p className="mt-1 text-sm leading-relaxed text-texto-tenue">
             {activo
-              ? "Tu enlace está activo: cualquiera que lo tenga ve tu perfil público —fotos, videoreel, experiencia, habilidades, redes y zona—, sin cuenta."
-              : "Un enlace que se ve sin cuenta, como una carta de presentación: tus fotos, tu videoreel, tu experiencia, tus habilidades, tus redes y tu zona. Nunca tu correo, tu teléfono ni tu fecha de nacimiento."}
+              ? "Tu enlace está activo: cualquiera que lo tenga ve tu perfil público —fotos, videoreel, experiencia, habilidades, zona, género y tu edad si la dejaste visible—, sin cuenta. Tus redes las ve solo quien te contacta dentro de Yalope."
+              : "Un enlace que se ve sin cuenta, como una carta de presentación: tus fotos, tu videoreel, tu experiencia, tus habilidades, tu zona, tu género y tu edad si la dejaste visible. Nunca tu correo, tu teléfono ni tu fecha de nacimiento, y tus redes las ve solo quien te contacta dentro de Yalope."}
           </p>
         </div>
         <Icono nombre="compartir" className="h-5 w-5 shrink-0 text-texto-tenue" />

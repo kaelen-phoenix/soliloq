@@ -74,3 +74,6 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
 ## Pendiente
 
 Falta un runner en CI (hoy es manual con el PAT) y E2E de navegador para los flujos de UI.
+- **`perfil_publico_sin_redes.sql`** — el enlace público no muestra las redes (0095): sin sesión,
+  `perfil_publico` devuelve el perfil con `redes` vacías y la columna `redes` no se puede leer;
+  adentro de la app, quien comparte sala sí las ve.

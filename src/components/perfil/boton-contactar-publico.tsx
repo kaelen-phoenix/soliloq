@@ -23,10 +23,10 @@ export function BotonContactarPublico({
   if (!haySesion) {
     return (
       <Link
-        href={`/ingresar?next=${encodeURIComponent(`/p/${token}`)}`}
+        href={`/ingresar?modo=registrarme&next=${encodeURIComponent(`/p/${token}`)}`}
         className="inline-flex items-center justify-center gap-2 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto transition-colors hover:opacity-90"
       >
-        Contactar
+        Crear cuenta y contactar
       </Link>
     );
   }
