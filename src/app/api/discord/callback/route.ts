@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sincronizarEspaciosDe, sumarAlServidor } from "@/lib/discord-servidor";
-import { redirectDiscord } from "../comun";
+import { redirectDiscord, SITIO } from "../comun";
 
 /**
  * Vuelta de Discord (#269): verifica el `state`, cambia el código por un token, lee quién es
@@ -11,7 +11,7 @@ import { redirectDiscord } from "../comun";
  * suma al servidor de Yalope y la mete en los espacios de las salas donde ya está.
  */
 export async function GET(req: NextRequest) {
-  const sitio = process.env.NEXT_PUBLIC_SITE_URL || "https://yalope.com";
+  const sitio = SITIO;
   const volver = (resultado: string) => {
     const res = NextResponse.redirect(`${sitio}/perfil?discord=${resultado}`);
     res.cookies.delete({ name: "discord_estado", path: "/api/discord" });

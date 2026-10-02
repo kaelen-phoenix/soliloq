@@ -2,7 +2,7 @@ import { NextResponse } from "next/server";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { discordConfigurado } from "@/lib/discord-servidor";
-import { redirectDiscord } from "../comun";
+import { redirectDiscord, SITIO } from "../comun";
 
 /**
  * «Vincular mi Discord» (#269): manda a la pantalla de permiso de Discord. El `state` va en
@@ -10,7 +10,7 @@ import { redirectDiscord } from "../comun";
  * vinculación de otra persona con un link armado.
  */
 export async function GET() {
-  const sitio = process.env.NEXT_PUBLIC_SITE_URL || "https://yalope.com";
+  const sitio = SITIO;
   const supabase = createClient();
   const {
     data: { user },
