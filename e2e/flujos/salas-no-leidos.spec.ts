@@ -85,9 +85,10 @@ test.describe("mensajes sin leer en Salas (UI)", () => {
   }
 
   test("un mensaje nuevo enciende la sala y el badge; leerla los apaga", async ({ page }) => {
+    const sufijo = Date.now();
     const lectora = await nuevoUsuario("Lectora E2E");
-    const autor = await nuevoUsuario("Autor E2E");
-    const titulo = `Sala E2E ${Date.now()}`;
+    const autor = await nuevoUsuario(`Autor E2E ${sufijo}`);
+    const titulo = `Sala E2E ${sufijo}`;
 
     // Sala 1:1 (sin obra ni equipo): se ve en los dos modos, así no depende de la
     // separación por modo de #144. Se siembra: armarla por UI no es lo que se prueba acá.
@@ -106,7 +107,8 @@ test.describe("mensajes sin leer en Salas (UI)", () => {
 
     await login(page, lectora.email);
     await page.goto("/salas");
-    const tarjeta = page.locator("li", { hasText: titulo });
+    // Un chat directo se titula con el nombre de la otra persona, no con el título guardado.
+    const tarjeta = page.locator("li", { hasText: `Autor E2E ${sufijo}` });
     await expect(tarjeta).toBeVisible({ timeout: 10_000 });
     await expect(tarjeta).not.toHaveAttribute("data-sin-leer", /.*/);
     await expect(page.getByRole("link", { name: /Chats, \d+ sin leer/ })).toHaveCount(0);
@@ -126,8 +128,8 @@ test.describe("mensajes sin leer en Salas (UI)", () => {
 
     // 3. Y queda leída al volver (persiste en la base, no es solo estado del cliente).
     await page.goto("/salas");
-    await expect(page.locator("li", { hasText: titulo })).toBeVisible({ timeout: 10_000 });
-    await expect(page.locator("li", { hasText: titulo })).not.toHaveAttribute("data-sin-leer", /.*/);
+    await expect(page.locator("li", { hasText: `Autor E2E ${sufijo}` })).toBeVisible({ timeout: 10_000 });
+    await expect(page.locator("li", { hasText: `Autor E2E ${sufijo}` })).not.toHaveAttribute("data-sin-leer", /.*/);
     await expect(page.getByRole("link", { name: /Chats, \d+ sin leer/ })).toHaveCount(0);
 
     // 4. Con el canal ya escuchando, otro mensaje llega por Realtime (el paso 1 lo puede
@@ -138,12 +140,12 @@ test.describe("mensajes sin leer en Salas (UI)", () => {
       .from("mensajes")
       .insert({ sala_id: sala.id, autor_id: autor.id, contenido: "Traigan el guion" });
     if (eMsg2) throw eMsg2;
-    await expect(page.locator("li", { hasText: titulo })).toHaveAttribute("data-sin-leer", "true", {
+    await expect(page.locator("li", { hasText: `Autor E2E ${sufijo}` })).toHaveAttribute("data-sin-leer", "true", {
       timeout: 15_000,
     });
     await expect(page.getByRole("link", { name: "Chats, 1 sin leer" })).toBeVisible();
     // Y la vista previa se actualiza con el último mensaje (router.refresh de la lista).
-    await expect(page.locator("li", { hasText: titulo })).toContainText("Traigan el guion", {
+    await expect(page.locator("li", { hasText: `Autor E2E ${sufijo}` })).toContainText("Traigan el guion", {
       timeout: 10_000,
     });
 
