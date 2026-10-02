@@ -229,7 +229,7 @@ export function GestionEquipo({
     // Primero la fila y después el Storage (no cascadea): si el borrado de la fila falla, el
     // equipo queda entero con sus fotos, en vez de vivo y sin fotos.
     // Los ids de sus canales de Discord, antes de que la sala caiga en cascada (#269).
-    const canales = await canalesParaBorrar({ equipoId: equipo.id }).catch(() => [] as string[]);
+    const canales = await canalesParaBorrar({ equipoId: equipo.id }).catch(() => null);
     const { error: errorBd } = await supabase.from("equipos").delete().eq("id", equipo.id);
     if (errorBd) {
       setCargando(false);

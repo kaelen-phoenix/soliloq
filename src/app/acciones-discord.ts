@@ -1,6 +1,7 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
+import { createHmac, timingSafeEqual } from "node:crypto";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
@@ -106,26 +107,45 @@ export async function sincronizarEspacioDeIniciativa(ids: Iniciativa) {
 }
 
 /**
- * Antes de borrar un Proyecto/Equipo: los ids de sus canales, para borrarlos después. Se
- * borran recién cuando se confirmó el borrado de la iniciativa (`borrarCanalesDeIniciativa`):
- * si el borrado de la fila falla, la iniciativa conserva su espacio.
+ * La lista de canales a borrar viaja por el navegador entre los dos pasos del borrado, así que
+ * va firmada por el servidor: solo vale para quien la pidió (y verificó ser el dueño), sin
+ * cambios y por 10 minutos. Si no, cualquiera podría mandar ids de otros canales.
  */
-export async function canalesParaBorrar(ids: Iniciativa): Promise<string[]> {
-  if (!(await esDueno(ids))) return [];
+function firmar(datos: string) {
+  return createHmac("sha256", process.env.DISCORD_BOT_TOKEN ?? "").update(datos).digest("base64url");
+}
+
+export type PermisoBorrado = { canales: string[]; usuario: string; vence: number; firma: string };
+
+/**
+ * Antes de borrar un Proyecto/Equipo: los ids de sus canales, firmados, para borrarlos
+ * después. Se borran recién cuando se confirmó el borrado de la iniciativa
+ * (`borrarCanalesDeIniciativa`): si el borrado de la fila falla, la iniciativa conserva su
+ * espacio.
+ */
+export async function canalesParaBorrar(ids: Iniciativa): Promise<PermisoBorrado | null> {
+  const { user } = await usuarioActual();
+  if (!user || !(await esDueno(ids))) return null;
   try {
-    return await canalesDeIniciativa(ids);
+    const canales = await canalesDeIniciativa(ids);
+    if (canales.length === 0) return null;
+    const vence = Date.now() + 10 * 60_000;
+    return { canales, usuario: user.id, vence, firma: firmar(`${user.id}|${vence}|${canales.join(",")}`) };
   } catch (e) {
     reportar(e, "canalesParaBorrar");
-    return [];
+    return null;
   }
 }
 
-/** Después de borrar la iniciativa: borra sus canales, que ya no usa ninguna sala. */
-export async function borrarCanalesDeIniciativa(canales: string[]) {
+/** Después de borrar la iniciativa: borra sus canales (ya sin sala), si el permiso es válido. */
+export async function borrarCanalesDeIniciativa(permiso: PermisoBorrado | null) {
   const { user } = await usuarioActual();
-  if (!user) return;
+  if (!user || !permiso || permiso.usuario !== user.id || permiso.vence < Date.now()) return;
+  const esperada = Buffer.from(firmar(`${permiso.usuario}|${permiso.vence}|${permiso.canales.join(",")}`));
+  const recibida = Buffer.from(permiso.firma);
+  if (esperada.length !== recibida.length || !timingSafeEqual(esperada, recibida)) return;
   try {
-    await borrarCanalesHuerfanos(canales);
+    await borrarCanalesHuerfanos(permiso.canales);
   } catch (e) {
     reportar(e, "borrarCanalesDeIniciativa");
   }

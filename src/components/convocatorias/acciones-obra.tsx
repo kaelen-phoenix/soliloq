@@ -74,7 +74,7 @@ export function AccionesObra({
       await supabase.storage.from("fotos-perfil").remove(fotosPaths);
     }
     // Los ids de sus canales de Discord, antes de que la sala caiga en cascada (#269).
-    const canales = await canalesParaBorrar({ obraId }).catch(() => [] as string[]);
+    const canales = await canalesParaBorrar({ obraId }).catch(() => null);
     const { error: errorBd } = await supabase.from("obras").delete().eq("id", obraId);
     if (errorBd) {
       setCargando(false);

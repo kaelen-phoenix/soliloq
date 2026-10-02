@@ -128,7 +128,7 @@ type Overwrite = { id: string; type: 0 | 1; allow: string; deny: string };
 /**
  * Deja los dos canales de la sala con exactamente sus integrantes actuales. Si los canales
  * se borraron a mano en Discord, se olvidan (la sala queda sin espacio y se puede volver a
- * abrir). Devuelve si la sala tiene espacio después de sincronizar.
+ * abrir). Devuelve si la sala sigue teniendo su canal de texto (el que se abre desde la app).
  */
 export async function sincronizarEspacio(salaId: string): Promise<boolean> {
   if (!discordConfigurado()) return false;
@@ -142,7 +142,7 @@ export async function sincronizarEspacio(salaId: string): Promise<boolean> {
   const quienes = new Set(await discordDeIntegrantes(salaId));
   const allow = (sala.cerrada ? SOLO_LECTURA : INTEGRANTE).toString();
   const deny = (sala.cerrada ? CERRADO_DENEGADO : 0).toString();
-  let alguno = false;
+  let hayTexto = false;
   const fallos: string[] = [];
 
   for (const [columna, canalId] of [
@@ -159,7 +159,7 @@ export async function sincronizarEspacio(salaId: string): Promise<boolean> {
       continue;
     }
     if (!canal.ok || !canal.datos) continue;
-    alguno = true;
+    if (columna === "discord_canal_id") hayTexto = true;
     const actuales = canal.datos.permission_overwrites.filter((o) => o.type === 1 && o.id !== bot);
 
     // Quien ya no está en la sala, afuera.
@@ -182,7 +182,7 @@ export async function sincronizarEspacio(salaId: string): Promise<boolean> {
   // Se intentan todos los cambios y recién después se avisa: una revocación que falla no
   // puede pasar como hecha (la persona conservaría el acceso).
   if (fallos.length) throw new Error(`Discord: ${fallos.join("; ")}`);
-  return alguno;
+  return hayTexto;
 }
 
 /**
