@@ -70,11 +70,9 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   (no los suspendidos) recibe `solicitud_acceso` por quien se registra sin invitación; quien
   llega invitado no genera avisos; aprobar o invitar a alguien pendiente le deja
   `acceso_habilitado` (una sola vez) y marca leída su solicitud; el push nace sin marcar.
-- **`perfil_publico_sin_redes.sql`** — el enlace público no muestra las redes (0095): sin sesión,
-  `perfil_publico` devuelve el perfil con `redes` vacías y la columna `redes` no se puede leer;
-  adentro de la app, quien comparte sala sí las ve.
-- **`contactar_requiere_perfil.sql`** — para contactar desde un perfil público hay que tener perfil
-  (0096): sin perfil, `contactar_desde_perfil` rechaza con `perfil_incompleto`; con perfil, contacta.
+- **`perfil_publico_sin_redes.sql`** — redes del enlace público (0095, 0097): sin sesión o con la
+  cuenta incompleta, `perfil_publico` las devuelve vacías (y sin sesión la columna no se lee); con
+  cuenta completa, sí. Nadie puede contactar ni insertar un contacto (sin chat de dos personas).
 
 ## Pendiente
 

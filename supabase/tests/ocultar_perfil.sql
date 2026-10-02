@@ -85,8 +85,7 @@ begin
   begin
     perform public.contactar_desde_perfil((select v from ctx where k='token_h'));
     raise exception 'T2: contactar_desde_perfil a H tenía que rechazarse';
-  exception when others then
-    if sqlerrm <> 'no disponible' then raise; end if;
+  exception when insufficient_privilege then null; -- 0097: ya nadie puede contactar
   end;
   begin
     -- X, como Creador de su Proyecto, marcando interés en H como talento.
@@ -95,19 +94,10 @@ begin
   exception when others then
     if sqlerrm <> 'no disponible' then raise; end if;
   end;
-  -- Descartar sí (no la contacta).
-  insert into intereses_equipo (de_perfil, a_perfil, interesa) values (auth.uid(), h, false);
-  -- …pero ese descarte no se puede pasar a contacto después (0091).
-  begin
-    update intereses_equipo set interesa = true where de_perfil = auth.uid() and a_perfil = h;
-    raise exception 'T2: pasar el descarte a contacto con un update tenía que rechazarse';
-  exception when insufficient_privilege then null;
-  end;
   -- Interesarse en el Proyecto publicado de H sí: el interés va a la iniciativa.
   perform public.marcar_interes(h, (select v from ctx where k='obra_h'), null, true);
 end $$;
 reset role;
-delete from intereses_equipo where de_perfil = (select v from ctx where k='x');
 
 -- ── T3 · S (sala compartida) la sigue viendo; H ve su propio enlace ────────
 set local role authenticated;
@@ -138,19 +128,14 @@ do $$ begin
 end $$;
 update perfiles_talento set aparece_en_buscador = false where id = (select v from ctx where k='h');
 
--- ── T5 · si H escribe primero, X le puede responder ─────────────────────────
--- Equipo: H contacta a X; X responde (y el trigger arma la sala).
+-- ── T5 · si H marca interés primero (match), X le puede responder ──────────
+-- (El contacto 1 a 1 ya no existe desde 0097; el match de Proyecto sí.)
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a1111111-1111-1111-1111-11111111aaaa"}';
-insert into intereses_equipo (de_perfil, a_perfil, interesa)
-  values (auth.uid(), (select v from ctx where k='x'), true);
--- Match: H marca interés en el Proyecto de X.
 select public.marcar_interes((select v from ctx where k='x'), (select v from ctx where k='obra_x'), null, true);
 reset role;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a3333333-3333-3333-3333-33333333aaaa"}';
-insert into intereses_equipo (de_perfil, a_perfil, interesa)
-  values (auth.uid(), (select v from ctx where k='h'), true);
 select public.marcar_interes((select v from ctx where k='h'), (select v from ctx where k='obra_x'), null, true);
 reset role;
 

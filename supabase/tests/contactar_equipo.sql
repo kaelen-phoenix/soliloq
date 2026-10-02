@@ -45,12 +45,9 @@ do $$ begin
     'T2: feed_equipo debería traer a B con nombre, zona, disciplinas y distancia';
 end $$;
 
--- ── T3 · A contacta a B; B puede ver quién le escribió ───────────────────────
-set local role authenticated;
-set local request.jwt.claims = '{"sub":"91111111-1111-1111-1111-11111111aaaa"}';
+-- ── T3 · A contactó a B (sembrado: desde una sesión ya no se puede, 0097) ─────
 insert into intereses_equipo (de_perfil, a_perfil, interesa)
   values ((select v from ctx where k='a'), (select v from ctx where k='b'), true);
-reset role;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"92222222-2222-2222-2222-22222222bbbb"}';
 create temp table t3 as select * from public.perfil_para_responder((select v from ctx where k='a'));
@@ -62,12 +59,9 @@ do $$ begin
     'T3: perfil_para_responder debería traer la zona del Perfil de Talento';
 end $$;
 
--- ── T4 · B responde: interés mutuo → sala 1:1 con el nombre de los dos ────────
-set local role authenticated;
-set local request.jwt.claims = '{"sub":"92222222-2222-2222-2222-22222222bbbb"}';
+-- ── T4 · interés mutuo → sala 1:1 con el nombre de los dos (el trigger sigue) ──
 insert into intereses_equipo (de_perfil, a_perfil, interesa)
   values ((select v from ctx where k='b'), (select v from ctx where k='a'), true);
-reset role;
 do $$ begin
   assert exists (
     select 1 from salas s

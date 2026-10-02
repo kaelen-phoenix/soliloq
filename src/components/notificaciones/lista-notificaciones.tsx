@@ -106,8 +106,6 @@ export function ListaNotificaciones({
       router.push("/convocatoria");
     } else if (n.tipo === "match" && n.obra_id) {
       router.push(`/obras/${n.obra_id}`);
-    } else if (n.tipo === "interes_recibido" && n.de_perfil) {
-      router.push(`/equipo/responder/${n.de_perfil}`);
     } else if (n.tipo === "nuevo_match") {
       router.push("/matches");
     } else if (n.tipo === "solicitud_acceso") {
@@ -188,7 +186,7 @@ export function ListaNotificaciones({
                   </>
                 ) : n.tipo === "interes_recibido" ? (
                   <p className="text-base leading-snug text-texto">
-                    Alguien quiere contactarte desde tu perfil
+                    Alguien quiso contactarte desde tu perfil
                   </p>
                 ) : n.tipo === "nuevo_match" ? (
                   <>
