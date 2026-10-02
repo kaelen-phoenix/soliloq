@@ -53,7 +53,7 @@ export function ResponderInteres({ persona }: { persona: PersonaParaResponder })
   if (estado === "hecho") {
     return (
       <div className="rounded-2xl border border-borde p-5 text-center">
-        <p className="text-base font-medium text-texto">¡Hay equipo!</p>
+        <p className="text-base font-medium text-texto">¡Conectaron!</p>
         <p className="mt-1 text-sm text-texto-tenue">Ya se abrió una sala para hablar.</p>
       </div>
     );

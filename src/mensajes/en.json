@@ -13,8 +13,6 @@
   "nav": {
     "convocatorias": "Casting calls",
     "convocatoriasCorto": "Feed",
-    "armarEquipo": "Build a team",
-    "armarEquipoCorto": "Team",
     "salas": "Chats",
     "perfil": "Profile",
     "misProyectos": "My projects",
@@ -26,7 +24,7 @@
     "matches": "Call Back"
   },
   "titulos": {
-    "armarEquipo": "Build a team",
+    "contacto": "Contact",
     "sala": "Room",
     "salas": "Chats",
     "notificaciones": "Notifications",

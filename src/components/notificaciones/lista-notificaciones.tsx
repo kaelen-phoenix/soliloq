@@ -180,7 +180,7 @@ export function ListaNotificaciones({
                 ) : n.tipo === "equipo_armado" ? (
                   <>
                     <p className="text-base font-semibold leading-snug text-texto">
-                      ¡Hay equipo!
+                      ¡Conectaron!
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
                       El interés fue mutuo. Ya pueden hablar.

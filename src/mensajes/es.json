@@ -13,8 +13,6 @@
   "nav": {
     "convocatorias": "Convocatorias",
     "convocatoriasCorto": "Explorar",
-    "armarEquipo": "Armar equipo",
-    "armarEquipoCorto": "Equipo",
     "salas": "Chats",
     "perfil": "Perfil",
     "misProyectos": "Mis proyectos",
@@ -26,7 +24,7 @@
     "matches": "Call Back"
   },
   "titulos": {
-    "armarEquipo": "Armar equipo",
+    "contacto": "Contacto",
     "sala": "Sala",
     "salas": "Chats",
     "notificaciones": "Notificaciones",
