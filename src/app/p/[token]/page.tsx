@@ -84,8 +84,8 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-600">
               {user
-                ? "Le mandamos tu interés. Si responde, se abre una sala para hablar."
-                : "Creá tu cuenta en Yalope para dejarle tu interés. Si responde, se abre una sala para hablar."}
+                ? "Le mandamos tu interés. Si responde, se abre un chat directo y vas a ver su perfil completo, con sus redes."
+                : `Creá tu cuenta gratis en Yalope para contactar a ${perfil.nombre.split(" ")[0]}. Si responde, se abre un chat directo y ves su perfil completo, con sus redes.`}
             </p>
             <div className="mt-4">
               <BotonContactarPublico token={params.token} haySesion={!!user} />
