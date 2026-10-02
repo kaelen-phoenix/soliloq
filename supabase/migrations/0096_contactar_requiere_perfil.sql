@@ -31,7 +31,7 @@ begin
   -- 0096: sin perfil no se contacta. Si no, el chat directo quedaba con «Alguien» y quien
   -- recibe el contacto no sabe quién le escribe.
   if not exists (select 1 from perfiles_talento where id = auth.uid()) then
-    raise exception 'completá tu perfil';
+    raise exception 'perfil_incompleto';
   end if;
 
   if public.hay_bloqueo(v_duenio) then

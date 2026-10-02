@@ -30,7 +30,7 @@ do $$ begin
     perform public.contactar_desde_perfil((select v from ctx where k='token_a'));
     raise exception 'T1: sin perfil no se tendría que poder contactar';
   exception when others then
-    if sqlerrm <> 'completá tu perfil' then raise; end if;
+    if sqlerrm <> 'perfil_incompleto' then raise; end if;
   end;
 end $$;
 reset role;
