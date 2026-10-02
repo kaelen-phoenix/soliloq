@@ -4,7 +4,13 @@ import * as Sentry from "@sentry/nextjs";
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
-import { abrirEspacio, sincronizarEspacio, sincronizarEspaciosDe } from "@/lib/discord-servidor";
+import {
+  abrirEspacio,
+  borrarEspaciosDeIniciativa,
+  sincronizarEspacio,
+  sincronizarEspaciosDe,
+  sincronizarEspaciosDeIniciativa,
+} from "@/lib/discord-servidor";
 
 /** Errores de Discord: se reportan y no frenan nada de la app. */
 function reportar(e: unknown, accion: string) {
@@ -68,5 +74,42 @@ export async function sincronizarEspacioDeSala(salaId: string) {
     await sincronizarEspacio(salaId);
   } catch (e) {
     reportar(e, "sincronizarEspacioDeSala");
+  }
+}
+
+type Iniciativa = { obraId?: string; equipoId?: string };
+
+/** ¿La iniciativa es de quien llama? */
+async function esDueno(ids: Iniciativa) {
+  const { supabase, user } = await usuarioActual();
+  if (!user) return false;
+  if (ids.obraId) {
+    const { data } = await supabase.from("obras").select("creador_id").eq("id", ids.obraId).maybeSingle();
+    return data?.creador_id === user.id;
+  }
+  if (ids.equipoId) {
+    const { data } = await supabase.from("equipos").select("creador_id").eq("id", ids.equipoId).maybeSingle();
+    return data?.creador_id === user.id;
+  }
+  return false;
+}
+
+/** Después de cerrar, reabrir o desactivar un Proyecto/Equipo (lo llama la pantalla del dueño). */
+export async function sincronizarEspacioDeIniciativa(ids: Iniciativa) {
+  if (!(await esDueno(ids))) return;
+  try {
+    await sincronizarEspaciosDeIniciativa(ids);
+  } catch (e) {
+    reportar(e, "sincronizarEspacioDeIniciativa");
+  }
+}
+
+/** Antes de borrar un Proyecto/Equipo: sus canales en Discord no quedan huérfanos. */
+export async function borrarEspacioDeIniciativa(ids: Iniciativa) {
+  if (!(await esDueno(ids))) return;
+  try {
+    await borrarEspaciosDeIniciativa(ids);
+  } catch (e) {
+    reportar(e, "borrarEspacioDeIniciativa");
   }
 }

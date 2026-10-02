@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { EstadoObra } from "@/lib/supabase/types";
+import { borrarEspacioDeIniciativa, sincronizarEspacioDeIniciativa } from "@/app/acciones-discord";
 
 const MIN_FOTOS = 1; // issue #162
 
@@ -43,6 +44,8 @@ export function AccionesObra({
     setCargando(true);
     const supabase = createClient();
     await supabase.from("obras").update({ estado: "publicada" }).eq("id", obraId);
+    // Si se reabre, su espacio en Discord vuelve a ser de escritura (#269).
+    await sincronizarEspacioDeIniciativa({ obraId }).catch(() => {});
     setCargando(false);
     router.refresh();
   }
@@ -51,6 +54,8 @@ export function AccionesObra({
     setCargando(true);
     const supabase = createClient();
     await supabase.from("obras").update({ estado: "cerrada" }).eq("id", obraId);
+    // Cerrado: su espacio en Discord queda de solo lectura (#269).
+    await sincronizarEspacioDeIniciativa({ obraId }).catch(() => {});
     setCargando(false);
     router.refresh();
   }
@@ -64,6 +69,8 @@ export function AccionesObra({
     if (fotosPaths.length > 0) {
       await supabase.storage.from("fotos-perfil").remove(fotosPaths);
     }
+    // Los canales de Discord se borran antes: la sala cae en cascada con la obra (#269).
+    await borrarEspacioDeIniciativa({ obraId }).catch(() => {});
     const { error: errorBd } = await supabase.from("obras").delete().eq("id", obraId);
     if (errorBd) {
       setCargando(false);

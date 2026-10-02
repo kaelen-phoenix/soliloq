@@ -112,10 +112,14 @@ async function leerSala(salaId: string) {
 /** Las cuentas de Discord de quienes hoy están en la sala (las que vincularon la suya). */
 async function discordDeIntegrantes(salaId: string) {
   const admin = createAdminClient();
-  const { data: integrantes } = await admin.from("sala_integrantes").select("perfil_id").eq("sala_id", salaId);
+  // Un error de lectura tira en vez de devolver []: una lista vacía por un error transitorio
+  // le sacaría el acceso a todo el grupo.
+  const { data: integrantes, error } = await admin.from("sala_integrantes").select("perfil_id").eq("sala_id", salaId);
+  if (error) throw new Error(`sala_integrantes: ${error.message}`);
   const ids = (integrantes ?? []).map((i) => i.perfil_id);
   if (ids.length === 0) return [];
-  const { data: perfiles } = await admin.from("perfiles").select("discord_user_id").in("id", ids);
+  const { data: perfiles, error: errorPerfiles } = await admin.from("perfiles").select("discord_user_id").in("id", ids);
+  if (errorPerfiles) throw new Error(`perfiles: ${errorPerfiles.message}`);
   return (perfiles ?? []).map((p) => p.discord_user_id).filter((d): d is string => !!d);
 }
 
@@ -131,7 +135,10 @@ export async function sincronizarEspacio(salaId: string): Promise<boolean> {
   const sala = await leerSala(salaId);
   if (!sala?.discord_canal_id) return false;
 
+  // Sin el id del bot no se toca nada: si no, su propio permiso quedaría entre los que hay
+  // que borrar y perdería el acceso al canal.
   const bot = await botId();
+  if (!bot) throw new Error("Discord: no se pudo leer el id del bot.");
   const quienes = new Set(await discordDeIntegrantes(salaId));
   const allow = (sala.cerrada ? SOLO_LECTURA : INTEGRANTE).toString();
   const deny = (sala.cerrada ? CERRADO_DENEGADO : 0).toString();
@@ -230,10 +237,38 @@ export async function sincronizarEspaciosDe(perfilId: string) {
  * Suma a una persona al servidor con el token OAuth que dio al vincular (scope
  * `guilds.join`). Si ya estaba, Discord responde 204 y no cambia nada.
  */
-export async function sumarAlServidor(discordUserId: string, accessToken: string) {
-  if (!GUILD) return;
-  await api(`/guilds/${GUILD}/members/${discordUserId}`, {
+export async function sumarAlServidor(discordUserId: string, accessToken: string): Promise<boolean> {
+  if (!GUILD) return false;
+  const r = await api(`/guilds/${GUILD}/members/${discordUserId}`, {
     method: "PUT",
     body: JSON.stringify({ access_token: accessToken }),
   });
+  return r.ok; // 201: la sumó; 204: ya estaba
+}
+
+/** Las salas con espacio de un Proyecto o Equipo. */
+async function salasConEspacio(ids: { obraId?: string | null; equipoId?: string | null }) {
+  if (!ids.obraId && !ids.equipoId) return [];
+  const consulta = createAdminClient()
+    .from("salas")
+    .select("id, discord_canal_id, discord_voz_id")
+    .not("discord_canal_id", "is", null);
+  const { data } = ids.obraId ? await consulta.eq("obra_id", ids.obraId) : await consulta.eq("equipo_id", ids.equipoId!);
+  return data ?? [];
+}
+
+/** Después de cerrar, reabrir o desactivar una iniciativa: el espacio pasa a solo lectura o vuelve. */
+export async function sincronizarEspaciosDeIniciativa(ids: { obraId?: string | null; equipoId?: string | null }) {
+  if (!discordConfigurado()) return;
+  for (const s of await salasConEspacio(ids)) await sincronizarEspacio(s.id);
+}
+
+/** Antes de borrar una iniciativa (la sala cae en cascada): borra sus canales en Discord. */
+export async function borrarEspaciosDeIniciativa(ids: { obraId?: string | null; equipoId?: string | null }) {
+  if (!discordConfigurado()) return;
+  for (const s of await salasConEspacio(ids)) {
+    for (const canal of [s.discord_canal_id, s.discord_voz_id]) {
+      if (canal) await api(`/channels/${canal}`, { method: "DELETE" });
+    }
+  }
 }

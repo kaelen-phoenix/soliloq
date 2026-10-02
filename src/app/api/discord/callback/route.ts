@@ -52,6 +52,9 @@ export async function GET(req: NextRequest) {
     if (!yo.ok) return volver("error");
     const discord = (await yo.json()) as { id: string; username: string; global_name?: string | null };
 
+    // Primero al servidor: si Discord no la deja entrar, no queda una vinculación a medias.
+    if (!(await sumarAlServidor(discord.id, access_token))) return volver("error");
+
     const admin = createAdminClient();
     const { error } = await admin
       .from("perfiles")
@@ -60,7 +63,6 @@ export async function GET(req: NextRequest) {
     // 23505: esa cuenta de Discord ya está vinculada a otra cuenta de Yalope.
     if (error) return volver(error.code === "23505" ? "en-uso" : "error");
 
-    await sumarAlServidor(discord.id, access_token);
     await sincronizarEspaciosDe(user.id);
     return volver("vinculado");
   } catch (e) {

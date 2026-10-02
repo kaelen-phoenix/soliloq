@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
+import { borrarEspacioDeIniciativa, sincronizarEspacioDeIniciativa } from "@/app/acciones-discord";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
 import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
@@ -197,6 +198,8 @@ export function GestionEquipo({
       setError("No pudimos cerrar el equipo. Probá de nuevo.");
       return;
     }
+    // Cerrado: su espacio en Discord queda de solo lectura (#269).
+    await sincronizarEspacioDeIniciativa({ equipoId: equipo.id }).catch(() => {});
     router.refresh();
   }
 
@@ -221,6 +224,8 @@ export function GestionEquipo({
     }
     // Primero la fila y después el Storage (no cascadea): si el borrado de la fila falla, el
     // equipo queda entero con sus fotos, en vez de vivo y sin fotos.
+    // Los canales de Discord se borran antes: la sala cae en cascada con el equipo (#269).
+    await borrarEspacioDeIniciativa({ equipoId: equipo.id }).catch(() => {});
     const { error: errorBd } = await supabase.from("equipos").delete().eq("id", equipo.id);
     if (errorBd) {
       setCargando(false);

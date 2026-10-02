@@ -5,7 +5,8 @@
  *
  * Comprueba: solo el dueño de la iniciativa crea el espacio; los dos canales (texto y voz)
  * quedan privados y en la categoría Proyectos; el integrante vinculado entra; al salir de la
- * sala pierde el acceso; con el Proyecto cerrado queda de solo lectura.
+ * sala pierde el acceso; con el Proyecto cerrado queda de solo lectura y al reabrirlo vuelve;
+ * al borrar el Proyecto se borran sus canales.
  *
  *   (env de staging: NEXT_PUBLIC_SUPABASE_URL, SUPABASE_SERVICE_ROLE_KEY)
  *   DISCORD_BOT_TOKEN=… DISCORD_GUILD_ID=… DISCORD_CATEGORIA_PROYECTOS=… \
@@ -14,7 +15,9 @@
  */
 import { createClient } from "@supabase/supabase-js";
 const base = "../../src/lib/";
-const { abrirEspacio, sincronizarEspacio } = await import(base + "discord-servidor.ts");
+const { abrirEspacio, sincronizarEspacio, sincronizarEspaciosDeIniciativa, borrarEspaciosDeIniciativa } = await import(
+  base + "discord-servidor.ts"
+);
 const admin = createClient(process.env.NEXT_PUBLIC_SUPABASE_URL!, process.env.SUPABASE_SERVICE_ROLE_KEY!, { auth: { persistSession: false } });
 const B = process.env.DISCORD_BOT_TOKEN!, G = process.env.DISCORD_GUILD_ID!;
 const d = async (p: string, o: RequestInit = {}) => { const r = await fetch("https://discord.com/api/v10" + p, { ...o, headers: { Authorization: "Bot " + B, "Content-Type": "application/json" } }); const t = await r.text(); return t ? JSON.parse(t) : null; };
@@ -56,6 +59,14 @@ try {
   await sincronizarEspacio(salaId);
   const m2 = (await d(`/channels/${canales[0]}`)).permission_overwrites.find((o: any) => o.id === owner);
   ok(!!m2 && (Number(m2.allow) & (VIEW | HISTORY)) === (VIEW | HISTORY) && (Number(m2.deny) & SEND) !== 0, "proyecto cerrado: el espacio queda de solo lectura");
+
+  await admin.from("obras").update({ estado: "publicada" }).eq("id", obra!.id);
+  await sincronizarEspaciosDeIniciativa({ obraId: obra!.id });
+  const m3 = (await d(`/channels/${canales[0]}`)).permission_overwrites.find((o: any) => o.id === owner);
+  ok(!!m3 && (Number(m3.allow) & SEND) !== 0 && (Number(m3.deny) & SEND) === 0, "proyecto reabierto: se vuelve a poder escribir");
+
+  await borrarEspaciosDeIniciativa({ obraId: obra!.id });
+  for (const c of canales) ok((await d(`/channels/${c}`))?.code === 10003, "al borrar el proyecto se borran sus canales");
 } finally {
   for (const c of canales) await d(`/channels/${c}`, { method: "DELETE" });
   if (salaId) await admin.from("salas").delete().eq("id", salaId);
