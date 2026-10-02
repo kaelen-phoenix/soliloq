@@ -8,7 +8,7 @@ import type { RolUsuario } from "@/lib/supabase/types";
 const TITULOS: { patron: RegExp; clave: string }[] = [
   { patron: /^\/matches/, clave: "matches" },
   { patron: /^\/convocatoria/, clave: "convocatoria" },
-  { patron: /^\/equipo/, clave: "armarEquipo" },
+  { patron: /^\/equipo/, clave: "contacto" },
   { patron: /^\/salas\/.+/, clave: "sala" },
   { patron: /^\/salas$/, clave: "salas" },
   { patron: /^\/notificaciones/, clave: "notificaciones" },

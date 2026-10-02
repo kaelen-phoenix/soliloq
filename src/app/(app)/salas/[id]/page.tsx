@@ -35,7 +35,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
 
   // #206: la sala de un Proyecto/Equipo propio vive en la experiencia de Creador; en la que
   // participás como Talento (convocado por otra persona), en la de Talento — mismo criterio
-  // que ya aplica la lista en `/salas`. Las salas sin iniciativa (armar equipo 1:1) no
+  // que ya aplica la lista en `/salas`. Las salas sin iniciativa (chat directo 1:1) no
   // distinguen: van en cualquiera de los dos modos.
   const esDeIniciativa = !!(sala.obra_id || sala.equipo_id);
   const esDueno = obra?.creador_id === user.id || equipo?.creador_id === user.id;
@@ -92,7 +92,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       nombre: talento?.nombre ?? "Integrante",
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
       // La sala nace de un interés mutuo + convocatoria, no de un casting con roles.
-      rol_en_obra: esDirector ? "Director/a" : esDeIniciativa ? "Elenco" : "Armando equipo",
+      rol_en_obra: esDirector ? "Director/a" : esDeIniciativa ? "Elenco" : "Contacto",
       // #149: sólo los mensajes de quien tiene perfil de Talento abren la placa de perfil.
       esTalento: !!talento,
     };
@@ -114,7 +114,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       <div className="flex items-center gap-3 border-b border-borde px-4 py-2">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wide text-texto-tenue">
-            {sala.obra_id ? "Sala de proyecto" : sala.equipo_id ? "Sala de equipo" : "Armar equipo"}
+            {sala.obra_id ? "Sala de proyecto" : sala.equipo_id ? "Sala de equipo" : "Chat directo"}
           </p>
           {/* Título de la obra o el equipo; si no, el de una sala sin iniciativa, o el
               genérico cuando esa fila está escondida por bloqueo (0022). */}

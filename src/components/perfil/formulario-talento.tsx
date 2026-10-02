@@ -406,7 +406,7 @@ export function FormularioTalento({
             Ocultar mi perfil a personas nuevas
             <span className="mt-0.5 block text-xs text-texto-tenue">
               Nadie nuevo te va a poder encontrar ni contactar: no salís en el buscador de
-              Creadores ni en «Armar equipo», y tu enlace público deja de mostrar tu perfil.
+              Creadores y tu enlace público deja de mostrar tu perfil.
               Tus chats abiertos siguen igual, tus Proyectos y Equipos publicados siguen
               recibiendo interesados, y vos podés seguir buscando y marcando «Me interesa».
             </span>
