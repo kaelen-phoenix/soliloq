@@ -10,9 +10,10 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 
 type Modo = "ingresar" | "registrarme";
 
-export function IngresarFormulario({ next }: { next?: string }) {
+/** `modoInicial`: el mail de invitación (#272) abre directo en «Crear cuenta». */
+export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: string; modoInicial?: Modo }) {
   const router = useRouter();
-  const [modo, setModo] = useState<Modo>("ingresar");
+  const [modo, setModo] = useState<Modo>(modoInicial);
   const [email, setEmail] = useState("");
   const [clave, setClave] = useState("");
   const [error, setError] = useState<string | null>(null);

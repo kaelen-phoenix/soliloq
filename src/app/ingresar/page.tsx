@@ -5,7 +5,7 @@ import { IngresarFormulario } from "./ingresar-formulario";
 export default async function IngresarPage({
   searchParams,
 }: {
-  searchParams: { error?: string; next?: string };
+  searchParams: { error?: string; next?: string; modo?: string };
 }) {
   const t = await getTranslations("auth");
   // Solo destinos internos: sin esto, `next` sería un redirect abierto.
@@ -32,7 +32,7 @@ export default async function IngresarPage({
         </p>
       )}
 
-      <IngresarFormulario next={next} />
+      <IngresarFormulario next={next} modoInicial={searchParams.modo === "registrarme" ? "registrarme" : "ingresar"} />
     </MarcoAcceso>
   );
 }
