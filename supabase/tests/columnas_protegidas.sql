@@ -1,4 +1,4 @@
--- Columnas de `perfiles` que el usuario no puede tocarse a sí mismo (#257, 0088).
+-- Columnas de `perfiles` que el usuario no puede tocarse a sí mismo (#257, 0088; 0093 suma `bienvenida_enviada_en`).
 -- Se corre entero dentro de begin/rollback: no deja rastro.
 --   supabase/tests/run.sh columnas_protegidas.sql
 --
@@ -32,7 +32,8 @@ begin
     'aprobado_en = now()',
     'suspendido_en = null',
     'creado_en = now() - interval ''1 year''',
-    'id = gen_random_uuid()'
+    'id = gen_random_uuid()',
+    'bienvenida_enviada_en = now()'
   ] loop
     begin
       execute format('update perfiles set %s where id = auth.uid()', cambio);

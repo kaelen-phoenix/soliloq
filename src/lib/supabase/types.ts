@@ -95,6 +95,8 @@ export interface Database {
           /** Tour guiado de cada experiencia (#231, 0084): null = todavía no lo vio. */
           tour_talento_visto_en: string | null;
           tour_creador_visto_en: string | null;
+          /** Mail de bienvenida (0093, #272): null = todavía no salió. Lo escribe solo el servidor. */
+          bienvenida_enviada_en: string | null;
           /** Idioma de la interfaz (0041): 'es' | 'en'. */
           idioma: string;
           /** Tema (0041): 'sistema' | 'claro' | 'oscuro'. */
@@ -123,6 +125,7 @@ export interface Database {
           normas_aceptadas_en?: string | null;
           tour_talento_visto_en?: string | null;
           tour_creador_visto_en?: string | null;
+          bienvenida_enviada_en?: string | null;
           idioma?: string;
           tema?: string;
         };
@@ -584,6 +587,8 @@ export interface Database {
           creado_en: string;
           /** Cuándo salió el push de este aviso (0092). `null` = todavía no, o no lleva push. */
           push_enviado_en: string | null;
+          /** Cuándo salió el mail de este aviso (0093). `null` = todavía no, o no lleva mail. */
+          mail_enviado_en: string | null;
         };
         Insert: {
           destinatario_id: string;
@@ -597,6 +602,8 @@ export interface Database {
           leida_en?: string | null;
           /** Solo lo escribe el servidor con la clave de servicio (`despacharAvisosDeAcceso`). */
           push_enviado_en?: string | null;
+          /** Solo lo escribe el servidor con la clave de servicio (`despacharAvisosDeAcceso`). */
+          mail_enviado_en?: string | null;
         };
         Relationships: [
           {

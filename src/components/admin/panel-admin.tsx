@@ -7,7 +7,14 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import { adminBorrarUsuario } from "@/app/(app)/admin/acciones";
+import {
+  adminBorrarUsuario,
+  adminEnviarBienvenidas,
+  adminMandarInvitacion,
+  adminEnviarmePruebaBienvenida,
+  adminEstadoBienvenidas,
+  type EstadoBienvenida,
+} from "@/app/(app)/admin/acciones";
 import { despacharAvisosDeAcceso } from "@/app/acciones-push";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { Database } from "@/lib/supabase/types";
@@ -593,7 +600,15 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
       setError(err.message ?? "No se pudo enviar la invitación.");
       return;
     }
-    setAviso(`Invitación registrada para ${email.trim()}.`);
+    const invitado = email.trim();
+    const mail = await adminMandarInvitacion(invitado);
+    setAviso(
+      mail.ok && mail.enviado
+        ? `Invitación registrada y enviada por mail a ${invitado}.`
+        : mail.ok
+          ? `Invitación registrada para ${invitado}.`
+          : `Invitación registrada para ${invitado}, pero no se pudo mandar el mail (${mail.error}).`,
+    );
     setEmail("");
     cargar();
     // Si ese email ya estaba esperando, la invitación lo habilitó: sale su push (#247).
@@ -644,6 +659,8 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
           Quien se registre con ese email entra directo, sin esperar aprobación.
         </p>
       </form>
+
+      <MailBienvenida />
 
       <div>
         <h3 className="mb-2 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
@@ -1017,6 +1034,105 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
           </Boton>
         </div>
       </form>
+    </div>
+  );
+}
+
+/**
+ * Mail de bienvenida (#272). A cada persona nueva le sale solo al aceptar las Normas. Acá:
+ * una prueba al propio admin, el estado de quién ya lo recibió, y el envío a quienes falten
+ * (la primera vez, a todos los usuarios). Cada cuenta lo recibe una sola vez.
+ */
+function MailBienvenida() {
+  const [cuentas, setCuentas] = useState<EstadoBienvenida[] | null>(null);
+  const [accion, setAccion] = useState<"prueba" | "envio" | null>(null);
+  const [mensaje, setMensaje] = useState<string | null>(null);
+  const [verLista, setVerLista] = useState(false);
+
+  const cargarEstado = useCallback(async () => {
+    const r = await adminEstadoBienvenidas();
+    if (r.ok) setCuentas(r.cuentas);
+    else setMensaje(r.error);
+  }, []);
+
+  useEffect(() => {
+    cargarEstado();
+  }, [cargarEstado]);
+
+  const faltan = cuentas?.filter((c) => !c.enviadaEn).length ?? 0;
+
+  async function prueba() {
+    setAccion("prueba");
+    setMensaje(null);
+    const r = await adminEnviarmePruebaBienvenida();
+    setAccion(null);
+    setMensaje(r.ok ? `Te mandamos la prueba a ${r.para}. Revisá la bandeja (y spam, por las dudas).` : r.error);
+  }
+
+  async function enviar() {
+    if (!window.confirm(`¿Mandar el mail de bienvenida a ${faltan} ${faltan === 1 ? "persona" : "personas"}?`)) return;
+    setAccion("envio");
+    setMensaje(null);
+    const r = await adminEnviarBienvenidas();
+    setAccion(null);
+    if (!r.ok) {
+      setMensaje(r.error);
+      return;
+    }
+    const { enviados, fallidos, sinCorreo } = r.resumen;
+    setMensaje(
+      sinCorreo
+        ? "Todavía no está configurado el envío de mails (falta RESEND_API_KEY en Vercel)."
+        : `Enviados: ${enviados}.${fallidos ? ` No se pudieron enviar: ${fallidos} (quedan para reintentar).` : ""}`,
+    );
+    cargarEstado();
+  }
+
+  return (
+    <div className="rounded-2xl border border-borde p-4">
+      <h3 className="text-sm font-medium text-texto">Mail de bienvenida</h3>
+      <p className="mt-1 text-xs leading-relaxed text-texto-tenue">
+        A cada persona nueva le llega solo, al entrar por primera vez. Cada cuenta lo recibe una
+        sola vez.
+      </p>
+      {cuentas && (
+        <p className="mt-2 text-sm text-texto">
+          Lo recibieron {cuentas.length - faltan} de {cuentas.length}.{" "}
+          <button
+            type="button"
+            onClick={() => setVerLista((v) => !v)}
+            className="text-xs font-medium text-texto-tenue underline hover:text-texto"
+          >
+            {verLista ? "Ocultar detalle" : "Ver detalle"}
+          </button>
+        </p>
+      )}
+      {verLista && cuentas && (
+        <ul className="mt-2 flex max-h-64 flex-col divide-y divide-ink-100 overflow-y-auto rounded-xl border border-borde">
+          {cuentas.map((c) => (
+            <li key={c.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+              <span className="truncate text-texto">{c.email}</span>
+              <span className={c.enviadaEn ? "shrink-0 text-exito-600" : "shrink-0 text-texto-tenue"}>
+                {c.enviadaEn ? `✓ ${new Date(c.enviadaEn).toLocaleDateString("es-AR")}` : "Pendiente"}
+              </span>
+            </li>
+          ))}
+        </ul>
+      )}
+      <div className="mt-3 flex flex-wrap gap-2">
+        <Boton variante="secundario" onClick={prueba} cargando={accion === "prueba"} textoCargando="Enviando…">
+          Enviarme una prueba
+        </Boton>
+        <Boton
+          onClick={enviar}
+          cargando={accion === "envio"}
+          textoCargando="Enviando…"
+          disabled={!cuentas || faltan === 0 || accion !== null}
+        >
+          {faltan === 0 && cuentas ? "Todos lo recibieron" : `Enviar a quienes faltan (${faltan})`}
+        </Boton>
+      </div>
+      {mensaje && <p className="mt-2 text-xs text-texto-tenue">{mensaje}</p>}
     </div>
   );
 }

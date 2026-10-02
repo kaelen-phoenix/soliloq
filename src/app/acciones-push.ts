@@ -1,9 +1,11 @@
 "use server";
 
+import * as Sentry from "@sentry/nextjs";
 import webpush from "web-push";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
+import { despacharMailsDeAcceso } from "@/lib/avisos-mail-servidor";
 
 const VAPID_LISTO =
   !!process.env.VAPID_PRIVATE_KEY &&
@@ -192,13 +194,22 @@ async function enviarPush(perfilIds: string[], aviso: AvisoPush): Promise<boolea
  * base ya decidió.
  */
 export async function despacharAvisosDeAcceso() {
-  if (!VAPID_LISTO) return;
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return;
 
+  // Push y mail (0093) en paralelo; cada canal con su marca y sus reintentos.
+  await Promise.all([
+    VAPID_LISTO ? despacharPushDeAcceso() : null,
+    despacharMailsDeAcceso().catch((e) =>
+      Sentry.captureException(e, { tags: { origen: "mail" }, extra: { accion: "despacharMailsDeAcceso" } }),
+    ),
+  ]);
+}
+
+async function despacharPushDeAcceso() {
   const admin = createAdminClient();
   const { data: avisos, error } = await admin
     .from("notificaciones")
