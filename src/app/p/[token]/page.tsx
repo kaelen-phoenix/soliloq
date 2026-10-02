@@ -7,6 +7,8 @@ import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 import { VidrieraPublica } from "@/components/perfil/vidriera-publica";
 import { BotonContactarPublico } from "@/components/perfil/boton-contactar-publico";
+import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
+import { destinoSegunEstado } from "@/lib/cuenta";
 
 // `cache()` deduplica la RPC entre `generateMetadata` y la página: las dos la piden con el
 // mismo token dentro del mismo request.
@@ -57,6 +59,12 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
     esDueño = miPerfil?.enlace_token === params.token;
   }
 
+  // Con sesión pero la cuenta todavía sin terminar (pendiente, sin Normas o sin perfil):
+  // `/p` está fuera de la app y no pasa por esa guarda, así que se mira acá. Sin esto se
+  // podía contactar sin perfil y el chat quedaba con «Alguien».
+  const pendiente = user && !esDueño ? destinoSegunEstado(await leerEstadoCuenta(supabase, user.id)) : "app";
+  const volverAca = encodeURIComponent(`/p/${params.token}`);
+
   const fotos = perfil.fotos.map(
     (f) => supabase.storage.from("fotos-perfil").getPublicUrl(f).data.publicUrl
   );
@@ -83,12 +91,25 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
               ¿Te interesa trabajar con {perfil.nombre.split(" ")[0]}?
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-600">
-              {user
+              {pendiente === "solicitud-pendiente"
+                ? "Tu cuenta está esperando aprobación. Cuando te habiliten vas a poder contactar desde acá."
+                : pendiente !== "app"
+                  ? `Completá tu perfil en Yalope para contactar a ${perfil.nombre.split(" ")[0]}. Así sabe quién le escribe.`
+                  : user
                 ? "Le mandamos tu interés. Si responde, se abre un chat directo y vas a ver su perfil completo, con sus redes."
                 : `Creá tu cuenta gratis en Yalope para contactar a ${perfil.nombre.split(" ")[0]}. Si responde, se abre un chat directo y ves su perfil completo, con sus redes.`}
             </p>
             <div className="mt-4">
-              <BotonContactarPublico token={params.token} haySesion={!!user} />
+              {pendiente === "app" ? (
+                <BotonContactarPublico token={params.token} haySesion={!!user} />
+              ) : pendiente !== "solicitud-pendiente" ? (
+                <Link
+                  href={`/${pendiente}?next=${volverAca}`}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto transition-colors hover:opacity-90"
+                >
+                  Completar mi perfil
+                </Link>
+              ) : null}
             </div>
           </section>
         )}

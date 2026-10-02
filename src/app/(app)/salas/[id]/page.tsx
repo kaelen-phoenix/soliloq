@@ -89,7 +89,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
     const esDirector = obra?.creador_id === id || equipo?.creador_id === id;
     return {
       perfil_id: id,
-      nombre: talento?.nombre ?? "Integrante",
+      nombre: talento?.nombre ?? (esDeIniciativa ? "Integrante" : "Perfil sin completar"),
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
       // La sala nace de un interés mutuo + convocatoria, no de un casting con roles.
       rol_en_obra: esDirector ? "Director/a" : esDeIniciativa ? "Elenco" : "Contacto",
@@ -119,7 +119,12 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
           {/* Título de la obra o el equipo; si no, el de una sala sin iniciativa, o el
               genérico cuando esa fila está escondida por bloqueo (0022). */}
           <h1 className="font-display font-semibold tracking-[-0.02em] text-texto">
-            {obra?.titulo ?? equipo?.titulo ?? sala.titulo ?? "Proyecto"}
+            {obra?.titulo ??
+              equipo?.titulo ??
+              (!esDeIniciativa
+                ? integrantes.filter((i) => i.perfil_id !== user.id).map((i) => i.nombre).join(" y ") || sala.titulo
+                : sala.titulo) ??
+              "Proyecto"}
           </h1>
         </div>
         {/* Espacio privado en Discord (#269), solo en Proyectos y Equipos. */}

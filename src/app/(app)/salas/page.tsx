@@ -4,6 +4,31 @@ import { InvitacionComunidad } from "@/components/comunidad/invitacion-comunidad
 import { createClient } from "@/lib/supabase/server";
 import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
+/** Por cada chat directo, el nombre de quienes no son uno («Perfil sin completar» si no tienen). */
+async function nombresDeLosOtros(
+  supabase: ReturnType<typeof createClient>,
+  salaIds: string[],
+  yo: string,
+): Promise<Map<string, string>> {
+  const nombres = new Map<string, string>();
+  if (salaIds.length === 0) return nombres;
+  const { data: integrantes } = await supabase
+    .from("sala_integrantes")
+    .select("sala_id, perfil_id")
+    .in("sala_id", salaIds)
+    .neq("perfil_id", yo);
+  const ids = Array.from(new Set((integrantes ?? []).map((i) => i.perfil_id)));
+  const { data: talentos } = ids.length
+    ? await supabase.from("perfiles_talento").select("id, nombre").in("id", ids)
+    : { data: [] as { id: string; nombre: string }[] };
+  const nombre = new Map((talentos ?? []).map((t) => [t.id, t.nombre]));
+  for (const salaId of salaIds) {
+    const otros = (integrantes ?? []).filter((i) => i.sala_id === salaId).map((i) => nombre.get(i.perfil_id) ?? "Perfil sin completar");
+    if (otros.length) nombres.set(salaId, otros.join(" y "));
+  }
+  return nombres;
+}
+
 export default async function SalasPage() {
   const supabase = createClient();
   const user = await usuarioDeLaRequest();
@@ -23,6 +48,14 @@ export default async function SalasPage() {
 
   const destPorSala = new Map((destacados ?? []).map((d) => [d.sala_id, d.creado_en]));
 
+  // Chats directos (sin Proyecto ni Equipo): el título es el nombre de la otra persona, leído
+  // ahora y no el «A y B» que quedó guardado al crearse (si alguien todavía no tenía perfil,
+  // quedaba «Alguien» para siempre).
+  const directas = (integraciones ?? [])
+    .filter((i: any) => !i.salas?.obra_id && !i.salas?.equipo_id)
+    .map((i: any) => i.sala_id as string);
+  const nombresDirectos = await nombresDeLosOtros(supabase, directas, user.id);
+
   const salas = await Promise.all(
     (integraciones ?? []).map(async (i: any) => {
       const { data: ultimoMensaje } = await supabase
@@ -40,7 +73,7 @@ export default async function SalasPage() {
 
       return {
         salaId: i.sala_id as string,
-        titulo: obra?.titulo ?? equipo?.titulo ?? i.salas?.titulo ?? "Proyecto",
+        titulo: obra?.titulo ?? equipo?.titulo ?? nombresDirectos.get(i.sala_id) ?? i.salas?.titulo ?? "Proyecto",
         esEquipo: !!equipo,
         // ¿La sala cuelga de un Proyecto/Equipo (tiene dueño) o es una sala 1:1 de armar
         // equipo entre personas (sin obra ni equipo)?

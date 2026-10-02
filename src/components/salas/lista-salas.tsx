@@ -16,6 +16,8 @@ export interface SalaItem {
   salaId: string;
   titulo: string;
   esEquipo: boolean;
+  /** `false` en los chats directos (sin Proyecto ni Equipo): llevan la etiqueta «Directo». */
+  esDeIniciativa: boolean;
   ultimoMensaje: string | null;
   ultimaActividad: string | null;
   destacadoEn: string | null;
@@ -135,10 +137,14 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
                   <div className="flex items-center gap-2">
                     <span
                       className={`inline-block shrink-0 rounded-md px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide ${
-                        s.esEquipo ? "bg-coral text-ink-950" : "bg-brand-600 text-white"
+                        !s.esDeIniciativa
+                          ? "border border-borde text-texto-tenue"
+                          : s.esEquipo
+                            ? "bg-coral text-ink-950"
+                            : "bg-brand-600 text-white"
                       }`}
                     >
-                      {s.esEquipo ? "Equipo" : "Proyecto"}
+                      {!s.esDeIniciativa ? "Directo" : s.esEquipo ? "Equipo" : "Proyecto"}
                     </span>
                     <p
                       className={`truncate text-base text-texto ${sinLeer > 0 ? "font-semibold" : "font-medium"}`}

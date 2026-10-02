@@ -77,3 +77,5 @@ Falta un runner en CI (hoy es manual con el PAT) y E2E de navegador para los flu
 - **`perfil_publico_sin_redes.sql`** — el enlace público no muestra las redes (0095): sin sesión,
   `perfil_publico` devuelve el perfil con `redes` vacías y la columna `redes` no se puede leer;
   adentro de la app, quien comparte sala sí las ve.
+- **`contactar_requiere_perfil.sql`** — para contactar desde un perfil público hay que tener perfil
+  (0096): sin perfil, `contactar_desde_perfil` rechaza con `completá tu perfil`; con perfil, contacta.
