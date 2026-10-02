@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { correoConfigurado, enviarCorreo } from "@/lib/correo";
 import { mailAccesoHabilitado, mailSolicitudAcceso } from "@/lib/correos/acceso";
@@ -49,14 +50,30 @@ export async function despacharMailsDeAcceso() {
 
   // De a uno: el plan gratis de Resend acepta ~2 envíos por segundo.
   for (const a of avisos) {
-    const para = await emailDe(a.destinatario_id);
-    const mail =
-      a.tipo === "acceso_habilitado"
-        ? mailAccesoHabilitado()
-        : mailSolicitudAcceso({ email: await emailDe(a.de_perfil), fecha: new Date(a.creado_en) });
-    const r = para ? await enviarCorreo({ para, asunto: mail.asunto, html: mail.html, texto: mail.texto }) : null;
-    // Sin email no hay a quién mandarle: queda marcado. Si falló, se libera para reintentar.
-    if (r && !r.ok) await admin.from("notificaciones").update({ mail_enviado_en: null }).eq("id", a.id);
+    // Sin email no hay a quién mandarle: queda marcado. Si algo falla (incluso una excepción
+    // al buscar el email), se libera para reintentar.
+    let liberar = false;
+    try {
+      const para = await emailDe(a.destinatario_id);
+      if (para) {
+        const mail =
+          a.tipo === "acceso_habilitado"
+            ? mailAccesoHabilitado()
+            : mailSolicitudAcceso({ email: await emailDe(a.de_perfil), fecha: new Date(a.creado_en) });
+        liberar = !(await enviarCorreo({ para, asunto: mail.asunto, html: mail.html, texto: mail.texto })).ok;
+      }
+    } catch {
+      liberar = true;
+    }
+    if (liberar) {
+      const { error } = await admin.from("notificaciones").update({ mail_enviado_en: null }).eq("id", a.id);
+      if (error) {
+        Sentry.captureException(new Error(`No se pudo liberar el mail de un aviso: ${error.message}`), {
+          tags: { origen: "mail" },
+          extra: { notificacionId: a.id },
+        });
+      }
+    }
     if (avisos.length > 1) await new Promise((res) => setTimeout(res, 600));
   }
 }

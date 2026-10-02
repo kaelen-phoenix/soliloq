@@ -104,7 +104,7 @@ export async function adminEnviarmePruebaBienvenida(): Promise<
   return { ok: true, para: user.email };
 }
 
-export type EstadoBienvenida = { email: string; enviadaEn: string | null };
+export type EstadoBienvenida = { id: string; email: string; enviadaEn: string | null };
 
 /** Quién ya recibió la bienvenida y quién no, entre las cuentas habilitadas (#272). */
 export async function adminEstadoBienvenidas(): Promise<
@@ -113,18 +113,23 @@ export async function adminEstadoBienvenidas(): Promise<
   if (!(await adminActual())) return { ok: false, error: "No autorizado." };
   try {
     const admin = createAdminClient();
-    const [{ data: perfiles, error }, { data: usuarios }] = await Promise.all([
-      admin
-        .from("perfiles")
-        .select("id, bienvenida_enviada_en")
-        .not("aprobado_en", "is", null)
-        .is("suspendido_en", null),
-      admin.auth.admin.listUsers({ page: 1, perPage: 1000 }),
-    ]);
+    const { data: perfiles, error } = await admin
+      .from("perfiles")
+      .select("id, bienvenida_enviada_en")
+      .not("aprobado_en", "is", null)
+      .not("normas_aceptadas_en", "is", null)
+      .is("suspendido_en", null);
     if (error) return { ok: false, error: error.message };
-    const email = new Map((usuarios?.users ?? []).map((u) => [u.id, u.email ?? "(sin email)"]));
+    // `listUsers` pagina: se leen todas las páginas, no solo la primera.
+    const email = new Map<string, string>();
+    for (let page = 1; ; page++) {
+      const { data, error: errorUsuarios } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
+      if (errorUsuarios) return { ok: false, error: errorUsuarios.message };
+      for (const u of data.users) email.set(u.id, u.email ?? "(sin email)");
+      if (data.users.length < 1000) break;
+    }
     const cuentas = (perfiles ?? [])
-      .map((p) => ({ email: email.get(p.id) ?? "(sin email)", enviadaEn: p.bienvenida_enviada_en }))
+      .map((p) => ({ id: p.id, email: email.get(p.id) ?? "(sin email)", enviadaEn: p.bienvenida_enviada_en }))
       // Primero quienes faltan; después por fecha de envío.
       .sort((a, b) => (a.enviadaEn ? 1 : 0) - (b.enviadaEn ? 1 : 0) || a.email.localeCompare(b.email));
     return { ok: true, cuentas };

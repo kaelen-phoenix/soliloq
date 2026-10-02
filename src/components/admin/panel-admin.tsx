@@ -1110,7 +1110,7 @@ function MailBienvenida() {
       {verLista && cuentas && (
         <ul className="mt-2 flex max-h-64 flex-col divide-y divide-ink-100 overflow-y-auto rounded-xl border border-borde">
           {cuentas.map((c) => (
-            <li key={c.email} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
+            <li key={c.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
               <span className="truncate text-texto">{c.email}</span>
               <span className={c.enviadaEn ? "shrink-0 text-exito-600" : "shrink-0 text-texto-tenue"}>
                 {c.enviadaEn ? `✓ ${new Date(c.enviadaEn).toLocaleDateString("es-AR")}` : "Pendiente"}

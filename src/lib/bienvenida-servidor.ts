@@ -1,3 +1,4 @@
+import * as Sentry from "@sentry/nextjs";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { correoConfigurado, enviarCorreo } from "@/lib/correo";
 import { mailBienvenida } from "@/lib/correos/bienvenida";
@@ -11,7 +12,8 @@ export type ResumenBienvenidas = {
 
 /**
  * Manda el mail de bienvenida (#272) a quien ya puede entrar y todavía no lo recibió:
- * aprobada, no suspendida, `bienvenida_enviada_en` en null (0093).
+ * aprobada, con las Normas aceptadas (el último paso antes de entrar), no suspendida, y
+ * `bienvenida_enviada_en` en null (0093).
  *
  * - `soloPerfil`: solo esa cuenta (al aceptar las Normas, que es cuando alguien nuevo ya
  *   puede entrar).
@@ -31,6 +33,7 @@ export async function enviarBienvenidasPendientes(
     .from("perfiles")
     .select("id")
     .not("aprobado_en", "is", null)
+    .not("normas_aceptadas_en", "is", null)
     .is("suspendido_en", null)
     .is("bienvenida_enviada_en", null)
     .limit(opciones.limite ?? 100);
@@ -53,17 +56,28 @@ export async function enviarBienvenidasPendientes(
       .maybeSingle();
     if (!reclamada) continue; // otra llamada ya la tomó
 
-    const { data: usuario } = await admin.auth.admin.getUserById(id);
-    const email = usuario?.user?.email;
-    const resultado = email
-      ? await enviarCorreo({ para: email, asunto: mail.asunto, html: mail.html, texto: mail.texto })
-      : ({ ok: false, error: "sin email" } as const);
+    let enviado = false;
+    try {
+      const { data: usuario } = await admin.auth.admin.getUserById(id);
+      const email = usuario?.user?.email;
+      enviado = !!email && (await enviarCorreo({ para: email, asunto: mail.asunto, html: mail.html, texto: mail.texto })).ok;
+    } catch {
+      // `getUserById` puede tirar (red): se trata como envío fallido.
+    }
 
-    if (resultado.ok) {
+    if (enviado) {
       enviados++;
     } else {
       fallidos++;
-      await admin.from("perfiles").update({ bienvenida_enviada_en: null }).eq("id", id);
+      // Se libera para reintentar. Si ni eso se puede, queda reportado: si no, esa cuenta no
+      // recibiría nunca la bienvenida y nadie se enteraría.
+      const { error: errorLiberar } = await admin.from("perfiles").update({ bienvenida_enviada_en: null }).eq("id", id);
+      if (errorLiberar) {
+        Sentry.captureException(new Error(`No se pudo liberar la bienvenida: ${errorLiberar.message}`), {
+          tags: { origen: "mail" },
+          extra: { perfilId: id },
+        });
+      }
     }
     if (filas.length > 1) await new Promise((r) => setTimeout(r, 600));
   }
