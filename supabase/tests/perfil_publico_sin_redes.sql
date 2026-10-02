@@ -1,4 +1,4 @@
--- El enlace público no muestra las redes (0095).
+-- El enlace público muestra las redes solo a quien tiene cuenta completa (0095, 0097).
 -- Se corre entero dentro de begin/rollback: no deja rastro.
 --   supabase/tests/run.sh perfil_publico_sin_redes.sql
 --
@@ -45,6 +45,42 @@ do $$ begin
   begin
     perform redes from perfiles_talento where id = (select v from ctx where k='a');
     raise exception 'T1: sin sesión no se tendría que poder leer la columna redes';
+  exception when insufficient_privilege then null;
+  end;
+end $$;
+reset role;
+
+-- ── T1b · con cuenta incompleta (B sin aprobar todavía) tampoco ─────────────
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c2222222-2222-2222-2222-22222222cccc"}';
+create temp table t1b as select * from public.perfil_publico((select v from ctx where k='token_a'));
+reset role;
+do $$ begin
+  if (select redes from t1b) <> '{}'::jsonb then
+    raise exception 'T1b: una cuenta sin completar no tendría que ver las redes';
+  end if;
+end $$;
+
+-- ── T1c · con cuenta completa, el enlace sí muestra las redes (0097) ────────
+update perfiles set aprobado_en = now(), normas_aceptadas_en = now() where id = (select v from ctx where k='b');
+insert into perfiles_talento (id, nombre, fecha_nacimiento, ubicacion_texto, ubicacion_publica, ubicacion_lat, ubicacion_lng, ubicacion_pais, genero)
+  values ((select v from ctx where k='b'), 'Beto Registrado', '1990-01-01', 'x', 'Almagro', -34.6, -58.42, 'AR', 'sin_especificar');
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"c2222222-2222-2222-2222-22222222cccc"}';
+create temp table t1c as select * from public.perfil_publico((select v from ctx where k='token_a'));
+do $$ begin
+  if (select redes->>'instagram' from t1c) is distinct from 'https://instagram.com/ana.redes' then
+    raise exception 'T1c: con cuenta completa, el enlace tendría que mostrar las redes';
+  end if;
+  -- …y no hay chat de dos personas: ni contactar ni responder (0097).
+  begin
+    perform public.contactar_desde_perfil((select v from ctx where k='token_a'));
+    raise exception 'T1c: contactar_desde_perfil ya no tendría que poder ejecutarse';
+  exception when insufficient_privilege then null;
+  end;
+  begin
+    insert into intereses_equipo (de_perfil, a_perfil, interesa) values (auth.uid(), (select v from ctx where k='a'), true);
+    raise exception 'T1c: ya no se tendría que poder insertar un contacto';
   exception when insufficient_privilege then null;
   end;
 end $$;

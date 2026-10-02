@@ -1,7 +1,8 @@
 import { EtiquetasDisciplina } from "./etiquetas-disciplina";
 import { VideoreelEmbed } from "./videoreel-embed";
 import { GaleriaFotos } from "@/components/ui/galeria-fotos";
-import { etiquetaGenero, type Genero } from "@/lib/constantes";
+import { Icono } from "@/components/ui/icono";
+import { etiquetaGenero, REDES, type Genero } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 export interface PerfilPublico {
@@ -20,8 +21,8 @@ export interface PerfilPublico {
   genero_descripcion: string | null;
   videoreel_url: string | null;
   /** `{ [claveRed]: urlCanonica }`. */
-  /** No se muestran (0095): las redes quedan para dentro de la app. */
-  redes?: Record<string, string>;
+  /** Vacías sin cuenta o con la cuenta incompleta: las filtra `perfil_publico` (0095, 0097). */
+  redes: Record<string, string>;
 }
 
 /** Un bloque del booking, con el título en registro de programa de mano. */
@@ -55,6 +56,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
     generoTexto || null,
   ].filter(Boolean);
 
+  const redes = REDES.filter((r) => perfil.redes?.[r.clave]);
 
   return (
     <article className="flex flex-col">
@@ -70,6 +72,23 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
           <p className="mt-2 text-sm text-ink-600">{datos.join("  ·  ")}</p>
         )}
       </header>
+
+      {redes.length > 0 && (
+        <div className="mt-4 flex flex-wrap gap-2">
+          {redes.map((red) => (
+            <a
+              key={red.clave}
+              href={perfil.redes[red.clave]}
+              target="_blank"
+              rel="noopener noreferrer nofollow"
+              aria-label={red.etiqueta}
+              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-colors hover:border-ink-400 hover:text-ink-800"
+            >
+              <Icono nombre={red.icono} className="h-4 w-4" />
+            </a>
+          ))}
+        </div>
+      )}
 
       <div className="mt-6 flex flex-col divide-y divide-ink-100 border-t border-ink-100">
         {perfil.videoreel_url && (

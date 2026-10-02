@@ -204,7 +204,7 @@ test.describe("equipo, admin y notificaciones (UI)", () => {
     });
 
     await page.goto("/notificaciones");
-    await expect(page.getByText("Alguien quiere contactarte desde tu perfil")).toBeVisible({
+    await expect(page.getByText("Alguien quiso contactarte desde tu perfil")).toBeVisible({
       timeout: 10_000,
     });
   });

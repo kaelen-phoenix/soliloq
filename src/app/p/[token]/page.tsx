@@ -6,7 +6,6 @@ import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 import { VidrieraPublica } from "@/components/perfil/vidriera-publica";
-import { BotonContactarPublico } from "@/components/perfil/boton-contactar-publico";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { destinoSegunEstado } from "@/lib/cuenta";
 
@@ -60,8 +59,8 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
   }
 
   // Con sesión pero la cuenta todavía sin terminar (pendiente, sin Normas o sin perfil):
-  // `/p` está fuera de la app y no pasa por esa guarda, así que se mira acá. Sin esto se
-  // podía contactar sin perfil y el chat quedaba con «Alguien».
+  // `/p` está fuera de la app y no pasa por esa guarda, así que se mira acá. Solo una cuenta
+  // completa ve las redes (las filtra `perfil_publico`, 0097).
   const pendiente = user && !esDueño ? destinoSegunEstado(await leerEstadoCuenta(supabase, user.id)) : "app";
   const volverAca = encodeURIComponent(`/p/${params.token}`);
 
@@ -85,34 +84,44 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
 
         <VidrieraPublica perfil={{ ...perfil, fotos }} />
 
-        {!esDueño && (
+        {/* Sin chat de dos personas (#283): quien tiene cuenta completa ya ve todo, con las
+            redes, y contacta por donde quiera. Al resto se le dice qué le falta. */}
+        {!esDueño && (!user || pendiente !== "app") ? (
           <section className="mt-10 rounded-2xl border border-ink-200 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
             <h2 className="font-display text-lg font-semibold tracking-[-0.02em] text-ink-900">
               ¿Te interesa trabajar con {perfil.nombre.split(" ")[0]}?
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-600">
-              {pendiente === "solicitud-pendiente"
-                ? "Tu cuenta está esperando aprobación. Cuando te habiliten vas a poder contactar desde acá."
-                : pendiente !== "app"
-                  ? `Completá tu perfil en Yalope para contactar a ${perfil.nombre.split(" ")[0]}. Así sabe quién le escribe.`
-                  : user
-                ? "Le mandamos tu interés. Si responde, se abre un chat directo y vas a ver su perfil completo, con sus redes."
-                : `Creá tu cuenta gratis en Yalope para contactar a ${perfil.nombre.split(" ")[0]}. Si responde, se abre un chat directo y ves su perfil completo, con sus redes.`}
+              {!user
+                ? `Creá tu cuenta gratis en Yalope para ver el perfil completo de ${perfil.nombre.split(" ")[0]}, con sus redes.`
+                : pendiente === "solicitud-pendiente"
+                  ? "Tu cuenta está esperando aprobación. Cuando te habiliten vas a ver el perfil completo, con sus redes."
+                  : "Completá tu perfil en Yalope para ver el perfil completo, con sus redes."}
             </p>
-            <div className="mt-4">
-              {pendiente === "app" ? (
-                <BotonContactarPublico token={params.token} haySesion={!!user} />
-              ) : pendiente !== "solicitud-pendiente" ? (
+            {!user ? (
+              <div className="mt-4 flex flex-wrap items-center gap-4">
+                <Link
+                  href={`/ingresar?modo=registrarme&next=${volverAca}`}
+                  className="inline-flex items-center justify-center gap-2 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto transition-colors hover:opacity-90"
+                >
+                  Crear cuenta
+                </Link>
+                <Link href={`/ingresar?next=${volverAca}`} className="text-sm font-medium text-ink-700 hover:text-brand-600">
+                  Ya tengo cuenta
+                </Link>
+              </div>
+            ) : pendiente !== "solicitud-pendiente" ? (
+              <div className="mt-4">
                 <Link
                   href={`/${pendiente}?next=${volverAca}`}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto transition-colors hover:opacity-90"
                 >
                   Completar mi perfil
                 </Link>
-              ) : null}
-            </div>
+              </div>
+            ) : null}
           </section>
-        )}
+        ) : null}
 
         <footer className="mt-12 flex items-center justify-between border-t border-ink-100 pt-5 text-sm text-ink-500">
           {esDueño ? (
