@@ -58,7 +58,7 @@ test.describe("alta del perfil (UI)", () => {
     await expect(page.getByLabel("Experiencia")).toHaveCount(0);
 
     await page.getByLabel("Nombre completo").fill("Alta E2E");
-    await page.getByLabel("Fecha de nacimiento").fill("1995-05-05");
+    await page.getByLabel("Fecha de nacimiento").fill("05051995");
     await page.getByLabel("Género").selectOption({ index: 1 });
 
     // Tres fotos en una sola elección.
@@ -71,7 +71,7 @@ test.describe("alta del perfil (UI)", () => {
     await page.reload();
     await expect(page.getByText("Recuperamos lo que habías cargado")).toBeVisible({ timeout: 15_000 });
     await expect(page.getByLabel("Nombre completo")).toHaveValue("Alta E2E");
-    await expect(page.getByLabel("Fecha de nacimiento")).toHaveValue("1995-05-05");
+    await expect(page.getByLabel("Fecha de nacimiento")).toHaveValue("05/05/1995");
     await expect(page.getByText("3/5 fotos")).toBeVisible();
 
     // «Sumar más» despliega lo opcional.
