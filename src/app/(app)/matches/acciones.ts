@@ -3,7 +3,7 @@
 import { revalidatePath } from "next/cache";
 import { createClient } from "@/lib/supabase/server";
 import { sincronizarEspaciosDe } from "@/lib/discord-servidor";
-import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
+import { iniciativaParaBuscar } from "@/lib/iniciativa-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 
 type Resultado = { ok: true } | { ok: false; error: string };
@@ -89,12 +89,13 @@ export async function darDeBajaConvocado(convocatoriaId: string): Promise<Result
 }
 
 /**
- * El Creador marca (o desmarca) "Me interesa" en un talento, hacia su iniciativa activa
- * (issue #105).
+ * El Creador marca (o desmarca) "Me interesa" en un talento, hacia el Proyecto o Equipo
+ * para el que está buscando (#294; antes, siempre su iniciativa activa, #105).
  */
 export async function marcarInteresEnTalento(
   talentoId: string,
   interesa: boolean,
+  para?: { tipo: "obra" | "equipo"; id: string },
 ): Promise<Resultado> {
   const supabase = createClient();
   const {
@@ -102,7 +103,10 @@ export async function marcarInteresEnTalento(
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sin sesión." };
 
-  const iniciativa = await iniciativaActivaDelCreador(supabase, user.id);
+  const iniciativa = await iniciativaParaBuscar(supabase, user.id, {
+    obra: para?.tipo === "obra" ? para.id : null,
+    equipo: para?.tipo === "equipo" ? para.id : null,
+  });
   if (!iniciativa) {
     return { ok: false, error: "Creá un proyecto o equipo antes de marcar interés." };
   }

@@ -118,15 +118,8 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
 
   return (
     <main className="px-5 py-5">
-      {/* #142: "Buscar talento" salió de la barra inferior; su acceso vive acá. */}
-      <Link
-        href="/talentos"
-        data-tour="buscar-talento"
-        className="brillo-accion mb-4 flex items-center justify-center gap-1.5 rounded-full bg-accion px-4 py-3 text-sm font-semibold text-accion-texto transition hover:brightness-110"
-      >
-        <Icono nombre="buscar" className="h-4 w-4" />
-        Buscar talento
-      </Link>
+      {/* #294: «Buscar talento» vive dentro de cada Proyecto y en el panel del Equipo —se
+          busca para algo concreto—, no arriba de todo. */}
       <PanelesIniciativa
         modoInicial={hayEquipoActivo ? "equipo" : "proyecto"}
         panelProyecto={panelProyecto}

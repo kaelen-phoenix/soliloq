@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
@@ -289,6 +290,13 @@ export function GestionEquipo({
           form
         ) : (
           <>
+            <Link
+              href={`/talentos?equipo=${equipo.id}`}
+              className="brillo-accion mt-4 flex max-w-sm items-center justify-center gap-1.5 rounded-full bg-accion px-4 py-3 text-sm font-semibold text-accion-texto transition hover:brightness-110"
+            >
+              <Icono nombre="buscar" className="h-4 w-4" />
+              Buscar talento para este equipo
+            </Link>
             <div className="mt-4 flex flex-wrap gap-2">
               <button
                 type="button"
