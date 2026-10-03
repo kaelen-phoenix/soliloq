@@ -27,6 +27,8 @@ export function PestanasMatches({
     <button
       type="button"
       role="tab"
+      id={`pestana-matches-${p}`}
+      aria-controls="panel-matches"
       aria-selected={pestana === p}
       onClick={() => setPestana(p)}
       className={`flex-1 rounded-full px-3 py-2 text-sm font-medium transition-colors ${
@@ -48,7 +50,7 @@ export function PestanasMatches({
         {tab("proyectos", "Mis proyectos", cantidadProyectos)}
         {tab("talento", "Donde hice match", cantidadTalento)}
       </div>
-      <div role="tabpanel">{pestana === "proyectos" ? panelProyectos : panelTalento}</div>
+      <div role="tabpanel" id="panel-matches" aria-labelledby={`pestana-matches-${pestana}`}>{pestana === "proyectos" ? panelProyectos : panelTalento}</div>
     </>
   );
 }

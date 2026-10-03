@@ -6,7 +6,7 @@ import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 import { ModalNuevoMatch } from "@/components/convocatorias/modal-nuevo-match";
 import { MisMatchesTalento, type FilaMatchTalento } from "@/components/convocatorias/mis-matches-talento";
 import { PestanasMatches } from "@/components/convocatorias/pestanas-matches";
-import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 export const metadata = { title: "Matches — Yalope" };
 
@@ -119,8 +119,9 @@ export default async function MatchesPage() {
   }));
   const filasCreador = [...filasMatches, ...filasConvocados];
 
-  // #304: arranca en la pestaña que tiene algo; si ninguna, en la de proyectos solo si tiene.
-  const { tienePerfilCreador } = await estadoCuentaDeLaRequest(user.id);
+  // #304: arranca en la pestaña que tiene algo; si ninguna, en la de proyectos solo si tiene
+  // uno abierto (la fila de Creador queda aunque haya borrado todos).
+  const tienePerfilCreador = iniciativa != null;
   const inicial =
     filasCreador.length > 0
       ? "proyectos"
