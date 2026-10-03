@@ -55,7 +55,7 @@ export function EspacioDiscord({
   }
   if (url) {
     return (
-      <a href="/api/discord/vincular" className={pildora} title="Vinculá tu cuenta para entrar al espacio privado del grupo">
+      <a href={`/api/discord/vincular?volver=/salas/${salaId}`} className={pildora} title="Vinculá tu cuenta para entrar al espacio privado del grupo">
         Vinculá tu Discord
       </a>
     );

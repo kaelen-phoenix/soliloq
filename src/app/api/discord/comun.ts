@@ -9,3 +9,9 @@ export const SITIO = "https://yalope.com";
 export function redirectDiscord() {
   return `${SITIO}/api/discord/callback`;
 }
+
+/** Adónde volver después de vincular (#296): solo un chat de la app, para no abrir una
+ *  redirección a cualquier lado. */
+export function destinoVuelta(valor: string | null | undefined): string | null {
+  return valor && /^\/salas\/[0-9a-f-]{36}$/.test(valor) ? valor : null;
+}
