@@ -1,12 +1,9 @@
 import { Esqueleto, PantallaCargando } from "@/components/ui/esqueleto";
 
 /**
- * Fallback del segmento `(app)`: cubre la home —el feed del talento o el tablero del
- * creador— y cualquier ruta anidada que no traiga su propio `loading.tsx`.
- *
- * Por eso la forma es deliberadamente neutra: una franja de controles y un bloque grande.
- * Sirve tanto para la pila de tarjetas como para un listado sin mentirle a ninguno de los
- * dos. Las pantallas de más tránsito tienen el suyo, más parecido a lo que va a aparecer.
+ * Fallback de `/proyectos` (#288): mientras llega el tablero de Proyectos y Equipos propios.
+ * Forma neutra —una franja de controles y un bloque grande— porque según el caso aparece el
+ * formulario para armar el primero, el listado o el panel del equipo.
  */
 export default function Cargando() {
   return (
