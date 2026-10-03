@@ -875,6 +875,24 @@ export interface Database {
           mostrado_en: string | null;
         }[];
       };
+      /** Matches propios del lado del Talento, con estado (#298, 0099). */
+      mis_matches_como_talento: {
+        Args: Record<string, never>;
+        Returns: {
+          match_id: string;
+          es_equipo: boolean;
+          obra_id: string | null;
+          iniciativa_titulo: string;
+          iniciativa_foto: string | null;
+          creador_nombre: string | null;
+          expira_en: string;
+          estado: "match" | "convocado" | "en_sala";
+          convocatoria_id: string | null;
+          sala_id: string | null;
+        }[];
+      };
+      /** El Talento se baja de un match o convocatoria pendiente (#298, 0099). */
+      retirarme_de_match: { Args: { p_match_id: string }; Returns: undefined };
       /** El Creador cierra el aviso de un Match nuevo (issue #194). Idempotente. */
       marcar_match_mostrado: { Args: { p_match_id: string }; Returns: undefined };
       /** Salas propias con mensajes de otros sin leer (#216); solo vienen las que tienen alguno. */

@@ -18,15 +18,13 @@ import { esActivo, idTourNav, itemsParaNavegacion } from "./items-navegacion";
  * según el tamaño de pantalla, que es el bug clásico de este patrón.
  */
 export function BarraLateral({
-  tieneProyectos = false,
   esAdmin = false,
 }: {
-  tieneProyectos?: boolean;
   esAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
-  const items = itemsParaNavegacion({ tieneProyectos, esAdmin });
+  const items = itemsParaNavegacion({ esAdmin });
   const { total: noLeidos } = useNoLeidos();
 
   return (

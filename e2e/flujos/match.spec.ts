@@ -250,4 +250,33 @@ test.describe("circuito de match (UI)", () => {
 
     await creadorCtx.close();
   });
+
+  test("el Talento ve su match en Matches y se retira (#298)", async ({ page }) => {
+    const sufijo = Date.now();
+    const tituloObra = `Obra Retiro E2E ${sufijo}`;
+    const talento = await nuevoUsuario();
+    const creador = await nuevoUsuario();
+    await sembrarTalento(talento.id, `Talento Retiro E2E ${sufijo}`);
+    await sembrarCreadorConObra(creador.id, "Creador Retiro E2E", tituloObra);
+    const { data: obra } = await admin!.from("obras").select("id").eq("creador_id", creador.id).single();
+    // Interés mutuo sembrado: el trigger arma el match.
+    const { error } = await admin!.from("intereses_match").insert([
+      { de_perfil: talento.id, a_perfil: creador.id, obra_id: obra!.id, interesa: true },
+      { de_perfil: creador.id, a_perfil: talento.id, obra_id: obra!.id, interesa: true },
+    ]);
+    if (error) throw error;
+
+    await login(page, talento.email);
+    await page.getByRole("link", { name: "Matches" }).first().click();
+    await page.waitForURL(/\/matches$/);
+    await expect(page.getByRole("heading", { name: "Donde hiciste match" })).toBeVisible({ timeout: 10_000 });
+    const fila = page.locator("li", { hasText: tituloObra });
+    await expect(fila).toBeVisible();
+    await fila.getByRole("button", { name: "Retirarme" }).click();
+    await fila.getByRole("button", { name: "Sí, retirarme" }).click();
+    await expect(page.locator("li", { hasText: tituloObra })).toHaveCount(0, { timeout: 10_000 });
+
+    const { data: m } = await admin!.from("matches").select("descartado_en").eq("talento_id", talento.id).single();
+    expect(m?.descartado_en).not.toBeNull();
+  });
 });
