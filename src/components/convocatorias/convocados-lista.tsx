@@ -127,7 +127,7 @@ export function ConvocadosLista({
   return (
     <section className="mt-2">
       <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-        Matches ({filas.length})
+        {filas.length} {filas.length === 1 ? "persona" : "personas"}
       </h2>
       {error && !eligiendoRol && <p className="mt-1 text-xs text-error-600">{error}</p>}
       <ul className="mt-2 flex flex-col gap-2">

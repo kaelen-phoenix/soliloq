@@ -7,7 +7,7 @@ import { Superposicion } from "@/components/ui/superposicion";
 import { PerfilTalentoDetalle, type TalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 
 /**
- * Placa de perfil reutilizable: sala de chat (#149) y Call Back / Convocados (#151). Pide
+ * Placa de perfil reutilizable: sala de chat (#149) y Matches / Convocados (#151). Pide
  * el perfil client-side en vez de navegar a `/talentos/[id]`, así quien mira no pierde el
  * contexto (la conversación, la posición en la lista). RLS resuelve el acceso según por qué
  * corresponda verlo (compañero de sala, match, o el buscador de talento) — no hace falta que
@@ -20,7 +20,7 @@ export function PlacaPerfilTalento({
 }: {
   talentoId: string;
   onCerrar: () => void;
-  /** #149 pide "Aceptar" en la sala de chat; #151 pide "Cerrar" en Call Back. */
+  /** #149 pide "Aceptar" en la sala de chat; #151 pide "Cerrar" en Matches. */
   textoBoton?: string;
 }) {
   const [talento, setTalento] = useState<TalentoDetalle | null>(null);

@@ -6,7 +6,7 @@ import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 import { ModalNuevoMatch } from "@/components/convocatorias/modal-nuevo-match";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
-export const metadata = { title: "Call Back — Yalope" };
+export const metadata = { title: "Matches — Yalope" };
 
 export default async function MatchesPage() {
   const supabase = createClient();
@@ -62,7 +62,7 @@ export default async function MatchesPage() {
   }));
 
   // Aviso de "¡Tenés un Match!" (#194): uno por match, la primera vez que este Creador
-  // entra a Call Back después de que se generó.
+  // entra a Matches después de que se generó.
   const nuevos = (matches ?? [])
     .filter((m) => !m.mostrado_en)
     .map((m) => ({

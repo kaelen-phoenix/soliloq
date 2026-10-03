@@ -18,8 +18,8 @@ export interface MatchNuevo {
 
 /**
  * Aviso de "¡Tenés un Match!" (issue #194): aparece solo, una vez por match, al entrar a
- * Call Back. Cerrarlo (con "Listo" o con Esc/click afuera) no mueve nada de estado — el
- * match ya está en Call Back por el solo hecho de existir — solo marca el aviso como visto
+ * Matches. Cerrarlo (con "Listo" o con Esc/click afuera) no mueve nada de estado — el
+ * match ya está en Matches por el solo hecho de existir — solo marca el aviso como visto
  * para que no vuelva a aparecer. Con varios matches nuevos, se muestran de a uno.
  */
 export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {

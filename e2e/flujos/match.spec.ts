@@ -208,14 +208,14 @@ test.describe("circuito de match (UI)", () => {
     // `exact` porque si no, "Me interesa" matchea por substring dentro de "No me interesa".
     await creadorPage.getByRole("button", { name: "Me interesa", exact: true }).click();
 
-    // La cerramos con "Ahora no" a propósito: el circuito completo se sigue desde Call Back
-    // (si tocara "Convocar" acá, iría a Call Back igual, pero queremos ver el aviso solo).
+    // La cerramos con "Ahora no" a propósito: el circuito completo se sigue desde Matches
+    // (si tocara "Convocar" acá, iría a Matches igual, pero queremos ver el aviso solo).
     const placaInteres = creadorPage.getByRole("dialog", { name: "Hay interés" });
     await expect(placaInteres).toBeVisible({ timeout: 10_000 });
     await placaInteres.getByRole("button", { name: "Ahora no" }).click();
     await expect(placaInteres).toBeHidden();
 
-    // 3. El aviso "¡Tenés un Match!" (#194) aparece solo, la primera vez que entra a Call Back.
+    // 3. El aviso "¡Tenés un Match!" (#194) aparece solo, la primera vez que entra a Matches.
     await creadorPage.goto("/matches");
     const avisoMatch = creadorPage.getByRole("dialog", { name: "Nuevo match" });
     await expect(avisoMatch).toBeVisible({ timeout: 10_000 });

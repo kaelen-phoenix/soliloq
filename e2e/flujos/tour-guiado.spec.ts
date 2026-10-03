@@ -180,7 +180,7 @@ test.describe("tour guiado (UI)", () => {
     await expect(tour(page)).toBeVisible();
   });
 
-  test("Con Proyectos: el mismo tour, sin modos, y Call Back en la navegación", async ({ page }) => {
+  test("Con Proyectos: el mismo tour, sin modos, y Matches en la navegación", async ({ page }) => {
     const cuenta = await cuentaNueva("Doble Tour", { creador: true });
     await login(page, cuenta.email);
     await page.goto("/");
@@ -189,9 +189,9 @@ test.describe("tour guiado (UI)", () => {
     await tour(page).getByRole("button", { name: "Omitir" }).click();
     await expect(tour(page)).toHaveCount(0);
 
-    // #288: no hay «Cambiar a Creador»; Proyectos y Call Back están siempre a mano.
+    // #288: no hay «Cambiar a Creador»; Proyectos y Matches están siempre a mano.
     await expect(page.getByRole("button", { name: /Cambiar a/ })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Call Back" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Matches" }).first()).toBeVisible();
     await page.getByRole("link", { name: /Proyectos/ }).first().click();
     await page.waitForURL(/\/proyectos$/);
     await expect(tour(page)).toHaveCount(0);

@@ -11,7 +11,7 @@ type Resultado = { ok: true } | { ok: false; error: string };
 /**
  * El Creador cierra el aviso de "¡Tenés un Match!" (issue #194). Solo marca el aviso como
  * visto — no convoca a nadie: el match ya está en
- * Call Back por el solo hecho de existir.
+ * Matches por el solo hecho de existir.
  */
 export async function marcarMatchMostrado(matchId: string): Promise<Resultado> {
   const supabase = createClient();

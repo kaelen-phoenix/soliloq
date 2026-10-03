@@ -104,7 +104,7 @@ export function PilaTalentos({
     siguiente();
   }
 
-  /** Hay match: se convoca desde Call Back, donde está el selector de rol (#287). */
+  /** Hay match: se convoca desde Matches, donde está el selector de rol (#287). */
   function irAConvocar() {
     router.push("/matches");
   }

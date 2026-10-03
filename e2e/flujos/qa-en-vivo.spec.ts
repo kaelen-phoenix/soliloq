@@ -196,7 +196,7 @@ test.describe("QA en vivo (#122, teléfono)", () => {
     await page.waitForURL((u) => !u.pathname.startsWith("/ingresar"), { timeout: 30_000 });
   }
 
-  test("Call Back: con el cupo lleno, un match nuevo muestra «Cupo lleno» y no se puede aceptar", async ({
+  test("Matches: con el cupo lleno, un match nuevo muestra «Cupo lleno» y no se puede aceptar", async ({
     page,
   }) => {
     const s = sufijo();
@@ -272,7 +272,7 @@ test.describe("QA en vivo (#122, teléfono)", () => {
     await expect(page.getByText(`Obra donde ya entró ${s}`)).toHaveCount(0);
   });
 
-  test("Estados vacíos: Call Back sin matches y /convocatoria sin convocatorias", async ({ page }) => {
+  test("Estados vacíos: Matches sin matches y /convocatoria sin convocatorias", async ({ page }) => {
     const s = sufijo();
     const creador = await nuevoUsuario(`Creadora Vacía ${s}`, "creador");
     await nuevaObra(creador.id, `Obra vacía ${s}`);
