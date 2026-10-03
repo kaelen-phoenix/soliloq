@@ -100,7 +100,13 @@ export function PilaTalentos({
       const supabase = createClient();
       const { data, error } = await supabase.rpc("mis_matches");
       if (error) reportarErrorSupabase(error, { rpc: "mis_matches", talentoId: t.id });
-      const m = (data ?? []).find((x) => x.talento_id === t.id);
+      // Del mismo talento puede haber un match anterior con otra iniciativa: se mira el de esta.
+      const m = (data ?? []).find(
+        (x) =>
+          x.talento_id === t.id &&
+          x.es_equipo === (iniciativa.tipo === "equipo") &&
+          x.iniciativa_titulo === iniciativa.titulo,
+      );
       if (m) {
         setPlaca({ talento: t, matchId: m.match_id });
         setOcupado(false);
