@@ -409,7 +409,7 @@ test.describe("QA en vivo (#122, teléfono)", () => {
 
     await login(page, cuenta.email);
     await page.goto("/perfil?editar=1");
-    await expect(page.getByText("Te recomendamos tener al menos 3 fotos")).toBeVisible();
+    await expect(page.getByText("Te recomendamos 3 fotos o más")).toBeVisible();
     await page
       .getByRole("group", { name: /Perfil artístico como Creador/ })
       .getByRole("button", { name: "Dirección", exact: true })

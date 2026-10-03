@@ -42,7 +42,7 @@ export function AccionesObra({
       return;
     }
     if (cantidadFotos < MIN_FOTOS) {
-      setError(`Subí al menos ${MIN_FOTOS} fotos antes de publicar.`);
+      setError(`Subí al menos una foto antes de publicar.`);
       return;
     }
     setCargando(true);
