@@ -62,9 +62,8 @@ export async function mejorarRedaccion(texto: string): Promise<Resultado> {
         temperature: 0,
         messages: [
           { role: "system", content: INSTRUCCIONES },
-          { role: "user", content: `<texto>
-${entrada}
-</texto>` },
+          // Sin etiquetas propias adentro: nadie cierra el bloque y sigue con instrucciones.
+          { role: "user", content: `<texto>\n${entrada.replace(/<\/?\s*texto\s*>/gi, "")}\n</texto>` },
         ],
       }),
       signal: AbortSignal.timeout(30_000),

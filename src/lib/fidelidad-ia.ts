@@ -34,9 +34,10 @@ function palabras(texto: string, minimo: number): string[] {
 export type Veredicto = { ok: true } | { ok: false; motivo: "sin_datos" | "inventado" };
 
 export function revisarFidelidad(original: string, propuesta: string): Veredicto {
-  const p = normalizar(propuesta);
   // El modelo contesta en vez de reescribir («no encontré información…», «por favor enviá…»).
-  if (/no (se )?encontr|no hay (suficiente )?informacion|no poseo|no (se )?(ha )?proporcion|por favor|envie|envia(me)? |podrias|necesito mas/.test(p)) {
+  // Solo cuenta si la frase no venía ya en el texto de la persona.
+  const pedido = /no (se )?encontr|no hay (suficiente )?informacion|no poseo|no (se )?(ha )?proporcion|por favor|envie|envia(me)? |podrias|necesito mas/;
+  if (pedido.test(normalizar(propuesta)) && !pedido.test(normalizar(original))) {
     return { ok: false, motivo: "sin_datos" };
   }
   if (propuesta.length > original.length * 1.8 + 200) return { ok: false, motivo: "inventado" };
