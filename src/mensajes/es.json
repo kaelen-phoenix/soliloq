@@ -221,11 +221,11 @@
       },
       "meInteresa": {
         "titulo": "Me interesa",
-        "texto": "Tocá el corazón en lo que te interese. Si del otro lado también les interesa tu perfil, hay Match."
+        "texto": "Tocá el corazón en lo que te interese. Si del otro lado también les interesa tu perfil, aparece en Convocatorias."
       },
       "match": {
-        "titulo": "Match y convocatoria",
-        "texto": "Si del otro lado también les interesa, hay Match y lo ves en Convocatorias. Desde ahí te convocan, y si cambiás de idea, te retirás."
+        "titulo": "Convocatorias",
+        "texto": "Cuando el interés es mutuo, lo ves en Convocatorias: desde ahí te convocan, y si cambiás de idea, te retirás."
       },
       "proyectos": {
         "titulo": "Tus proyectos",

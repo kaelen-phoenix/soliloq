@@ -102,7 +102,7 @@ test.describe("tour guiado (UI)", () => {
       "Te damos la bienvenida a Yalope",
       "Explorar",
       "Me interesa",
-      "Match y convocatoria",
+      "Convocatorias",
       "Tus proyectos",
       "Chats",
       "Notificaciones",
