@@ -24,6 +24,7 @@ import {
 import { validarRedes } from "@/lib/redes";
 import { aColumnas, desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
 import { esVideoreelValido } from "@/lib/videoreel";
+import { formatearMientrasSeEscribe, isoATexto, textoAIso } from "@/lib/fecha-escrita";
 import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
 import { importarFotoDeGoogle } from "@/app/completar-perfil/acciones";
 
@@ -103,7 +104,8 @@ export function FormularioTalento({
 }) {
   const router = useRouter();
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? nombreSugerido ?? "");
-  const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales?.fecha_nacimiento ?? "");
+  // Lo que se escribe, «dd/mm/aaaa» (#307); se pasa a ISO al validar y guardar.
+  const [fechaNacimiento, setFechaNacimiento] = useState(isoATexto(datosIniciales?.fecha_nacimiento));
   const [edadVisible, setEdadVisible] = useState(datosIniciales?.edad_visible ?? true);
   const [ubicacion, setUbicacion] = useState<Ubicacion | null>(
     desdeColumnas(datosIniciales) ?? null,
@@ -147,7 +149,10 @@ export function FormularioTalento({
       const b = crudo ? JSON.parse(crudo) : null;
       if (b && typeof b === "object") {
         if (typeof b.nombre === "string" && b.nombre) setNombre(b.nombre);
-        if (typeof b.fechaNacimiento === "string") setFechaNacimiento(b.fechaNacimiento);
+        if (typeof b.fechaNacimiento === "string") {
+          // Borradores de antes de #307 la guardaban en ISO.
+          setFechaNacimiento(/^\d{4}-/.test(b.fechaNacimiento) ? isoATexto(b.fechaNacimiento) : b.fechaNacimiento);
+        }
         if (typeof b.edadVisible === "boolean") setEdadVisible(b.edadVisible);
         if (esUbicacion(b.ubicacion)) setUbicacion(b.ubicacion);
         if (typeof b.genero === "string") setGenero(b.genero);
@@ -244,12 +249,15 @@ export function FormularioTalento({
     const nuevos: Record<string, string> = {};
 
     if (nombre.trim().length < 2) nuevos.nombre = "Ingresá tu nombre.";
+    const fechaIso = textoAIso(fechaNacimiento);
     if (!fechaNacimiento) {
       nuevos.fecha_nacimiento = "Ingresá tu fecha de nacimiento.";
+    } else if (!fechaIso) {
+      nuevos.fecha_nacimiento = "Escribila así: día/mes/año, por ejemplo 07/05/1995.";
     } else {
       const hace16 = new Date();
       hace16.setFullYear(hace16.getFullYear() - 16);
-      if (new Date(fechaNacimiento) > hace16) {
+      if (new Date(fechaIso) > hace16) {
         nuevos.fecha_nacimiento = "La plataforma es para mayores de 16 años.";
       }
     }
@@ -312,7 +320,7 @@ export function FormularioTalento({
 
     const campos = {
       nombre: nombre.trim(),
-      fecha_nacimiento: fechaNacimiento,
+      fecha_nacimiento: textoAIso(fechaNacimiento)!,
       edad_visible: edadVisible,
       ...aColumnas(ubicacion!),
       genero: genero as Genero,
@@ -406,9 +414,12 @@ export function FormularioTalento({
           <CampoTexto
             id="fecha_nacimiento"
             etiqueta="Fecha de nacimiento"
-            type="date"
+            inputMode="numeric"
+            autoComplete="bday"
+            placeholder="dd/mm/aaaa"
+            maxLength={10}
             value={fechaNacimiento}
-            onChange={(e) => setFechaNacimiento(e.target.value)}
+            onChange={(e) => setFechaNacimiento(formatearMientrasSeEscribe(e.target.value))}
             error={errores.fecha_nacimiento}
           />
           <ToggleVisibilidad
