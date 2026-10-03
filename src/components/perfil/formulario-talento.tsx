@@ -25,6 +25,7 @@ import { validarRedes } from "@/lib/redes";
 import { aColumnas, desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
 import { esVideoreelValido } from "@/lib/videoreel";
 import { formatearMientrasSeEscribe, isoATexto, textoAIso } from "@/lib/fecha-escrita";
+import { MejorarRedaccion } from "./mejorar-redaccion";
 import { FOTOS_RECOMENDADAS, MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
 import { importarFotoDeGoogle } from "@/app/completar-perfil/acciones";
 
@@ -552,6 +553,7 @@ export function FormularioTalento({
                 placeholder="Contá tu formación, obras en las que participaste, etc."
               />
               <p className="text-right text-xs text-texto-tenue">{experiencia.length}/2000</p>
+              <MejorarRedaccion texto={experiencia} onUsar={setExperiencia} />
             </div>
 
             <div className="flex flex-wrap gap-2">

@@ -895,6 +895,8 @@ export interface Database {
       retirarme_de_match: { Args: { p_match_id: string }; Returns: undefined };
       /** El Creador cierra el aviso de un Match nuevo (issue #194). Idempotente. */
       marcar_match_mostrado: { Args: { p_match_id: string }; Returns: undefined };
+      /** Anota un uso de IA y rechaza pasado el tope diario (#313, 0100). */
+      consumir_uso_ia: { Args: Record<string, never>; Returns: undefined };
       /** Salas propias con mensajes de otros sin leer (#216); solo vienen las que tienen alguno. */
       /** La fila propia entera de `perfiles_talento`, con las columnas privadas (#255, 0089). */
       mi_perfil_talento: {
