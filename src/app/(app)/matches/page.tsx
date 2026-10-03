@@ -5,7 +5,8 @@ import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 import { ModalNuevoMatch } from "@/components/convocatorias/modal-nuevo-match";
 import { MisMatchesTalento, type FilaMatchTalento } from "@/components/convocatorias/mis-matches-talento";
-import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
+import { PestanasMatches } from "@/components/convocatorias/pestanas-matches";
+import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
 export const metadata = { title: "Matches — Yalope" };
 
@@ -118,21 +119,52 @@ export default async function MatchesPage() {
   }));
   const filasCreador = [...filasMatches, ...filasConvocados];
 
+  // #304: arranca en la pestaña que tiene algo; si ninguna, en la de proyectos solo si tiene.
+  const { tienePerfilCreador } = await estadoCuentaDeLaRequest(user.id);
+  const inicial =
+    filasCreador.length > 0
+      ? "proyectos"
+      : filasTalento.length > 0 || !tienePerfilCreador
+        ? "talento"
+        : "proyectos";
+
   return (
-    <main className="flex flex-col gap-7 px-5 py-5">
-      <p className="text-sm text-texto-tenue">
+    <main className="px-5 py-5">
+      <p className="mb-5 text-sm text-texto-tenue">
         Interés mutuo: cuando a vos y a la otra parte les interesa, aparece acá.
       </p>
 
-      {filasCreador.length === 0 && filasTalento.length === 0 && (
-        <EstadoVacio
-          icono="corazon"
-          titulo="Todavía no hay matches"
-          detalle="Marcá «Me interesa» en Explorar, o buscá talento para tu proyecto. Cuando el interés es mutuo, aparece acá."
-        />
-      )}
-      {filasCreador.length > 0 && <ConvocadosLista filas={filasCreador} roles={roles} />}
-      {filasTalento.length > 0 && <MisMatchesTalento filas={filasTalento} />}
+      <PestanasMatches
+        inicial={inicial}
+        cantidadProyectos={filasCreador.length}
+        cantidadTalento={filasTalento.length}
+        panelProyectos={
+          filasCreador.length > 0 ? (
+            <ConvocadosLista filas={filasCreador} roles={roles} />
+          ) : (
+            <EstadoVacio
+              icono="corazon"
+              titulo="Todavía no hay matches"
+              detalle={
+                tienePerfilCreador
+                  ? "Buscá talento desde tu proyecto o equipo. Cuando alguien que te interesa también lo marca, aparece acá para convocarlo."
+                  : "Cuando armes un proyecto o equipo y busques talento, acá vas a ver a quién convocar."
+              }
+            />
+          )
+        }
+        panelTalento={
+          filasTalento.length > 0 ? (
+            <MisMatchesTalento filas={filasTalento} />
+          ) : (
+            <EstadoVacio
+              icono="corazon"
+              titulo="Todavía no hay matches"
+              detalle="Marcá «Me interesa» en Explorar. Si del otro lado también les interesa tu perfil, aparece acá."
+            />
+          )
+        }
+      />
 
       <ModalNuevoMatch nuevos={nuevos} />
     </main>

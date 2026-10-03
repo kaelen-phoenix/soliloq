@@ -126,11 +126,8 @@ export function ConvocadosLista({
 
   return (
     <section>
-      <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-        Para tus proyectos ({filas.length})
-      </h2>
-      {error && !eligiendoRol && <p className="mt-1 text-xs text-error-600">{error}</p>}
-      <ul className="mt-2 flex flex-col gap-2">
+      {error && !eligiendoRol && <p className="mb-2 text-xs text-error-600">{error}</p>}
+      <ul className="flex flex-col gap-2">
         {filas.map((f) => (
           <li
             key={f.matchId}

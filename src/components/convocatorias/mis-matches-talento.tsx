@@ -57,11 +57,8 @@ export function MisMatchesTalento({ filas: iniciales }: { filas: FilaMatchTalent
 
   return (
     <section>
-      <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-        Donde hiciste match
-      </h2>
-      {error && <p className="mt-1 text-xs text-error-600">{error}</p>}
-      <ul className="mt-2 flex flex-col gap-2">
+      {error && <p className="mb-2 text-xs text-error-600">{error}</p>}
+      <ul className="flex flex-col gap-2">
         {filas.map((f) => {
           const titulo = (
             <span className="block truncate text-sm font-medium text-texto">{f.titulo}</span>

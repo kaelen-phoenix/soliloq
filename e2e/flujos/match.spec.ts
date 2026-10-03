@@ -193,6 +193,15 @@ test.describe("circuito de match (UI)", () => {
     await page.goto("/");
     await expect(page.getByText(tituloObra)).toBeVisible({ timeout: 15_000 });
     await page.getByRole("button", { name: "Postularme" }).click();
+    // Que el interés del Talento ya esté guardado: si no, el del Creador llega primero, no
+    // hay match todavía y la placa «Hay interés» no aparece (pasaba con varios specs en paralelo).
+    await expect
+      .poll(
+        async () =>
+          (await admin!.from("intereses_match").select("id").eq("de_perfil", talento.id)).data?.length ?? 0,
+        { timeout: 10_000 },
+      )
+      .toBe(1);
 
     // 2. El Creador entra en su propia sesión (otro contexto de navegador), ve al Talento en
     // `/talentos` y marca "Me interesa". Como el interés ya era mutuo, el match se genera en
@@ -269,7 +278,7 @@ test.describe("circuito de match (UI)", () => {
     await login(page, talento.email);
     await page.getByRole("link", { name: "Matches" }).first().click();
     await page.waitForURL(/\/matches$/);
-    await expect(page.getByRole("heading", { name: "Donde hiciste match" })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("tab", { name: /Donde hice match/, selected: true })).toBeVisible({ timeout: 10_000 });
     const fila = page.locator("li", { hasText: tituloObra });
     await expect(fila).toBeVisible();
     await fila.getByRole("button", { name: "Retirarme" }).click();
