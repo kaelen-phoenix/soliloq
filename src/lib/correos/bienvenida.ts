@@ -16,7 +16,8 @@ export function mailBienvenida(opciones: { discord?: string | null } = {}) {
     ],
     botones: [
       { href: `${SITIO}/ingresar`, texto: "Entrar a Yalope", primario: true },
-      { href: `${SITIO}/bienvenida`, texto: "Conocé cómo funciona" },
+      // Abre el recorrido guiado; sin sesión, la portada que explica cómo funciona.
+      { href: `${SITIO}/?tour=1`, texto: "Conocé cómo funciona" },
     ],
     lista: {
       titulo: "Para arrancar con todo",

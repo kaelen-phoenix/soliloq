@@ -20,7 +20,7 @@ export interface FilaMatchTalento {
 }
 
 const CHIP: Record<FilaMatchTalento["estado"], { texto: string; clase: string }> = {
-  match: { texto: "Match", clase: "bg-fondo-sutil text-texto-tenue" },
+  match: { texto: "Interés mutuo", clase: "bg-fondo-sutil text-texto-tenue" },
   convocado: { texto: "Te convocaron", clase: "bg-alerta-50 text-alerta-800" },
   en_sala: { texto: "En el chat", clase: "bg-accion text-accion-texto" },
 };

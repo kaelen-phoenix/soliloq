@@ -191,7 +191,7 @@ test.describe("tour guiado (UI)", () => {
 
     // #288: no hay «Cambiar a Creador»; Proyectos y Matches están siempre a mano.
     await expect(page.getByRole("button", { name: /Cambiar a/ })).toHaveCount(0);
-    await expect(page.getByRole("link", { name: "Matches" }).first()).toBeVisible();
+    await expect(page.getByRole("link", { name: "Convocatorias" }).first()).toBeVisible();
     await page.getByRole("link", { name: /Proyectos/ }).first().click();
     await page.waitForURL(/\/proyectos$/);
     await expect(tour(page)).toHaveCount(0);

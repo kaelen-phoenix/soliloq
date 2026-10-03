@@ -276,9 +276,9 @@ test.describe("circuito de match (UI)", () => {
     if (error) throw error;
 
     await login(page, talento.email);
-    await page.getByRole("link", { name: "Matches" }).first().click();
+    await page.getByRole("link", { name: "Convocatorias" }).first().click();
     await page.waitForURL(/\/matches$/);
-    await expect(page.getByRole("tab", { name: /Donde hice match/, selected: true })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("tab", { name: /Mis convocatorias/, selected: true })).toBeVisible({ timeout: 10_000 });
     const fila = page.locator("li", { hasText: tituloObra });
     await expect(fila).toBeVisible();
     await fila.getByRole("button", { name: "Retirarme" }).click();
