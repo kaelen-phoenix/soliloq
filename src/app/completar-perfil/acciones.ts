@@ -4,6 +4,8 @@ import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import * as Sentry from "@sentry/nextjs";
 
+const MAX_BYTES = 5 * 1024 * 1024;
+
 type Resultado =
   | { ok: true; storage_path: string; url: string }
   | { ok: false; error: string };
@@ -39,11 +41,26 @@ export async function importarFotoDeGoogle(): Promise<Resultado> {
 
   let imagen: Blob;
   try {
-    const r = await fetch(origen, { signal: AbortSignal.timeout(10_000) });
+    // Sin seguir redirecciones: solo se baja de la URL de Google ya validada.
+    const r = await fetch(origen, { signal: AbortSignal.timeout(10_000), redirect: "error" });
     const tipo = r.headers.get("content-type") ?? "";
     if (!r.ok || !tipo.startsWith("image/")) throw new Error(`HTTP ${r.status} ${tipo}`);
-    imagen = await r.blob();
-    if (imagen.size > 5 * 1024 * 1024) throw new Error("demasiado grande");
+    if (Number(r.headers.get("content-length") ?? 0) > MAX_BYTES) throw new Error("demasiado grande");
+    // Se lee cortando al pasar el tope, aunque el servidor no haya mandado el largo.
+    const partes: Uint8Array<ArrayBuffer>[] = [];
+    let total = 0;
+    const lector = r.body!.getReader();
+    for (;;) {
+      const { done, value } = await lector.read();
+      if (done) break;
+      total += value.length;
+      if (total > MAX_BYTES) {
+        await lector.cancel();
+        throw new Error("demasiado grande");
+      }
+      partes.push(value as Uint8Array<ArrayBuffer>);
+    }
+    imagen = new Blob(partes, { type: tipo });
   } catch {
     return { ok: false, error: "No pudimos traer tu foto de Google. Subila desde el celular." };
   }

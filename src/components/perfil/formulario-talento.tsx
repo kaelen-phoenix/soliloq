@@ -31,6 +31,32 @@ import { importarFotoDeGoogle } from "@/app/completar-perfil/acciones";
  *  a otra app (a copiar un link, a la cámara) puede cerrar la página, y se perdía todo. */
 const claveBorrador = (userId: string) => `yalope-alta-perfil-${userId}`;
 
+// El borrador sale del navegador: se valida la forma antes de usarlo.
+function esUbicacion(u: unknown): u is Ubicacion {
+  const x = u as Record<string, unknown> | null;
+  return (
+    !!x &&
+    typeof x.texto === "string" &&
+    typeof x.publica === "string" &&
+    typeof x.pais === "string" &&
+    Number.isFinite(x.lat) &&
+    Number.isFinite(x.lng)
+  );
+}
+
+function esFotoPendiente(f: unknown, userId: string): f is FotoTalento {
+  const x = f as Record<string, unknown> | null;
+  return (
+    !!x &&
+    typeof x.id === "string" &&
+    typeof x.storage_path === "string" &&
+    x.storage_path.startsWith(`${userId}/`) &&
+    Number.isInteger(x.orden) &&
+    typeof x.url === "string" &&
+    x.enBd === false
+  );
+}
+
 interface DatosIniciales {
   nombre: string;
   /** `null` en cuentas migradas sin ese dato (issue #175): el formulario lo sigue pidiendo. */
@@ -123,7 +149,7 @@ export function FormularioTalento({
         if (typeof b.nombre === "string" && b.nombre) setNombre(b.nombre);
         if (typeof b.fechaNacimiento === "string") setFechaNacimiento(b.fechaNacimiento);
         if (typeof b.edadVisible === "boolean") setEdadVisible(b.edadVisible);
-        if (b.ubicacion) setUbicacion(b.ubicacion);
+        if (esUbicacion(b.ubicacion)) setUbicacion(b.ubicacion);
         if (typeof b.genero === "string") setGenero(b.genero);
         if (typeof b.generoDescripcion === "string") setGeneroDescripcion(b.generoDescripcion);
         if (typeof b.videoreelUrl === "string") setVideoreelUrl(b.videoreelUrl);
@@ -132,7 +158,10 @@ export function FormularioTalento({
         if (b.redes && typeof b.redes === "object") setRedes(b.redes);
         if (typeof b.apareceEnBuscador === "boolean") setApareceEnBuscador(b.apareceEnBuscador);
         // Las fotos del alta ya están en Storage: alcanza con recordar dónde.
-        if (Array.isArray(b.fotos) && b.fotos.length > 0) setFotos(b.fotos);
+        if (Array.isArray(b.fotos)) {
+          const validas = b.fotos.filter((f: unknown) => esFotoPendiente(f, userId)).slice(0, 5);
+          if (validas.length > 0) setFotos(validas);
+        }
         if (b.verOpcionales) setVerOpcionales(true);
         // Solo se avisa si había algo cargado de verdad, no solo el nombre precargado.
         setRecuperado(!!(b.fechaNacimiento || b.ubicacion || b.genero || b.fotos?.length));

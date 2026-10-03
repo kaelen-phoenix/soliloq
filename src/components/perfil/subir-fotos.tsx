@@ -49,7 +49,9 @@ export function SubirFotos({
 }: {
   talentoId: string;
   fotos: FotoTalento[];
-  onCambio: (fotos: FotoTalento[]) => void;
+  /** Acepta la lista nueva o una función sobre la anterior (como un `setState`): mientras se
+   *  suben varias, otra foto puede llegar por otro lado (la de Google) y no se tiene que pisar. */
+  onCambio: (fotos: FotoTalento[] | ((prev: FotoTalento[]) => FotoTalento[])) => void;
   persistir: boolean;
 }) {
   const [error, setError] = useState<string | null>(null);
@@ -118,7 +120,12 @@ export function SubirFotos({
         continue;
       }
       actuales = [...actuales, r];
-      onCambio(actuales);
+      onCambio((prev) => {
+        if (prev.length >= MAX_FOTOS) return prev;
+        // En el alta (sin fila en la base todavía) el orden se recalcula sobre lo que hay.
+        const ordenFinal = persistir ? r.orden : prev.reduce((max, f) => Math.max(max, f.orden), -1) + 1;
+        return [...prev, { ...r, orden: ordenFinal }];
+      });
     }
     setSubiendo(false);
     setError(problema);
