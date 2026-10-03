@@ -6,8 +6,7 @@ import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
 import { LogotipoInline } from "@/components/ui/logotipo";
 import { BadgeNoLeidos, useNoLeidos } from "@/components/salas/no-leidos";
-import { idTourNav, itemsParaNavegacion } from "./items-navegacion";
-import type { RolUsuario } from "@/lib/supabase/types";
+import { esActivo, idTourNav, itemsParaNavegacion } from "./items-navegacion";
 
 /**
  * Navegación de escritorio. Es un componente aparte de `BarraNavegacion` en vez de un
@@ -18,10 +17,16 @@ import type { RolUsuario } from "@/lib/supabase/types";
  * Los ítems sí son compartidos: si divergieran, la app tendría dos navegaciones distintas
  * según el tamaño de pantalla, que es el bug clásico de este patrón.
  */
-export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmin?: boolean }) {
+export function BarraLateral({
+  tieneProyectos = false,
+  esAdmin = false,
+}: {
+  tieneProyectos?: boolean;
+  esAdmin?: boolean;
+}) {
   const pathname = usePathname();
   const t = useTranslations("nav");
-  const items = itemsParaNavegacion(rol, { esAdmin });
+  const items = itemsParaNavegacion({ tieneProyectos, esAdmin });
   const { total: noLeidos } = useNoLeidos();
 
   return (
@@ -33,7 +38,7 @@ export function BarraLateral({ rol, esAdmin = false }: { rol: RolUsuario; esAdmi
       <nav className="flex-1">
         <ul className="flex flex-col gap-1">
           {items.map((item) => {
-            const activo = pathname === item.href;
+            const activo = esActivo(pathname, item.href);
             const badge = item.href === "/salas" ? noLeidos : 0;
             return (
               <li key={item.href}>

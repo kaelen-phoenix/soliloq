@@ -6,43 +6,32 @@ import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react
 import { Boton } from "@/components/ui/boton";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import type { RolUsuario } from "@/lib/supabase/types";
 
 /**
- * Tour guiado de la primera vez (#231). Se muestra en la pantalla principal (`/`) de cada
- * experiencia mientras su marca en `perfiles` (0084) esté en null; terminarlo u omitirlo la
+ * Tour guiado de la primera vez (#231). Se muestra en la pantalla principal (`/`)
+ * mientras su marca en `perfiles` (0084) esté en null; terminarlo u omitirlo la
  * escribe y no vuelve a aparecer solo (se puede repetir desde Ajustes).
  *
  * Cada paso señala un elemento real por su `data-tour` (barra de navegación, campanita,
- * «Buscar talento», el corazón del feed). Si ese elemento no está en pantalla —p. ej. el
+ * el corazón del feed). Si ese elemento no está en pantalla —p. ej. el
  * feed vacío no tiene corazón—, el globo sale centrado en vez de apuntar a la nada.
  *
  * Mientras está abierto, una capa atrapa los clics: la app no se usa a medias. Esc = omitir.
  */
 
-type Paso = { clave: string; ancla?: string; soloSiNoVioElOtro?: boolean };
+type Paso = { clave: string; ancla?: string };
 
-const PASOS: Record<RolUsuario, Paso[]> = {
-  talento: [
-    { clave: "bienvenida" },
-    { clave: "explorar", ancla: "nav-inicio" },
-    { clave: "meInteresa", ancla: "me-interesa" },
-    { clave: "match" },
-    { clave: "chats", ancla: "nav-salas" },
-    { clave: "notificaciones", ancla: "campanita" },
-    // El Perfil es compartido: si ya se presentó en el otro tour, no se repite.
-    { clave: "perfil", ancla: "nav-perfil", soloSiNoVioElOtro: true },
-  ],
-  creador: [
-    { clave: "bienvenida" },
-    { clave: "misProyectos", ancla: "nav-inicio" },
-    { clave: "buscar", ancla: "buscar-talento" },
-    { clave: "callBack", ancla: "nav-matches" },
-    { clave: "convocar", ancla: "nav-matches" },
-    { clave: "chats", ancla: "nav-salas" },
-    { clave: "perfil", ancla: "nav-perfil", soloSiNoVioElOtro: true },
-  ],
-};
+// #288: un solo recorrido, sin modos Talento / Creador.
+const PASOS: Paso[] = [
+  { clave: "bienvenida" },
+  { clave: "explorar", ancla: "nav-inicio" },
+  { clave: "meInteresa", ancla: "me-interesa" },
+  { clave: "match" },
+  { clave: "proyectos", ancla: "nav-proyectos" },
+  { clave: "chats", ancla: "nav-salas" },
+  { clave: "notificaciones", ancla: "campanita" },
+  { clave: "perfil", ancla: "nav-perfil" },
+];
 
 const MARGEN = 16;
 const HOLGURA = 6;
@@ -61,14 +50,11 @@ function buscarAncla(id: string): HTMLElement | null {
 
 export function TourGuiado({
   userId,
-  modo,
-  vistoTalento,
-  vistoCreador,
+  visto,
 }: {
   userId: string;
-  modo: RolUsuario;
-  vistoTalento: boolean;
-  vistoCreador: boolean;
+  /** La marca es `tour_talento_visto_en` (0084): desde #288 hay un solo recorrido. */
+  visto: boolean;
 }) {
   const t = useTranslations("tour");
   const pathname = usePathname();
@@ -76,9 +62,7 @@ export function TourGuiado({
   // «Ver el recorrido de nuevo» llega con `?tour=1`: lo abre sin depender de que el layout
   // ya tenga la marca nueva (un `router.refresh()` anterior puede llegar tarde con la vieja).
   const forzado = useSearchParams().get("tour") === "1";
-  const visto = modo === "talento" ? vistoTalento : vistoCreador;
-  const vioElOtro = modo === "talento" ? vistoCreador : vistoTalento;
-  const pasos = PASOS[modo].filter((p) => !(p.soloSiNoVioElOtro && vioElOtro));
+  const pasos = PASOS;
 
   const [cerrado, setCerrado] = useState(false);
   const [listo, setListo] = useState(false);
@@ -107,7 +91,7 @@ export function TourGuiado({
       setCerrado(false);
       setIndice(0);
     }
-  }, [visto, modo, forzado]);
+  }, [visto, forzado]);
 
   const medir = useCallback(() => {
     if (!paso?.ancla) {
@@ -146,18 +130,18 @@ export function TourGuiado({
     const ahora = new Date().toISOString();
     const { error } = await createClient()
       .from("perfiles")
-      .update(modo === "talento" ? { tour_talento_visto_en: ahora } : { tour_creador_visto_en: ahora })
+      .update({ tour_talento_visto_en: ahora, tour_creador_visto_en: ahora })
       .eq("id", userId);
     setGuardando(false);
     if (error) {
-      reportarErrorSupabase(error, { accion: "marcar tour visto", modo });
+      reportarErrorSupabase(error, { accion: "marcar tour visto" });
       setErrorGuardado(true);
       return;
     }
     setCerrado(true);
     if (forzado) router.replace("/");
     router.refresh();
-  }, [guardando, modo, userId, router, forzado]);
+  }, [guardando, userId, router, forzado]);
 
   // Mientras está abierto: Esc = omitir; Tab no sale del globo; y las flechas no llegan a la
   // app — el feed descarta o marca «Me interesa» con ← / →, y eso no puede pasar detrás del
@@ -209,7 +193,7 @@ export function TourGuiado({
   if (!activo || !listo || !paso) return null;
 
   const esUltimo = indice === pasos.length - 1;
-  const base = `${modo}.${paso.clave}`;
+  const base = `pasos.${paso.clave}`;
 
   // Globo: debajo del elemento si entra, si no arriba; centrado en pantalla sin ancla.
   const anchoPantalla = typeof window !== "undefined" ? window.innerWidth : 390;

@@ -5,7 +5,6 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import type { RolUsuario } from "@/lib/supabase/types";
 
 /** Una fila de `salas_no_leidas()` (0082): solo vienen las salas con algo sin leer. */
 export interface FilaNoLeidos {
@@ -16,9 +15,9 @@ export interface FilaNoLeidos {
 }
 
 interface ValorNoLeidos {
-  /** Mensajes sin leer por sala, ya filtrado al modo activo. */
+  /** Mensajes sin leer por sala. */
   porSala: Map<string, number>;
-  /** Suma de todas las salas del modo activo: es el número del badge de "Salas". */
+  /** Suma de todas las salas: es el número del badge de "Chats". */
   total: number;
   /** Sube con cada mensaje nuevo de cualquier sala propia, aunque no cambie el total: la
    *  lista de `/salas` lo usa para refrescar la vista previa y el orden por actividad. */
@@ -40,12 +39,10 @@ const ContextoNoLeidos = createContext<ValorNoLeidos>({
  */
 export function ProveedorNoLeidos({
   userId,
-  modo,
   inicial,
   children,
 }: {
   userId: string;
-  modo: RolUsuario;
   inicial: FilaNoLeidos[];
   children: React.ReactNode;
 }) {
@@ -118,17 +115,15 @@ export function ProveedorNoLeidos({
   const valor = useMemo(() => {
     const porSala = new Map<string, number>();
     for (const f of filas) {
-      // Mismo criterio que `/salas` (#144): las salas de iniciativas propias son del modo
-      // Creador, las demás de iniciativas, del modo Talento; las 1:1, de los dos.
-      const delModo = !f.es_de_iniciativa || (modo === "creador" ? f.es_dueno : !f.es_dueno);
-      if (delModo && f.sala_id !== salaAbierta && f.no_leidos > 0) {
+      // #288: sin modos, cuentan todas las salas (antes se filtraban por Talento/Creador).
+      if (f.sala_id !== salaAbierta && f.no_leidos > 0) {
         porSala.set(f.sala_id, f.no_leidos);
       }
     }
     let total = 0;
     porSala.forEach((n) => (total += n));
     return { porSala, total, revision, marcarLeida };
-  }, [filas, modo, salaAbierta, revision, marcarLeida]);
+  }, [filas, salaAbierta, revision, marcarLeida]);
 
   return <ContextoNoLeidos.Provider value={valor}>{children}</ContextoNoLeidos.Provider>;
 }

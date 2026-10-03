@@ -15,7 +15,7 @@ export async function leerEstadoCuenta(
     supabase
       .from("perfiles")
       .select(
-        "modo_activo, es_admin, suspendido_en, aprobado_en, normas_aceptadas_en, tour_talento_visto_en, tour_creador_visto_en",
+        "es_admin, suspendido_en, aprobado_en, normas_aceptadas_en, tour_talento_visto_en",
       )
       .eq("id", userId)
       .maybeSingle(),

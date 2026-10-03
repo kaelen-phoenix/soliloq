@@ -495,7 +495,7 @@ test.describe("QA en vivo (#122, teléfono)", () => {
     await page.getByRole("button", { name: "Borrar proyecto" }).click();
     await page.getByLabel("Escribí BORRAR para confirmar").fill("BORRAR");
     await page.getByRole("button", { name: "Borrar definitivamente" }).click();
-    await page.waitForURL((u) => u.pathname === "/", { timeout: 15_000 });
+    await page.waitForURL((u) => u.pathname === "/proyectos", { timeout: 15_000 });
 
     const { data } = await admin!.from("obras").select("id").eq("id", obraId);
     expect(data).toHaveLength(0);

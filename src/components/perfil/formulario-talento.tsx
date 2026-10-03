@@ -202,10 +202,9 @@ export function FormularioTalento({
     if (esAlta) {
       // Recién ahora existe la fila de `perfiles_talento` que exige la FK de las fotos.
       await persistirFotosPendientes(userId, fotos);
-      // El perfil recién creado pasa a ser el modo en el que se opera.
       await supabase
         .from("perfiles")
-        .update({ onboarding_completo: true, modo_activo: "talento" })
+        .update({ onboarding_completo: true })
         .eq("id", userId);
       router.replace(destinoAlTerminar ?? "/");
       router.refresh();

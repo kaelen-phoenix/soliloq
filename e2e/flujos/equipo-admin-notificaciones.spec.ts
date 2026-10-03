@@ -123,10 +123,10 @@ test.describe("equipo, admin y notificaciones (UI)", () => {
     await sembrarBase(creador.id, "Creador Equipo E2E", { modoActivo: "creador" });
     await sembrarBase(talento.id, "Talento Equipo E2E", { modoActivo: "talento" });
 
-    // 1. El Creador arma el equipo desde el tablero (`/`), sin pasar por la siembra directa
+    // 1. El Creador arma el equipo desde Mis proyectos (`/proyectos`), sin pasar por la siembra directa
     // que usa `match.spec.ts` para la Obra — acá interesa probar el formulario en sí.
     await login(page, creador.email);
-    await page.goto("/");
+    await page.goto("/proyectos");
     // Sin iniciativa activa el tablero arranca en la pestaña "Armar proyecto".
     await page.getByRole("tab", { name: "Armar equipo" }).click();
     await page.getByRole("button", { name: "Armar un equipo" }).click();

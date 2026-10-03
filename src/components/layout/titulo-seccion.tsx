@@ -2,10 +2,10 @@
 
 import { useTranslations } from "next-intl";
 import { usePathname } from "next/navigation";
-import type { RolUsuario } from "@/lib/supabase/types";
 
 /** El valor es la clave en el namespace `titulos` de los mensajes. */
 const TITULOS: { patron: RegExp; clave: string }[] = [
+  { patron: /^\/proyectos/, clave: "misProyectos" },
   { patron: /^\/matches/, clave: "matches" },
   { patron: /^\/convocatoria/, clave: "convocatoria" },
   { patron: /^\/equipo/, clave: "contacto" },
@@ -22,15 +22,11 @@ const TITULOS: { patron: RegExp; clave: string }[] = [
   { patron: /^\/creadores\/.+/, clave: "perfil" },
 ];
 
-export function TituloSeccion({ modoActivo }: { modoActivo: RolUsuario }) {
+export function TituloSeccion() {
   const pathname = usePathname();
   const t = useTranslations("titulos");
   const coincidencia = TITULOS.find((x) => x.patron.test(pathname));
-  const titulo = coincidencia
-    ? t(coincidencia.clave)
-    : modoActivo === "talento"
-      ? t("convocatorias")
-      : t("misProyectos");
+  const titulo = t(coincidencia ? coincidencia.clave : "convocatorias");
 
   // En `display`: es el título de portada de cada pantalla y lo que le da a la app el
   // registro editorial de la marca. La interfaz (botones, etiquetas, campos) sigue en sans.
