@@ -14,6 +14,7 @@
     "@sentry/nextjs": "^10.75.1",
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.45.4",
+    "@vercel/oidc": "^4.0.0",
     "framer-motion": "^11.11.9",
     "next": "^14.2.15",
     "next-intl": "^3.26.5",
