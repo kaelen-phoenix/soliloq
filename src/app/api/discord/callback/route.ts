@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sincronizarEspaciosDe, sumarAlServidor } from "@/lib/discord-servidor";
-import { redirectDiscord, SITIO } from "../comun";
+import { destinoVuelta, redirectDiscord, SITIO } from "../comun";
 
 /**
  * Vuelta de Discord (#269): verifica el `state`, cambia el código por un token, lee quién es
@@ -12,9 +12,14 @@ import { redirectDiscord, SITIO } from "../comun";
  */
 export async function GET(req: NextRequest) {
   const sitio = SITIO;
+  // Bien vinculado, vuelve al chat de donde salió (#296); los errores se explican en Perfil.
+  const chat = destinoVuelta(req.cookies.get("discord_volver")?.value);
   const volver = (resultado: string) => {
-    const res = NextResponse.redirect(`${sitio}/perfil?discord=${resultado}`);
+    const destino =
+      resultado === "vinculado" && chat ? `${sitio}${chat}` : `${sitio}/perfil?discord=${resultado}`;
+    const res = NextResponse.redirect(destino);
     res.cookies.delete({ name: "discord_estado", path: "/api/discord" });
+    res.cookies.delete({ name: "discord_volver", path: "/api/discord" });
     return res;
   };
 

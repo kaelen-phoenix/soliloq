@@ -1,15 +1,16 @@
-import { NextResponse } from "next/server";
+import { NextResponse, type NextRequest } from "next/server";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { discordConfigurado } from "@/lib/discord-servidor";
-import { redirectDiscord, SITIO } from "../comun";
+import { destinoVuelta, redirectDiscord, SITIO } from "../comun";
 
 /**
  * «Vincular mi Discord» (#269): manda a la pantalla de permiso de Discord. El `state` va en
  * una cookie httpOnly y se compara a la vuelta, para que nadie pueda completar la
- * vinculación de otra persona con un link armado.
+ * vinculación de otra persona con un link armado. Desde un chat llega `?volver=/salas/…`
+ * (#296): se guarda igual, en cookie, y la vuelta termina ahí.
  */
-export async function GET() {
+export async function GET(req: NextRequest) {
   const sitio = SITIO;
   const supabase = createClient();
   const {
@@ -36,5 +37,15 @@ export async function GET() {
     path: "/api/discord",
     maxAge: 600,
   });
+  const volver = destinoVuelta(req.nextUrl.searchParams.get("volver"));
+  if (volver) {
+    res.cookies.set("discord_volver", volver, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "lax",
+      path: "/api/discord",
+      maxAge: 600,
+    });
+  }
   return res;
 }
