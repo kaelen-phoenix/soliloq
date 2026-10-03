@@ -5,32 +5,31 @@ import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
 import { BadgeNoLeidos, useNoLeidos } from "@/components/salas/no-leidos";
-import { idTourNav, itemsParaNavegacion } from "./items-navegacion";
-import type { RolUsuario } from "@/lib/supabase/types";
+import { esActivo, idTourNav, itemsParaNavegacion } from "./items-navegacion";
 
 /**
  * Navegación de teléfono: barra fija abajo, al alcance del pulgar.
  *
  * Desaparece en escritorio, donde el lugar lo toma `BarraLateral`. Los ítems salen de
- * `ITEMS_NAVEGACION`, compartidos con ella.
+ * `itemsParaNavegacion`, compartidos con ella.
  */
 export function BarraNavegacion({
-  rol,
+  tieneProyectos = false,
   esAdmin = false,
 }: {
-  rol: RolUsuario;
+  tieneProyectos?: boolean;
   esAdmin?: boolean;
 }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
-  const items = itemsParaNavegacion(rol, { esAdmin });
+  const items = itemsParaNavegacion({ tieneProyectos, esAdmin });
   const { total: noLeidos } = useNoLeidos();
 
   return (
     <nav className="safe-bottom fixed inset-x-0 bottom-0 z-30 border-t border-borde bg-superficie/85 backdrop-blur-xl lg:hidden">
       <ul className="mx-auto flex max-w-lg items-stretch">
         {items.map((item) => {
-          const activo = pathname === item.href;
+          const activo = esActivo(pathname, item.href);
           const badge = item.href === "/salas" ? noLeidos : 0;
           return (
             <li key={item.href} className="flex-1">

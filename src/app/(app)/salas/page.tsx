@@ -2,7 +2,7 @@ import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ListaSalas } from "@/components/salas/lista-salas";
 import { InvitacionComunidad } from "@/components/comunidad/invitacion-comunidad";
 import { createClient } from "@/lib/supabase/server";
-import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 /** Por cada chat directo, el nombre de quienes no son uno («Perfil sin completar» si no tienen). */
 async function nombresDeLosOtros(
@@ -33,8 +33,6 @@ export default async function SalasPage() {
   const supabase = createClient();
   const user = await usuarioDeLaRequest();
   if (!user) return null;
-
-  const estado = await estadoCuentaDeLaRequest(user.id);
 
   const [{ data: integraciones }, { data: destacados }] = await Promise.all([
     supabase
@@ -86,29 +84,19 @@ export default async function SalasPage() {
     }),
   );
 
-  // #144: la sala de un Proyecto/Equipo propio vive en la experiencia de Creador; las salas
-  // donde participás como Talento, en la de Talento. Las salas 1:1 (sin iniciativa) van en
-  // ambos modos. `modoActivo` ya viene resuelto contra los perfiles que existen.
-  const modo = estado.modoActivo;
-  const salasVisibles = salas.filter((s) =>
-    !s.esDeIniciativa ? true : modo === "creador" ? s.esDueno : !s.esDueno,
-  );
-
+  // #288: sin modos, todas las salas en una lista (antes las de tus Proyectos iban en
+  // Creador y en las que participás, en Talento). La etiqueta dice cuáles son tuyas.
   return (
     <main className="px-5 py-5">
       <InvitacionComunidad variante="compacta" />
-      {salasVisibles.length === 0 ? (
+      {salas.length === 0 ? (
         <EstadoVacio
           icono="salas"
           titulo="Todavía no tenés chats"
-          detalle={
-            modo === "creador"
-              ? "Se abren cuando convocás a alguien a tu proyecto o equipo."
-              : "Se abren cuando te convocan a un proyecto o equipo."
-          }
+          detalle="Se abren cuando convocás a alguien a tu proyecto, o cuando te convocan a uno."
         />
       ) : (
-        <ListaSalas salas={salasVisibles} />
+        <ListaSalas salas={salas} />
       )}
     </main>
   );

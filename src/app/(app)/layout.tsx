@@ -30,7 +30,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   ]);
   if (estado.suspendido) redirect("/suspendido");
   if (!estado.normasAceptadas) redirect("/aceptar-normas");
-  if (!estado.modoActivo) redirect("/completar-perfil");
+  if (!estado.tienePerfilTalento) redirect("/completar-perfil");
   if (errorNoLeidos) reportarErrorSupabase(errorNoLeidos, { rpc: "salas_no_leidas" });
 
   return (
@@ -49,37 +49,24 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     //
     // Lo único que sigue siendo por breakpoint es la navegación, y ahí corresponde: una
     // barra abajo y una lateral no son la misma forma con otro tamaño.
-    // `data-rol` fija el acento de color de toda el área autenticada: encabezado, ítem
-    // de navegación activo y anillo de foco leen `--acento` (ver `globals.css`).
-    <ProveedorNoLeidos
-      userId={user.id}
-      modo={estado.modoActivo}
-      inicial={(noLeidos ?? []) as FilaNoLeidos[]}
-    >
-      <div
-        data-rol={estado.modoActivo}
-        className="min-h-screen pb-20 sm:bg-fondo-sutil sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
+    <ProveedorNoLeidos userId={user.id} inicial={(noLeidos ?? []) as FilaNoLeidos[]}>
+      <div className="min-h-screen pb-20 sm:bg-fondo-sutil sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
       >
         <ActualizarAlVolver />
         <AvisoConvocatoria userId={user.id} />
-        <BarraLateral rol={estado.modoActivo} esAdmin={estado.esAdmin} />
+        <BarraLateral tieneProyectos={estado.tienePerfilCreador} esAdmin={estado.esAdmin} />
 
         <div className="min-w-0 flex-1">
-          <Encabezado userId={user.id} modoActivo={estado.modoActivo} />
+          <Encabezado userId={user.id} />
           <div className="w-full bg-superficie px-0 sm:min-h-[calc(100vh-9rem)]">
             <TransicionPagina>{children}</TransicionPagina>
           </div>
         </div>
 
-        <BarraNavegacion rol={estado.modoActivo} esAdmin={estado.esAdmin} />
+        <BarraNavegacion tieneProyectos={estado.tienePerfilCreador} esAdmin={estado.esAdmin} />
         {/* Suspense: el tour lee `?tour=1` con useSearchParams. */}
         <Suspense fallback={null}>
-          <TourGuiado
-            userId={user.id}
-            modo={estado.modoActivo}
-            vistoTalento={estado.tourTalentoVisto}
-            vistoCreador={estado.tourCreadorVisto}
-          />
+          <TourGuiado userId={user.id} visto={estado.tourVisto} />
         </Suspense>
       </div>
     </ProveedorNoLeidos>

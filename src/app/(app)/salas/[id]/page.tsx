@@ -1,11 +1,7 @@
 import { notFound } from "next/navigation";
-import { getTranslations } from "next-intl/server";
-import { conmutarModo } from "@/app/acciones-modo";
 import { createClient } from "@/lib/supabase/server";
-import { Boton } from "@/components/ui/boton";
-import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { SalaChat, type Integrante } from "@/components/salas/sala-chat";
-import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 import { EspacioDiscord } from "@/components/comunidad/espacio-discord";
 import { discordConfigurado, urlCanal } from "@/lib/discord-servidor";
 
@@ -33,36 +29,8 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
     | null
     | undefined;
 
-  // #206: la sala de un Proyecto/Equipo propio vive en la experiencia de Creador; en la que
-  // participás como Talento (convocado por otra persona), en la de Talento — mismo criterio
-  // que ya aplica la lista en `/salas`. Las salas sin iniciativa (chat directo 1:1) no
-  // distinguen: van en cualquiera de los dos modos.
   const esDeIniciativa = !!(sala.obra_id || sala.equipo_id);
   const esDueno = obra?.creador_id === user.id || equipo?.creador_id === user.id;
-  const estado = await estadoCuentaDeLaRequest(user.id);
-  const perteneceAModoActual =
-    !esDeIniciativa || (estado.modoActivo === "creador" ? esDueno : !esDueno);
-
-  if (!perteneceAModoActual) {
-    const otro = estado.modoActivo === "creador" ? "talento" : "creador";
-    const t = await getTranslations("modo");
-    return (
-      <main className="px-5 py-5">
-        <EstadoVacio
-          icono="cambiar"
-          titulo="Esta sala es de tu otro modo"
-          detalle={`Cambiá a ${t(otro)} para verla. Después la encontrás en Chats, desde ahí.`}
-          accion={
-            <form action={conmutarModo.bind(null, otro)}>
-              <Boton type="submit" variante="secundario">
-                {t("cambiarA", { rol: t(otro) })}
-              </Boton>
-            </form>
-          }
-        />
-      </main>
-    );
-  }
 
   const conDiscord = esDeIniciativa && discordConfigurado();
   const [{ data: mensajes }, { data: integrantesRaw }, { data: miPerfil }] = await Promise.all([

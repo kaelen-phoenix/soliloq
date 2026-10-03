@@ -2,20 +2,18 @@ import { redirect } from "next/navigation";
 import { BuscadorTalento } from "@/components/talento/buscador-talento";
 import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 import { createClient } from "@/lib/supabase/server";
-import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 /**
  * Buscador de talento: la única superficie donde el creador sale a buscar gente por
- * iniciativa propia. Gateada al modo creador —un talento acá no tiene nada que hacer y
- * además la RLS no le daría resultados.
+ * iniciativa propia. Sin modos (#288) cualquiera entra; sin un Proyecto o Equipo activo el
+ * buscador lo avisa, porque no hay a qué iniciativa marcarle el interés.
  */
 export default async function BuscarTalentoPage() {
   const supabase = createClient();
   const user = await usuarioDeLaRequest();
   if (!user) redirect("/ingresar");
 
-  const estado = await estadoCuentaDeLaRequest(user.id);
-  if (estado.modoActivo !== "creador") redirect("/");
 
   // Para el swipe (#124): a qué iniciativa se marca el interés, y su foto para la placa.
   const iniciativa = await iniciativaActivaDelCreador(supabase, user.id);

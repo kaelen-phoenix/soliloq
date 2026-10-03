@@ -1,5 +1,3 @@
-import type { RolUsuario } from "@/lib/supabase/types";
-
 export interface ItemNavegacion {
   href: string;
   /** Clave en el namespace `nav` de los mensajes. */
@@ -22,44 +20,46 @@ export interface ItemNavegacion {
  * son componentes distintos porque son formas distintas, pero leen de acá: si cada una
  * tuviera su lista, la app terminaría con dos navegaciones según el tamaño de pantalla.
  * El rótulo visible sale del namespace `nav` de i18n con `clave` / `claveCorto`.
+ *
+ * #288: una sola app, sin modos Talento / Creador. Todos ven lo mismo: Explorar lo que se
+ * está armando, sus Proyectos, sus Chats y su Perfil. "Salas" se muestra como "Chats" (i18n);
+ * la ruta sigue siendo `/salas`.
  */
-export const ITEMS_NAVEGACION: Record<RolUsuario, ItemNavegacion[]> = {
-  talento: [
-    { href: "/", clave: "convocatorias", claveCorto: "convocatoriasCorto", icono: "feed" },
-    { href: "/salas", clave: "salas", icono: "salas" },
-    { href: "/perfil", clave: "perfil", icono: "perfil" },
-  ],
-  // #217: la acción principal primero y Perfil al final, igual que en Talento (antes, por
-  // #142, Perfil iba primero). "Buscar talento" sale de la barra y se ofrece desde la
-  // pantalla de Proyecto (`TableroCreador`). "Salas" se muestra como "Chats" (i18n); la
-  // ruta sigue siendo `/salas`.
-  creador: [
-    { href: "/", clave: "misProyectos", claveCorto: "misProyectosCorto", icono: "tablero" },
-    { href: "/matches", clave: "matches", icono: "corazon" },
-    { href: "/salas", clave: "salas", icono: "salas" },
-    { href: "/perfil", clave: "perfil", icono: "perfil" },
-  ],
-};
-
-const ITEM_ADMIN: ItemNavegacion = {
-  href: "/admin",
-  clave: "admin",
-  claveCorto: "admin",
-  icono: "admin",
-};
+const EXPLORAR: ItemNavegacion = { href: "/", clave: "convocatorias", claveCorto: "convocatoriasCorto", icono: "feed" };
+const PROYECTOS: ItemNavegacion = { href: "/proyectos", clave: "misProyectos", claveCorto: "misProyectosCorto", icono: "tablero" };
+const CALL_BACK: ItemNavegacion = { href: "/matches", clave: "matches", icono: "corazon" };
+const CHATS: ItemNavegacion = { href: "/salas", clave: "salas", icono: "salas" };
+const PERFIL: ItemNavegacion = { href: "/perfil", clave: "perfil", icono: "perfil" };
+const ADMIN: ItemNavegacion = { href: "/admin", clave: "admin", claveCorto: "admin", icono: "admin" };
 
 /**
- * La lista de navegación para un usuario: la de su rol, más "Admin" al final si lo es.
- * El admin no es un rol (no entra en `ITEMS_NAVEGACION`), es un flag que suma un ítem.
+ * La lista de navegación para un usuario. Call Back aparece recién cuando la persona armó
+ * su primer Proyecto o Equipo (antes no tiene a quién convocar), y "Admin" al final si lo
+ * es: el admin no es un rol, es un flag que suma un ítem.
  */
-export function itemsParaNavegacion(
-  rol: RolUsuario,
-  { esAdmin = false }: { esAdmin?: boolean } = {}
-): ItemNavegacion[] {
-  return esAdmin ? [...ITEMS_NAVEGACION[rol], ITEM_ADMIN] : ITEMS_NAVEGACION[rol];
+export function itemsParaNavegacion({
+  tieneProyectos = false,
+  esAdmin = false,
+}: { tieneProyectos?: boolean; esAdmin?: boolean } = {}): ItemNavegacion[] {
+  return [
+    EXPLORAR,
+    PROYECTOS,
+    ...(tieneProyectos ? [CALL_BACK] : []),
+    CHATS,
+    PERFIL,
+    ...(esAdmin ? [ADMIN] : []),
+  ];
 }
 
 /** Ancla del tour guiado (#231) para un ítem: `nav-inicio`, `nav-salas`, `nav-matches`… */
 export function idTourNav(href: string) {
   return href === "/" ? "nav-inicio" : `nav-${href.slice(1)}`;
+}
+
+/** El ítem queda marcado también en sus pantallas hijas: una sala marca Chats, el buscador
+ *  de talento marca Proyectos. */
+export function esActivo(pathname: string, href: string) {
+  if (href === "/") return pathname === "/";
+  if (href === "/proyectos") return /^\/(proyectos|talentos)(\/|$)/.test(pathname);
+  return pathname === href || pathname.startsWith(`${href}/`);
 }

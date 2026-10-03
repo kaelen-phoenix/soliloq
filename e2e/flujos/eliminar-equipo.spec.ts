@@ -132,8 +132,8 @@ test.describe("eliminar equipo (UI)", () => {
     await page.getByRole("textbox", { name: "Buscar" }).fill(sufijo);
     await expect(page.getByText(nombreTalento)).toHaveCount(0, { timeout: 10_000 });
 
-    // 2. Eliminar el equipo desde el tablero (con equipo activo abre en "Armar equipo").
-    await page.goto("/");
+    // 2. Eliminar el equipo desde Mis proyectos (con equipo activo abre en "Armar equipo").
+    await page.goto("/proyectos");
     await expect(page.getByText(tituloEquipo)).toBeVisible({ timeout: 10_000 });
     await page.getByRole("button", { name: "Eliminar equipo" }).click();
     await page.getByLabel("Escribí BORRAR para confirmar").fill("BORRAR");

@@ -1,10 +1,6 @@
-import type { RolUsuario } from "./supabase/types";
-
 export interface EstadoCuenta {
   tienePerfilTalento: boolean;
   tienePerfilCreador: boolean;
-  /** Modo en el que opera efectivamente, ya corregido contra los perfiles que existen. */
-  modoActivo: RolUsuario | null;
   tieneAmbosPerfiles: boolean;
   /** Flag de administrador de la app (no es un rol). */
   esAdmin: boolean;
@@ -17,19 +13,16 @@ export interface EstadoCuenta {
   aprobado: boolean;
   /** Aceptó las Normas de la Comunidad (issue #180). No es retroactivo. */
   normasAceptadas: boolean;
-  /** Ya vio (u omitió) el tour guiado de cada experiencia (#231, 0084). */
-  tourTalentoVisto: boolean;
-  tourCreadorVisto: boolean;
+  /** Ya vio (u omitió) el tour guiado (#231, 0084). Desde #288 hay uno solo. */
+  tourVisto: boolean;
 }
 
 interface FilaPerfil {
-  modo_activo: RolUsuario | null;
   es_admin?: boolean | null;
   suspendido_en?: string | null;
   aprobado_en?: string | null;
   normas_aceptadas_en?: string | null;
   tour_talento_visto_en?: string | null;
-  tour_creador_visto_en?: string | null;
 }
 
 /**
@@ -42,36 +35,16 @@ export function resolverEstadoCuenta(
   tienePerfilTalento: boolean,
   tienePerfilCreador: boolean
 ): EstadoCuenta {
-  const modoGuardado = perfil?.modo_activo ?? null;
-
-  // El modo `creador` ya no exige que exista la fila de `perfiles_creador`: se activa sola
-  // al crear el primer Proyecto o Equipo (0075), así que entrar a ese modo con las manos
-  // vacías es válido — el tablero muestra el estado inicial para armar el primero. El modo
-  // `talento` sí puede apuntar a un perfil inexistente si se manipuló la base; ahí preferimos
-  // degradar al que sí existe antes que dejar a la persona afuera.
-  const modoEsUsable = modoGuardado === "creador" || (modoGuardado === "talento" && tienePerfilTalento);
-
-  let modoActivo: RolUsuario | null = null;
-  if (modoEsUsable) {
-    modoActivo = modoGuardado;
-  } else if (tienePerfilTalento) {
-    modoActivo = "talento";
-  } else if (tienePerfilCreador) {
-    modoActivo = "creador";
-  }
-
   return {
     tienePerfilTalento,
     tienePerfilCreador,
-    modoActivo,
     tieneAmbosPerfiles: tienePerfilTalento && tienePerfilCreador,
     esAdmin: perfil?.es_admin ?? false,
     suspendido: perfil?.suspendido_en != null,
     aprobado: perfil?.aprobado_en != null,
     normasAceptadas: perfil?.normas_aceptadas_en != null,
     // Sin fila de perfil no hay a quién mostrarle nada: se toma como visto.
-    tourTalentoVisto: perfil ? perfil.tour_talento_visto_en != null : true,
-    tourCreadorVisto: perfil ? perfil.tour_creador_visto_en != null : true,
+    tourVisto: perfil ? perfil.tour_talento_visto_en != null : true,
   };
 }
 

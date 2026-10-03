@@ -1,18 +1,10 @@
-import { TableroCreador } from "@/components/convocatorias/tablero-creador";
 import { FeedTalento } from "@/components/feed/feed-talento";
-import { createClient } from "@/lib/supabase/server";
-import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
+import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
+/** Explorar: lo que se está armando. Los Proyectos propios viven en `/proyectos` (#288). */
 export default async function InicioPage() {
-  const supabase = createClient();
   const user = await usuarioDeLaRequest();
   if (!user) return null;
 
-  const estado = await estadoCuentaDeLaRequest(user.id);
-
-  if (estado.modoActivo === "talento") {
-    return <FeedTalento talentoId={user.id} />;
-  }
-
-  return <TableroCreador creadorId={user.id} />;
+  return <FeedTalento talentoId={user.id} />;
 }

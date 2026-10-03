@@ -103,6 +103,7 @@ test.describe("tour guiado (UI)", () => {
       "Explorar",
       "Me interesa",
       "Match y convocatoria",
+      "Tus proyectos",
       "Chats",
       "Notificaciones",
       "Tu perfil",
@@ -121,9 +122,10 @@ test.describe("tour guiado (UI)", () => {
     }
     await expect(globo).toHaveCount(0);
 
+    // #288: un solo tour; se marcan las dos columnas de 0084.
     await expect.poll(() => marcas(cuenta.id), { timeout: 10_000 }).toEqual({
       talento: true,
-      creador: false,
+      creador: true,
     });
     await page.reload();
     await expect(page.getByRole("link", { name: "Chats" })).toBeVisible({ timeout: 15_000 });
@@ -178,27 +180,21 @@ test.describe("tour guiado (UI)", () => {
     await expect(tour(page)).toBeVisible();
   });
 
-  test("Talento + Creador: cada experiencia tiene su tour y el Perfil no se repite", async ({
-    page,
-  }) => {
+  test("Con Proyectos: el mismo tour, sin modos, y Call Back en la navegación", async ({ page }) => {
     const cuenta = await cuentaNueva("Doble Tour", { creador: true });
     await login(page, cuenta.email);
     await page.goto("/");
     await expect(tour(page)).toBeVisible({ timeout: 15_000 });
-    await expect(tour(page).getByText("Paso 1 de 7")).toBeVisible();
+    await expect(tour(page).getByText("Paso 1 de 8")).toBeVisible();
     await tour(page).getByRole("button", { name: "Omitir" }).click();
-    await expect.poll(() => marcas(cuenta.id), { timeout: 10_000 }).toEqual({
-      talento: true,
-      creador: false,
-    });
+    await expect(tour(page)).toHaveCount(0);
 
-    // Al pasar a Creador aparece el suyo, sin el paso de Perfil (ya se presentó).
-    await page.getByRole("button", { name: "Cambiar a Creador" }).click();
-    await expect(tour(page)).toBeVisible({ timeout: 15_000 });
-    await expect(tour(page).getByRole("heading", { name: "Tu espacio de Creador" })).toBeVisible();
-    await expect(tour(page).getByText("Paso 1 de 6")).toBeVisible();
-    await tour(page).getByRole("button", { name: "Siguiente" }).click();
-    await expect(tour(page).getByRole("heading", { name: "Mis proyectos" })).toBeVisible();
+    // #288: no hay «Cambiar a Creador»; Proyectos y Call Back están siempre a mano.
+    await expect(page.getByRole("button", { name: /Cambiar a/ })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Call Back" }).first()).toBeVisible();
+    await page.getByRole("link", { name: /Proyectos/ }).first().click();
+    await page.waitForURL(/\/proyectos$/);
+    await expect(tour(page)).toHaveCount(0);
   });
 
   test("Ajustes: «Ver el recorrido de nuevo» lo vuelve a mostrar", async ({ page }) => {
@@ -215,6 +211,6 @@ test.describe("tour guiado (UI)", () => {
     await page.getByRole("button", { name: "Ver el recorrido de nuevo" }).click();
     await page.waitForURL((u) => u.pathname === "/", { timeout: 15_000 });
     await expect(tour(page)).toBeVisible({ timeout: 15_000 });
-    await expect(tour(page).getByText("Paso 1 de 7")).toBeVisible();
+    await expect(tour(page).getByText("Paso 1 de 8")).toBeVisible();
   });
 });

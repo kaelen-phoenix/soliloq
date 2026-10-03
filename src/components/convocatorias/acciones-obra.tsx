@@ -84,7 +84,7 @@ export function AccionesObra({
     // Recién con el proyecto borrado se borran sus canales.
     await borrarCanalesDeIniciativa(canales).catch(() => {});
     // Sin `setCargando(false)`: la pantalla ya se va.
-    router.replace("/");
+    router.replace("/proyectos");
     router.refresh();
   }
 

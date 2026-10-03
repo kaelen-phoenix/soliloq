@@ -71,12 +71,9 @@
     --accion-texto: 255 255 255;
   }
 
-  /* Acento. Un único punto de verdad: el layout de `(app)` pone `data-rol` en su
-     contenedor y todo lo que quiera acento lee estas variables (utilidades `acento-*` más
-     abajo, y el anillo de foco).
-     #217: Talento y Creador comparten el acento de marca —la referencia visual es una sola
-     identidad naranja/roja— y el modo se distingue por el rótulo «Estás en…» del
-     encabezado. El mecanismo por rol queda por si algún día vuelven a separarse. En oscuro
+  /* Acento. Un único punto de verdad: todo lo que quiera acento lee estas variables
+     (utilidades `acento-*` más abajo, y el anillo de foco). Desde #288 no hay modos
+     Talento / Creador: una sola app, un solo acento de marca. En oscuro
      el acento es el naranja del isotipo (`brand-400`, 5.8:1 sobre el negro); en claro, el
      rojo (`brand-500`), que sobre blanco lee mejor. */
   :root,

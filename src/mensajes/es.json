@@ -11,7 +11,7 @@
     "guardado": "Guardado"
   },
   "nav": {
-    "convocatorias": "Convocatorias",
+    "convocatorias": "Explorar",
     "convocatoriasCorto": "Explorar",
     "salas": "Chats",
     "perfil": "Perfil",
@@ -39,12 +39,6 @@
     "misProyectos": "Mis proyectos",
     "matches": "Call Back",
     "convocatoria": "Te convocaron"
-  },
-  "modo": {
-    "talento": "Talento",
-    "creador": "Creador",
-    "estasEn": "Estás en {rol}",
-    "cambiarA": "Cambiar a {rol}"
   },
   "landing": {
     "entrar": "Entrar",
@@ -216,7 +210,7 @@
     "entendido": "Entendido",
     "paso": "Paso {n} de {total}",
     "etiqueta": "Recorrido guiado",
-    "talento": {
+    "pasos": {
       "bienvenida": {
         "titulo": "Te damos la bienvenida a Yalope",
         "texto": "En un minuto te mostramos cómo funciona. Podés omitirlo cuando quieras."
@@ -231,49 +225,23 @@
       },
       "match": {
         "titulo": "Match y convocatoria",
-        "texto": "Con el Match, quien armó el proyecto puede convocarte. Si aceptás, entrás a la sala para conversar con el resto."
+        "texto": "Con el Match, quien armó el proyecto puede convocarte. Si aceptás, entrás al chat para conversar con el resto."
+      },
+      "proyectos": {
+        "titulo": "Tus proyectos",
+        "texto": "¿Querés armar algo propio? Creá tu Proyecto o Equipo acá, buscá talento y convocá a quien te interese desde Call Back."
       },
       "chats": {
         "titulo": "Chats",
-        "texto": "Acá están las salas de los Proyectos y Equipos donde participás. Entrá a una para conversar."
+        "texto": "Acá están los chats de los Proyectos y Equipos donde participás, y los de los tuyos."
       },
       "notificaciones": {
         "titulo": "Notificaciones",
-        "texto": "La campanita te avisa de las novedades: un match, una convocatoria o alguien que quiere contactarte."
+        "texto": "La campanita te avisa de las novedades: un match o una convocatoria."
       },
       "perfil": {
         "titulo": "Tu perfil",
         "texto": "Completá y editá tu información personal y artística. Es lo que ven quienes buscan talento."
-      }
-    },
-    "creador": {
-      "bienvenida": {
-        "titulo": "Tu espacio de Creador",
-        "texto": "En un minuto te mostramos cómo armar tu Proyecto o Equipo y encontrar a la gente que buscás."
-      },
-      "misProyectos": {
-        "titulo": "Mis proyectos",
-        "texto": "Acá creás y administrás tu Proyecto o tu Equipo: título, roles, fotos y quién ya forma parte."
-      },
-      "buscar": {
-        "titulo": "Buscar talento",
-        "texto": "Encontrá artistas por nombre, habilidad o zona. Tocá el corazón en quien te interese."
-      },
-      "callBack": {
-        "titulo": "Call Back",
-        "texto": "Cuando el interés es mutuo, el Match aparece acá. Aceptalo para pasar a esa persona a Convocados."
-      },
-      "convocar": {
-        "titulo": "Convocar",
-        "texto": "Desde Call Back, convocá a quien te interese. Cuando acepta, entra al chat de tu proyecto."
-      },
-      "chats": {
-        "titulo": "Chats",
-        "texto": "Acá están las salas de tus Proyectos y Equipos, con quienes aceptaron la convocatoria."
-      },
-      "perfil": {
-        "titulo": "Tu perfil",
-        "texto": "Tu información personal y artística. Es la misma en las dos experiencias."
       }
     },
     "errorGuardar": "No pudimos guardarlo. Probá de nuevo.",

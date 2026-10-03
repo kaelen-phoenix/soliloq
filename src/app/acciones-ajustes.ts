@@ -5,7 +5,6 @@ import { cookies } from "next/headers";
 import { redirect } from "next/navigation";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
-import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { borrarUsuarioYArchivos } from "@/lib/supabase/borrar-usuario";
 
@@ -36,15 +35,14 @@ export async function guardarTema(tema: "sistema" | "claro" | "oscuro") {
 }
 
 /**
- * «Ver el recorrido de nuevo» (#231): borra la marca del tour de la experiencia en la que
- * se está y vuelve a la pantalla principal, donde el tour arranca solo.
+ * «Ver el recorrido de nuevo» (#231): borra la marca del tour y vuelve a la pantalla
+ * principal, donde el tour arranca solo.
  */
 export async function volverAVerTour() {
   const { supabase, user } = await usuario();
-  const { modoActivo } = await leerEstadoCuenta(supabase, user.id);
   const { error } = await supabase
     .from("perfiles")
-    .update(modoActivo === "creador" ? { tour_creador_visto_en: null } : { tour_talento_visto_en: null })
+    .update({ tour_talento_visto_en: null })
     .eq("id", user.id);
   // Si no se pudo borrar la marca, ir a `/` no mostraría nada: se queda en Ajustes.
   if (error) {

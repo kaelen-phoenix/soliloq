@@ -144,7 +144,11 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
                             : "bg-brand-600 text-white"
                       }`}
                     >
-                      {!s.esDeIniciativa ? "Directo" : s.esEquipo ? "Equipo" : "Proyecto"}
+                      {!s.esDeIniciativa
+                        ? "Directo"
+                        : s.esDueno
+                          ? s.esEquipo ? "Mi equipo" : "Mi proyecto"
+                          : s.esEquipo ? "Equipo" : "Proyecto"}
                     </span>
                     <p
                       className={`truncate text-base text-texto ${sinLeer > 0 ? "font-semibold" : "font-medium"}`}

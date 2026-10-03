@@ -122,8 +122,12 @@ test.describe("mensajes sin leer en Salas (UI)", () => {
     await expect(page.getByRole("link", { name: "Chats, 1 sin leer" })).toBeVisible();
 
     // 2. Entrar a la sala la marca leída.
+    // Se espera a que la marca llegue a la base: el `goto` del paso 3 es una navegación
+    // completa y corta el pedido si todavía está en vuelo.
+    const marcada = page.waitForResponse((r) => r.url().includes("marcar_sala_leida"), { timeout: 15_000 });
     await tarjeta.getByRole("link").first().click();
     await expect(page.getByText("¿Ensayamos el sábado?")).toBeVisible({ timeout: 10_000 });
+    await marcada;
     await expect(page.getByRole("link", { name: /Chats, \d+ sin leer/ })).toHaveCount(0);
 
     // 3. Y queda leída al volver (persiste en la base, no es solo estado del cliente).

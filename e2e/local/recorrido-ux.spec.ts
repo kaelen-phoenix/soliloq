@@ -169,7 +169,7 @@ test.describe("recorrido de UX", () => {
     // ── Creador ──
     const pC = await entrar(browser, creador.email);
     for (const [ruta, nombre] of [
-      ["/", "creador-tablero"],
+      ["/proyectos", "creador-tablero"],
       ["/matches", "creador-callback"],
       ["/talentos", "creador-buscar"],
       [`/obras/${obra!.id}`, "creador-proyecto"],
