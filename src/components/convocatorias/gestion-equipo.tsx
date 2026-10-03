@@ -318,7 +318,7 @@ export function GestionEquipo({
             <FotosEquipo equipoId={equipo.id} creadorId={creadorId} fotosIniciales={fotos} />
             <p className="mt-4 rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
               Para sumar gente al equipo, buscá talento y deslizá. Cuando el interés es mutuo
-              lo ves en <span className="font-medium text-texto">Matches</span> y desde ahí lo
+              lo ves en <span className="font-medium text-texto">Convocatorias</span> y desde ahí lo
               convocás a la sala.
             </p>
             <div className="mt-4">

@@ -440,6 +440,10 @@ export function FormularioTalento({
           onCambio={setUbicacion}
           error={errores.ubicacion}
         />
+        <p className="-mt-2 text-xs text-texto-tenue">
+          Alcanza con tu ciudad o barrio. Nadie ve tu dirección: solo la zona, para mostrarte lo
+          que tenés cerca.
+        </p>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="genero" className="text-sm font-medium text-texto">

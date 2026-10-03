@@ -43,7 +43,7 @@ export interface RolDisponible {
 }
 
 const CHIP: Record<Estado, { texto: string; clase: string }> = {
-  en_convocados: { texto: "Match", clase: "bg-fondo-sutil text-texto-tenue" },
+  en_convocados: { texto: "Para convocar", clase: "bg-fondo-sutil text-texto-tenue" },
   esperando_confirmacion: { texto: "Esperando confirmación", clase: "bg-alerta-50 text-alerta-800" },
   en_sala: { texto: "En la sala", clase: "bg-accion text-accion-texto" },
 };

@@ -38,7 +38,7 @@ const ADMIN: ItemNavegacion = { href: "/admin", clave: "admin", claveCorto: "adm
  * un rol, es un flag que suma un ítem.
  */
 export function itemsParaNavegacion({ esAdmin = false }: { esAdmin?: boolean } = {}): ItemNavegacion[] {
-  return [EXPLORAR, PROYECTOS, MATCHES, CHATS, PERFIL, ...(esAdmin ? [ADMIN] : [])];
+  return [EXPLORAR, CHATS, PROYECTOS, MATCHES, PERFIL, ...(esAdmin ? [ADMIN] : [])];
 }
 
 /** Ancla del tour guiado (#231) para un ítem: `nav-inicio`, `nav-salas`, `nav-matches`… */

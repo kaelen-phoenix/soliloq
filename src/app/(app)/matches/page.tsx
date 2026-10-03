@@ -8,7 +8,7 @@ import { MisMatchesTalento, type FilaMatchTalento } from "@/components/convocato
 import { PestanasMatches } from "@/components/convocatorias/pestanas-matches";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
-export const metadata = { title: "Matches — Yalope" };
+export const metadata = { title: "Convocatorias — Yalope" };
 
 export default async function MatchesPage() {
   const supabase = createClient();
@@ -132,7 +132,7 @@ export default async function MatchesPage() {
   return (
     <main className="px-5 py-5">
       <p className="mb-5 text-sm text-texto-tenue">
-        Interés mutuo: cuando a vos y a la otra parte les interesa, aparece acá.
+        Cuando el interés es mutuo, aparece acá: para convocar, o porque te pueden convocar.
       </p>
 
       <PestanasMatches
@@ -145,7 +145,7 @@ export default async function MatchesPage() {
           ) : (
             <EstadoVacio
               icono="corazon"
-              titulo="Todavía no hay matches"
+              titulo="Todavía nadie para convocar"
               detalle={
                 tienePerfilCreador
                   ? "Buscá talento desde tu proyecto o equipo. Cuando alguien que te interesa también lo marca, aparece acá para convocarlo."
@@ -160,7 +160,7 @@ export default async function MatchesPage() {
           ) : (
             <EstadoVacio
               icono="corazon"
-              titulo="Todavía no hay matches"
+              titulo="Todavía no tenés convocatorias"
               detalle="Marcá «Me interesa» en Explorar. Si del otro lado también les interesa tu perfil, aparece acá."
             />
           )

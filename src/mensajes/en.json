@@ -21,7 +21,7 @@
     "buscarTalentoCorto": "Search",
     "admin": "Admin",
     "ajustes": "Settings",
-    "matches": "Matches"
+    "matches": "Casting calls"
   },
   "titulos": {
     "contacto": "Contact",
@@ -37,7 +37,7 @@
     "admin": "Administration",
     "convocatorias": "Explore",
     "misProyectos": "My projects",
-    "matches": "Matches",
+    "matches": "Casting calls",
     "convocatoria": "You're invited"
   },
   "landing": {
@@ -221,15 +221,15 @@
       },
       "meInteresa": {
         "titulo": "I'm interested",
-        "texto": "Tap the heart on anything you like. If they're interested in your profile too, it's a Match."
+        "texto": "Tap the heart on anything you like. If they're interested in your profile too, it shows up in Casting calls."
       },
       "match": {
-        "titulo": "Match and casting call",
-        "texto": "If they're interested too, it's a Match and you'll see it in Matches. That's where they cast you, and where you can withdraw if you change your mind."
+        "titulo": "Casting calls",
+        "texto": "When the interest is mutual, you'll see it in Casting calls: that's where they cast you, and where you can withdraw if you change your mind."
       },
       "proyectos": {
         "titulo": "Your projects",
-        "texto": "Want to start something of your own? Create your Project or Team here, find talent and cast whoever you like from Matches."
+        "texto": "Want to start something of your own? Create your Project or Team here, find talent and cast from Casting calls."
       },
       "chats": {
         "titulo": "Chats",

@@ -280,7 +280,7 @@ test.describe("QA en vivo (#122, teléfono)", () => {
 
     await login(page, creador.email);
     await page.goto("/matches");
-    await expect(page.getByText("Todavía no hay matches")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText("Todavía nadie para convocar")).toBeVisible({ timeout: 15_000 });
 
     await page.context().clearCookies();
     await login(page, talento.email);

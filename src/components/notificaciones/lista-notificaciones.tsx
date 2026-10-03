@@ -194,7 +194,7 @@ export function ListaNotificaciones({
                       ¡Tenés un nuevo match!
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      Alguien se interesó en tu proyecto o equipo. Revisalo en Matches.
+                      Alguien se interesó en tu proyecto o equipo. Revisalo en Convocatorias.
                     </p>
                   </>
                 ) : n.tipo === "solicitud_acceso" ? (

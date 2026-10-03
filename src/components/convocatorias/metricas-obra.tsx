@@ -52,7 +52,7 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
 
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-borde pt-3.5">
         <div>
-          <dt className="text-2xs uppercase tracking-wide text-texto-tenue">Matches</dt>
+          <dt className="text-2xs uppercase tracking-wide text-texto-tenue">Interés mutuo</dt>
           <dd className="mt-0.5 text-lg font-semibold leading-none text-texto">{m.matches}</dd>
         </div>
         <div>
