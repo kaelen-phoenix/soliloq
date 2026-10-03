@@ -25,7 +25,7 @@ Los flujos con sesión (circuito de match: swipe → placa → `/matches` → sa
 
 `flujos/match.spec.ts` recorre el circuito completo por UI: Talento se postula a una Obra
 (swipe), Creador marca "Me interesa" (match en el acto), placa "Hay interés" → "Ahora no",
-aviso "¡Tenés un Match!" (#194) → "Aceptar", Call Back → "Aceptar" (pasa a Convocados),
+aviso "¡Tenés un Match!" (#194) → "Aceptar", Matches → "Aceptar" (pasa a Convocados),
 "Convocar" en firme, Talento acepta en `/convocatoria` → entra a `/salas`. La aprobación
 manual (#182), las Normas (#180) y el onboarding con ubicación por Google Places se siembran
 directo con el cliente admin en vez de navegarse — ver los comentarios del archivo.
@@ -39,8 +39,8 @@ Realtime espera la sesión, `suscribirConSesion`).
 Talento que había convocado vuelve a aparecer en Buscar Talentos; la sala del equipo se borra.
 
 `flujos/qa-en-vivo.spec.ts` (#122), en teléfono (Pixel 7): la caminata de QA que antes se
-pedía a mano — «Cupo lleno» en Call Back, «Dar de baja» un convocado, el feed no repite una
-obra donde ya entraste, estados vacíos de Call Back y `/convocatoria`, destacar y
+pedía a mano — «Cupo lleno» en Matches, «Dar de baja» un convocado, el feed no repite una
+obra donde ya entraste, estados vacíos de Matches y `/convocatoria`, destacar y
 desvincularse en Chats, ocultar la edad (y que el enlace público la respete), deslizar en el
 visor de fotos, «Borrar mi cuenta», «Borrar proyecto», borrar un usuario desde Admin y el
 límite de 20 «Me interesa» por día. Los borrados usan la clave de servicio del server:

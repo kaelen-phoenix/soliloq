@@ -21,7 +21,7 @@
     "buscarTalentoCorto": "Search",
     "admin": "Admin",
     "ajustes": "Settings",
-    "matches": "Call Back"
+    "matches": "Matches"
   },
   "titulos": {
     "contacto": "Contact",
@@ -37,7 +37,7 @@
     "admin": "Administration",
     "convocatorias": "Explore",
     "misProyectos": "My projects",
-    "matches": "Call Back",
+    "matches": "Matches",
     "convocatoria": "You're invited"
   },
   "landing": {
@@ -229,7 +229,7 @@
       },
       "proyectos": {
         "titulo": "Your projects",
-        "texto": "Want to start something of your own? Create your Project or Team here, find talent and cast whoever you like from Call Back."
+        "texto": "Want to start something of your own? Create your Project or Team here, find talent and cast whoever you like from Matches."
       },
       "chats": {
         "titulo": "Chats",

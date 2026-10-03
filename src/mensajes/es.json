@@ -21,7 +21,7 @@
     "buscarTalentoCorto": "Buscar",
     "admin": "Admin",
     "ajustes": "Ajustes",
-    "matches": "Call Back"
+    "matches": "Matches"
   },
   "titulos": {
     "contacto": "Contacto",
@@ -37,7 +37,7 @@
     "admin": "Administración",
     "convocatorias": "Explorar",
     "misProyectos": "Mis proyectos",
-    "matches": "Call Back",
+    "matches": "Matches",
     "convocatoria": "Te convocaron"
   },
   "landing": {
@@ -229,7 +229,7 @@
       },
       "proyectos": {
         "titulo": "Tus proyectos",
-        "texto": "¿Querés armar algo propio? Creá tu Proyecto o Equipo acá, buscá talento y convocá a quien te interese desde Call Back."
+        "texto": "¿Querés armar algo propio? Creá tu Proyecto o Equipo acá, buscá talento y convocá a quien te interese desde Matches."
       },
       "chats": {
         "titulo": "Chats",

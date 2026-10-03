@@ -33,7 +33,7 @@ const PERFIL: ItemNavegacion = { href: "/perfil", clave: "perfil", icono: "perfi
 const ADMIN: ItemNavegacion = { href: "/admin", clave: "admin", claveCorto: "admin", icono: "admin" };
 
 /**
- * La lista de navegación para un usuario. Call Back aparece recién cuando la persona armó
+ * La lista de navegación para un usuario. Matches aparece recién cuando la persona armó
  * su primer Proyecto o Equipo (antes no tiene a quién convocar), y "Admin" al final si lo
  * es: el admin no es un rol, es un flag que suma un ítem.
  */
