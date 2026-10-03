@@ -53,9 +53,11 @@ export function PerfilTalentoDetalle({
           {talento.ubicacion_publica}
         </p>
         {avisoEdadOculta && <p className="text-xs text-texto-tenue">Tu edad está oculta: nadie más la ve.</p>}
-        <p className="text-sm text-texto-tenue">
-          {talento.genero_descripcion || etiquetaGenero(talento.genero)}
-        </p>
+        {(talento.genero_descripcion || talento.genero !== "sin_especificar") && (
+          <p className="text-sm text-texto-tenue">
+            {talento.genero_descripcion || etiquetaGenero(talento.genero)}
+          </p>
+        )}
       </div>
 
       {redes.length > 0 && (

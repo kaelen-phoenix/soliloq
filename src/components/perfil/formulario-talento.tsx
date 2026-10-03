@@ -80,6 +80,11 @@ export function FormularioTalento({
   const [habilidades, setHabilidades] = useState<string[]>(datosIniciales?.habilidades ?? []);
   // Lo que la persona tipeó, tal cual. Se normaliza recién en `validar()` / `guardar()`.
   const [redes, setRedes] = useState<Record<string, string>>(datosIniciales?.redes ?? {});
+  // #285: siete campos de redes seguidos hacían el formulario interminable. Instagram (la más
+  // usada) queda a la vista; el resto, detrás de «Agregar otra red», salvo que ya tenga alguna.
+  const [masRedes, setMasRedes] = useState(() =>
+    REDES.some((r) => r.clave !== "instagram" && !!datosIniciales?.redes?.[r.clave]),
+  );
   const [apareceEnBuscador, setApareceEnBuscador] = useState(
     datosIniciales?.aparece_en_buscador ?? true,
   );
@@ -375,7 +380,9 @@ export function FormularioTalento({
 
       <section className="flex flex-col gap-4">
         <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Redes sociales (opcional)</h2>
-        {REDES.map((red) => (
+        {REDES.filter(
+          (red) => masRedes || red.clave === "instagram" || !!redes[red.clave] || !!errores[`redes_${red.clave}`],
+        ).map((red) => (
           <CampoTexto
             key={red.clave}
             id={`red_${red.clave}`}
@@ -386,9 +393,15 @@ export function FormularioTalento({
             error={errores[`redes_${red.clave}`]}
           />
         ))}
-        <p className="-mt-2 text-xs text-texto-tenue">
-          Solo se valida el formato del enlace, no que la cuenta exista o sea tuya.
-        </p>
+        {!masRedes && (
+          <button
+            type="button"
+            onClick={() => setMasRedes(true)}
+            className="self-start text-sm font-medium text-texto-tenue underline hover:text-texto"
+          >
+            + Agregar otra red (YouTube, TikTok, X, LinkedIn, Vimeo, sitio web)
+          </button>
+        )}
       </section>
 
       <section className="flex flex-col gap-3">
@@ -405,10 +418,8 @@ export function FormularioTalento({
           <span className="text-sm text-texto">
             Ocultar mi perfil a personas nuevas
             <span className="mt-0.5 block text-xs text-texto-tenue">
-              Nadie nuevo te va a poder encontrar ni contactar: no salís en el buscador de
-              Creadores y tu enlace público deja de mostrar tu perfil.
-              Tus chats abiertos siguen igual, tus Proyectos y Equipos publicados siguen
-              recibiendo interesados, y vos podés seguir buscando y marcando «Me interesa».
+              No salís en el buscador de Creadores y tu enlace público deja de mostrar tu
+              perfil. Tus chats y tus Proyectos y Equipos siguen igual.
             </span>
           </span>
         </label>

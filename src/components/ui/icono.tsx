@@ -2,6 +2,7 @@ type NombreIcono =
   | "feed"
   | "postulaciones"
   | "salas"
+  | "editar"
   | "perfil"
   | "tablero"
   | "campana"
@@ -171,6 +172,9 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
       <path d="M10 14a4.5 4.5 0 0 0 6.4 0l2-2a4.5 4.5 0 0 0-6.4-6.4l-1 1" />
       <path d="M14 10a4.5 4.5 0 0 0-6.4 0l-2 2a4.5 4.5 0 0 0 6.4 6.4l1-1" />
     </>
+  ),
+  editar: (
+    <path d="M4 20h4L18.5 9.5a2.1 2.1 0 0 0-3-3L5 17v3zM13.5 7.5l3 3" />
   ),
   compartir: (
     <>

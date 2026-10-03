@@ -91,7 +91,7 @@ export default async function DetalleObraPage({
             href={`/obras/${obra.id}?editar=1`}
             className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-borde px-3 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil"
           >
-            <Icono nombre="cambiar" className="h-3.5 w-3.5" />
+            <Icono nombre="editar" className="h-3.5 w-3.5" />
             Editar
           </Link>
         )}

@@ -154,10 +154,9 @@ export function FotosObra({
 
       {error && <p className="text-xs text-error-600">{error}</p>}
       <p className="text-xs text-texto-tenue">
-        {fotos.length}/{MAX} fotos
         {faltan > 0
-          ? ` — sumá ${faltan} más para llegar al mínimo de ${MIN_FOTOS_OBRA}.`
-          : " — se recomienda que muestren el proyecto."}
+          ? `Agregá al menos ${MIN_FOTOS_OBRA} ${MIN_FOTOS_OBRA === 1 ? "foto" : "fotos"} (hasta ${MAX}): es lo primero que ve el elenco.`
+          : `${fotos.length} de ${MAX} fotos.`}
       </p>
     </div>
   );

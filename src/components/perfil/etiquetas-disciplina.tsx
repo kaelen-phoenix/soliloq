@@ -19,7 +19,12 @@ export function EtiquetasDisciplina({
   className?: string;
 }) {
   if (disciplinas.length === 0) {
-    return <p className={`text-sm text-texto-tenue ${className}`}>Perfil artístico sin completar</p>;
+    // Solo se ve en el perfil propio (el enlace público esconde la sección vacía): que diga qué hacer.
+    return (
+      <p className={`text-sm text-texto-tenue ${className}`}>
+        Sumá tus disciplinas (actuación, dirección, técnica…) desde «Editar».
+      </p>
+    );
   }
 
   return (
