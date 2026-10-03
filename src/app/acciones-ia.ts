@@ -6,7 +6,9 @@ import { createClient } from "@/lib/supabase/server";
 
 type Resultado = { ok: true; texto: string } | { ok: false; error: string };
 
-const MODELO = "anthropic/claude-haiku-4.5";
+// El plan gratis de AI Gateway no incluye Anthropic (#315): gpt-4.1-mini entra en el crédito
+// gratis y redacta bien. Con crédito pago se puede cambiar por IA_MODELO (p. ej. Claude Haiku).
+const MODELO = process.env.IA_MODELO ?? "openai/gpt-4.1-mini";
 const MAX_ENTRADA = 4000;
 const MAX_SALIDA = 2000;
 
@@ -20,7 +22,7 @@ Te pasan el texto que una persona escribió o pegó sobre su experiencia (formac
 - Devolvé solo el texto final, sin comentarios ni introducciones.`;
 
 /**
- * «✨ Mejorar redacción» de la Experiencia (#313). Claude Haiku por Vercel AI Gateway,
+ * «✨ Mejorar redacción» de la Experiencia (#313). Un modelo chico por Vercel AI Gateway,
  * autenticado con el OIDC del proyecto (sin clave). Cada uso pasa antes por el tope de
  * `consumir_uso_ia()` (0100). La persona ve el resultado y elige si lo usa.
  */
