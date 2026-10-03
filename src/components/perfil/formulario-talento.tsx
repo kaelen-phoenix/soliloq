@@ -25,7 +25,7 @@ import { validarRedes } from "@/lib/redes";
 import { aColumnas, desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
 import { esVideoreelValido } from "@/lib/videoreel";
 import { formatearMientrasSeEscribe, isoATexto, textoAIso } from "@/lib/fecha-escrita";
-import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
+import { FOTOS_RECOMENDADAS, MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
 import { importarFotoDeGoogle } from "@/app/completar-perfil/acciones";
 
 /** Lo cargado en el alta, guardado en el teléfono (#300): en celulares con poca memoria, salir
@@ -269,7 +269,7 @@ export function FormularioTalento({
     // El mínimo de fotos es para **completar** el perfil (el alta). Al editar no bloquea: las
     // fotos se guardan solas al subirlas o borrarlas, y trabar el resto del formulario por eso
     // dejaba a cuentas viejas sin poder guardar nada (#243). Se avisa abajo de las fotos.
-    if (esAlta && fotos.length < MIN_FOTOS) nuevos.fotos = `Cargá al menos ${MIN_FOTOS} fotos.`;
+    if (esAlta && fotos.length < MIN_FOTOS) nuevos.fotos = "Cargá al menos una foto.";
     if (videoreelUrl && !esVideoreelValido(videoreelUrl)) {
       nuevos.videoreel_url =
         "No reconocemos ese enlace. Pegá el link de un video de YouTube o Vimeo.";
@@ -324,7 +324,7 @@ export function FormularioTalento({
       edad_visible: edadVisible,
       ...aColumnas(ubicacion!),
       genero: genero as Genero,
-      genero_descripcion: generoDescripcion.trim() || null,
+      genero_descripcion: genero === "otro" ? generoDescripcion.trim() || null : null,
       videoreel_url: videoreelUrl || null,
       experiencia: experiencia || null,
       habilidades,
@@ -467,21 +467,17 @@ export function FormularioTalento({
           {errores.genero && <p className="text-xs text-error-600">{errores.genero}</p>}
         </div>
 
-        {verOpcionales && (
-          <>
-            <CampoTexto
-              id="genero_descripcion"
-              etiqueta="Cómo te identificás (opcional)"
-              placeholder="Con tus palabras"
-              maxLength={MAX_GENERO_DESCRIPCION}
-              value={generoDescripcion}
-              onChange={(e) => setGeneroDescripcion(e.target.value)}
-              error={errores.genero_descripcion}
-            />
-            <p className="-mt-2 text-xs text-texto-tenue">
-              Se muestra en tu perfil. No se usa para filtrar convocatorias.
-            </p>
-          </>
+        {/* #311: la aclaración solo si eligió «Otro» (antes era un «Cómo te identificás»
+            para todos, que no sonaba a perfil profesional). */}
+        {genero === "otro" && (
+          <CampoTexto
+            id="genero_descripcion"
+            etiqueta="¿Cuál? (opcional)"
+            maxLength={MAX_GENERO_DESCRIPCION}
+            value={generoDescripcion}
+            onChange={(e) => setGeneroDescripcion(e.target.value)}
+            error={errores.genero_descripcion}
+          />
         )}
       </section>
 
@@ -504,9 +500,9 @@ export function FormularioTalento({
         )}
         <SubirFotos talentoId={userId} fotos={fotos} onCambio={setFotos} persistir={!esAlta} />
         {errores.fotos && <p className="text-xs text-error-600">{errores.fotos}</p>}
-        {!esAlta && fotos.length < MIN_FOTOS && (
+        {fotos.length > 0 && fotos.length < FOTOS_RECOMENDADAS && (
           <p className="text-xs text-alerta-800">
-            Te recomendamos tener al menos {MIN_FOTOS} fotos: así tu perfil se ve completo.
+            Te recomendamos {FOTOS_RECOMENDADAS} fotos o más: así quien busca talento te ve mejor.
           </p>
         )}
       </section>

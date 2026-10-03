@@ -19,7 +19,9 @@ export interface FotoTalento {
 const TIPOS_ADMITIDOS = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
 const MAX_FOTOS = 5;
-export const MIN_FOTOS = 3;
+// #311: con una foto alcanza para empezar; se recomiendan tres.
+export const MIN_FOTOS = 1;
+export const FOTOS_RECOMENDADAS = 3;
 
 /**
  * Persiste en `fotos_talento` las fotos que todavía solo existen en Storage.
@@ -212,7 +214,7 @@ export function SubirFotos({
 
       {error && <p className="text-xs text-error-600">{error}</p>}
       <p className="text-xs text-texto-tenue">
-        {fotos.length}/{MAX_FOTOS} fotos — mínimo {MIN_FOTOS} para completar el perfil. Podés elegir varias juntas.
+        {fotos.length}/{MAX_FOTOS} fotos — con una alcanza para empezar. Podés elegir varias juntas.
       </p>
     </div>
   );

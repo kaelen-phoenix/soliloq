@@ -22,7 +22,7 @@ export function mailBienvenida(opciones: { discord?: string | null } = {}) {
     lista: {
       titulo: "Para arrancar con todo",
       items: [
-        "🎬 &nbsp;Subí al menos 3 fotos y tu videoreel: es lo primero que miran.",
+        "🎬 &nbsp;Sumá 3 fotos o más y tu videoreel: es lo primero que miran.",
         "🔔 &nbsp;Activá las notificaciones para enterarte de cada match y cada mensaje.",
         "📱 &nbsp;Instalá la app desde el navegador del celular: «Agregar a la pantalla de inicio».",
         ...(discord
