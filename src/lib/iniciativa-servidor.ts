@@ -36,3 +36,36 @@ export async function iniciativaActivaDelCreador(
 
   return null;
 }
+
+/**
+ * La iniciativa para la que se busca talento (#294): la que viene en la URL
+ * (`/talentos?obra=…` o `?equipo=…`, desde la pantalla del Proyecto o el panel del Equipo)
+ * si es de este Creador y sigue abierta; si no viene ninguna, la activa.
+ */
+export async function iniciativaParaBuscar(
+  supabase: SupabaseClient<Database>,
+  creadorId: string,
+  pedida: { obra?: string | null; equipo?: string | null },
+): Promise<IniciativaActiva | null> {
+  if (pedida.equipo) {
+    const { data } = await supabase
+      .from("equipos")
+      .select("id, titulo")
+      .eq("id", pedida.equipo)
+      .eq("creador_id", creadorId)
+      .eq("activo", true)
+      .maybeSingle();
+    return data ? { tipo: "equipo", id: data.id, titulo: data.titulo } : null;
+  }
+  if (pedida.obra) {
+    const { data } = await supabase
+      .from("obras")
+      .select("id, titulo")
+      .eq("id", pedida.obra)
+      .eq("creador_id", creadorId)
+      .neq("estado", "cerrada")
+      .maybeSingle();
+    return data ? { tipo: "obra", id: data.id, titulo: data.titulo } : null;
+  }
+  return iniciativaActivaDelCreador(supabase, creadorId);
+}

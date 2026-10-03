@@ -97,6 +97,15 @@ export default async function DetalleObraPage({
         )}
       </div>
       <p className="mt-1 text-sm text-texto-tenue">{obra.ubicacion_texto}</p>
+      {esDueno && obra.estado !== "cerrada" && (
+        <Link
+          href={`/talentos?obra=${obra.id}`}
+          className="brillo-accion mt-4 flex max-w-sm items-center justify-center gap-1.5 rounded-full bg-accion px-4 py-3 text-sm font-semibold text-accion-texto transition hover:brightness-110"
+        >
+          <Icono nombre="buscar" className="h-4 w-4" />
+          Buscar talento para este proyecto
+        </Link>
+      )}
       {obra.sinopsis && (
         <p className="mt-3 max-w-prose text-base leading-relaxed text-texto-tenue">{obra.sinopsis}</p>
       )}

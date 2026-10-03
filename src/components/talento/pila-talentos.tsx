@@ -1,5 +1,6 @@
 "use client";
 
+import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
 import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
@@ -13,6 +14,9 @@ import { marcarInteresEnTalento } from "@/app/(app)/matches/acciones";
 import type { ResultadoTalento } from "./tarjeta-talento";
 
 export interface IniciativaPlaca {
+  /** Para qué Proyecto o Equipo se busca (#294): ahí se marca el interés. */
+  tipo: "obra" | "equipo";
+  id: string;
   titulo: string;
   fotoUrl: string | null;
 }
@@ -54,7 +58,11 @@ export function PilaTalentos({
   if (!iniciativa) {
     return (
       <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
-        Creá un proyecto o equipo para empezar a buscar talento.
+        Para buscar talento primero armá un proyecto o equipo en{" "}
+        <Link href="/proyectos" className="font-medium text-texto underline">
+          Mis proyectos
+        </Link>
+        .
       </p>
     );
   }
@@ -74,12 +82,12 @@ export function PilaTalentos({
   }
 
   async function decidir(interesa: boolean) {
-    if (ocupado) return;
+    if (ocupado || !iniciativa) return;
     setOcupado(true);
     setError(null);
     const t = arriba;
 
-    const res = await marcarInteresEnTalento(t.id, interesa);
+    const res = await marcarInteresEnTalento(t.id, interesa, { tipo: iniciativa.tipo, id: iniciativa.id });
     if (!res.ok) {
       setError(res.error);
       setOcupado(false);
