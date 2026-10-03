@@ -151,7 +151,7 @@ export function FormularioTalento({
         if (typeof b.nombre === "string" && b.nombre) setNombre(b.nombre);
         if (typeof b.fechaNacimiento === "string") {
           // Borradores de antes de #307 la guardaban en ISO.
-          setFechaNacimiento(/^d{4}-/.test(b.fechaNacimiento) ? isoATexto(b.fechaNacimiento) : b.fechaNacimiento);
+          setFechaNacimiento(/^\d{4}-/.test(b.fechaNacimiento) ? isoATexto(b.fechaNacimiento) : b.fechaNacimiento);
         }
         if (typeof b.edadVisible === "boolean") setEdadVisible(b.edadVisible);
         if (esUbicacion(b.ubicacion)) setUbicacion(b.ubicacion);
