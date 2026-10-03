@@ -209,7 +209,7 @@ test.describe("circuito de match (UI)", () => {
     await creadorPage.getByRole("button", { name: "Me interesa", exact: true }).click();
 
     // La cerramos con "Ahora no" a propósito: el circuito completo se sigue desde Call Back
-    // (si tocara "Enviar a Convocados" acá, el match saltearía el aviso "¡Tenés un Match!").
+    // (si tocara "Convocar" acá, iría a Call Back igual, pero queremos ver el aviso solo).
     const placaInteres = creadorPage.getByRole("dialog", { name: "Hay interés" });
     await expect(placaInteres).toBeVisible({ timeout: 10_000 });
     await placaInteres.getByRole("button", { name: "Ahora no" }).click();
@@ -219,18 +219,11 @@ test.describe("circuito de match (UI)", () => {
     await creadorPage.goto("/matches");
     const avisoMatch = creadorPage.getByRole("dialog", { name: "Nuevo match" });
     await expect(avisoMatch).toBeVisible({ timeout: 10_000 });
-    await avisoMatch.getByRole("button", { name: "Aceptar" }).click();
+    await avisoMatch.getByRole("button", { name: "Listo" }).click();
     await expect(avisoMatch).toBeHidden();
 
-    // 4. Cerrar el aviso no movió nada: el match sigue en Call Back. Aceptarlo ahí sí lo pasa
-    // a Convocados (RPC `aceptar_match`, distinto del "Aceptar" del aviso).
-    await creadorPage.getByRole("button", { name: "Aceptar" }).click();
-    const confirmarMatch = creadorPage.getByRole("dialog", { name: "Confirmar match" });
-    await expect(confirmarMatch).toBeVisible({ timeout: 5_000 });
-    await confirmarMatch.getByRole("button", { name: "Aceptar" }).click();
-    await expect(confirmarMatch).toBeHidden();
-
-    // 5. Convoca en firme. Con un solo Rol no hay selector de por medio (#152).
+    // 4-5. Convoca directo desde el match, sin aceptarlo antes (#287). Con un solo Rol no hay
+    // selector de por medio (#152).
     await creadorPage.getByRole("button", { name: "Convocar" }).click();
     await expect(creadorPage.getByText("Esperando confirmación")).toBeVisible({ timeout: 10_000 });
 

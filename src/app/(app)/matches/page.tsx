@@ -3,7 +3,6 @@ import { createClient } from "@/lib/supabase/server";
 import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
-import { MatchesLista } from "@/components/convocatorias/matches-lista";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 import { ModalNuevoMatch } from "@/components/convocatorias/modal-nuevo-match";
 import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
@@ -78,6 +77,21 @@ export default async function MatchesPage() {
       iniciativaFotoUrl: url(m.iniciativa_foto),
     }));
 
+  // #287: un match nuevo se convoca directo, en la misma lista (antes había que aceptarlo
+  // primero para que pasara a Convocados).
+  const filasMatches = filas.map((f) => ({
+    matchId: f.matchId,
+    convocatoriaId: null,
+    talentoId: f.talentoId,
+    nombre: f.nombre,
+    fotoUrl: f.fotoUrl,
+    esEquipo: f.esEquipo,
+    iniciativaTitulo: f.iniciativaTitulo,
+    estado: "en_convocados" as const,
+    expiraEn: f.expiraEn,
+    cupoLleno: f.cupoLleno,
+  }));
+
   const filasConvocados = (convocados ?? []).map((c) => ({
     matchId: c.match_id,
     convocatoriaId: c.convocatoria_id,
@@ -92,8 +106,7 @@ export default async function MatchesPage() {
   return (
     <main className="px-5 py-5">
       <p className="mb-5 text-sm text-texto-tenue">
-        Interés mutuo. Aceptá el match para sumar a la persona a Convocados; después la
-        convocás en firme.
+        Interés mutuo. Convocá a quien quieras sumar: cuando acepte, entra al chat del proyecto.
       </p>
 
       {filas.length === 0 && filasConvocados.length === 0 && (
@@ -103,9 +116,7 @@ export default async function MatchesPage() {
           detalle="Cuando marques «Me interesa» en un perfil y esa persona también marque tu proyecto o equipo, aparece acá."
         />
       )}
-      {filas.length > 0 && <MatchesLista filas={filas} />}
-
-      <ConvocadosLista filas={filasConvocados} roles={roles} />
+      <ConvocadosLista filas={[...filasMatches, ...filasConvocados]} roles={roles} />
 
       <ModalNuevoMatch nuevos={nuevos} />
     </main>

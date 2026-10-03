@@ -4,7 +4,7 @@ import { useEffect, useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
-import { Avatar } from "@/components/convocatorias/matches-lista";
+import { Avatar } from "@/components/convocatorias/avatar";
 import { marcarMatchMostrado } from "@/app/(app)/matches/acciones";
 
 export interface MatchNuevo {
@@ -18,7 +18,7 @@ export interface MatchNuevo {
 
 /**
  * Aviso de "¡Tenés un Match!" (issue #194): aparece solo, una vez por match, al entrar a
- * Call Back. Cerrarlo (con "Aceptar" o con Esc/click afuera) no mueve nada de estado — el
+ * Call Back. Cerrarlo (con "Listo" o con Esc/click afuera) no mueve nada de estado — el
  * match ya está en Call Back por el solo hecho de existir — solo marca el aviso como visto
  * para que no vuelva a aparecer. Con varios matches nuevos, se muestran de a uno.
  */
@@ -73,7 +73,7 @@ export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
           onClick={cerrar}
           className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
         >
-          {ocupado ? "…" : "Aceptar"}
+          {ocupado ? "…" : "Listo"}
         </button>
       </div>
     </Superposicion>

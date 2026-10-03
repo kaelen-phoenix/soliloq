@@ -328,6 +328,9 @@ test.describe("QA en vivo (#122, teléfono)", () => {
   });
 
   test("Perfil: ocultar la edad la saca también del enlace público", async ({ page, browser }) => {
+    // Recorre dos sesiones y edita el perfil: con staging lento y otros specs en paralelo,
+    // 30 s no alcanzaba (#285).
+    test.setTimeout(60_000);
     const s = sufijo();
     // 3 fotos: el formulario del perfil no guarda con menos ("Cargá al menos 3 fotos").
     const talento = await nuevoUsuario(`Talento Edad ${s}`, "talento", { enlacePublico: true, fotos: 3 });

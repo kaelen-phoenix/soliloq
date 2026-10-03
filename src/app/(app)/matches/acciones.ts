@@ -10,7 +10,7 @@ type Resultado = { ok: true } | { ok: false; error: string };
 
 /**
  * El Creador cierra el aviso de "¡Tenés un Match!" (issue #194). Solo marca el aviso como
- * visto — a diferencia de `aceptarMatch`, no mueve nada a Convocados: el match ya está en
+ * visto — no convoca a nadie: el match ya está en
  * Call Back por el solo hecho de existir.
  */
 export async function marcarMatchMostrado(matchId: string): Promise<Resultado> {
@@ -23,22 +23,6 @@ export async function marcarMatchMostrado(matchId: string): Promise<Resultado> {
   return { ok: true };
 }
 
-/** El Creador acepta el Match → el talento pasa a Convocados. Sin notificación (#143). */
-export async function aceptarMatch(matchId: string): Promise<Resultado> {
-  const supabase = createClient();
-  const { error } = await supabase.rpc("aceptar_match", { p_match_id: matchId });
-  if (error) {
-    const m = error.message ?? "";
-    if (m.includes("cupo_lleno")) {
-      return { ok: false, error: "Ya llenaste el cupo. Liberá un lugar para sumar a otra persona." };
-    }
-    if (m.includes("venció")) return { ok: false, error: "El match venció." };
-    reportarErrorSupabase(error, { rpc: "aceptar_match", matchId });
-    return { ok: false, error: "No se pudo aceptar. Probá de nuevo." };
-  }
-  revalidatePath("/matches");
-  return { ok: true };
-}
 
 /**
  * El Creador convoca (definitivo) a alguien de Convocados: recién acá se notifica al
