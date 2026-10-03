@@ -100,7 +100,7 @@ export default async function SalasPage() {
       {salasVisibles.length === 0 ? (
         <EstadoVacio
           icono="salas"
-          titulo="Todavía no tenés salas"
+          titulo="Todavía no tenés chats"
           detalle={
             modo === "creador"
               ? "Se abren cuando convocás a alguien a tu proyecto o equipo."

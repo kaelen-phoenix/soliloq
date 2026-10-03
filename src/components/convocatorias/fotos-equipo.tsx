@@ -157,7 +157,7 @@ export function FotosEquipo({
       <p className="text-xs text-texto-tenue">
         {fotos.length}/{MAX} fotos
         {faltan > 0
-          ? ` — sumá ${faltan} más para llegar al mínimo de ${MIN_FOTOS_EQUIPO}.`
+          ? ` — agregá ${faltan} más (mínimo ${MIN_FOTOS_EQUIPO}).`
           : " — se recomienda que sean de quien arma el equipo."}
       </p>
     </div>

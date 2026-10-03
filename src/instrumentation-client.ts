@@ -7,6 +7,9 @@ import * as Sentry from "@sentry/nextjs";
 Sentry.init({
   dsn: process.env.NEXT_PUBLIC_SENTRY_DSN,
   tracesSampleRate: process.env.NODE_ENV === "development" ? 1.0 : 0.1,
+  // Cortes de red del dispositivo (sin señal, app en segundo plano): no son errores de la
+  // app y no se pueden arreglar desde acá (#285). Mismo criterio que `esCorteDeRed`.
+  ignoreErrors: [/failed to fetch/i, /load failed/i, /networkerror/i, /network error/i, /the network connection was lost/i],
 });
 
 export const onRouterTransitionStart = Sentry.captureRouterTransitionStart;

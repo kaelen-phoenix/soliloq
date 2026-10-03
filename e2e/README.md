@@ -120,3 +120,7 @@ node -e 'const k=require("web-push").generateVAPIDKeys();console.log(`export NEX
 # … mismo build/start contra staging que arriba …
 E2E_PUSH_CHROME=1 npx playwright test e2e/local
 ```
+
+`local/recorrido-ux.spec.ts` (#285): recorrido de UX, sin aserciones. Pasa por todas las pantallas
+en tamaño celular (sin cuenta, alta, Talento, Creador, Admin) y guarda una captura de cada una en
+`E2E_RECORRIDO_DIR`. Se corre con `E2E_RECORRIDO=1` contra staging.
