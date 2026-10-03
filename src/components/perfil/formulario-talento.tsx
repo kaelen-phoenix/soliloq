@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { AvisoGuardado, useAvisoGuardado } from "@/components/ui/aviso-guardado";
@@ -25,6 +25,11 @@ import { validarRedes } from "@/lib/redes";
 import { aColumnas, desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
 import { esVideoreelValido } from "@/lib/videoreel";
 import { MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
+import { importarFotoDeGoogle } from "@/app/completar-perfil/acciones";
+
+/** Lo cargado en el alta, guardado en el teléfono (#300): en celulares con poca memoria, salir
+ *  a otra app (a copiar un link, a la cámara) puede cerrar la página, y se perdía todo. */
+const claveBorrador = (userId: string) => `yalope-alta-perfil-${userId}`;
 
 interface DatosIniciales {
   nombre: string;
@@ -53,6 +58,8 @@ export function FormularioTalento({
   fotosIniciales,
   destinoAlTerminar,
   datosCreador,
+  nombreSugerido,
+  conFotoGoogle = false,
 }: {
   userId: string;
   esAlta: boolean;
@@ -63,9 +70,13 @@ export function FormularioTalento({
   /** Perfil artístico de Creador, si la cuenta lo tiene: se edita y se guarda acá mismo, con
    *  el mismo botón, en vez de en un formulario aparte (#234). */
   datosCreador?: DatosCreador;
+  /** Alta con Google (#303): el nombre de la cuenta, para no tener que escribirlo. */
+  nombreSugerido?: string;
+  /** Alta con Google con foto: se ofrece usarla como primera foto. */
+  conFotoGoogle?: boolean;
 }) {
   const router = useRouter();
-  const [nombre, setNombre] = useState(datosIniciales?.nombre ?? "");
+  const [nombre, setNombre] = useState(datosIniciales?.nombre ?? nombreSugerido ?? "");
   const [fechaNacimiento, setFechaNacimiento] = useState(datosIniciales?.fecha_nacimiento ?? "");
   const [edadVisible, setEdadVisible] = useState(datosIniciales?.edad_visible ?? true);
   const [ubicacion, setUbicacion] = useState<Ubicacion | null>(
@@ -95,6 +106,102 @@ export function FormularioTalento({
   const [cargando, setCargando] = useState(false);
   const [guardado, setGuardado] = useAvisoGuardado();
   const [errorGeneral, setErrorGeneral] = useState<string | null>(null);
+  // #302: en el alta va primero lo obligatorio; lo opcional, plegado (se completa después).
+  const [verOpcionales, setVerOpcionales] = useState(!esAlta);
+  const [recuperado, setRecuperado] = useState(false);
+  // "lista" | "trayendo" | "usada" | el mensaje de error.
+  const [fotoGoogle, setFotoGoogle] = useState<string>("lista");
+  const borradorLeido = useRef(!esAlta);
+
+  // #300: al entrar al alta se recupera lo que hubiera quedado guardado en el teléfono...
+  useEffect(() => {
+    if (!esAlta) return;
+    try {
+      const crudo = localStorage.getItem(claveBorrador(userId));
+      const b = crudo ? JSON.parse(crudo) : null;
+      if (b && typeof b === "object") {
+        if (typeof b.nombre === "string" && b.nombre) setNombre(b.nombre);
+        if (typeof b.fechaNacimiento === "string") setFechaNacimiento(b.fechaNacimiento);
+        if (typeof b.edadVisible === "boolean") setEdadVisible(b.edadVisible);
+        if (b.ubicacion) setUbicacion(b.ubicacion);
+        if (typeof b.genero === "string") setGenero(b.genero);
+        if (typeof b.generoDescripcion === "string") setGeneroDescripcion(b.generoDescripcion);
+        if (typeof b.videoreelUrl === "string") setVideoreelUrl(b.videoreelUrl);
+        if (typeof b.experiencia === "string") setExperiencia(b.experiencia);
+        if (Array.isArray(b.habilidades)) setHabilidades(b.habilidades);
+        if (b.redes && typeof b.redes === "object") setRedes(b.redes);
+        if (typeof b.apareceEnBuscador === "boolean") setApareceEnBuscador(b.apareceEnBuscador);
+        // Las fotos del alta ya están en Storage: alcanza con recordar dónde.
+        if (Array.isArray(b.fotos) && b.fotos.length > 0) setFotos(b.fotos);
+        if (b.verOpcionales) setVerOpcionales(true);
+        // Solo se avisa si había algo cargado de verdad, no solo el nombre precargado.
+        setRecuperado(!!(b.fechaNacimiento || b.ubicacion || b.genero || b.fotos?.length));
+      }
+    } catch {
+      // Sin acceso al almacenamiento del navegador: el formulario anda igual, sin borrador.
+    }
+    borradorLeido.current = true;
+  }, [esAlta, userId]);
+
+  // ...y se guarda en cada cambio.
+  useEffect(() => {
+    if (!esAlta || !borradorLeido.current) return;
+    try {
+      localStorage.setItem(
+        claveBorrador(userId),
+        JSON.stringify({
+          nombre,
+          fechaNacimiento,
+          edadVisible,
+          ubicacion,
+          genero,
+          generoDescripcion,
+          videoreelUrl,
+          experiencia,
+          habilidades,
+          redes,
+          apareceEnBuscador,
+          fotos,
+          verOpcionales,
+        }),
+      );
+    } catch {
+      // Ídem: sin almacenamiento no hay borrador.
+    }
+  }, [
+    esAlta,
+    userId,
+    nombre,
+    fechaNacimiento,
+    edadVisible,
+    ubicacion,
+    genero,
+    generoDescripcion,
+    videoreelUrl,
+    experiencia,
+    habilidades,
+    redes,
+    apareceEnBuscador,
+    fotos,
+    verOpcionales,
+  ]);
+
+  async function usarFotoGoogle() {
+    setFotoGoogle("trayendo");
+    const r = await importarFotoDeGoogle();
+    if (!r.ok) return setFotoGoogle(r.error);
+    setFotos((prev) => [
+      ...prev,
+      {
+        id: crypto.randomUUID(),
+        storage_path: r.storage_path,
+        orden: prev.reduce((max, f) => Math.max(max, f.orden), -1) + 1,
+        url: r.url,
+        enBd: false,
+      },
+    ]);
+    setFotoGoogle("usada");
+  }
 
   function alternarHabilidad(h: string) {
     setHabilidades((prev) => (prev.includes(h) ? prev.filter((x) => x !== h) : [...prev, h]));
@@ -147,6 +254,11 @@ export function FormularioTalento({
     }
 
     setErrores(nuevos);
+    // Si el error está en algo opcional que estaba plegado, se despliega para que se vea.
+    const opcionales = ["genero_descripcion", "videoreel_url", "experiencia"];
+    if (Object.keys(nuevos).some((k) => opcionales.includes(k) || k.startsWith("redes_"))) {
+      setVerOpcionales(true);
+    }
     return Object.keys(nuevos).length === 0;
   }
 
@@ -202,6 +314,11 @@ export function FormularioTalento({
     if (esAlta) {
       // Recién ahora existe la fila de `perfiles_talento` que exige la FK de las fotos.
       await persistirFotosPendientes(userId, fotos);
+      try {
+        localStorage.removeItem(claveBorrador(userId));
+      } catch {
+        // Nada que limpiar.
+      }
       await supabase
         .from("perfiles")
         .update({ onboarding_completo: true })
@@ -242,6 +359,11 @@ export function FormularioTalento({
 
   return (
     <form onSubmit={guardar} data-formulario-talento className="flex max-w-2xl flex-col gap-6">
+      {recuperado && (
+        <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-2.5 text-sm text-texto">
+          Recuperamos lo que habías cargado. Seguí desde acá.
+        </p>
+      )}
       <section className="flex flex-col gap-4">
         <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Ficha básica</h2>
         <CampoTexto
@@ -301,22 +423,41 @@ export function FormularioTalento({
           {errores.genero && <p className="text-xs text-error-600">{errores.genero}</p>}
         </div>
 
-        <CampoTexto
-          id="genero_descripcion"
-          etiqueta="Cómo te identificás (opcional)"
-          placeholder="Con tus palabras"
-          maxLength={MAX_GENERO_DESCRIPCION}
-          value={generoDescripcion}
-          onChange={(e) => setGeneroDescripcion(e.target.value)}
-          error={errores.genero_descripcion}
-        />
-        <p className="-mt-2 text-xs text-texto-tenue">
-          Se muestra en tu perfil. No se usa para filtrar convocatorias.
-        </p>
+        {verOpcionales && (
+          <>
+            <CampoTexto
+              id="genero_descripcion"
+              etiqueta="Cómo te identificás (opcional)"
+              placeholder="Con tus palabras"
+              maxLength={MAX_GENERO_DESCRIPCION}
+              value={generoDescripcion}
+              onChange={(e) => setGeneroDescripcion(e.target.value)}
+              error={errores.genero_descripcion}
+            />
+            <p className="-mt-2 text-xs text-texto-tenue">
+              Se muestra en tu perfil. No se usa para filtrar convocatorias.
+            </p>
+          </>
+        )}
       </section>
 
       <section className="flex flex-col gap-3">
         <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Portfolio de fotos</h2>
+        {esAlta && conFotoGoogle && fotoGoogle !== "usada" && (
+          <div className="flex flex-col gap-1">
+            <button
+              type="button"
+              onClick={usarFotoGoogle}
+              disabled={fotoGoogle === "trayendo"}
+              className="self-start rounded-full border border-borde px-3.5 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
+            >
+              {fotoGoogle === "trayendo" ? "Trayendo tu foto…" : "Usar mi foto de Google"}
+            </button>
+            {fotoGoogle !== "lista" && fotoGoogle !== "trayendo" && (
+              <p className="text-xs text-error-600">{fotoGoogle}</p>
+            )}
+          </div>
+        )}
         <SubirFotos talentoId={userId} fotos={fotos} onCambio={setFotos} persistir={!esAlta} />
         {errores.fotos && <p className="text-xs text-error-600">{errores.fotos}</p>}
         {!esAlta && fotos.length < MIN_FOTOS && (
@@ -326,103 +467,120 @@ export function FormularioTalento({
         )}
       </section>
 
-      <section className="flex flex-col gap-4">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Videoreel (opcional)</h2>
-        <CampoTexto
-          id="videoreel"
-          etiqueta="Enlace de YouTube o Vimeo"
-          placeholder="https://youtu.be/... o https://vimeo.com/..."
-          value={videoreelUrl}
-          onChange={(e) => setVideoreelUrl(e.target.value)}
-          error={errores.videoreel_url}
-        />
-        <p className="-mt-2 text-xs text-texto-tenue">
-          Sirve el link normal, el de compartir, Shorts o el de la app del celular.
-        </p>
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">CV y habilidades</h2>
-        <div className="flex flex-col gap-1.5">
-          <label htmlFor="experiencia" className="text-sm font-medium text-texto">
-            Experiencia
-          </label>
-          <textarea
-            id="experiencia"
-            rows={5}
-            maxLength={2000}
-            value={experiencia}
-            onChange={(e) => setExperiencia(e.target.value)}
-            className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
-            placeholder="Contá tu formación, obras en las que participaste, etc."
-          />
-          <p className="text-right text-xs text-texto-tenue">{experiencia.length}/2000</p>
-        </div>
-
-        <div className="flex flex-wrap gap-2">
-          {HABILIDADES.map((h) => (
-            <button
-              key={h}
-              type="button"
-              onClick={() => alternarHabilidad(h)}
-              className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
-                habilidades.includes(h)
-                  ? "border-accion bg-accion text-accion-texto"
-                  : "border-borde text-texto-tenue"
-              }`}
-            >
-              {h}
-            </button>
-          ))}
-        </div>
-      </section>
-
-      <section className="flex flex-col gap-4">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Redes sociales (opcional)</h2>
-        {REDES.filter(
-          (red) => masRedes || red.clave === "instagram" || !!redes[red.clave] || !!errores[`redes_${red.clave}`],
-        ).map((red) => (
-          <CampoTexto
-            key={red.clave}
-            id={`red_${red.clave}`}
-            etiqueta={red.etiqueta}
-            placeholder={red.clave === "sitio" ? "https://tusitio.com" : "@usuario o https://…"}
-            value={redes[red.clave] ?? ""}
-            onChange={(e) => cambiarRed(red.clave, e.target.value)}
-            error={errores[`redes_${red.clave}`]}
-          />
-        ))}
-        {!masRedes && (
-          <button
-            type="button"
-            onClick={() => setMasRedes(true)}
-            className="self-start text-sm font-medium text-texto-tenue underline hover:text-texto"
-          >
-            + Agregar otra red (YouTube, TikTok, X, LinkedIn, Vimeo, sitio web)
-          </button>
-        )}
-      </section>
-
-      <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Visibilidad</h2>
-        {/* #265: se tilda para ocultarse. En la base sigue siendo `aparece_en_buscador`
-            (invertido); 0090 lo aplica a todo contacto nuevo, no solo al buscador. */}
-        <label className="flex items-start gap-3">
-          <input
-            type="checkbox"
-            checked={!apareceEnBuscador}
-            onChange={(e) => setApareceEnBuscador(!e.target.checked)}
-            className="mt-0.5 h-4 w-4 rounded border-ink-300 text-texto focus:ring-accion"
-          />
-          <span className="text-sm text-texto">
-            Ocultar mi perfil a personas nuevas
-            <span className="mt-0.5 block text-xs text-texto-tenue">
-              No salís en el buscador de Creadores y tu enlace público deja de mostrar tu
-              perfil. Tus chats y tus Proyectos y Equipos siguen igual.
-            </span>
+      {!verOpcionales ? (
+        <button
+          type="button"
+          onClick={() => setVerOpcionales(true)}
+          className="flex flex-col items-start rounded-xl border border-dashed border-borde px-4 py-3 text-left transition-colors hover:bg-fondo-sutil"
+        >
+          <span className="text-sm font-medium text-texto">+ Sumar más (opcional)</span>
+          <span className="mt-0.5 text-xs text-texto-tenue">
+            Videoreel, experiencia, habilidades y redes. También podés completarlo después desde
+            tu Perfil.
           </span>
-        </label>
-      </section>
+        </button>
+      ) : (
+        <>
+          <section className="flex flex-col gap-4">
+            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Videoreel (opcional)</h2>
+            <CampoTexto
+              id="videoreel"
+              etiqueta="Enlace de YouTube o Vimeo"
+              placeholder="https://youtu.be/... o https://vimeo.com/..."
+              value={videoreelUrl}
+              onChange={(e) => setVideoreelUrl(e.target.value)}
+              error={errores.videoreel_url}
+            />
+            <p className="-mt-2 text-xs text-texto-tenue">
+              Sirve el link normal, el de compartir, Shorts o el de la app del celular.
+            </p>
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">CV y habilidades</h2>
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="experiencia" className="text-sm font-medium text-texto">
+                Experiencia
+              </label>
+              <textarea
+                id="experiencia"
+                rows={5}
+                maxLength={2000}
+                value={experiencia}
+                onChange={(e) => setExperiencia(e.target.value)}
+                className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
+                placeholder="Contá tu formación, obras en las que participaste, etc."
+              />
+              <p className="text-right text-xs text-texto-tenue">{experiencia.length}/2000</p>
+            </div>
+
+            <div className="flex flex-wrap gap-2">
+              {HABILIDADES.map((h) => (
+                <button
+                  key={h}
+                  type="button"
+                  onClick={() => alternarHabilidad(h)}
+                  className={`rounded-full border px-3 py-1.5 text-sm transition-colors ${
+                    habilidades.includes(h)
+                      ? "border-accion bg-accion text-accion-texto"
+                      : "border-borde text-texto-tenue"
+                  }`}
+                >
+                  {h}
+                </button>
+              ))}
+            </div>
+          </section>
+
+          <section className="flex flex-col gap-4">
+            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Redes sociales (opcional)</h2>
+            {REDES.filter(
+              (red) => masRedes || red.clave === "instagram" || !!redes[red.clave] || !!errores[`redes_${red.clave}`],
+            ).map((red) => (
+              <CampoTexto
+                key={red.clave}
+                id={`red_${red.clave}`}
+                etiqueta={red.etiqueta}
+                placeholder={red.clave === "sitio" ? "https://tusitio.com" : "@usuario o https://…"}
+                value={redes[red.clave] ?? ""}
+                onChange={(e) => cambiarRed(red.clave, e.target.value)}
+                error={errores[`redes_${red.clave}`]}
+              />
+            ))}
+            {!masRedes && (
+              <button
+                type="button"
+                onClick={() => setMasRedes(true)}
+                className="self-start text-sm font-medium text-texto-tenue underline hover:text-texto"
+              >
+                + Agregar otra red (YouTube, TikTok, X, LinkedIn, Vimeo, sitio web)
+              </button>
+            )}
+          </section>
+
+          <section className="flex flex-col gap-3">
+            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Visibilidad</h2>
+            {/* #265: se tilda para ocultarse. En la base sigue siendo `aparece_en_buscador`
+                (invertido); 0090 lo aplica a todo contacto nuevo, no solo al buscador. */}
+            <label className="flex items-start gap-3">
+              <input
+                type="checkbox"
+                checked={!apareceEnBuscador}
+                onChange={(e) => setApareceEnBuscador(!e.target.checked)}
+                className="mt-0.5 h-4 w-4 rounded border-ink-300 text-texto focus:ring-accion"
+              />
+              <span className="text-sm text-texto">
+                Ocultar mi perfil a personas nuevas
+                <span className="mt-0.5 block text-xs text-texto-tenue">
+                  No salís en el buscador de Creadores y tu enlace público deja de mostrar tu
+                  perfil. Tus chats y tus Proyectos y Equipos siguen igual.
+                </span>
+              </span>
+            </label>
+          </section>
+
+        </>
+      )}
 
       {datosCreador && (
         <section className="border-t border-borde pt-6">

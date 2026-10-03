@@ -57,72 +57,71 @@ export function SubirFotos({
 
   const ordenadas = [...fotos].sort((a, b) => a.orden - b.orden);
 
-  async function agregarFoto(e: React.ChangeEvent<HTMLInputElement>) {
-    const archivo = e.target.files?.[0];
-    e.target.value = "";
-    if (!archivo) return;
-    setError(null);
-
-    if (fotos.length >= MAX_FOTOS) {
-      setError(`El máximo es ${MAX_FOTOS} fotos.`);
-      return;
-    }
-    if (!TIPOS_ADMITIDOS.includes(archivo.type)) {
-      setError("Solo se admiten imágenes JPEG, PNG o WebP.");
-      return;
-    }
-
-    setSubiendo(true);
+  /** Sube un archivo y devuelve la foto, o el motivo por el que no se pudo. */
+  async function subirUna(archivo: File, orden: number): Promise<FotoTalento | string> {
+    if (!TIPOS_ADMITIDOS.includes(archivo.type)) return "Solo se admiten imágenes JPEG, PNG o WebP.";
 
     // Si la foto pesa o mide de más, se comprime acá en vez de rechazarla.
     let foto: File;
     try {
       foto = await comprimirImagen(archivo, { maxBytes: MAX_BYTES });
     } catch (e) {
-      setSubiendo(false);
-      setError(e instanceof Error ? e.message : "No pudimos procesar la imagen.");
-      return;
+      return e instanceof Error ? e.message : "No pudimos procesar la imagen.";
     }
 
     const supabase = createClient();
     const extension = (foto.type.split("/")[1] ?? "jpg").replace("jpeg", "jpg");
     const ruta = `${talentoId}/${crypto.randomUUID()}.${extension}`;
-
     const { error: errorSubida } = await supabase.storage
       .from("fotos-perfil")
       .upload(ruta, foto, { contentType: foto.type });
+    if (errorSubida) return "No pudimos subir la foto. Probá de nuevo.";
 
-    if (errorSubida) {
-      setSubiendo(false);
-      setError("No pudimos subir la foto. Probá de nuevo.");
-      return;
-    }
-
-    // max + 1: evita reusar el orden de una foto borrada del medio.
-    const siguienteOrden = fotos.reduce((max, f) => Math.max(max, f.orden), -1) + 1;
     const url = supabase.storage.from("fotos-perfil").getPublicUrl(ruta).data.publicUrl;
-
-    if (!persistir) {
-      setSubiendo(false);
-      onCambio([...fotos, { id: crypto.randomUUID(), storage_path: ruta, orden: siguienteOrden, url, enBd: false }]);
-      return;
-    }
+    if (!persistir) return { id: crypto.randomUUID(), storage_path: ruta, orden, url, enBd: false };
 
     const { data: fila, error: errorInsert } = await supabase
       .from("fotos_talento")
-      .insert({ talento_id: talentoId, storage_path: ruta, orden: siguienteOrden })
+      .insert({ talento_id: talentoId, storage_path: ruta, orden })
       .select()
       .single();
-
-    setSubiendo(false);
-
     if (errorInsert || !fila) {
       await supabase.storage.from("fotos-perfil").remove([ruta]);
-      setError("No pudimos guardar la foto. Probá de nuevo.");
+      return "No pudimos guardar la foto. Probá de nuevo.";
+    }
+    return { id: fila.id, storage_path: ruta, orden, url, enBd: true };
+  }
+
+  // #301: se pueden elegir varias a la vez; se suben de a una, hasta llenar el máximo.
+  async function agregarFotos(e: React.ChangeEvent<HTMLInputElement>) {
+    const archivos = Array.from(e.target.files ?? []);
+    e.target.value = "";
+    if (archivos.length === 0) return;
+    setError(null);
+
+    const lugares = MAX_FOTOS - fotos.length;
+    if (lugares <= 0) {
+      setError(`El máximo es ${MAX_FOTOS} fotos.`);
       return;
     }
 
-    onCambio([...fotos, { id: fila.id, storage_path: ruta, orden: siguienteOrden, url, enBd: true }]);
+    setSubiendo(true);
+    let actuales = fotos;
+    let problema: string | null =
+      archivos.length > lugares ? `Subimos ${lugares} de ${archivos.length}: el máximo es ${MAX_FOTOS} fotos.` : null;
+    for (const archivo of archivos.slice(0, lugares)) {
+      // max + 1: evita reusar el orden de una foto borrada del medio.
+      const orden = actuales.reduce((max, f) => Math.max(max, f.orden), -1) + 1;
+      const r = await subirUna(archivo, orden);
+      if (typeof r === "string") {
+        problema = r;
+        continue;
+      }
+      actuales = [...actuales, r];
+      onCambio(actuales);
+    }
+    setSubiendo(false);
+    setError(problema);
   }
 
   async function eliminarFoto(foto: FotoTalento) {
@@ -191,12 +190,13 @@ export function SubirFotos({
         {fotos.length < MAX_FOTOS && (
           <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-ink-300 text-texto-tenue transition-colors hover:border-texto hover:text-texto">
             <Icono nombre="mas" className="h-5 w-5" />
-            <span className="text-2xs font-medium">{subiendo ? "Subiendo…" : "Agregar"}</span>
+            <span className="text-2xs font-medium">{subiendo ? "Subiendo…" : "Agregar fotos"}</span>
             <input
               type="file"
               accept={TIPOS_ADMITIDOS.join(",")}
               className="hidden"
-              onChange={agregarFoto}
+              multiple
+              onChange={agregarFotos}
               disabled={subiendo}
             />
           </label>
@@ -205,7 +205,7 @@ export function SubirFotos({
 
       {error && <p className="text-xs text-error-600">{error}</p>}
       <p className="text-xs text-texto-tenue">
-        {fotos.length}/{MAX_FOTOS} fotos — mínimo {MIN_FOTOS} para completar el perfil.
+        {fotos.length}/{MAX_FOTOS} fotos — mínimo {MIN_FOTOS} para completar el perfil. Podés elegir varias juntas.
       </p>
     </div>
   );
