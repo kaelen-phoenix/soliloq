@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { mejorarRedaccion } from "@/app/acciones-ia";
 
 /**
@@ -9,17 +9,28 @@ import { mejorarRedaccion } from "@/app/acciones-ia";
  */
 export function MejorarRedaccion({ texto, onUsar }: { texto: string; onUsar: (nuevo: string) => void }) {
   const [estado, setEstado] = useState<"listo" | "pensando">("listo");
-  const [propuesta, setPropuesta] = useState<string | null>(null);
+  // La propuesta va con el texto del que salió: si la persona lo sigue editando, ya no aplica.
+  const [propuesta, setPropuesta] = useState<{ de: string; texto: string } | null>(null);
   const [error, setError] = useState<string | null>(null);
 
+  useEffect(() => {
+    if (propuesta && propuesta.de !== texto) setPropuesta(null);
+  }, [texto, propuesta]);
+
   async function pedir() {
+    const de = texto;
     setEstado("pensando");
     setError(null);
     setPropuesta(null);
-    const r = await mejorarRedaccion(texto);
-    setEstado("listo");
-    if (!r.ok) return setError(r.error);
-    setPropuesta(r.texto);
+    try {
+      const r = await mejorarRedaccion(de);
+      if (!r.ok) return setError(r.error);
+      setPropuesta({ de, texto: r.texto });
+    } catch {
+      setError("No pudimos mejorarlo ahora. Probá de nuevo.");
+    } finally {
+      setEstado("listo");
+    }
   }
 
   return (
@@ -41,13 +52,13 @@ export function MejorarRedaccion({ texto, onUsar }: { texto: string; onUsar: (nu
       {propuesta && (
         <div className="flex flex-col gap-2 rounded-xl border border-borde bg-fondo-sutil p-3.5">
           <p className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Propuesta</p>
-          <p className="whitespace-pre-line text-sm text-texto">{propuesta}</p>
+          <p className="whitespace-pre-line text-sm text-texto">{propuesta.texto}</p>
           <p className="text-xs text-texto-tenue">Revisala: la IA puede equivocarse.</p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
               onClick={() => {
-                onUsar(propuesta);
+                onUsar(propuesta.texto);
                 setPropuesta(null);
               }}
               className="rounded-full bg-accion px-3.5 py-1.5 text-sm font-semibold text-accion-texto"

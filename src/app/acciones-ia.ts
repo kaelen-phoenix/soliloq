@@ -40,7 +40,7 @@ export async function mejorarRedaccion(texto: string): Promise<Resultado> {
   const { error: errorTope } = await supabase.rpc("consumir_uso_ia");
   if (errorTope) {
     if (errorTope.message?.includes("limite_ia")) {
-      return { ok: false, error: "Llegaste al máximo de mejoras por hoy. Probá mañana." };
+      return { ok: false, error: "Llegaste al máximo de mejoras de las últimas 24 horas. Probá más tarde." };
     }
     Sentry.captureException(errorTope, { extra: { accion: "consumir_uso_ia" } });
     return { ok: false, error: "No pudimos mejorarlo ahora. Probá de nuevo." };
