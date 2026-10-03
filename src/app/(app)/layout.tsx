@@ -54,7 +54,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
       >
         <ActualizarAlVolver />
         <AvisoConvocatoria userId={user.id} />
-        <BarraLateral tieneProyectos={estado.tienePerfilCreador} esAdmin={estado.esAdmin} />
+        <BarraLateral esAdmin={estado.esAdmin} />
 
         <div className="min-w-0 flex-1">
           <Encabezado userId={user.id} />
@@ -63,7 +63,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           </div>
         </div>
 
-        <BarraNavegacion tieneProyectos={estado.tienePerfilCreador} esAdmin={estado.esAdmin} />
+        <BarraNavegacion esAdmin={estado.esAdmin} />
         {/* Suspense: el tour lee `?tour=1` con useSearchParams. */}
         <Suspense fallback={null}>
           <TourGuiado userId={user.id} visto={estado.tourVisto} />

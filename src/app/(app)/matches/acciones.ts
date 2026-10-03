@@ -126,3 +126,19 @@ export async function marcarInteresEnTalento(
   revalidatePath("/matches");
   return { ok: true };
 }
+
+/** El Talento se baja de un match o de una convocatoria todavía sin responder (#298). */
+export async function retirarmeDeMatch(matchId: string): Promise<Resultado> {
+  const supabase = createClient();
+  const { error } = await supabase.rpc("retirarme_de_match", { p_match_id: matchId });
+  if (error) {
+    if (error.message?.includes("ya estás en el chat")) {
+      return { ok: false, error: "Ya estás en el chat: usá «Salir del chat»." };
+    }
+    reportarErrorSupabase(error, { rpc: "retirarme_de_match", matchId });
+    return { ok: false, error: "No se pudo aplicar. Probá de nuevo." };
+  }
+  revalidatePath("/matches");
+  revalidatePath("/convocatoria");
+  return { ok: true };
+}

@@ -26,7 +26,7 @@ const PASOS: Paso[] = [
   { clave: "bienvenida" },
   { clave: "explorar", ancla: "nav-inicio" },
   { clave: "meInteresa", ancla: "me-interesa" },
-  { clave: "match" },
+  { clave: "match", ancla: "nav-matches" },
   { clave: "proyectos", ancla: "nav-proyectos" },
   { clave: "chats", ancla: "nav-salas" },
   { clave: "notificaciones", ancla: "campanita" },

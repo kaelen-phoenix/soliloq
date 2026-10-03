@@ -27,28 +27,18 @@ export interface ItemNavegacion {
  */
 const EXPLORAR: ItemNavegacion = { href: "/", clave: "convocatorias", claveCorto: "convocatoriasCorto", icono: "feed" };
 const PROYECTOS: ItemNavegacion = { href: "/proyectos", clave: "misProyectos", claveCorto: "misProyectosCorto", icono: "tablero" };
-const CALL_BACK: ItemNavegacion = { href: "/matches", clave: "matches", icono: "corazon" };
+const MATCHES: ItemNavegacion = { href: "/matches", clave: "matches", icono: "corazon" };
 const CHATS: ItemNavegacion = { href: "/salas", clave: "salas", icono: "salas" };
 const PERFIL: ItemNavegacion = { href: "/perfil", clave: "perfil", icono: "perfil" };
 const ADMIN: ItemNavegacion = { href: "/admin", clave: "admin", claveCorto: "admin", icono: "admin" };
 
 /**
- * La lista de navegación para un usuario. Matches aparece recién cuando la persona armó
- * su primer Proyecto o Equipo (antes no tiene a quién convocar), y "Admin" al final si lo
- * es: el admin no es un rol, es un flag que suma un ítem.
+ * La lista de navegación para un usuario: la misma para todos (#298: Matches también sirve
+ * a quien hizo match con un proyecto ajeno), más "Admin" al final si lo es: el admin no es
+ * un rol, es un flag que suma un ítem.
  */
-export function itemsParaNavegacion({
-  tieneProyectos = false,
-  esAdmin = false,
-}: { tieneProyectos?: boolean; esAdmin?: boolean } = {}): ItemNavegacion[] {
-  return [
-    EXPLORAR,
-    PROYECTOS,
-    ...(tieneProyectos ? [CALL_BACK] : []),
-    CHATS,
-    PERFIL,
-    ...(esAdmin ? [ADMIN] : []),
-  ];
+export function itemsParaNavegacion({ esAdmin = false }: { esAdmin?: boolean } = {}): ItemNavegacion[] {
+  return [EXPLORAR, PROYECTOS, MATCHES, CHATS, PERFIL, ...(esAdmin ? [ADMIN] : [])];
 }
 
 /** Ancla del tour guiado (#231) para un ítem: `nav-inicio`, `nav-salas`, `nav-matches`… */

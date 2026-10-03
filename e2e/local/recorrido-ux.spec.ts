@@ -155,6 +155,7 @@ test.describe("recorrido de UX", () => {
     const pT = await entrar(browser, talento.email);
     for (const [ruta, nombre] of [
       ["/", "talento-feed"],
+      ["/matches", "talento-matches"],
       ["/convocatoria", "talento-convocatorias"],
       ["/salas", "talento-chats"],
       ["/perfil", "talento-perfil"],
@@ -170,7 +171,7 @@ test.describe("recorrido de UX", () => {
     const pC = await entrar(browser, creador.email);
     for (const [ruta, nombre] of [
       ["/proyectos", "creador-tablero"],
-      ["/matches", "creador-callback"],
+      ["/matches", "creador-matches"],
       ["/talentos", "creador-buscar"],
       [`/obras/${obra!.id}`, "creador-proyecto"],
       ["/salas", "creador-chats"],

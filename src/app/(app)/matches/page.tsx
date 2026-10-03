@@ -4,6 +4,7 @@ import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 import { ModalNuevoMatch } from "@/components/convocatorias/modal-nuevo-match";
+import { MisMatchesTalento, type FilaMatchTalento } from "@/components/convocatorias/mis-matches-talento";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 export const metadata = { title: "Matches — Yalope" };
@@ -13,13 +14,13 @@ export default async function MatchesPage() {
   const user = await usuarioDeLaRequest();
   if (!user) return null;
 
-
   const iniciativa = await iniciativaActivaDelCreador(supabase, user.id);
 
   const [
     { data: matches, error: errorMatches },
     { data: convocados, error: errorConvocados },
     { data: cobertura, error: errorCobertura },
+    { data: comoTalento, error: errorComoTalento },
   ] = await Promise.all([
     supabase.rpc("mis_matches"),
     supabase.rpc("mis_convocados"),
@@ -28,7 +29,11 @@ export default async function MatchesPage() {
     iniciativa?.tipo === "obra"
       ? supabase.rpc("cobertura_iniciativa", { p_obra_id: iniciativa.id, p_equipo_id: null })
       : Promise.resolve({ data: null, error: null }),
+    // #298: del otro lado, dónde hizo match quien mira (todos, no solo quien tiene proyecto).
+    supabase.rpc("mis_matches_como_talento"),
   ]);
+  if (errorComoTalento)
+    reportarErrorSupabase(errorComoTalento, { rpc: "mis_matches_como_talento", userId: user.id });
   if (errorMatches) reportarErrorSupabase(errorMatches, { rpc: "mis_matches", userId: user.id });
   if (errorConvocados)
     reportarErrorSupabase(errorConvocados, { rpc: "mis_convocados", userId: user.id });
@@ -100,20 +105,34 @@ export default async function MatchesPage() {
     estado: c.estado as "en_convocados" | "esperando_confirmacion" | "en_sala",
   }));
 
+  const filasTalento: FilaMatchTalento[] = (comoTalento ?? []).map((m) => ({
+    matchId: m.match_id,
+    esEquipo: m.es_equipo,
+    obraId: m.obra_id,
+    titulo: m.iniciativa_titulo,
+    fotoUrl: url(m.iniciativa_foto),
+    creadorNombre: m.creador_nombre,
+    expiraEn: m.expira_en,
+    estado: m.estado,
+    salaId: m.sala_id,
+  }));
+  const filasCreador = [...filasMatches, ...filasConvocados];
+
   return (
-    <main className="px-5 py-5">
-      <p className="mb-5 text-sm text-texto-tenue">
-        Interés mutuo. Convocá a quien quieras sumar: cuando acepte, entra al chat del proyecto.
+    <main className="flex flex-col gap-7 px-5 py-5">
+      <p className="text-sm text-texto-tenue">
+        Interés mutuo: cuando a vos y a la otra parte les interesa, aparece acá.
       </p>
 
-      {filas.length === 0 && filasConvocados.length === 0 && (
+      {filasCreador.length === 0 && filasTalento.length === 0 && (
         <EstadoVacio
           icono="corazon"
           titulo="Todavía no hay matches"
-          detalle="Cuando marques «Me interesa» en un perfil y esa persona también marque tu proyecto o equipo, aparece acá."
+          detalle="Marcá «Me interesa» en Explorar, o buscá talento para tu proyecto. Cuando el interés es mutuo, aparece acá."
         />
       )}
-      <ConvocadosLista filas={[...filasMatches, ...filasConvocados]} roles={roles} />
+      {filasCreador.length > 0 && <ConvocadosLista filas={filasCreador} roles={roles} />}
+      {filasTalento.length > 0 && <MisMatchesTalento filas={filasTalento} />}
 
       <ModalNuevoMatch nuevos={nuevos} />
     </main>
