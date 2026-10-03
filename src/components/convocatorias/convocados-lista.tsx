@@ -23,6 +23,17 @@ export interface FilaConvocado {
   esEquipo: boolean;
   iniciativaTitulo: string;
   estado: Estado;
+  /** Match nuevo (todavía sin convocar): cuándo vence. */
+  expiraEn?: string | null;
+  /** La iniciativa ya llenó su cupo: no se puede convocar a nadie más. */
+  cupoLleno?: boolean;
+}
+
+function diasRestantes(expiraEn: string) {
+  const dias = Math.ceil((new Date(expiraEn).getTime() - Date.now()) / 86_400_000);
+  if (dias <= 0) return "Vence hoy";
+  if (dias === 1) return "Vence mañana";
+  return `Vence en ${dias} días`;
 }
 
 export interface RolDisponible {
@@ -32,7 +43,7 @@ export interface RolDisponible {
 }
 
 const CHIP: Record<Estado, { texto: string; clase: string }> = {
-  en_convocados: { texto: "En convocados", clase: "bg-fondo-sutil text-texto-tenue" },
+  en_convocados: { texto: "Match", clase: "bg-fondo-sutil text-texto-tenue" },
   esperando_confirmacion: { texto: "Esperando confirmación", clase: "bg-alerta-50 text-alerta-800" },
   en_sala: { texto: "En la sala", clase: "bg-accion text-accion-texto" },
 };
@@ -114,9 +125,9 @@ export function ConvocadosLista({
   }
 
   return (
-    <section className="mt-8">
+    <section className="mt-2">
       <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-        Convocados ({filas.length})
+        Matches ({filas.length})
       </h2>
       {error && !eligiendoRol && <p className="mt-1 text-xs text-error-600">{error}</p>}
       <ul className="mt-2 flex flex-col gap-2">
@@ -154,6 +165,9 @@ export function ConvocadosLista({
                 >
                   {CHIP[f.estado].texto}
                 </span>
+                {f.estado === "en_convocados" && f.expiraEn && (
+                  <span className="ml-2 text-xs text-texto-tenue">{diasRestantes(f.expiraEn)}</span>
+                )}
               </div>
 
               {f.estado === "en_convocados" && (
@@ -162,9 +176,10 @@ export function ConvocadosLista({
                     variante="secundario"
                     cargando={ocupadoId === f.matchId}
                     textoCargando="…"
+                    disabled={f.cupoLleno}
                     onClick={() => alConvocar(f)}
                   >
-                    Convocar
+                    {f.cupoLleno ? "Cupo lleno" : "Convocar"}
                   </Boton>
                   <button
                     type="button"
@@ -191,7 +206,7 @@ export function ConvocadosLista({
                 <p className="text-sm text-texto">
                   {f.estado === "en_sala"
                     ? `¿Dar de baja a ${f.nombre}? Sale de la sala y se libera un lugar.`
-                    : `¿Descartar a ${f.nombre} de Convocados? Se libera el lugar.`}
+                    : `¿Descartar a ${f.nombre}? Se libera el lugar.`}
                 </p>
                 <div className="flex gap-2">
                   <Boton

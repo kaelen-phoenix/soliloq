@@ -24,7 +24,7 @@ correr() {
   local ruta="$1"
   echo "── $(basename "$ruta")"
   local payload resp code body
-  payload="$(python3 -c "import json,sys; print(json.dumps({'query': open(sys.argv[1]).read()}))" "$ruta")"
+  payload="$(python3 -c "import json,sys; print(json.dumps({'query': open(sys.argv[1], encoding='utf-8').read()}))" "$ruta")"
   resp="$(curl -sS -w $'\n%{http_code}' \
     -H "Authorization: Bearer $TOKEN" -H "Content-Type: application/json" \
     -X POST "https://api.supabase.com/v1/projects/$REF/database/query" --data "$payload")"

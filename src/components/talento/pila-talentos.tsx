@@ -9,7 +9,7 @@ import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { Superposicion } from "@/components/ui/superposicion";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import { marcarInteresEnTalento, aceptarMatch } from "@/app/(app)/matches/acciones";
+import { marcarInteresEnTalento } from "@/app/(app)/matches/acciones";
 import type { ResultadoTalento } from "./tarjeta-talento";
 
 export interface IniciativaPlaca {
@@ -104,16 +104,9 @@ export function PilaTalentos({
     siguiente();
   }
 
-  async function enviarAConvocados() {
-    if (!placa) return;
-    setOcupado(true);
-    const res = await aceptarMatch(placa.matchId);
-    setOcupado(false);
-    if (!res.ok) {
-      setError(res.error);
-      return;
-    }
-    cerrarPlaca();
+  /** Hay match: se convoca desde Call Back, donde está el selector de rol (#287). */
+  function irAConvocar() {
+    router.push("/matches");
   }
 
   /** Cerrar sin aceptar: el match queda igual en `/matches`, no se pierde. */
@@ -255,10 +248,10 @@ export function PilaTalentos({
             <button
               type="button"
               disabled={ocupado}
-              onClick={enviarAConvocados}
+              onClick={irAConvocar}
               className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
             >
-              {ocupado ? "…" : "Enviar a Convocados"}
+              {ocupado ? "…" : "Convocar"}
             </button>
             <button
               type="button"

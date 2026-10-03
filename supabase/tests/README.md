@@ -74,6 +74,9 @@ Necesita el **secret `SUPABASE_ACCESS_TOKEN`** (un PAT de cuenta de Supabase,
   cuenta incompleta, `perfil_publico` las devuelve vacías (y sin sesión la columna no se lee); con
   cuenta completa, sí. Nadie puede contactar ni insertar un contacto (sin chat de dos personas).
 
+- **`convocar_en_un_paso.sql`** — convocar sin «aceptar el match» (#287, 0098): `convocar` acepta el
+  match solo y deja la convocatoria pendiente con su aviso; un match vencido o descartado no se convoca.
+
 ## Pendiente
 
 Falta un runner en CI (hoy es manual con el PAT) y E2E de navegador para los flujos de UI.
