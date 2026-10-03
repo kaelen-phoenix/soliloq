@@ -2,7 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Avatar } from "@/components/convocatorias/avatar";
 import { retirarmeDeMatch } from "@/app/(app)/matches/acciones";
 import { desvincularmeDeSala } from "@/app/(app)/salas/acciones";

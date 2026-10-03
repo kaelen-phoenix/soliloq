@@ -48,11 +48,15 @@ as $function$
       else 'match'
     end,
     coalesce(ca.id, cp.id),
+    -- La sala de esa iniciativa, por tipo, y solo si quien mira está adentro.
     case when ca.id is not null then
-      (select s.id from salas s where coalesce(s.obra_id, s.equipo_id) = coalesce(m.obra_id, m.equipo_id) limit 1)
+      (select s.id from salas s
+       join sala_integrantes si on si.sala_id = s.id and si.perfil_id = m.talento_id
+       where (m.obra_id is not null and s.obra_id = m.obra_id)
+          or (m.equipo_id is not null and s.equipo_id = m.equipo_id)
+       limit 1)
     end
   from matches m
-  -- Si quien mira bloqueó al Creador (0022) la iniciativa no se ve: no se lista.
   left join obras o on o.id = m.obra_id
   left join equipos e on e.id = m.equipo_id
   left join perfiles_talento tc on tc.id = m.creador_id
@@ -70,6 +74,8 @@ as $function$
     and m.creador_id <> auth.uid()
     and m.descartado_en is null
     and coalesce(o.id, e.id) is not null
+    -- Con un bloqueo entre las dos personas (0022, en cualquier sentido) no se lista.
+    and not public.hay_bloqueo(m.creador_id)
     and not exists (
       select 1 from convocatorias c
       where c.match_id = m.id and c.estado in ('rechazada', 'baja')
