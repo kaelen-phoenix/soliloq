@@ -288,4 +288,43 @@ test.describe("circuito de match (UI)", () => {
     const { data: m } = await admin!.from("matches").select("descartado_en").eq("talento_id", talento.id).single();
     expect(m?.descartado_en).not.toBeNull();
   });
+
+  test("el Talento en el chat sale desde Mis convocatorias (#298)", async ({ page }) => {
+    const sufijo = Date.now();
+    const tituloObra = `Obra Salida E2E ${sufijo}`;
+    const talento = await nuevoUsuario();
+    const creador = await nuevoUsuario();
+    await sembrarTalento(talento.id, `Talento Salida E2E ${sufijo}`);
+    await sembrarCreadorConObra(creador.id, "Creador Salida E2E", tituloObra);
+    const { data: obra } = await admin!.from("obras").select("id").eq("creador_id", creador.id).single();
+    const { error } = await admin!.from("intereses_match").insert([
+      { de_perfil: talento.id, a_perfil: creador.id, obra_id: obra!.id, interesa: true },
+      { de_perfil: creador.id, a_perfil: talento.id, obra_id: obra!.id, interesa: true },
+    ]);
+    if (error) throw error;
+    // Ya está adentro: match aceptado, convocatoria aceptada y la sala con los dos.
+    const { data: m } = await admin!.from("matches").select("id").eq("talento_id", talento.id).single();
+    await admin!.from("matches").update({ aceptado_en: new Date().toISOString() }).eq("id", m!.id);
+    const { error: eC } = await admin!.from("convocatorias").insert({ match_id: m!.id, estado: "aceptada" });
+    if (eC) throw eC;
+    const { data: sala, error: eS } = await admin!.from("salas").insert({ titulo: tituloObra, obra_id: obra!.id }).select("id").single();
+    if (eS) throw eS;
+    await admin!.from("sala_integrantes").insert([
+      { sala_id: sala.id, perfil_id: creador.id },
+      { sala_id: sala.id, perfil_id: talento.id },
+    ]);
+
+    await login(page, talento.email);
+    await page.goto("/matches");
+    const fila = page.locator("li", { hasText: tituloObra });
+    await expect(fila).toBeVisible({ timeout: 15_000 });
+    await expect(fila.getByText("En el chat")).toBeVisible();
+    await expect(fila.getByRole("link", { name: "Ir al chat" })).toBeVisible();
+    await fila.getByRole("button", { name: "Salir del chat" }).click();
+    await fila.getByRole("button", { name: "Sí, salir" }).click();
+    await expect(page.locator("li", { hasText: tituloObra })).toHaveCount(0, { timeout: 10_000 });
+
+    const { data: adentro } = await admin!.from("sala_integrantes").select("perfil_id").eq("sala_id", sala.id).eq("perfil_id", talento.id);
+    expect(adentro).toHaveLength(0);
+  });
 });
