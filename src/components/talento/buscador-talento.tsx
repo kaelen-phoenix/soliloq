@@ -9,7 +9,8 @@ import { Icono } from "@/components/ui/icono";
 import { GENEROS_BUSCABLES, HABILIDADES, type Genero } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import { opcionesDeRadio, RADIO_INICIAL_METROS, type Ubicacion } from "@/lib/ubicacion";
+import { opcionesDeRadio, RADIO_INICIAL_METROS, SesionUbicacion, type Ubicacion } from "@/lib/ubicacion";
+import { interpretarBusqueda } from "@/app/acciones-ia";
 import { type ResultadoTalento } from "./tarjeta-talento";
 import { PilaTalentos, type IniciativaPlaca } from "./pila-talentos";
 
@@ -29,6 +30,53 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
   const [radioMetros, setRadioMetros] = useState<number | null>(RADIO_INICIAL_METROS);
 
   const [verFiltros, setVerFiltros] = useState(false);
+
+  // #321: «Describí a quién buscás» → los mismos filtros de abajo, a la vista para corregirlos.
+  const [consulta, setConsulta] = useState("");
+  const [interpretando, setInterpretando] = useState(false);
+  const [avisoConsulta, setAvisoConsulta] = useState<string | null>(null);
+
+  async function aplicarConsulta(e: React.FormEvent) {
+    e.preventDefault();
+    if (interpretando || consulta.trim().length < 3) return;
+    setInterpretando(true);
+    setAvisoConsulta(null);
+    try {
+      const r = await interpretarBusqueda(consulta);
+      if (!r.ok) return setAvisoConsulta(r.error);
+      const f = r.filtros;
+      setEdadMin(f.edadMin ? String(f.edadMin) : "");
+      setEdadMax(f.edadMax ? String(f.edadMax) : "");
+      setGeneros((f.generos ?? []) as Genero[]);
+      setHabilidades(f.habilidades ?? []);
+      setTexto(f.texto ?? "");
+      let zona: string | null = null;
+      if (f.zona) {
+        try {
+          const sesion = new SesionUbicacion();
+          const [primera] = await sesion.buscar(f.zona);
+          if (primera) {
+            setUbicacion(await sesion.resolver(primera.id));
+            zona = primera.texto;
+          }
+        } catch {
+          // Sin zona: el resto de los filtros se aplica igual.
+        }
+      } else {
+        setUbicacion(null);
+      }
+      setVerFiltros(true);
+      setAvisoConsulta(
+        f.zona && !zona
+          ? `Aplicamos los filtros. No encontramos «${f.zona}»: elegí la zona abajo.`
+          : "Aplicamos los filtros: revisalos abajo.",
+      );
+    } catch {
+      setAvisoConsulta("No pudimos interpretarlo ahora. Usá los filtros de abajo.");
+    } finally {
+      setInterpretando(false);
+    }
+  }
 
   const [resultados, setResultados] = useState<ResultadoTalento[]>([]);
   const [offset, setOffset] = useState(0);
@@ -121,6 +169,30 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
   return (
     <div className="flex flex-col gap-6">
       <div className="flex flex-col gap-4 rounded-2xl border border-borde bg-fondo-sutil/50 p-4">
+        <form onSubmit={aplicarConsulta} className="flex flex-col gap-1.5">
+          <label htmlFor="buscar-describi" className="text-sm font-medium text-texto">
+            ✨ Describí a quién buscás
+          </label>
+          <div className="flex gap-2">
+            <input
+              id="buscar-describi"
+              value={consulta}
+              onChange={(e) => setConsulta(e.target.value)}
+              maxLength={300}
+              placeholder="Actriz de 30 a 40 que cante, cerca de Palermo"
+              className="min-w-0 flex-1 rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto placeholder:text-texto-tenue focus:border-accion"
+            />
+            <button
+              type="submit"
+              disabled={interpretando || consulta.trim().length < 3}
+              className="shrink-0 rounded-xl bg-accion px-3.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
+            >
+              {interpretando ? "…" : "Buscar"}
+            </button>
+          </div>
+          {avisoConsulta && <p className="text-xs text-texto-tenue">{avisoConsulta}</p>}
+        </form>
+
         <CampoTexto
           id="buscar-nombre"
           etiqueta="Buscar"
