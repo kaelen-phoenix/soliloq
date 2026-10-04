@@ -53,12 +53,13 @@ const config: Config = {
         // sistema, el próximo rojo iba a ser otro y nadie lo iba a notar. Tres pasos por
         // color alcanzan — fondo, borde y texto — porque un estado no necesita una rampa.
         // Estados. `50` (fondo de la caja) y `800` (texto de la caja) son variables: en
-        // oscuro dejan de ser casi blanco / casi negro y quedan legibles. `400`/`600`
-        // leen bien en los dos temas, quedan fijos.
+        // oscuro dejan de ser casi blanco / casi negro y quedan legibles. `600` también
+        // es variable (#345); `400` lee bien en los dos temas y queda fijo.
         error: {
           50: "rgb(var(--error-50) / <alpha-value>)",
           400: "#e88a8a",
-          600: "#c62b2b",
+          // Variable (#345): en oscuro el rojo fijo no llegaba al contraste mínimo.
+          600: "rgb(var(--error-600) / <alpha-value>)",
           800: "rgb(var(--error-800) / <alpha-value>)",
         },
         alerta: {
