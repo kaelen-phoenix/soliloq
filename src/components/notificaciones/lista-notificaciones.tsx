@@ -6,6 +6,8 @@ import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Imagen } from "@/components/ui/imagen";
 import { createClient } from "@/lib/supabase/client";
 import type { TipoNotificacion } from "@/lib/supabase/types";
+import { reportarErrorSupabase } from "@/lib/observabilidad";
+import { avisarCambioNotificaciones, cerrarPushDe, tagPush } from "@/lib/notificaciones-cliente";
 
 type Obra = { titulo: string };
 
@@ -82,19 +84,38 @@ export function ListaNotificaciones({
 
   const hayNoLeidas = notificaciones.some((n) => !n.leida_en);
 
+  // #347: además de la base, se avisa a la campanita (que recuenta enseguida) y se cierra la
+  // push del sistema si este aviso también llegó así. Si la base falla, vuelve a no leída.
   async function marcarLeida(id: string) {
-    setNotificaciones((prev) =>
-      prev.map((n) => (n.id === id ? { ...n, leida_en: n.leida_en ?? new Date().toISOString() } : n))
-    );
+    const previa = notificaciones.find((n) => n.id === id);
+    if (!previa || previa.leida_en) return;
+    const ahora = new Date().toISOString();
+    setNotificaciones((prev) => prev.map((n) => (n.id === id ? { ...n, leida_en: ahora } : n)));
     const supabase = createClient();
-    await supabase.from("notificaciones").update({ leida_en: new Date().toISOString() }).eq("id", id);
+    const { error } = await supabase.from("notificaciones").update({ leida_en: ahora }).eq("id", id);
+    if (error) {
+      reportarErrorSupabase(error, { accion: "marcar notificación leída", id });
+      setNotificaciones((prev) => prev.map((n) => (n.id === id ? { ...n, leida_en: null } : n)));
+      return;
+    }
+    avisarCambioNotificaciones();
+    void cerrarPushDe([tagPush(previa)]);
   }
 
   async function marcarTodasLeidas() {
     const ahora = new Date().toISOString();
+    const pendientes = notificaciones.filter((n) => !n.leida_en);
     setNotificaciones((prev) => prev.map((n) => ({ ...n, leida_en: n.leida_en ?? ahora })));
     const supabase = createClient();
-    await supabase.from("notificaciones").update({ leida_en: ahora }).is("leida_en", null);
+    const { error } = await supabase.from("notificaciones").update({ leida_en: ahora }).is("leida_en", null);
+    if (error) {
+      reportarErrorSupabase(error, { accion: "marcar todas las notificaciones leídas" });
+      const ids = new Set(pendientes.map((n) => n.id));
+      setNotificaciones((prev) => prev.map((n) => (ids.has(n.id) ? { ...n, leida_en: null } : n)));
+      return;
+    }
+    avisarCambioNotificaciones();
+    void cerrarPushDe(pendientes.map(tagPush));
   }
 
   async function abrir(n: Notificacion) {
