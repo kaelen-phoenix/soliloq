@@ -1,37 +1,62 @@
 "use client";
 
 import Link from "next/link";
+import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { EVENTO_NOTIFICACIONES } from "@/lib/notificaciones-cliente";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
 
 export function CampanitaNotificaciones({ userId }: { userId: string }) {
   const [noLeidas, setNoLeidas] = useState(0);
+  const pathname = usePathname();
+  const [revision, setRevision] = useState(0);
 
+  // #347: la campanita vive en el layout y no se vuelve a montar al navegar. Además de
+  // Realtime (0106), recuenta al cambiar de pantalla, al volver a la app y cuando la lista
+  // avisa que marcó algo como leído.
+  useEffect(() => {
+    const recontar = () => setRevision((r) => r + 1);
+    const alVolver = () => {
+      if (document.visibilityState === "visible") recontar();
+    };
+    window.addEventListener(EVENTO_NOTIFICACIONES, recontar);
+    document.addEventListener("visibilitychange", alVolver);
+    return () => {
+      window.removeEventListener(EVENTO_NOTIFICACIONES, recontar);
+      document.removeEventListener("visibilitychange", alVolver);
+    };
+  }, []);
+
+  // El conteo: al montar, al navegar, al volver a la app y cuando la lista avisa.
+  useEffect(() => {
+    let vigente = true;
+    createClient()
+      .from("notificaciones")
+      .select("id", { count: "exact", head: true })
+      .eq("destinatario_id", userId)
+      .is("leida_en", null)
+      .then(({ count, error }) => {
+        if (vigente && !error) setNoLeidas(count ?? 0);
+      });
+    return () => {
+      vigente = false;
+    };
+  }, [userId, pathname, revision]);
+
+  // Realtime (0106): una sola suscripción; cada cambio pide un recuento.
   useEffect(() => {
     const supabase = createClient();
-
-    async function cargarConteo() {
-      const { count } = await supabase
-        .from("notificaciones")
-        .select("id", { count: "exact", head: true })
-        .eq("destinatario_id", userId)
-        .is("leida_en", null);
-      setNoLeidas(count ?? 0);
-    }
-
-    cargarConteo();
-
     return suscribirConSesion(supabase, () =>
       supabase
         .channel(`notificaciones-badge-${userId}`)
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "notificaciones", filter: `destinatario_id=eq.${userId}` },
-          () => cargarConteo()
+          () => setRevision((r) => r + 1),
         )
-        .subscribe()
+        .subscribe(),
     );
   }, [userId]);
 

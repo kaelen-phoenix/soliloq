@@ -209,5 +209,26 @@ test.describe("equipo, admin y notificaciones (UI)", () => {
     await expect(page.getByText("Alguien quiso contactarte desde tu perfil")).toBeVisible({
       timeout: 10_000,
     });
+
+    // #347: leerla baja la campanita en el momento, sin recargar (antes quedaba «1 sin leer»).
+    await page.getByText("Alguien quiso contactarte desde tu perfil").click();
+    await expect(page.getByRole("link", { name: "Notificaciones", exact: true }).first()).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect.poll(async () => {
+      const { data } = await admin!.from("notificaciones").select("leida_en").eq("destinatario_id", destinatario.id);
+      return data?.every((n) => n.leida_en !== null);
+    }, { timeout: 10_000 }).toBe(true);
+
+    // Y una nueva aparece en vivo, sin recargar (Realtime, 0106).
+    const { error: e2 } = await admin!.from("notificaciones").insert({
+      destinatario_id: destinatario.id,
+      tipo: "interes_recibido",
+      de_perfil: origen.id,
+    });
+    if (e2) throw e2;
+    await expect(page.getByRole("link", { name: /Notificaciones, 1 sin leer/ }).first()).toBeVisible({
+      timeout: 20_000,
+    });
   });
 });
