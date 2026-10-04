@@ -18,6 +18,7 @@ import {
 import { despacharAvisosDeAcceso } from "@/app/acciones-push";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { Database } from "@/lib/supabase/types";
+import { RevisionIa } from "./revision-ia";
 
 type Metricas = Database["public"]["Functions"]["admin_metricas"]["Returns"][number];
 type Usuario = Database["public"]["Functions"]["admin_usuarios"]["Returns"][number];
@@ -38,7 +39,8 @@ type Pestana =
   | "denuncias"
   | "bloqueos"
   | "mensajes"
-  | "sponsors";
+  | "sponsors"
+  | "revisión";
 
 function fecha(v: string | null) {
   return v ? new Date(v).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" }) : "—";
@@ -79,7 +81,7 @@ export function PanelAdmin({
     <div className="flex flex-col gap-6">
       <nav className="flex flex-wrap gap-1.5">
         {(
-          ["resumen", "usuarios", "acceso", "publicaciones", "denuncias", "bloqueos", "mensajes", "sponsors"] as const
+          ["resumen", "usuarios", "acceso", "publicaciones", "denuncias", "revisión", "bloqueos", "mensajes", "sponsors"] as const
         ).map((p) => (
           <button
             key={p}
@@ -104,6 +106,7 @@ export function PanelAdmin({
       {pestana === "bloqueos" && <Bloqueos supabase={supabase} />}
       {pestana === "mensajes" && <Mensajes supabase={supabase} />}
       {pestana === "sponsors" && <Sponsors supabase={supabase} />}
+      {pestana === "revisión" && <RevisionIa />}
     </div>
   );
 }
