@@ -1,3 +1,4 @@
+import type { SupabaseClient } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 
 /**
@@ -232,12 +233,15 @@ export async function abrirEspacio(
   return { ok: true, url: urlCanal(texto.datos.id) };
 }
 
-/** Sincroniza todos los espacios de las salas donde está (o estaba) una persona. */
+/** Sincroniza todos los espacios de las salas donde está (o estaba) una persona, y sus logros. */
 export async function sincronizarEspaciosDe(perfilId: string) {
   if (!discordConfigurado()) return;
   const admin = createAdminClient();
   const { data } = await admin.from("sala_integrantes").select("sala_id").eq("perfil_id", perfilId);
   for (const { sala_id } of data ?? []) await sincronizarEspacio(sala_id);
+  // Los logros (#336) cambian con las mismas acciones que los espacios: entrar a un grupo, un
+  // match, vincular la cuenta.
+  await sincronizarLogros(perfilId).catch(() => {});
 }
 
 /**
@@ -308,4 +312,91 @@ export async function borrarCanalesHuerfanos(canales: string[]) {
     if (!r.ok && r.status !== 404) fallos.push(`${canal}: ${r.status}`);
   }
   if (fallos.length) throw new Error(`Discord: no se pudieron borrar ${fallos.join("; ")}`);
+}
+
+// ── Logros (#336) ──────────────────────────────────────────────────────────────
+
+/**
+ * Logros: roles del servidor que la app asigna sola a quien vinculó su Discord, según lo que
+ * hizo en Yalope. Los roles los crea `scripts/discord-servidor.mjs` y acá se buscan por nombre:
+ * si alguno no existe, se saltea.
+ */
+export const LOGROS = [
+  { nombre: "🎭 Perfil completo", descripcion: "Tres fotos o más y la experiencia escrita." },
+  { nombre: "💫 Primer match", descripcion: "El primer interés mutuo, de cualquiera de los dos lados." },
+  { nombre: "🎬 En elenco", descripcion: "Aceptó una convocatoria y entró a un grupo." },
+  { nombre: "🏗️ Creador/a", descripcion: "Publicó un proyecto o armó un equipo." },
+  { nombre: "🌱 Pionero/a", descripcion: "Está en Yalope desde el principio." },
+] as const;
+
+/** Cuentas creadas antes de esta fecha son «Pionero/a». */
+const FIN_PIONEROS = "2026-11-01T00:00:00Z";
+
+async function logrosDe(perfilId: string): Promise<Set<string>> {
+  // `matches` y `convocatorias` no están en los tipos generados: cliente sin tipar para esas.
+  const admin = createAdminClient() as unknown as SupabaseClient;
+  const contar = async (q: PromiseLike<{ count: number | null }>) => ((await q).count ?? 0) > 0;
+  const [perfil, fotos, talento, matches, elenco, obras, equipos] = await Promise.all([
+    admin.from("perfiles").select("creado_en").eq("id", perfilId).maybeSingle(),
+    admin.from("fotos_talento").select("id", { count: "exact", head: true }).eq("talento_id", perfilId),
+    admin.from("perfiles_talento").select("experiencia").eq("id", perfilId).maybeSingle(),
+    contar(
+      admin
+        .from("matches")
+        .select("id", { count: "exact", head: true })
+        .or(`talento_id.eq.${perfilId},creador_id.eq.${perfilId}`),
+    ),
+    // Convocatorias aceptadas de sus matches como Talento.
+    (async () => {
+      const { data: suyos } = await admin.from("matches").select("id").eq("talento_id", perfilId);
+      const ids = (suyos ?? []).map((m) => m.id);
+      if (ids.length === 0) return false;
+      return contar(
+        admin.from("convocatorias").select("id", { count: "exact", head: true }).in("match_id", ids).eq("estado", "aceptada"),
+      );
+    })(),
+    contar(admin.from("obras").select("id", { count: "exact", head: true }).eq("creador_id", perfilId).neq("estado", "borrador")),
+    contar(admin.from("equipos").select("id", { count: "exact", head: true }).eq("creador_id", perfilId)),
+  ]);
+
+  const logros = new Set<string>();
+  if ((fotos.count ?? 0) >= 3 && (talento.data?.experiencia ?? "").trim().length > 0) logros.add(LOGROS[0].nombre);
+  if (matches) logros.add(LOGROS[1].nombre);
+  if (elenco) logros.add(LOGROS[2].nombre);
+  if (obras || equipos) logros.add(LOGROS[3].nombre);
+  if (perfil.data?.creado_en && perfil.data.creado_en < FIN_PIONEROS) logros.add(LOGROS[4].nombre);
+  return logros;
+}
+
+let rolesDeLogros: Map<string, string> | null = null;
+async function idsDeLogros(): Promise<Map<string, string>> {
+  if (rolesDeLogros) return rolesDeLogros;
+  const r = await api<{ id: string; name: string }[]>(`/guilds/${GUILD}/roles`);
+  const nombres = new Set<string>(LOGROS.map((l) => l.nombre));
+  rolesDeLogros = new Map((r.datos ?? []).filter((x) => nombres.has(x.name)).map((x) => [x.name, x.id]));
+  return rolesDeLogros;
+}
+
+/**
+ * Deja los roles de logros de una persona exactamente como corresponden: suma los ganados y
+ * saca los que ya no aplican (p. ej. si borró su único proyecto). Idempotente.
+ */
+export async function sincronizarLogros(perfilId: string) {
+  if (!discordConfigurado()) return;
+  const admin = createAdminClient();
+  const { data } = await admin.from("perfiles").select("discord_user_id").eq("id", perfilId).maybeSingle();
+  const discordId = data?.discord_user_id;
+  if (!discordId) return;
+
+  const miembro = await api<{ roles: string[] }>(`/guilds/${GUILD}/members/${discordId}`);
+  if (!miembro.ok || !miembro.datos) return; // no está en el servidor
+  const actuales = new Set(miembro.datos.roles);
+  const [ganados, ids] = await Promise.all([logrosDe(perfilId), idsDeLogros()]);
+
+  for (const [nombre, rolId] of ids) {
+    const tiene = actuales.has(rolId);
+    const corresponde = ganados.has(nombre);
+    if (corresponde && !tiene) await api(`/guilds/${GUILD}/members/${discordId}/roles/${rolId}`, { method: "PUT" });
+    if (!corresponde && tiene) await api(`/guilds/${GUILD}/members/${discordId}/roles/${rolId}`, { method: "DELETE" });
+  }
 }

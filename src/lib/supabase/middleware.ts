@@ -15,8 +15,9 @@ const RUTAS_SIEMPRE_DISPONIBLES = ["/cambiar-clave"];
 // NO se rebota a `/` — hace falta poder abrir `/normas` desde el gate de `/aceptar-normas`
 // sin salir de esa pantalla. «Apoyar» (`/apoyar`) también: la enlaza la portada y la declaran
 // pública `robots.ts` y `sitemap.ts`, pero faltaba acá y a quien no tenía sesión lo mandaba a
-// `/ingresar` (#226).
-const RUTAS_ABIERTAS = ["/p/", "/normas", "/apoyar"];
+// `/ingresar` (#226). Los crons de Vercel (`/api/cron/`) llegan sin sesión: cada ruta valida
+// `CRON_SECRET` por su cuenta (#336).
+const RUTAS_ABIERTAS = ["/p/", "/normas", "/apoyar", "/api/cron/"];
 
 /** Solo destinos internos: `next` viaja por la URL y no puede convertirse en un redirect abierto. */
 function conNext(destino: string, next: string): string {

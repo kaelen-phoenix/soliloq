@@ -107,6 +107,24 @@ await canal({ id: "1554824549487480946", nombre: "Charla", padre: catVoz, tipo: 
 await canal({ id: "1554824549487480947", nombre: "Ensayo libre", padre: catVoz, tipo: 2, posicion: 1 });
 await canal({ id: "1554824549487480948", nombre: "Escenario", padre: catVoz, tipo: 2, posicion: 2 });
 
+// ── Logros (#336): roles que la app asigna sola (src/lib/discord-servidor.ts → LOGROS) ──
+// Mismos nombres que en la app: es por nombre que los encuentra.
+const LOGROS = [
+  ["🎭 Perfil completo", 0xe8a33d, "Tres fotos o más y la experiencia escrita."],
+  ["💫 Primer match", 0xe45a84, "El primer interés mutuo, de cualquiera de los dos lados."],
+  ["🎬 En elenco", 0x4caf50, "Aceptó una convocatoria y entró a un grupo."],
+  ["🏗️ Creador/a", 0x3b82f6, "Publicó un proyecto o armó un equipo."],
+  ["🌱 Pionero/a", 0x8bc34a, "Está en Yalope desde el principio."],
+];
+const rolesActuales = await api("GET", `/guilds/${G}/roles`);
+for (const [nombre, color] of LOGROS) {
+  const rol = rolesActuales.find((r) => r.name === nombre);
+  const datos = { name: nombre, color, hoist: false, mentionable: false, permissions: "0" };
+  if (rol) await api("PATCH", `/guilds/${G}/roles/${rol.id}`, datos);
+  else await api("POST", `/guilds/${G}/roles`, datos);
+}
+const logros = await canal({ nombre: "logros", padre: catInfo, soloLectura: true, posicion: 4, tema: "Los logros de la comunidad y cómo se ganan." });
+
 // ── Mensajes ────────────────────────────────────────────────────────────────
 
 
@@ -205,6 +223,21 @@ await publicar(anuncios, [
           { name: "Alta más simple", value: "Alcanza con una foto, la fecha se escribe y lo que cargaste no se pierde si se cierra la página." },
           { name: "✨ IA", value: "Te ayuda a redactar tu experiencia y tus proyectos, sugiere habilidades y busca talento a partir de lo que escribís." },
         ],
+        footer: pie,
+      },
+    ],
+  },
+]);
+
+await publicar(logros, [
+  {
+    embeds: [
+      {
+        color: COLOR,
+        title: "🏅 Logros",
+        description:
+          "Se ganan usando la app y se ven como un color al lado de tu nombre. Se asignan solos a quien tiene el Discord vinculado (en la app: **Perfil → Vincular Discord**) y se actualizan todos los días.",
+        fields: LOGROS.map(([nombre, , como]) => ({ name: nombre, value: como })),
         footer: pie,
       },
     ],
