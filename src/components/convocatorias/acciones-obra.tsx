@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
@@ -34,19 +34,29 @@ export function AccionesObra({
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
+  // Al subir una foto o agregar un rol, el aviso viejo («Subí al menos una foto…») se va.
+  useEffect(() => setError(null), [cantidadFotos, cantidadRoles]);
 
   async function publicar() {
     setError(null);
-    if (cantidadRoles === 0) {
+    setCargando(true);
+    const supabase = createClient();
+    // #329: se cuenta en el momento. Los números que vinieron con la página quedaban viejos al
+    // subir una foto o agregar un rol, y el aviso no se iba hasta salir y volver a entrar.
+    const [{ count: roles }, { count: fotos }] = await Promise.all([
+      supabase.from("roles").select("id", { count: "exact", head: true }).eq("obra_id", obraId),
+      supabase.from("fotos_obra").select("id", { count: "exact", head: true }).eq("obra_id", obraId),
+    ]);
+    if ((roles ?? cantidadRoles) === 0) {
+      setCargando(false);
       setError("Definí al menos un rol antes de publicar.");
       return;
     }
-    if (cantidadFotos < MIN_FOTOS) {
-      setError(`Subí al menos una foto antes de publicar.`);
+    if ((fotos ?? cantidadFotos) < MIN_FOTOS) {
+      setCargando(false);
+      setError("Subí al menos una foto antes de publicar.");
       return;
     }
-    setCargando(true);
-    const supabase = createClient();
     await supabase.from("obras").update({ estado: "publicada" }).eq("id", obraId);
     // Si se reabre, su espacio en Discord vuelve a ser de escritura (#269).
     await sincronizarEspacioDeIniciativa({ obraId }).catch(() => {});

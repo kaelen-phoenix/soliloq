@@ -10,7 +10,6 @@ import { createClient } from "@/lib/supabase/client";
 import { aColumnas, type Ubicacion } from "@/lib/ubicacion";
 import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
-const MAX_ROLES = 10;
 
 interface RolNuevo {
   id: string;
@@ -48,7 +47,6 @@ export function FormularioObra({ creadorId }: { creadorId: string }) {
       setErrores((p) => ({ ...p, rol: "Ingresá el rol que buscás." }));
       return;
     }
-    if (roles.length >= MAX_ROLES) return;
     setRoles((prev) => [
       ...prev,
       { id: crypto.randomUUID(), nombre: rolNombre.trim(), descripcion: rolDescripcion.trim() },
@@ -69,7 +67,8 @@ export function FormularioObra({ creadorId }: { creadorId: string }) {
     const nuevos: Record<string, string> = {};
     if (!titulo.trim()) nuevos.titulo = "Ingresá el título del proyecto.";
     if (!ubicacion) nuevos.ubicacion = "Elegí la locación de ensayos de la lista de sugerencias.";
-    setErrores((p) => ({ ...p, ...nuevos }));
+    // Reemplaza los avisos de título y locación: uno ya corregido no tiene que quedar en rojo.
+    setErrores((p) => ({ rol: p.rol ?? "", ...nuevos }));
     if (Object.keys(nuevos).length > 0) return;
 
     setCargando(true);
@@ -197,9 +196,9 @@ export function FormularioObra({ creadorId }: { creadorId: string }) {
           </ul>
         )}
 
-        {roles.length < MAX_ROLES ? (
-          <div className="flex flex-col gap-2 rounded-xl border border-dashed border-borde p-3">
-            <div className="grid grid-cols-2 gap-2">
+        {/* #330: sin tope de roles. */}
+        <div className="flex flex-col gap-2 rounded-xl border border-dashed border-borde p-3">
+            <div className="grid gap-2 sm:grid-cols-2 sm:items-end">
               <CampoTexto
                 id="rol_nombre"
                 etiqueta="Rol buscado"
@@ -219,11 +218,6 @@ export function FormularioObra({ creadorId }: { creadorId: string }) {
               + Agregar rol
             </Boton>
           </div>
-        ) : (
-          <p className="text-xs text-texto-tenue">Llegaste al máximo de {MAX_ROLES} roles.</p>
-        )}
-
-        <p className="text-xs text-texto-tenue">{roles.length}/{MAX_ROLES} roles</p>
       </div>
 
       {errorGeneral && <p className="text-sm text-error-600">{errorGeneral}</p>}

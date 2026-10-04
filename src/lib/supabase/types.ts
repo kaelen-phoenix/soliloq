@@ -533,7 +533,7 @@ export interface Database {
           creador_id: string;
           titulo: string;
           /** Cuántas personas quiere sumar. 1..10. */
-          cupo: number;
+          cupo: number | null;
           /** #157: igual que `obras.sinopsis`. */
           descripcion: string | null;
           activo: boolean;
@@ -543,13 +543,13 @@ export interface Database {
         Insert: {
           creador_id: string;
           titulo: string;
-          cupo: number;
+          cupo?: number | null;
           descripcion?: string | null;
           activo?: boolean;
         };
         Update: {
           titulo?: string;
-          cupo?: number;
+          cupo?: number | null;
           descripcion?: string | null;
           activo?: boolean;
           actualizado_en?: string;
@@ -873,6 +873,7 @@ export interface Database {
           iniciativa_foto: string | null;
           cupo_lleno: boolean;
           mostrado_en: string | null;
+          obra_id: string | null;
         }[];
       };
       /** Matches propios del lado del Talento, con estado (#298, 0099). */
@@ -949,6 +950,7 @@ export interface Database {
           iniciativa_titulo: string;
           iniciativa_foto: string | null;
           estado: "en_convocados" | "esperando_confirmacion" | "en_sala";
+          obra_id: string | null;
         }[];
       };
       mis_convocatorias: {
@@ -1057,7 +1059,7 @@ export interface Database {
         Returns: {
           equipo_id: string;
           titulo: string;
-          cupo: number;
+          cupo: number | null;
           creado_en: string;
           creador_id: string;
           creador_nombre: string;
@@ -1096,7 +1098,7 @@ export interface Database {
           interes_recibido: number;
           matches: number;
           convocados: number;
-          cupo: number;
+          cupo: number | null;
         }[];
       };
       /** Panel de administración (0040). Todas rechazan con `raise exception` si `auth.uid()` no es admin. */

@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useRouter } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { comprimirImagen } from "@/lib/comprimir-imagen";
@@ -15,7 +16,8 @@ export interface FotoEquipo {
 
 const TIPOS = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
-const MAX = 2;
+// #330: el tope de 2 se sacó; 10 queda como resguardo de almacenamiento (igual que la base, 0101).
+const MAX = 10;
 export const MIN_FOTOS_EQUIPO = 1;
 
 /**
@@ -35,6 +37,9 @@ export function FotosEquipo({
   fotosIniciales: FotoEquipo[];
 }) {
   const [fotos, setFotos] = useState(fotosIniciales);
+  // #329: el resto de la pantalla (p. ej. «Publicar convocatoria») cuenta las fotos del
+  // servidor; sin refrescar, seguía viendo cero aunque ya hubiera una.
+  const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
 
@@ -98,6 +103,7 @@ export function FotosEquipo({
 
     const url = supabase.storage.from("fotos-perfil").getPublicUrl(ruta).data.publicUrl;
     setFotos((prev) => [...prev, { id: data.id, storage_path: ruta, orden: siguienteOrden, url }]);
+    router.refresh();
   }
 
   async function eliminar(foto: FotoEquipo) {
@@ -105,6 +111,7 @@ export function FotosEquipo({
     await supabase.storage.from("fotos-perfil").remove([foto.storage_path]);
     await supabase.from("fotos_equipo").delete().eq("id", foto.id);
     setFotos((prev) => prev.filter((f) => f.id !== foto.id));
+    router.refresh();
   }
 
   return (

@@ -9,14 +9,16 @@ interface Props extends React.InputHTMLAttributes<HTMLInputElement> {
 
 export const CampoTexto = forwardRef<HTMLInputElement, Props>(
   ({ etiqueta, error, id, className = "", ...props }, ref) => (
-    <div className="flex flex-col gap-1.5">
+    // `min-w-0` + `w-full`: sin esto, dos campos lado a lado (edad mínima/máxima) se salían de
+    // la pantalla en celulares angostos: un input tiene un ancho propio que no se achica (#328).
+    <div className="flex min-w-0 flex-col gap-1.5">
       <label htmlFor={id} className="text-sm font-medium text-texto">
         {etiqueta}
       </label>
       <input
         ref={ref}
         id={id}
-        className={`rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto transition-colors placeholder:text-texto-tenue focus:border-accion ${
+        className={`w-full min-w-0 rounded-xl border bg-superficie px-3.5 py-2.5 text-base text-texto transition-colors placeholder:text-texto-tenue focus:border-accion ${
           error ? "border-error-400" : "border-borde"
         } ${className}`}
         {...props}

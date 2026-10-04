@@ -31,7 +31,7 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
   // Cuánta de la gente que decidió algo (Me interesa o Paso) se interesó. Es el número que
   // dice si la convocatoria es atractiva; el alcance solo dice si se está mostrando.
   const tasa = Math.round((m.interes_recibido / m.alcance) * 100);
-  const convocadosCubierto = Math.min(m.convocados, m.cupo);
+  const convocadosCubierto = Math.min(m.convocados, m.cupo ?? 0);
 
   return (
     <div className="rounded-2xl border border-borde bg-superficie p-4">
