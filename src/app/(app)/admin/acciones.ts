@@ -9,7 +9,7 @@ import { enviarBienvenidasPendientes, type ResumenBienvenidas } from "@/lib/bien
 import { correoConfigurado, enviarCorreo } from "@/lib/correo";
 import { mailBienvenida } from "@/lib/correos/bienvenida";
 import { mailInvitacion } from "@/lib/correos/acceso";
-import { consumirUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
+import { consumirUsoIa, devolverUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
 import { INSTRUCCIONES_MODERACION } from "@/lib/ia-prompts";
 
 type Resultado = { ok: true } | { ok: false; error: string };
@@ -243,7 +243,10 @@ export async function adminRevisarConIa(): Promise<
     });
     const crudos = objetoJson(crudo).marcados;
     // Sin la lista no se sabe nada: no se puede informar «no encontramos nada».
-    if (!Array.isArray(crudos)) return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+    if (!Array.isArray(crudos)) {
+      await devolverUsoIa(supabase).catch(() => {});
+      return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+    }
     const lista = crudos as { n?: unknown; motivo?: unknown }[];
     const marcados = lista.flatMap((m) => {
       const it = typeof m.n === "number" ? items[m.n - 1] : undefined;
@@ -253,6 +256,9 @@ export async function adminRevisarConIa(): Promise<
     });
     return { ok: true, marcados, revisados: items.length };
   } catch (e) {
+    // #343: si falló, el uso no cuenta (si no se llegó a consumir, no borra nada viejo: solo
+    // toma un uso de los últimos 5 minutos).
+    await devolverUsoIa(supabase).catch(() => {});
     return { ok: false, error: e instanceof Error ? e.message : "No se pudo revisar." };
   }
 }

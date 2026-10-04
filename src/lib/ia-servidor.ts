@@ -23,6 +23,11 @@ export async function consumirUsoIa(supabase: SupabaseClient<Database>): Promise
   return "No pudimos hacerlo ahora. Probá de nuevo.";
 }
 
+/** Si la llamada al modelo falló, el uso no cuenta (#343): se devuelve. */
+export async function devolverUsoIa(supabase: SupabaseClient<Database>) {
+  await supabase.rpc("devolver_uso_ia");
+}
+
 /** Saca las etiquetas del bloque para que nadie lo cierre y siga con instrucciones propias. */
 export function enBloque(etiqueta: string, contenido: string) {
   const limpio = contenido.replace(new RegExp(`<\\/?\\s*${etiqueta}\\s*>`, "gi"), "");
