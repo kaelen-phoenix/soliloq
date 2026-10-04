@@ -250,8 +250,22 @@ export async function adminRevisarConIa(): Promise<
       return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
     }
     const lista = crudos as { n?: unknown; motivo?: unknown }[];
+    // Una entrada que no apunta a una publicación revisada (n fuera de rango) o sin motivo
+    // invalida la respuesta entera: no se informa una revisión a medias como completa.
+    const valida = (m: { n?: unknown; motivo?: unknown }) =>
+      m !== null &&
+      typeof m === "object" &&
+      Number.isInteger(m.n) &&
+      (m.n as number) >= 1 &&
+      (m.n as number) <= items.length &&
+      typeof m.motivo === "string" &&
+      m.motivo.trim().length > 0;
+    if (!lista.every(valida)) {
+      await devolverUsoIa(uso.usoId).catch(() => {});
+      return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+    }
     const marcados = lista.flatMap((m) => {
-      const it = typeof m.n === "number" ? items[m.n - 1] : undefined;
+      const it = items[(m.n as number) - 1];
       if (!it || typeof m.motivo !== "string") return [];
       const { texto: _texto, ...resto } = it;
       return [{ ...resto, motivo: m.motivo.slice(0, 200) }];

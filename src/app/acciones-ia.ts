@@ -90,7 +90,9 @@ export async function sugerirHabilidades(
     // Una respuesta que no es JSON es una falla (y el uso se devuelve en el catch).
     if (!json) throw new Error("sugerir habilidades: la respuesta no es un objeto JSON");
     const crudas = json.habilidades;
-    const lista: unknown[] = Array.isArray(crudas) ? crudas : [];
+    // Sin la lista no es «no hay habilidades»: es una respuesta que no sirve.
+    if (!Array.isArray(crudas)) throw new Error("sugerir habilidades: falta la lista");
+    const lista: unknown[] = crudas;
     const validas = HABILIDADES.filter((h) => lista.includes(h));
     return { ok: true, habilidades: validas };
   } catch (e) {
