@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useId, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { Boton } from "@/components/ui/boton";
@@ -21,13 +21,12 @@ import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 export interface EquipoActivo {
   id: string;
   titulo: string;
-  cupo: number;
+  /** null = sin límite de integrantes (#330). */
+  cupo: number | null;
   descripcion: string | null;
   activo: boolean;
 }
 
-const CUPO_MIN = 1;
-const CUPO_MAX = 10;
 const MAX_TITULO = 80;
 
 function FormEquipo({
@@ -35,8 +34,6 @@ function FormEquipo({
   setTitulo,
   descripcion,
   setDescripcion,
-  cupo,
-  setCupo,
   error,
   cargando,
   onGuardar,
@@ -47,18 +44,18 @@ function FormEquipo({
   setTitulo: (v: string) => void;
   descripcion: string;
   setDescripcion: (v: string) => void;
-  cupo: number;
-  setCupo: (v: number) => void;
   error: string | null;
   cargando: boolean;
   onGuardar: (e: React.FormEvent) => void;
   onCancelar: () => void;
   editando: boolean;
 }) {
+  // Puede haber varios equipos en pantalla (#330): los ids de los campos no se pueden repetir.
+  const idBase = useId();
   return (
     <form onSubmit={onGuardar} className="mt-3 flex flex-col gap-4">
       <CampoTexto
-        id="equipo-titulo"
+        id={`${idBase}-titulo`}
         etiqueta="Título — por qué querés armar el equipo"
         placeholder="Escribamos juntos"
         maxLength={MAX_TITULO}
@@ -66,11 +63,11 @@ function FormEquipo({
         onChange={(e) => setTitulo(e.target.value)}
       />
       <div className="flex flex-col gap-1.5">
-        <label htmlFor="equipo-descripcion" className="text-sm font-medium text-texto">
+        <label htmlFor={`${idBase}-descripcion`} className="text-sm font-medium text-texto">
           Descripción (opcional)
         </label>
         <textarea
-          id="equipo-descripcion"
+          id={`${idBase}-descripcion`}
           rows={3}
           maxLength={2000}
           value={descripcion}
@@ -79,27 +76,6 @@ function FormEquipo({
         />
         <MejorarRedaccion tipo="equipo" texto={descripcion} onUsar={setDescripcion} />
       </div>
-      <div className="flex flex-col gap-1.5">
-        <span className="text-sm font-medium text-texto">Cuántas personas querés sumar</span>
-        <div className="flex flex-wrap gap-2">
-          {Array.from({ length: CUPO_MAX - CUPO_MIN + 1 }, (_, i) => CUPO_MIN + i).map((n) => (
-            <button
-              key={n}
-              type="button"
-              aria-pressed={cupo === n}
-              onClick={() => setCupo(n)}
-              className={`h-10 w-10 rounded-full border text-sm font-medium transition-colors ${
-                cupo === n
-                  ? "border-accion bg-accion text-accion-texto"
-                  : "border-borde text-texto-tenue hover:border-ink-300"
-              }`}
-            >
-              {n}
-            </button>
-          ))}
-        </div>
-      </div>
-
       {error && <p className="text-sm text-error-600">{error}</p>}
 
       <div className="flex gap-2">
@@ -119,33 +95,26 @@ function FormEquipo({
 }
 
 /**
- * Gestión del "Armar equipo" del Creador (issue #57, fase 1): título + cupo, sin roles.
- * Un Creador lleva adelante una sola iniciativa a la vez — si ya tiene una obra publicada,
- * acá se le explica que primero la cierre (la exclusión mutua se garantiza con un trigger
- * de base en la fase 2).
- *
- * Las fotos del equipo (mínimo 3) llegan en una unidad aparte; por ahora el equipo se crea
- * con título y cupo.
+ * Gestión de un Equipo del Creador (issue #57): título y descripción, sin roles. Desde #330
+ * no hay límites: se pueden tener varios Equipos y Proyectos a la vez, y el Equipo no tiene
+ * cupo de integrantes. Con `equipo = null` es el formulario para armar uno nuevo.
  */
 export function GestionEquipo({
   creadorId,
   equipo,
   fotos,
   cobertura,
-  tieneObraPublicada,
 }: {
   creadorId: string;
   equipo: EquipoActivo | null;
   fotos: FotoEquipo[];
   /** Quién ya forma parte del equipo, para "Participantes" (#152). */
   cobertura: FilaCobertura[];
-  tieneObraPublicada: boolean;
 }) {
   const router = useRouter();
   const [abierto, setAbierto] = useState(false);
   const [titulo, setTitulo] = useState(equipo?.titulo ?? "");
   const [descripcion, setDescripcion] = useState(equipo?.descripcion ?? "");
-  const [cupo, setCupo] = useState(equipo?.cupo ?? 4);
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
@@ -170,13 +139,12 @@ export function GestionEquipo({
             .update({
               titulo: titulo.trim(),
               descripcion: descripcion || null,
-              cupo,
               actualizado_en: new Date().toISOString(),
             })
             .eq("id", equipo.id)
         : await supabase
             .from("equipos")
-            .insert({ creador_id: creadorId, titulo: titulo.trim(), descripcion: descripcion || null, cupo });
+            .insert({ creador_id: creadorId, titulo: titulo.trim(), descripcion: descripcion || null, cupo: null });
 
     setCargando(false);
     if (res.error) {
@@ -261,8 +229,6 @@ export function GestionEquipo({
       setTitulo={setTitulo}
       descripcion={descripcion}
       setDescripcion={setDescripcion}
-      cupo={cupo}
-      setCupo={setCupo}
       error={error}
       cargando={cargando}
       onGuardar={guardar}
@@ -280,9 +246,11 @@ export function GestionEquipo({
             Armar equipo
           </span>
           <p className="mt-2 text-base font-medium text-texto">{equipo.titulo}</p>
-          <p className="mt-0.5 text-sm text-texto-tenue">
-            Hasta {equipo.cupo} {equipo.cupo === 1 ? "integrante" : "integrantes"}
-          </p>
+          {equipo.cupo != null && (
+            <p className="mt-0.5 text-sm text-texto-tenue">
+              Hasta {equipo.cupo} {equipo.cupo === 1 ? "integrante" : "integrantes"}
+            </p>
+          )}
           {equipo.descripcion && (
             <p className="mt-2 max-w-prose text-sm leading-relaxed text-texto">{equipo.descripcion}</p>
           )}
@@ -352,16 +320,6 @@ export function GestionEquipo({
           </>
         )}
       </section>
-    );
-  }
-
-  // Sin equipo, pero con una obra publicada: se explica la exclusión.
-  if (tieneObraPublicada) {
-    return (
-      <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
-        Para armar un equipo, primero cerrá tus obras publicadas: un perfil de Creador lleva
-        adelante una sola iniciativa a la vez.
-      </p>
     );
   }
 

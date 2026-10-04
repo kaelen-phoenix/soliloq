@@ -9,7 +9,6 @@ import { GENEROS_BUSCABLES, type Genero } from "@/lib/constantes";
 import type { TipoRol } from "@/lib/supabase/types";
 import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
-const MAX_ROLES = 10;
 
 export function FormularioRol({
   obraId,
@@ -81,14 +80,6 @@ export function FormularioRol({
     setGeneros([]);
     setAbierto(false);
     router.refresh();
-  }
-
-  if (cantidadRoles >= MAX_ROLES) {
-    return (
-      <p className="text-sm text-texto-tenue">
-        Llegaste al máximo de {MAX_ROLES} roles por obra.
-      </p>
-    );
   }
 
   if (!abierto) {

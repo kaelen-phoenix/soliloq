@@ -21,6 +21,9 @@ export async function iniciativaActivaDelCreador(
     .select("id, titulo")
     .eq("creador_id", creadorId)
     .eq("activo", true)
+    // Desde #330 puede haber varios Equipos activos: el más reciente.
+    .order("creado_en", { ascending: false })
+    .limit(1)
     .maybeSingle();
   if (equipo) return { tipo: "equipo", id: equipo.id, titulo: equipo.titulo };
 

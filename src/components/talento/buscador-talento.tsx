@@ -231,7 +231,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
         </div>
 
         <div className={verFiltros ? "flex flex-col gap-4" : "hidden"}>
-        <div className="flex gap-3">
+        <div className="grid grid-cols-2 gap-3">
           <CampoTexto
             id="edad-min"
             etiqueta="Edad mínima"

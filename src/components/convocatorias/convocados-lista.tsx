@@ -25,6 +25,8 @@ export interface FilaConvocado {
   estado: Estado;
   /** Match nuevo (todavía sin convocar): cuándo vence. */
   expiraEn?: string | null;
+  /** El Proyecto del match (null en un Equipo): de ahí salen los roles para elegir (#330). */
+  obraId?: string | null;
   /** La iniciativa ya llenó su cupo: no se puede convocar a nadie más. */
   cupoLleno?: boolean;
 }
@@ -50,18 +52,19 @@ const CHIP: Record<Estado, { texto: string; clase: string }> = {
 
 export function ConvocadosLista({
   filas: filasIniciales,
-  roles,
+  rolesPorObra,
 }: {
   filas: FilaConvocado[];
-  /** Roles del Proyecto activo, para elegir a cuál queda asociado (#152). `null` en un
-   *  Equipo (no tiene roles) o si el Proyecto no tiene ninguno definido. */
-  roles: RolDisponible[] | null;
+  /** Roles de cada Proyecto, por id (#152, #330). Un Equipo no tiene roles. */
+  rolesPorObra: Record<string, RolDisponible[]>;
 }) {
   const router = useRouter();
   const [filas, setFilas] = useState(filasIniciales);
   const [ocupadoId, setOcupadoId] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState<string | null>(null);
   const [eligiendoRol, setEligiendoRol] = useState<FilaConvocado | null>(null);
+  const rolesDe = (f: FilaConvocado | null) => (f?.obraId ? rolesPorObra[f.obraId] ?? null : null);
+  const roles = rolesDe(eligiendoRol);
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -94,10 +97,11 @@ export function ConvocadosLista({
     setError(null);
     // Con más de un rol hay que elegir a cuál queda asociado; con uno solo (o sin roles,
     // como un Equipo) se convoca directo (#152).
-    if (roles && roles.length > 1) {
+    const deEste = rolesDe(f);
+    if (deEste && deEste.length > 1) {
       setEligiendoRol(f);
     } else {
-      convocar(f, roles?.[0]?.id);
+      convocar(f, deEste?.[0]?.id);
     }
   }
 

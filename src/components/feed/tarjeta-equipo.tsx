@@ -8,7 +8,8 @@ import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 export interface EquipoFeed {
   equipo_id: string;
   titulo: string;
-  cupo: number;
+  /** null = sin límite de integrantes (#330). */
+  cupo: number | null;
   creador_id: string;
   creador_nombre: string;
   creador_imagen_url: string | null;
@@ -49,9 +50,11 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
           <h2 className="text-2xl font-semibold leading-[1.1] tracking-[-0.02em]">
             {equipo.titulo}
           </h2>
-          <p className="mt-2 text-sm text-white/70">
-            Hasta {equipo.cupo} {equipo.cupo === 1 ? "integrante" : "integrantes"}
-          </p>
+          {equipo.cupo != null && (
+            <p className="mt-2 text-sm text-white/70">
+              Hasta {equipo.cupo} {equipo.cupo === 1 ? "integrante" : "integrantes"}
+            </p>
+          )}
         </div>
       </div>
 

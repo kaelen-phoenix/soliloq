@@ -20,16 +20,10 @@ export default async function MatchesPage() {
   const [
     { data: matches, error: errorMatches },
     { data: convocados, error: errorConvocados },
-    { data: cobertura, error: errorCobertura },
     { data: comoTalento, error: errorComoTalento },
   ] = await Promise.all([
     supabase.rpc("mis_matches"),
     supabase.rpc("mis_convocados"),
-    // Roles del Proyecto activo, para elegir a cuál queda asociado al convocar en firme
-    // (#152). Un Equipo no tiene roles: no hace falta elegir nada.
-    iniciativa?.tipo === "obra"
-      ? supabase.rpc("cobertura_iniciativa", { p_obra_id: iniciativa.id, p_equipo_id: null })
-      : Promise.resolve({ data: null, error: null }),
     // #298: del otro lado, dónde hizo match quien mira (todos, no solo quien tiene proyecto).
     supabase.rpc("mis_matches_como_talento"),
   ]);
@@ -38,22 +32,34 @@ export default async function MatchesPage() {
   if (errorMatches) reportarErrorSupabase(errorMatches, { rpc: "mis_matches", userId: user.id });
   if (errorConvocados)
     reportarErrorSupabase(errorConvocados, { rpc: "mis_convocados", userId: user.id });
-  if (errorCobertura)
-    reportarErrorSupabase(errorCobertura, { rpc: "cobertura_iniciativa", userId: user.id });
+
+  // Roles de cada Proyecto con matches, para elegir a cuál queda asociado al convocar (#152).
+  // Con varios Proyectos a la vez (#330), cada match ofrece los roles del suyo. Un Equipo no
+  // tiene roles: no hace falta elegir nada. Un rol ya cubierto no se puede elegir de nuevo.
+  const obraIds = Array.from(
+    new Set([...(matches ?? []), ...(convocados ?? [])].map((m) => m.obra_id).filter((x): x is string => !!x)),
+  );
+  const rolesPorObra: Record<string, { id: string; nombre: string; disponible: boolean }[]> = {};
+  await Promise.all(
+    obraIds.map(async (obraId) => {
+      const { data: cobertura, error } = await supabase.rpc("cobertura_iniciativa", {
+        p_obra_id: obraId,
+        p_equipo_id: null,
+      });
+      if (error) reportarErrorSupabase(error, { rpc: "cobertura_iniciativa", obraId });
+      rolesPorObra[obraId] = [...new Map((cobertura ?? []).filter((r) => r.rol_id).map((r) => [r.rol_id, r])).values()].map(
+        (r) => ({
+          id: r.rol_id as string,
+          nombre: r.rol_nombre as string,
+          disponible: (cobertura ?? []).filter((x) => x.rol_id === r.rol_id && x.talento_id).length < r.vacantes,
+        }),
+      );
+    }),
+  );
 
   const url = (path: string | null) =>
     path ? supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl : null;
 
-  // Un rol ya cubierto (todas sus vacantes con convocatoria pendiente o aceptada) no se
-  // puede elegir de nuevo al convocar.
-  const roles = cobertura
-    ? [...new Map(cobertura.filter((r) => r.rol_id).map((r) => [r.rol_id, r])).values()].map((r) => ({
-        id: r.rol_id as string,
-        nombre: r.rol_nombre as string,
-        disponible:
-          cobertura.filter((x) => x.rol_id === r.rol_id && x.talento_id).length < r.vacantes,
-      }))
-    : null;
 
   const filas = (matches ?? []).map((m) => ({
     matchId: m.match_id,
@@ -65,6 +71,7 @@ export default async function MatchesPage() {
     iniciativaTitulo: m.iniciativa_titulo,
     iniciativaFotoUrl: url(m.iniciativa_foto),
     cupoLleno: m.cupo_lleno,
+    obraId: m.obra_id,
   }));
 
   // Aviso de "¡Tenés un Match!" (#194): uno por match, la primera vez que este Creador
@@ -93,6 +100,7 @@ export default async function MatchesPage() {
     estado: "en_convocados" as const,
     expiraEn: f.expiraEn,
     cupoLleno: f.cupoLleno,
+    obraId: f.obraId,
   }));
 
   const filasConvocados = (convocados ?? []).map((c) => ({
@@ -104,6 +112,7 @@ export default async function MatchesPage() {
     esEquipo: c.es_equipo,
     iniciativaTitulo: c.iniciativa_titulo,
     estado: c.estado as "en_convocados" | "esperando_confirmacion" | "en_sala",
+    obraId: c.obra_id,
   }));
 
   const filasTalento: FilaMatchTalento[] = (comoTalento ?? []).map((m) => ({
@@ -141,7 +150,7 @@ export default async function MatchesPage() {
         cantidadTalento={filasTalento.length}
         panelProyectos={
           filasCreador.length > 0 ? (
-            <ConvocadosLista filas={filasCreador} roles={roles} />
+            <ConvocadosLista filas={filasCreador} rolesPorObra={rolesPorObra} />
           ) : (
             <EstadoVacio
               icono="corazon"

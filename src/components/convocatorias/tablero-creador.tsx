@@ -23,7 +23,8 @@ const COLOR_ESTADO: Record<string, string> = {
 export async function TableroCreador({ creadorId }: { creadorId: string }) {
   const supabase = createClient();
 
-  const [{ data: obras }, { data: equipo }] = await Promise.all([
+  // #330: sin límites. Se pueden tener varios Proyectos y varios Equipos activos a la vez.
+  const [{ data: obras }, { data: equipos }] = await Promise.all([
     supabase
       .from("obras")
       .select("id, titulo, estado")
@@ -34,66 +35,50 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
       .select("id, titulo, descripcion, cupo, activo, fotos_equipo(id, storage_path, orden)")
       .eq("creador_id", creadorId)
       .eq("activo", true)
-      .maybeSingle(),
+      .order("creado_en", { ascending: false }),
   ]);
 
-  const tieneObraPublicada = (obras ?? []).some((o) => o.estado === "publicada");
-  const hayEquipoActivo = equipo != null;
+  const url = (path: string) => supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl;
 
-  const fotosEquipo = (equipo?.fotos_equipo ?? [])
-    .map((f) => ({
-      id: f.id,
-      storage_path: f.storage_path,
-      orden: f.orden,
-      url: supabase.storage.from("fotos-perfil").getPublicUrl(f.storage_path).data.publicUrl,
-    }))
-    .sort((a, b) => a.orden - b.orden);
+  // Por cada Equipo, sus fotos y quién ya forma parte («Participantes», #152).
+  const equiposConDatos = await Promise.all(
+    (equipos ?? []).map(async (equipo) => {
+      const { data: coberturaRaw, error } = await supabase.rpc("cobertura_iniciativa", {
+        p_obra_id: null,
+        p_equipo_id: equipo.id,
+      });
+      if (error) reportarErrorSupabase(error, { rpc: "cobertura_iniciativa", equipoId: equipo.id });
+      const cobertura: FilaCobertura[] = (coberturaRaw ?? []).map((r) => ({
+        rolId: r.rol_id,
+        rolNombre: r.rol_nombre,
+        vacantes: r.vacantes,
+        convocatoriaId: r.convocatoria_id,
+        talentoId: r.talento_id,
+        talentoNombre: r.talento_nombre,
+        talentoFotoUrl: r.talento_foto ? url(r.talento_foto) : null,
+      }));
+      const fotos = (equipo.fotos_equipo ?? [])
+        .map((f) => ({ id: f.id, storage_path: f.storage_path, orden: f.orden, url: url(f.storage_path) }))
+        .sort((x, y) => x.orden - y.orden);
+      return { equipo, fotos, cobertura };
+    }),
+  );
 
-  // Quién ya forma parte del equipo, para la sección "Participantes" (#152).
-  const { data: coberturaRaw, error: errorCobertura } = equipo
-    ? await supabase.rpc("cobertura_iniciativa", { p_obra_id: null, p_equipo_id: equipo.id })
-    : { data: null, error: null };
-  if (errorCobertura)
-    reportarErrorSupabase(errorCobertura, { rpc: "cobertura_iniciativa", equipoId: equipo?.id });
-
-  const coberturaEquipo: FilaCobertura[] = (coberturaRaw ?? []).map((r) => ({
-    rolId: r.rol_id,
-    rolNombre: r.rol_nombre,
-    vacantes: r.vacantes,
-    convocatoriaId: r.convocatoria_id,
-    talentoId: r.talento_id,
-    talentoNombre: r.talento_nombre,
-    talentoFotoUrl: r.talento_foto
-      ? supabase.storage.from("fotos-perfil").getPublicUrl(r.talento_foto).data.publicUrl
-      : null,
-  }));
-
-  // Un perfil de Creador lleva adelante una sola iniciativa: un proyecto (obra con roles)
-  // o un equipo (por cupo, sin roles). El toggle elige cuál se ve; la exclusión la impone
-  // un trigger de base. Ver issues #57 y #101.
   const panelProyecto = (
     <div className="flex flex-col gap-4">
-      {hayEquipoActivo ? (
-        <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
-          Tenés un equipo activo. Cerralo desde «Armar equipo» para armar un proyecto: un
-          perfil de Creador lleva adelante una sola iniciativa a la vez.
-        </p>
-      ) : (
-        // #157: antes esto llevaba a /obras/nueva — una pantalla aparte, con los roles
-        // agregados de a uno después. Ahora es el mismo formulario inline que ya usa
-        // "Armar equipo": título, descripción, ubicación y roles, todo antes de crear.
-        <FormularioObra creadorId={creadorId} />
-      )}
+      {/* #157: el mismo formulario inline que «Armar equipo»: título, descripción, ubicación y
+          roles, todo antes de crear. */}
+      <FormularioObra creadorId={creadorId} />
 
-      {!hayEquipoActivo && (!obras || obras.length === 0) && (
+      {(!obras || obras.length === 0) && (
         <EstadoVacio
           icono="tablero"
-          titulo="Todavía no creaste ninguna obra"
-          detalle="Creá tu primera obra, definí los roles que buscás y publicala para que aparezca en el feed de los talentos."
+          titulo="Todavía no creaste ningún proyecto"
+          detalle="Creá tu proyecto, definí los roles que buscás y publicalo para que aparezca en Explorar."
         />
       )}
 
-      <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
+      <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(min(18rem,100%),1fr))]">
         {obras?.map((obra) => (
           <li key={obra.id}>
             <Link
@@ -116,22 +101,24 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
     </div>
   );
 
+  const panelEquipo = (
+    <div className="flex flex-col gap-4">
+      {/* Primero el formulario para armar otro; después los que ya están armados. */}
+      <GestionEquipo creadorId={creadorId} equipo={null} fotos={[]} cobertura={[]} />
+      {equiposConDatos.map(({ equipo, fotos, cobertura }) => (
+        <GestionEquipo key={equipo.id} creadorId={creadorId} equipo={equipo} fotos={fotos} cobertura={cobertura} />
+      ))}
+    </div>
+  );
+
   return (
     <main className="px-5 py-5">
       {/* #294: «Buscar talento» vive dentro de cada Proyecto y en el panel del Equipo —se
           busca para algo concreto—, no arriba de todo. */}
       <PanelesIniciativa
-        modoInicial={hayEquipoActivo ? "equipo" : "proyecto"}
+        modoInicial={(obras ?? []).length === 0 && equiposConDatos.length > 0 ? "equipo" : "proyecto"}
         panelProyecto={panelProyecto}
-        panelEquipo={
-          <GestionEquipo
-            creadorId={creadorId}
-            equipo={equipo ?? null}
-            fotos={fotosEquipo}
-            cobertura={coberturaEquipo}
-            tieneObraPublicada={tieneObraPublicada}
-          />
-        }
+        panelEquipo={panelEquipo}
       />
     </main>
   );
