@@ -308,7 +308,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
               id="buscar-radio"
               value={radioMetros ?? ""}
               onChange={(e) => setRadioMetros(e.target.value === "" ? null : Number(e.target.value))}
-              className="rounded-xl border border-borde bg-superficie px-3 py-2 text-base text-texto sm:text-sm"
+              className="rounded-xl border border-borde bg-superficie px-3 py-2 text-sm text-texto"
             >
               {opcionesRadio.map((o) => (
                 <option key={o.etiqueta} value={o.metros ?? ""}>

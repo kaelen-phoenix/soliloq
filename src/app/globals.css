@@ -342,3 +342,14 @@ html[data-splash="omitir"] .splash-marca {
     visibility: hidden;
   }
 }
+
+/* #345: con el zoom permitido, iOS agranda la pantalla al tocar un campo con letra de menos de
+   16 px, y acá `text-base` es 15 px. En el teléfono todo campo va a 16 px (el `!important` le gana
+   a las clases de tamaño); en pantallas grandes cada uno conserva el suyo. */
+@media (max-width: 639px) {
+  input:not([type="checkbox"]):not([type="radio"]):not([type="range"]),
+  select,
+  textarea {
+    font-size: 16px !important;
+  }
+}

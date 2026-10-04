@@ -339,7 +339,7 @@ export function PilaTarjetas({
           value={opcionActual.metros ?? ""}
           disabled={recargando}
           onChange={(e) => cambiarRadio(e.target.value === "" ? null : Number(e.target.value))}
-          className="rounded-lg border border-borde bg-superficie px-2 py-1 text-base font-medium text-texto focus:border-accion sm:text-2xs"
+          className="rounded-lg border border-borde bg-superficie px-2 py-1 text-2xs font-medium text-texto focus:border-accion"
         >
           {opciones.map((o) => (
             <option key={o.etiqueta} value={o.metros ?? ""}>
