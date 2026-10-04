@@ -191,7 +191,7 @@ export async function adminRevisarConIa(): Promise<
   const estado = await leerEstadoCuenta(supabase, user.id);
   if (!estado.esAdmin) return { ok: false, error: "No autorizado." };
 
-  let consumido = false;
+  let usoId: number | null = null;
   try {
     // Service role: los textos de otras cuentas no se leen con la sesión (RLS, 0089).
     const admin = createAdminClient();
@@ -232,9 +232,9 @@ export async function adminRevisarConIa(): Promise<
     ];
     if (items.length === 0) return { ok: true, marcados: [], revisados: 0 };
 
-    const tope = await consumirUsoIa(supabase);
-    if (tope) return { ok: false, error: tope };
-    consumido = true;
+    const uso = await consumirUsoIa(supabase);
+    if (uso.error !== undefined) return { ok: false, error: uso.error };
+    usoId = uso.usoId;
 
     const listado = items.map((it, i) => `${i + 1}. [${it.tipo}] ${it.texto.replace(/\s+/g, " ").slice(0, 2000)}`).join("\n");
     const crudo = await llamarModelo({
@@ -243,10 +243,10 @@ export async function adminRevisarConIa(): Promise<
       maxTokens: 800,
       json: true,
     });
-    const crudos = objetoJson(crudo).marcados;
+    const crudos = objetoJson(crudo)?.marcados;
     // Sin la lista no se sabe nada: no se puede informar «no encontramos nada».
     if (!Array.isArray(crudos)) {
-      await devolverUsoIa(user.id).catch(() => {});
+      await devolverUsoIa(uso.usoId).catch(() => {});
       return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
     }
     const lista = crudos as { n?: unknown; motivo?: unknown }[];
@@ -259,7 +259,7 @@ export async function adminRevisarConIa(): Promise<
     return { ok: true, marcados, revisados: items.length };
   } catch (e) {
     // #343: si falló después de consumir, el uso no cuenta.
-    if (consumido) await devolverUsoIa(user.id).catch(() => {});
+    if (usoId !== null) await devolverUsoIa(usoId).catch(() => {});
     return { ok: false, error: e instanceof Error ? e.message : "No se pudo revisar." };
   }
 }

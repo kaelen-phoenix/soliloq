@@ -14,24 +14,26 @@ import { createAdminClient } from "./supabase/admin";
 const MODELO = process.env.IA_MODELO ?? "openai/gpt-4.1-mini";
 
 /** Anota un uso (0100). Devuelve el mensaje para la persona si no se puede, o `null`. */
-export async function consumirUsoIa(supabase: SupabaseClient<Database>): Promise<string | null> {
-  const { error } = await supabase.rpc("consumir_uso_ia");
-  if (!error) return null;
-  if (error.message?.includes("limite_ia")) {
-    return "Llegaste al máximo de usos de IA de las últimas 24 horas. Probá más tarde.";
+export async function consumirUsoIa(
+  supabase: SupabaseClient<Database>,
+): Promise<{ usoId: number; error?: undefined } | { error: string; usoId?: undefined }> {
+  const { data, error } = await supabase.rpc("consumir_uso_ia");
+  if (!error && typeof data === "number") return { usoId: data };
+  if (error?.message?.includes("limite_ia")) {
+    return { error: "Llegaste al máximo de usos de IA de las últimas 24 horas. Probá más tarde." };
   }
-  Sentry.captureException(error, { extra: { accion: "consumir_uso_ia" } });
-  return "No pudimos hacerlo ahora. Probá de nuevo.";
+  Sentry.captureException(error ?? new Error("consumir_uso_ia sin id"), { extra: { accion: "consumir_uso_ia" } });
+  return { error: "No pudimos hacerlo ahora. Probá de nuevo." };
 }
 
 /**
  * Si la llamada al modelo falló, el uso no cuenta (#343): se devuelve. Va con el cliente de
- * servicio y el perfil explícito: la función no es ejecutable por una sesión (0104), así nadie
- * se borra sus usos desde el navegador para saltear el tope.
+ * servicio y el id exacto del uso de esta acción (0105): la función no es ejecutable por una
+ * sesión, así nadie se borra sus usos desde el navegador para saltear el tope.
  */
-export async function devolverUsoIa(perfilId: string) {
-  const { error } = await createAdminClient().rpc("devolver_uso_ia", { p_perfil_id: perfilId });
-  if (error) Sentry.captureException(new Error(`devolver_uso_ia: ${error.message}`), { extra: { perfilId } });
+export async function devolverUsoIa(usoId: number) {
+  const { error } = await createAdminClient().rpc("devolver_uso_ia", { p_uso_id: usoId });
+  if (error) Sentry.captureException(new Error(`devolver_uso_ia: ${error.message}`), { extra: { usoId } });
 }
 
 /** Saca las etiquetas del bloque para que nadie lo cierre y siga con instrucciones propias. */
@@ -76,12 +78,12 @@ export async function llamarModelo({
   return salida;
 }
 
-/** El JSON de una respuesta, o `{}` si no es un objeto (el modelo puede devolver cualquier cosa). */
-export function objetoJson(crudo: string): Record<string, unknown> {
+/** El JSON de una respuesta, o `null` si no es un objeto (el modelo puede devolver cualquier cosa). */
+export function objetoJson(crudo: string): Record<string, unknown> | null {
   try {
     const v = JSON.parse(crudo);
-    return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
+    return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : null;
   } catch {
-    return {};
+    return null;
   }
 }

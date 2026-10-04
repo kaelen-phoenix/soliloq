@@ -1,4 +1,4 @@
--- Tope de usos de IA (#313 0100, #343 0103/0104). Se corre entero dentro de begin/rollback.
+-- Tope de usos de IA (#313 0100, #343 0103–0105). Se corre entero dentro de begin/rollback.
 --   supabase/tests/run.sh usos_ia.sql
 
 begin;
@@ -25,14 +25,14 @@ end $$;
 -- ── T2 · la sesión no puede devolverse usos (0104): solo el servidor ────────
 do $$ begin
   begin
-    perform public.devolver_uso_ia('a7777777-7777-7777-7777-77777777aaaa');
+    perform public.devolver_uso_ia(1);
     raise exception 'T2: authenticated no tendría que poder devolver usos';
   exception when insufficient_privilege then null;
   end;
 end $$;
 reset role;
 -- El servidor devuelve el uso de un intento fallido y vuelve a haber lugar.
-select public.devolver_uso_ia('a7777777-7777-7777-7777-77777777aaaa');
+select public.devolver_uso_ia((select max(id) from usos_ia where perfil_id = 'a7777777-7777-7777-7777-77777777aaaa'));
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a7777777-7777-7777-7777-77777777aaaa"}';
 do $$ begin
