@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { getVercelOidcToken } from "@vercel/oidc";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./supabase/types";
+import { createAdminClient } from "./supabase/admin";
 
 /**
  * Lo común de las funciones de IA (#313 y siguientes): el tope de usos de la base y la
@@ -23,9 +24,14 @@ export async function consumirUsoIa(supabase: SupabaseClient<Database>): Promise
   return "No pudimos hacerlo ahora. Probá de nuevo.";
 }
 
-/** Si la llamada al modelo falló, el uso no cuenta (#343): se devuelve. */
-export async function devolverUsoIa(supabase: SupabaseClient<Database>) {
-  await supabase.rpc("devolver_uso_ia");
+/**
+ * Si la llamada al modelo falló, el uso no cuenta (#343): se devuelve. Va con el cliente de
+ * servicio y el perfil explícito: la función no es ejecutable por una sesión (0104), así nadie
+ * se borra sus usos desde el navegador para saltear el tope.
+ */
+export async function devolverUsoIa(perfilId: string) {
+  const { error } = await createAdminClient().rpc("devolver_uso_ia", { p_perfil_id: perfilId });
+  if (error) Sentry.captureException(new Error(`devolver_uso_ia: ${error.message}`), { extra: { perfilId } });
 }
 
 /** Saca las etiquetas del bloque para que nadie lo cierre y siga con instrucciones propias. */

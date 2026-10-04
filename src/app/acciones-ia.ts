@@ -47,7 +47,7 @@ export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "exp
     const veredicto = revisarFidelidad(entrada, salida);
     if (!veredicto.ok) {
       // La persona no recibe nada: el uso no cuenta (#343).
-      await devolverUsoIa(supabase).catch(() => {});
+      await devolverUsoIa(user.id).catch(() => {});
       return {
         ok: false,
         error:
@@ -59,7 +59,7 @@ export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "exp
     return { ok: true, texto: salida };
   } catch (e) {
     // #343: si falló, el uso no cuenta.
-    await devolverUsoIa(supabase).catch(() => {});
+    await devolverUsoIa(user.id).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "mejorar redacción", tipo } });
     return { ok: false, error: "No pudimos mejorarlo ahora. Probá de nuevo en un rato." };
   }
@@ -92,7 +92,7 @@ export async function sugerirHabilidades(
     return { ok: true, habilidades: validas };
   } catch (e) {
     // #343: si falló, el uso no cuenta.
-    await devolverUsoIa(supabase).catch(() => {});
+    await devolverUsoIa(user.id).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "sugerir habilidades" } });
     return { ok: false, error: "No pudimos sugerirlas ahora. Probá de nuevo en un rato." };
   }
@@ -152,7 +152,7 @@ export async function interpretarBusqueda(
     return { ok: true, filtros };
   } catch (e) {
     // #343: si falló, el uso no cuenta.
-    await devolverUsoIa(supabase).catch(() => {});
+    await devolverUsoIa(user.id).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "interpretar búsqueda" } });
     return { ok: false, error: "No pudimos interpretarlo ahora. Usá los filtros de abajo." };
   }
@@ -225,7 +225,7 @@ export async function borradorSaludo(salaId: string): Promise<Resultado> {
     return { ok: true, texto: salida.slice(0, 600) };
   } catch (e) {
     // #343: si falló, el uso no cuenta.
-    await devolverUsoIa(supabase).catch(() => {});
+    await devolverUsoIa(user.id).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "borrador saludo" } });
     return { ok: false, error: "No pudimos escribirlo ahora. Probá de nuevo en un rato." };
   }
