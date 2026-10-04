@@ -10,6 +10,7 @@ import {
   INSTRUCCIONES,
   INSTRUCCIONES_BUSQUEDA,
   INSTRUCCIONES_HABILIDADES,
+  INSTRUCCIONES_SALUDO,
   MAX_ENTRADA,
   MAX_SALIDA,
   type TipoRedaccion,
@@ -145,5 +146,75 @@ export async function interpretarBusqueda(
   } catch (e) {
     Sentry.captureException(e, { extra: { accion: "interpretar búsqueda" } });
     return { ok: false, error: "No pudimos interpretarlo ahora. Usá los filtros de abajo." };
+  }
+}
+
+/**
+ * «✨ Escribir un saludo» en el chat de un Proyecto o Equipo propio (#322): arma un primer
+ * mensaje de bienvenida con el título, la descripción y quiénes se sumaron (y su rol). Va al
+ * campo de texto para editarlo; no se manda solo.
+ */
+export async function borradorSaludo(salaId: string): Promise<Resultado> {
+  const supabase = createClient();
+  const {
+    data: { user },
+  } = await supabase.auth.getUser();
+  if (!user) return { ok: false, error: "Sin sesión." };
+
+  const { data: sala } = await supabase
+    .from("salas")
+    .select("obra_id, equipo_id, obras(titulo, sinopsis, creador_id), equipos(titulo, descripcion, creador_id)")
+    .eq("id", salaId)
+    .maybeSingle();
+  const obra = (Array.isArray(sala?.obras) ? sala?.obras[0] : sala?.obras) as
+    | { titulo: string; sinopsis: string | null; creador_id: string }
+    | null
+    | undefined;
+  const equipo = (Array.isArray(sala?.equipos) ? sala?.equipos[0] : sala?.equipos) as
+    | { titulo: string; descripcion: string | null; creador_id: string }
+    | null
+    | undefined;
+  if (!sala || (obra?.creador_id ?? equipo?.creador_id) !== user.id) {
+    return { ok: false, error: "Solo quien armó el proyecto puede usar esto." };
+  }
+
+  const { data: integrantes } = await supabase
+    .from("sala_integrantes")
+    .select("perfil_id")
+    .eq("sala_id", salaId)
+    .neq("perfil_id", user.id);
+  const ids = (integrantes ?? []).map((i) => i.perfil_id);
+  if (ids.length === 0) return { ok: false, error: "Todavía no se sumó nadie al chat." };
+  const { data: talentos } = await supabase.from("perfiles_talento").select("id, nombre").in("id", ids);
+
+  // El rol de cada uno, si es un Proyecto (un Equipo no tiene roles).
+  const rolPorTalento = new Map<string, string>();
+  if (sala.obra_id) {
+    const { data: cobertura } = await supabase.rpc("cobertura_iniciativa", {
+      p_obra_id: sala.obra_id,
+      p_equipo_id: null,
+    });
+    for (const c of cobertura ?? []) if (c.talento_id && c.rol_nombre) rolPorTalento.set(c.talento_id, c.rol_nombre);
+  }
+
+  const personas = (talentos ?? [])
+    .map((t) => `- ${t.nombre}${rolPorTalento.get(t.id) ? ` (rol: ${rolPorTalento.get(t.id)})` : ""}`)
+    .join("\n");
+  const datos = [
+    `${obra ? "Proyecto" : "Equipo"}: ${obra?.titulo ?? equipo?.titulo}`,
+    (obra?.sinopsis ?? equipo?.descripcion) ? `Descripción: ${(obra?.sinopsis ?? equipo?.descripcion)!.slice(0, 1000)}` : "",
+    `Se suman:\n${personas}`,
+  ]
+    .filter(Boolean)
+    .join("\n");
+
+  const tope = await consumirUsoIa(supabase);
+  if (tope) return { ok: false, error: tope };
+  try {
+    const salida = await llamarModelo({ sistema: INSTRUCCIONES_SALUDO, usuario: enBloque("datos", datos), maxTokens: 400 });
+    return { ok: true, texto: salida.slice(0, 600) };
+  } catch (e) {
+    Sentry.captureException(e, { extra: { accion: "borrador saludo" } });
+    return { ok: false, error: "No pudimos escribirlo ahora. Probá de nuevo en un rato." };
   }
 }
