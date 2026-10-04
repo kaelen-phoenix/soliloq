@@ -52,16 +52,9 @@ const pie = { text: `Yalope · ${L.pieLema}` };
 const PIES = [pie.text, "Yalope · Teatro y audiovisual"];
 
 const SEND = 1n << 11n;
-const VER = 1n << 10n;
 const SOLO_LECTURA = [
   { id: G, type: 0, allow: "0", deny: String(SEND | (1n << 35n) | (1n << 36n) | (1n << 38n)) }, // enviar, hilos
   { id: BOT_ROL, type: 0, allow: String(SEND | (1n << 14n)), deny: "0" },
-];
-// Lo ve solo quien administra (la dueña o dueño del servidor ve todo): Discord manda ahí sus avisos
-// para moderación, que es obligatorio tener en un servidor «Comunidad».
-const PRIVADO = [
-  { id: G, type: 0, allow: "0", deny: String(VER) },
-  { id: BOT_ROL, type: 0, allow: String(VER | SEND), deny: "0" },
 ];
 
 const canales = await api("GET", `/guilds/${G}/channels`);
@@ -124,7 +117,6 @@ const bienvenida = await canal({ id: "1554824548929507399", nombre: "bienvenida"
 const comoFunciona = await canal({ nombre: "cómo-funciona", padre: catInfo, permisos: SOLO_LECTURA, posicion: 1, tema: L.comoFunciona });
 const normas = await canal({ nombre: "normas", padre: catInfo, permisos: SOLO_LECTURA, posicion: 2, tema: N.titulo });
 const anuncios = await canal({ id: "1554824548929507400", nombre: "anuncios", padre: catInfo, permisos: SOLO_LECTURA, posicion: 3, tema: "Novedades de la app." });
-const moderacion = await canal({ nombre: "moderación", padre: catInfo, permisos: PRIVADO, posicion: 9, tema: "Avisos de Discord para quien administra. No lo ve la comunidad." });
 
 // ── Comunidad ───────────────────────────────────────────────────────────────
 const general = await canal({ id: "1554824548929507402", nombre: "general", padre: catComunidad, posicion: 0, tema: `Charla libre de la comunidad. Las convocatorias y los chats de cada proyecto están en la app: ${APP}` });
@@ -153,10 +145,9 @@ const servidor = await api("PATCH", `/guilds/${G}`, {
   rules_channel_id: normas,
 });
 // Activar «Comunidad» lo puede hacer solo quien administra el servidor (al bot Discord le
-// responde 403): Ajustes del servidor → Habilitar Comunidad, con #normas como reglas y
-// #moderación para los avisos. Con eso activo, este script arma la pantalla de bienvenida.
+// responde 403): Ajustes del servidor → Habilitar Comunidad. El asistente crea su canal privado
+// de avisos (#solo-moderadores). Con eso activo, este script arma la pantalla de bienvenida.
 if (servidor.features?.includes("COMMUNITY")) {
-  await api("PATCH", `/guilds/${G}`, { public_updates_channel_id: moderacion });
   await api("PATCH", `/guilds/${G}/welcome-screen`, {
     enabled: true,
     description: "Yalope conecta actores, actrices y creadores de proyectos.",
@@ -253,4 +244,4 @@ await publicar(anuncios, [
   },
 ]);
 
-console.log("listo:", { bienvenida, comoFunciona, normas, anuncios, moderacion });
+console.log("listo:", { bienvenida, comoFunciona, normas, anuncios });
