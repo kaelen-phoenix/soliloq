@@ -17,6 +17,7 @@ const DIR = process.env.E2E_RECORRIDO_DIR ?? "recorrido-ux";
 const PASS = "test-1234-abcd";
 // Ancho del teléfono (E2E_ANCHO=320 para los más angostos). Cada captura anota lo que se sale.
 const ANCHO = Number(process.env.E2E_ANCHO ?? 390);
+if (!Number.isInteger(ANCHO) || ANCHO < 240 || ANCHO > 2000) throw new Error(`E2E_ANCHO inválido: ${process.env.E2E_ANCHO}`);
 const LAT = -34.6037;
 const LNG = -58.3816;
 // PNG 1×1: alcanza para que las pantallas con fotos tengan algo que mostrar.
