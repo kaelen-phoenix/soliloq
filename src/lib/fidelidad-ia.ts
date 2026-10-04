@@ -69,10 +69,13 @@ export function revisarFidelidad(original: string, propuesta: string): Veredicto
   if ((propuesta.match(/\d+/g) ?? []).some((n) => !numerosOriginal.has(n))) {
     return { ok: false, motivo: "inventado" };
   }
-  // Un nombre propio nuevo ya es un dato inventado (salvo vocabulario de CV en mayúscula).
-  const nombresNuevos = nombresPropios(propuesta).filter(
-    (n) => esNueva(n) && !PERMITIDAS.has(normalizar(n)),
-  );
+  // Un nombre propio nuevo ya es un dato inventado (salvo vocabulario de CV en mayúscula). Se
+  // compara la palabra completa: «Martínez» no es «Martín» aunque compartan la raíz.
+  const palabrasOriginal = new Set(palabras(original, 1));
+  const nombresNuevos = nombresPropios(propuesta).filter((n) => {
+    const w = normalizar(n);
+    return !palabrasOriginal.has(w) && !PERMITIDAS.has(w);
+  });
   if (nombresNuevos.length > 0) return { ok: false, motivo: "inventado" };
 
   // Y que no sea mayormente otro texto. Unos sinónimos o un adorno («entusiasmo») no alcanzan.

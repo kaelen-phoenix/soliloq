@@ -194,7 +194,7 @@ export async function adminRevisarConIa(): Promise<
   try {
     // Service role: los textos de otras cuentas no se leen con la sesión (RLS, 0089).
     const admin = createAdminClient();
-    const [{ data: cuentas }, { data: obras }, { data: equipos }, { data: roles }] = await Promise.all([
+    const consultas = await Promise.all([
       admin.from("perfiles").select("id").order("creado_en", { ascending: false }).limit(200),
       admin.from("obras").select("id, titulo, sinopsis").order("creado_en", { ascending: false }).limit(20),
       admin.from("equipos").select("id, titulo, descripcion").order("creado_en", { ascending: false }).limit(20),
@@ -205,14 +205,18 @@ export async function adminRevisarConIa(): Promise<
         .order("creado_en", { ascending: false })
         .limit(30),
     ]);
+    const fallida = consultas.find((c) => c.error);
+    if (fallida?.error) return { ok: false, error: `No se pudo leer lo publicado: ${fallida.error.message}` };
+    const [{ data: cuentas }, { data: obras }, { data: equipos }, { data: roles }] = consultas;
     // De las cuentas más nuevas, las primeras 40 que tienen Experiencia escrita (sin texto no
     // hay nada que revisar, y no tienen que ocupar el cupo).
     const orden = (cuentas ?? []).map((c) => c.id);
-    const { data: conTexto } = await admin
+    const { data: conTexto, error: errorPerfiles } = await admin
       .from("perfiles_talento")
       .select("id, nombre, experiencia")
       .in("id", orden)
       .not("experiencia", "is", null);
+    if (errorPerfiles) return { ok: false, error: `No se pudieron leer los perfiles: ${errorPerfiles.message}` };
     const perfiles = (conTexto ?? [])
       .sort((a, b) => orden.indexOf(a.id) - orden.indexOf(b.id))
       .slice(0, 40);
@@ -238,7 +242,9 @@ export async function adminRevisarConIa(): Promise<
       json: true,
     });
     const crudos = objetoJson(crudo).marcados;
-    const lista = (Array.isArray(crudos) ? crudos : []) as { n?: unknown; motivo?: unknown }[];
+    // Sin la lista no se sabe nada: no se puede informar «no encontramos nada».
+    if (!Array.isArray(crudos)) return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+    const lista = crudos as { n?: unknown; motivo?: unknown }[];
     const marcados = lista.flatMap((m) => {
       const it = typeof m.n === "number" ? items[m.n - 1] : undefined;
       if (!it || typeof m.motivo !== "string") return [];
