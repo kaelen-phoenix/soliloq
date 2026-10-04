@@ -41,7 +41,8 @@ function palabras(texto: string, minimo: number): string[] {
 function nombresPropios(texto: string): string[] {
   const nombres: string[] = [];
   for (const oracion of texto.split(/[.!?:\n]+/)) {
-    const tokens = oracion.trim().split(/\s+/);
+    // También por guiones: «Coca-Cola» son dos palabras, como «coca cola» en el original.
+    const tokens = oracion.trim().split(/[\s\-–]+/);
     for (const t of tokens.slice(1)) {
       const limpio = t.replace(/^[«"'(¿¡]+|[»"'),;]+$/g, "");
       if (/^[A-ZÁÉÍÓÚÑ][a-záéíóúñ]{2,}/.test(limpio)) nombres.push(limpio);
@@ -65,12 +66,14 @@ export function revisarFidelidad(original: string, propuesta: string): Veredicto
 
   // Años o números que no estaban.
   const numerosOriginal = new Set(original.match(/\d+/g) ?? []);
-  if ((propuesta.match(/\d{2,}/g) ?? []).some((n) => !numerosOriginal.has(n))) {
+  if ((propuesta.match(/\d+/g) ?? []).some((n) => !numerosOriginal.has(n))) {
     return { ok: false, motivo: "inventado" };
   }
-  // Nombres propios nuevos (dos o más distintos: uno suelto puede ser un sustantivo en mayúscula).
-  const nombresNuevos = new Set(nombresPropios(propuesta).filter(esNueva).map(normalizar));
-  if (nombresNuevos.size >= 2) return { ok: false, motivo: "inventado" };
+  // Un nombre propio nuevo ya es un dato inventado (salvo vocabulario de CV en mayúscula).
+  const nombresNuevos = nombresPropios(propuesta).filter(
+    (n) => esNueva(n) && !PERMITIDAS.has(normalizar(n)),
+  );
+  if (nombresNuevos.length > 0) return { ok: false, motivo: "inventado" };
 
   // Y que no sea mayormente otro texto. Unos sinónimos o un adorno («entusiasmo») no alcanzan.
   const candidatas = palabras(propuesta, 5).filter((w) => !PERMITIDAS.has(w));

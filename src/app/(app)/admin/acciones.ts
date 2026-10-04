@@ -9,7 +9,7 @@ import { enviarBienvenidasPendientes, type ResumenBienvenidas } from "@/lib/bien
 import { correoConfigurado, enviarCorreo } from "@/lib/correo";
 import { mailBienvenida } from "@/lib/correos/bienvenida";
 import { mailInvitacion } from "@/lib/correos/acceso";
-import { consumirUsoIa, enBloque, llamarModelo } from "@/lib/ia-servidor";
+import { consumirUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
 import { INSTRUCCIONES_MODERACION } from "@/lib/ia-prompts";
 
 type Resultado = { ok: true } | { ok: false; error: string };
@@ -195,7 +195,7 @@ export async function adminRevisarConIa(): Promise<
     // Service role: los textos de otras cuentas no se leen con la sesión (RLS, 0089).
     const admin = createAdminClient();
     const [{ data: cuentas }, { data: obras }, { data: equipos }, { data: roles }] = await Promise.all([
-      admin.from("perfiles").select("id").order("creado_en", { ascending: false }).limit(40),
+      admin.from("perfiles").select("id").order("creado_en", { ascending: false }).limit(200),
       admin.from("obras").select("id, titulo, sinopsis").order("creado_en", { ascending: false }).limit(20),
       admin.from("equipos").select("id, titulo, descripcion").order("creado_en", { ascending: false }).limit(20),
       admin
@@ -205,13 +205,20 @@ export async function adminRevisarConIa(): Promise<
         .order("creado_en", { ascending: false })
         .limit(30),
     ]);
-    const { data: perfiles } = await admin
+    // De las cuentas más nuevas, las primeras 40 que tienen Experiencia escrita (sin texto no
+    // hay nada que revisar, y no tienen que ocupar el cupo).
+    const orden = (cuentas ?? []).map((c) => c.id);
+    const { data: conTexto } = await admin
       .from("perfiles_talento")
       .select("id, nombre, experiencia")
-      .in("id", (cuentas ?? []).map((c) => c.id));
+      .in("id", orden)
+      .not("experiencia", "is", null);
+    const perfiles = (conTexto ?? [])
+      .sort((a, b) => orden.indexOf(a.id) - orden.indexOf(b.id))
+      .slice(0, 40);
 
     const items: (Omit<MarcaModeracion, "motivo"> & { texto: string })[] = [
-      ...(perfiles ?? [])
+      ...perfiles
         .filter((p) => p.experiencia)
         .map((p) => ({ tipo: "perfil" as const, id: p.id, titulo: p.nombre, texto: p.experiencia! })),
       ...(obras ?? []).map((o) => ({ tipo: "proyecto" as const, id: o.id, titulo: o.titulo, texto: `${o.titulo}. ${o.sinopsis ?? ""}` })),
@@ -223,14 +230,15 @@ export async function adminRevisarConIa(): Promise<
     const tope = await consumirUsoIa(supabase);
     if (tope) return { ok: false, error: tope };
 
-    const listado = items.map((it, i) => `${i + 1}. [${it.tipo}] ${it.texto.replace(/\s+/g, " ").slice(0, 600)}`).join("\n");
+    const listado = items.map((it, i) => `${i + 1}. [${it.tipo}] ${it.texto.replace(/\s+/g, " ").slice(0, 2000)}`).join("\n");
     const crudo = await llamarModelo({
       sistema: INSTRUCCIONES_MODERACION,
       usuario: enBloque("publicaciones", listado),
       maxTokens: 800,
       json: true,
     });
-    const lista = (JSON.parse(crudo)?.marcados ?? []) as { n?: unknown; motivo?: unknown }[];
+    const crudos = objetoJson(crudo).marcados;
+    const lista = (Array.isArray(crudos) ? crudos : []) as { n?: unknown; motivo?: unknown }[];
     const marcados = lista.flatMap((m) => {
       const it = typeof m.n === "number" ? items[m.n - 1] : undefined;
       if (!it || typeof m.motivo !== "string") return [];

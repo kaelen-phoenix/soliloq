@@ -59,7 +59,8 @@ export function SalaChat({
     try {
       const r = await borradorSaludo(salaId);
       if (!r.ok) return setSaludo(r.error);
-      setTexto(r.texto);
+      // Si mientras tanto la persona empezó a escribir, no se le pisa lo suyo.
+      setTexto((prev) => (prev.trim() ? prev : r.texto));
       setSaludo("listo");
     } catch {
       setSaludo("No pudimos escribirlo ahora. Probá de nuevo.");
@@ -337,7 +338,10 @@ export function SalaChat({
       <form onSubmit={enviar} className="safe-bottom flex gap-2 border-t border-borde bg-superficie p-3">
         <input
           value={texto}
-          onChange={(e) => setTexto(e.target.value)}
+          onChange={(e) => {
+            setTexto(e.target.value);
+            if (saludo !== "listo" && saludo !== "escribiendo") setSaludo("listo");
+          }}
           maxLength={2000}
           placeholder="Escribí un mensaje…"
           className="flex-1 rounded-full border border-borde bg-superficie px-4 py-2.5 text-base text-texto placeholder:text-texto-tenue focus:border-accion"

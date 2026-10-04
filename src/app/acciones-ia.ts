@@ -3,7 +3,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { revisarFidelidad } from "@/lib/fidelidad-ia";
-import { consumirUsoIa, enBloque, llamarModelo } from "@/lib/ia-servidor";
+import { consumirUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
 import { GENEROS_BUSCABLES, HABILIDADES } from "@/lib/constantes";
 import {
   ERROR_SIN_DATOS,
@@ -26,7 +26,7 @@ type Resultado = { ok: true; texto: string } | { ok: false; error: string };
  */
 export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "experiencia"): Promise<Resultado> {
   const entrada = texto.trim();
-  if (!(tipo in INSTRUCCIONES)) return { ok: false, error: "No se puede mejorar este texto." };
+  if (!Object.hasOwn(INSTRUCCIONES, tipo)) return { ok: false, error: "No se puede mejorar este texto." };
   if (entrada.length < 15) return { ok: false, error: "Escribí o pegá un poco más de texto primero." };
   if (entrada.length > MAX_ENTRADA) {
     return { ok: false, error: `El texto es muy largo (máximo ${MAX_ENTRADA} caracteres).` };
@@ -82,7 +82,8 @@ export async function sugerirHabilidades(
 
   try {
     const crudo = await llamarModelo({ sistema: INSTRUCCIONES_HABILIDADES, usuario: enBloque("texto", entrada), maxTokens: 200, json: true });
-    const lista = (JSON.parse(crudo)?.habilidades ?? []) as unknown[];
+    const crudas = objetoJson(crudo).habilidades;
+    const lista: unknown[] = Array.isArray(crudas) ? crudas : [];
     const validas = HABILIDADES.filter((h) => lista.includes(h));
     return { ok: true, habilidades: validas };
   } catch (e) {
@@ -127,7 +128,7 @@ export async function interpretarBusqueda(
       maxTokens: 200,
       json: true,
     });
-    const j = JSON.parse(crudo) ?? {};
+    const j = objetoJson(crudo) as Record<string, any>;
     const edad = (v: unknown) =>
       typeof v === "number" && Number.isInteger(v) && v >= 16 && v <= 100 ? v : undefined;
     const generosValidos = GENEROS_BUSCABLES.map((g) => g.valor as string);
@@ -198,7 +199,8 @@ export async function borradorSaludo(salaId: string): Promise<Resultado> {
   }
 
   const personas = (talentos ?? [])
-    .map((t) => `- ${t.nombre}${rolPorTalento.get(t.id) ? ` (rol: ${rolPorTalento.get(t.id)})` : ""}`)
+    // Nombres y roles los escribe cada persona: van como datos JSON, no como texto suelto.
+    .map((t) => JSON.stringify({ nombre: t.nombre, rol: rolPorTalento.get(t.id) ?? null }))
     .join("\n");
   const datos = [
     `${obra ? "Proyecto" : "Equipo"}: ${obra?.titulo ?? equipo?.titulo}`,

@@ -51,6 +51,8 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
       setHabilidades(f.habilidades ?? []);
       setTexto(f.texto ?? "");
       let zona: string | null = null;
+      // La zona anterior no puede quedar aplicada si la nueva no se encuentra.
+      setUbicacion(null);
       if (f.zona) {
         try {
           const sesion = new SesionUbicacion();
@@ -62,8 +64,6 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
         } catch {
           // Sin zona: el resto de los filtros se aplica igual.
         }
-      } else {
-        setUbicacion(null);
       }
       setVerFiltros(true);
       setAvisoConsulta(

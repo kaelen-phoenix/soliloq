@@ -64,3 +64,13 @@ export async function llamarModelo({
   if (!salida) throw new Error("respuesta vacía");
   return salida;
 }
+
+/** El JSON de una respuesta, o `{}` si no es un objeto (el modelo puede devolver cualquier cosa). */
+export function objetoJson(crudo: string): Record<string, unknown> {
+  try {
+    const v = JSON.parse(crudo);
+    return v && typeof v === "object" && !Array.isArray(v) ? (v as Record<string, unknown>) : {};
+  } catch {
+    return {};
+  }
+}

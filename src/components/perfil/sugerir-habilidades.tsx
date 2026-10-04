@@ -15,7 +15,8 @@ export function SugerirHabilidades({
 }: {
   experiencia: string;
   marcadas: string[];
-  onMarcar: (habilidades: string[]) => void;
+  /** Como un `setState`: suma sobre lo marcado en ese momento, aunque haya cambiado mientras. */
+  onMarcar: (actualizar: (prev: string[]) => string[]) => void;
 }) {
   const [pensando, setPensando] = useState(false);
   const [aviso, setAviso] = useState<string | null>(null);
@@ -34,7 +35,7 @@ export function SugerirHabilidades({
             : "No encontramos habilidades de la lista en tu experiencia.",
         );
       }
-      onMarcar([...marcadas, ...nuevas]);
+      onMarcar((prev) => [...prev, ...r.habilidades.filter((h) => !prev.includes(h))]);
       setAviso(`Marcamos: ${nuevas.join(", ")}. Revisalas antes de guardar.`);
     } catch {
       setAviso("No pudimos sugerirlas ahora. Probá de nuevo.");
