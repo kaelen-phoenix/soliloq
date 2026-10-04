@@ -8,6 +8,7 @@ const TITULOS: { patron: RegExp; clave: string }[] = [
   { patron: /^\/proyectos/, clave: "misProyectos" },
   { patron: /^\/matches/, clave: "matches" },
   { patron: /^\/convocatoria/, clave: "convocatoria" },
+  { patron: /^\/equipos\/.+/, clave: "equipo" },
   { patron: /^\/equipo/, clave: "contacto" },
   { patron: /^\/salas\/.+/, clave: "sala" },
   { patron: /^\/salas$/, clave: "salas" },

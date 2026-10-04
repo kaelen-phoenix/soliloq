@@ -90,12 +90,13 @@ test.describe("formularios en pantallas angostas", () => {
       const page = await entrar(browser, email, ancho);
 
       await page.goto("/proyectos");
-      await page.getByRole("button", { name: /Crear un proyecto/ }).click();
+      await page.getByRole("button", { name: "Crear proyecto" }).click();
+      await page.getByRole("button", { name: /Un proyecto con roles/ }).click();
       await revisar(page, "crear-proyecto", ancho, informe, fallas);
 
       await page.goto("/proyectos");
-      await page.getByRole("tab", { name: "Armar equipo" }).click();
-      await page.getByRole("button", { name: /Armar un equipo/ }).click();
+      await page.getByRole("button", { name: "Crear proyecto" }).click();
+      await page.getByRole("button", { name: /Armar equipo/ }).click();
       await revisar(page, "crear-equipo", ancho, informe, fallas);
 
       await page.goto(`/obras/${obraId}`);

@@ -132,12 +132,15 @@ test.describe("eliminar equipo (UI)", () => {
     await page.getByRole("textbox", { name: "Buscar" }).fill(sufijo);
     await expect(page.getByText(nombreTalento)).toHaveCount(0, { timeout: 10_000 });
 
-    // 2. Eliminar el equipo desde Mis proyectos (con equipo activo abre en "Armar equipo").
+    // 2. Eliminar el equipo desde su pantalla (#341: Mis proyectos lleva a /equipos/[id]).
     await page.goto("/proyectos");
-    await expect(page.getByText(tituloEquipo)).toBeVisible({ timeout: 10_000 });
+    await page.getByRole("link", { name: new RegExp(tituloEquipo) }).click();
+    await page.waitForURL(/\/equipos\/[^/]+$/, { timeout: 15_000 });
     await page.getByRole("button", { name: "Eliminar equipo" }).click();
     await page.getByLabel("Escribí BORRAR para confirmar").fill("BORRAR");
     await page.getByRole("button", { name: "Eliminar definitivamente" }).click();
+    // Vuelve a Mis proyectos, y el equipo ya no está.
+    await page.waitForURL(/\/proyectos$/, { timeout: 15_000 });
     await expect(page.getByText(tituloEquipo)).toHaveCount(0, { timeout: 10_000 });
 
     // 3. El Talento vuelve a Buscar Talentos. Buscar pide una iniciativa activa ("Creá un

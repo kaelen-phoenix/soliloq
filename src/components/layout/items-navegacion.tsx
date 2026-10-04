@@ -50,6 +50,8 @@ export function idTourNav(href: string) {
  *  de talento marca Proyectos. */
 export function esActivo(pathname: string, href: string) {
   if (href === "/") return pathname === "/";
-  if (href === "/proyectos") return /^\/(proyectos|talentos)(\/|$)/.test(pathname);
+  // `/equipos/[id]` es solo de quien lo armó (#341); `/obras/[id]` no, porque también se abre
+  // desde Explorar.
+  if (href === "/proyectos") return /^\/(proyectos|talentos|equipos)(\/|$)/.test(pathname);
   return pathname === href || pathname.startsWith(`${href}/`);
 }
