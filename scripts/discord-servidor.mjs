@@ -33,6 +33,9 @@ async function api(metodo, p, cuerpo) {
   }
 }
 
+// Marca de los mensajes informativos: el script solo edita los que la llevan.
+const pie = { text: "Yalope · Teatro y audiovisual" };
+
 const SEND = 1n << 11n;
 const SOLO_LECTURA = [
   { id: G, type: 0, allow: "0", deny: String(SEND | (1n << 35n) | (1n << 36n) | (1n << 38n)) }, // enviar, hilos
@@ -41,7 +44,10 @@ const SOLO_LECTURA = [
 
 const canales = await api("GET", `/guilds/${G}/channels`);
 const porId = (id) => canales.find((c) => c.id === id);
-const porNombre = (nombre, tipo = 0) => canales.find((c) => c.name === nombre && c.type === tipo);
+// Solo dentro de la categoría destino: un Equipo o Proyecto de la app puede llamarse «normas», y
+// sin esto el script tomaría ese canal privado, lo movería y le cambiaría los permisos.
+const porNombre = (nombre, tipo, padre) =>
+  canales.find((c) => c.name === nombre && c.type === tipo && c.parent_id === padre);
 
 async function categoria(id, nombre, posicion) {
   await api("PATCH", `/channels/${id}`, { name: nombre, position: posicion });
@@ -49,7 +55,7 @@ async function categoria(id, nombre, posicion) {
 }
 
 async function canal({ id, nombre, padre, tema, soloLectura, tipo = 0, posicion }) {
-  const existente = (id && porId(id)) || porNombre(nombre, tipo);
+  const existente = (id && porId(id)) || porNombre(nombre, tipo, padre);
   const datos = {
     name: nombre,
     parent_id: padre,
@@ -70,7 +76,7 @@ async function canal({ id, nombre, padre, tema, soloLectura, tipo = 0, posicion 
 async function publicar(canalId, mensajes) {
   const yo = await api("GET", "/users/@me");
   const previos = (await api("GET", `/channels/${canalId}/messages?limit=50`))
-    .filter((m) => m.author?.id === yo.id)
+    .filter((m) => m.author?.id === yo.id && m.embeds?.[0]?.footer?.text === pie.text)
     .reverse();
   for (const [i, m] of mensajes.entries()) {
     if (previos[i]) await api("PATCH", `/channels/${canalId}/messages/${previos[i].id}`, m);
@@ -102,7 +108,7 @@ await canal({ id: "1554824549487480947", nombre: "Ensayo libre", padre: catVoz, 
 await canal({ id: "1554824549487480948", nombre: "Escenario", padre: catVoz, tipo: 2, posicion: 2 });
 
 // ── Mensajes ────────────────────────────────────────────────────────────────
-const pie = { text: "Yalope · Teatro y audiovisual" };
+
 
 await publicar(bienvenida, [
   {
