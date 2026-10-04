@@ -28,9 +28,19 @@ interface RolNuevo {
  * fila de `obras` todavía mientras se completa este formulario, y `fotos_obra` necesita que
  * exista para poder guardarse.
  */
-export function FormularioObra({ creadorId }: { creadorId: string }) {
+export function FormularioObra({
+  creadorId,
+  abiertoInicial = false,
+  onCancelar,
+}: {
+  creadorId: string;
+  /** Desde «Crear proyecto» (#341) llega ya abierto. */
+  abiertoInicial?: boolean;
+  /** Cancelar vuelve a la pregunta «¿Qué querés armar?» en vez de plegar el formulario. */
+  onCancelar?: () => void;
+}) {
   const router = useRouter();
-  const [abierto, setAbierto] = useState(false);
+  const [abierto, setAbierto] = useState(abiertoInicial);
   const [titulo, setTitulo] = useState("");
   const [sinopsis, setSinopsis] = useState("");
   const [ubicacion, setUbicacion] = useState<Ubicacion | null>(null);
@@ -226,7 +236,7 @@ export function FormularioObra({ creadorId }: { creadorId: string }) {
         <Boton type="submit" cargando={cargando}>
           Crear proyecto
         </Boton>
-        <Boton type="button" variante="fantasma" onClick={() => setAbierto(false)} disabled={cargando}>
+        <Boton type="button" variante="fantasma" onClick={() => (onCancelar ? onCancelar() : setAbierto(false))} disabled={cargando}>
           Cancelar
         </Boton>
       </div>

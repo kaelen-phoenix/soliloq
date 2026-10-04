@@ -127,11 +127,13 @@ test.describe("equipo, admin y notificaciones (UI)", () => {
     // que usa `match.spec.ts` para la Obra — acá interesa probar el formulario en sí.
     await login(page, creador.email);
     await page.goto("/proyectos");
-    // Sin iniciativa activa el tablero arranca en la pestaña "Armar proyecto".
-    await page.getByRole("tab", { name: "Armar equipo" }).click();
-    await page.getByRole("button", { name: "Armar un equipo" }).click();
+    // #341: «Crear proyecto» → «¿Qué querés armar?» → «Armar equipo».
+    await page.getByRole("button", { name: "Crear proyecto" }).click();
+    await page.getByRole("button", { name: /Armar equipo/ }).click();
     await page.getByLabel("Título — por qué querés armar el equipo").fill(tituloEquipo);
-    await page.getByRole("button", { name: "Armar equipo" }).click();
+    await page.getByRole("button", { name: "Armar equipo", exact: true }).click();
+    // Recién armado, va a su pantalla.
+    await page.waitForURL(/\/equipos\/[^/]+$/, { timeout: 15_000 });
     await expect(page.getByText(tituloEquipo)).toBeVisible({ timeout: 10_000 });
 
     // 2. Para salir en el feed del Talento (`/`, `feed_equipos_para_talento`) el equipo

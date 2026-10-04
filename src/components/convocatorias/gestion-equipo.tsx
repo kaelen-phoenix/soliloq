@@ -104,15 +104,21 @@ export function GestionEquipo({
   equipo,
   fotos,
   cobertura,
+  abiertoInicial = false,
+  onCancelar,
 }: {
   creadorId: string;
   equipo: EquipoActivo | null;
   fotos: FotoEquipo[];
   /** Quién ya forma parte del equipo, para "Participantes" (#152). */
   cobertura: FilaCobertura[];
+  /** Desde «Crear proyecto» (#341) el formulario para armar uno nuevo llega ya abierto. */
+  abiertoInicial?: boolean;
+  /** Cancelar el alta vuelve a la pregunta «¿Qué querés armar?». */
+  onCancelar?: () => void;
 }) {
   const router = useRouter();
-  const [abierto, setAbierto] = useState(false);
+  const [abierto, setAbierto] = useState(abiertoInicial);
   const [titulo, setTitulo] = useState(equipo?.titulo ?? "");
   const [descripcion, setDescripcion] = useState(equipo?.descripcion ?? "");
   const [error, setError] = useState<string | null>(null);
@@ -144,7 +150,9 @@ export function GestionEquipo({
             .eq("id", equipo.id)
         : await supabase
             .from("equipos")
-            .insert({ creador_id: creadorId, titulo: titulo.trim(), descripcion: descripcion || null, cupo: null });
+            .insert({ creador_id: creadorId, titulo: titulo.trim(), descripcion: descripcion || null, cupo: null })
+            .select("id")
+            .single();
 
     setCargando(false);
     if (res.error) {
@@ -157,6 +165,11 @@ export function GestionEquipo({
     }
 
     setAbierto(false);
+    // Recién armado: a su pantalla, como el Proyecto (#341).
+    if (!editando && res.data && "id" in res.data) {
+      router.push(`/equipos/${res.data.id}`);
+      return;
+    }
     router.refresh();
   }
 
@@ -220,6 +233,8 @@ export function GestionEquipo({
     }
     setConfirmarBorrado(false);
     setCargando(false);
+    // Su pantalla ya no existe: de vuelta a Mis proyectos.
+    router.replace("/proyectos");
     router.refresh();
   }
 
@@ -232,7 +247,7 @@ export function GestionEquipo({
       error={error}
       cargando={cargando}
       onGuardar={guardar}
-      onCancelar={() => setAbierto(false)}
+      onCancelar={() => (!equipo && onCancelar ? onCancelar() : setAbierto(false))}
       editando={editando}
     />
   );

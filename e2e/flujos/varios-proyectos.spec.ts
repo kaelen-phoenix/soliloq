@@ -85,8 +85,18 @@ test.describe("varios proyectos (UI)", () => {
     await page.goto("/proyectos");
     await expect(page.getByText(`Proyecto A ${s}`)).toBeVisible({ timeout: 15_000 });
     await expect(page.getByText(`Proyecto B ${s}`)).toBeVisible();
-    await page.getByRole("tab", { name: "Armar equipo" }).click();
+    // #341: una sola lista, con la etiqueta de cada uno.
     await expect(page.getByText(`Equipo ${s}`)).toBeVisible();
+
+    // «Crear proyecto» pregunta qué se quiere armar; cancelar vuelve a la pregunta.
+    await page.getByRole("button", { name: "Crear proyecto" }).click();
+    await expect(page.getByRole("heading", { name: "¿Qué querés armar?" })).toBeVisible();
+    await page.getByRole("button", { name: /Un proyecto con roles/ }).click();
+    await expect(page.getByLabel("Título del proyecto")).toBeVisible();
+    await page.getByRole("button", { name: "Cancelar" }).click();
+    await expect(page.getByRole("heading", { name: "¿Qué querés armar?" })).toBeVisible();
+    await page.getByRole("button", { name: /Armar equipo/ }).click();
+    await expect(page.getByLabel("Título — por qué querés armar el equipo")).toBeVisible();
 
     // Convocar a T2 ofrece los roles de B, no los de A.
     await page.goto("/matches");
