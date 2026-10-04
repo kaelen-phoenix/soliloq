@@ -19,7 +19,8 @@ const estilosPorVariante: Record<Variante, string> = {
   secundario:
     "border border-borde bg-superficie text-texto hover:border-[color:var(--acento)] hover:bg-fondo-sutil disabled:opacity-50",
   fantasma: "text-texto-tenue hover:bg-fondo-sutil disabled:opacity-50",
-  peligro: "text-error-600 hover:bg-error-50 disabled:opacity-50",
+  // Con contorno: sin borde se veía como texto suelto y corrido respecto del resto.
+  peligro: "border border-error-400 text-error-600 hover:bg-error-50 disabled:opacity-50",
 };
 
 export const Boton = forwardRef<HTMLButtonElement, Props>(

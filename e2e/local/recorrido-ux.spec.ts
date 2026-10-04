@@ -15,6 +15,9 @@ const URL = process.env.E2E_SUPABASE_URL;
 const KEY = process.env.E2E_SERVICE_KEY;
 const DIR = process.env.E2E_RECORRIDO_DIR ?? "recorrido-ux";
 const PASS = "test-1234-abcd";
+// Ancho del teléfono (E2E_ANCHO=320 para los más angostos). Cada captura anota lo que se sale.
+const ANCHO = Number(process.env.E2E_ANCHO ?? 390);
+if (!Number.isInteger(ANCHO) || ANCHO < 240 || ANCHO > 2000) throw new Error(`E2E_ANCHO inválido: ${process.env.E2E_ANCHO}`);
 const LAT = -34.6037;
 const LNG = -58.3816;
 // PNG 1×1: alcanza para que las pantallas con fotos tengan algo que mostrar.
@@ -36,6 +39,19 @@ test.describe("recorrido de UX", () => {
     await page.waitForLoadState("networkidle").catch(() => {});
     await page.waitForTimeout(600);
     n++;
+    const fuera = await page.evaluate((w) => {
+      const salidos: string[] = [];
+      for (const el of Array.from(document.querySelectorAll<HTMLElement>("body *"))) {
+        const r = el.getBoundingClientRect();
+        if (r.width === 0 || r.height === 0 || getComputedStyle(el).position === "fixed") continue;
+        if (r.right > w + 1) salidos.push(`${el.tagName.toLowerCase()} → ${Math.round(r.right)} «${(el.textContent ?? "").trim().slice(0, 30)}»`);
+      }
+      return { scroll: document.documentElement.scrollWidth, salidos: salidos.slice(0, 6) };
+    }, ANCHO);
+    const linea = fuera.scroll > ANCHO || fuera.salidos.length
+      ? `${nombre}: scrollWidth=${fuera.scroll} ${fuera.salidos.join(" | ")}`
+      : `${nombre}: OK`;
+    fs.appendFileSync(path.join(DIR, "informe.txt"), `${linea}\n`);
     await page.screenshot({ path: path.join(DIR, `${String(n).padStart(2, "0")}-${nombre}.png`), fullPage: true });
   }
 
@@ -83,7 +99,7 @@ test.describe("recorrido de UX", () => {
   }
 
   async function entrar(browser: Browser, email: string) {
-    const ctx = await browser.newContext({ viewport: { width: 390, height: 844 }, deviceScaleFactor: 1 });
+    const ctx = await browser.newContext({ viewport: { width: ANCHO, height: 844 }, deviceScaleFactor: 1 });
     const page = await ctx.newPage();
     await page.goto("/ingresar");
     await page.getByLabel("Tu email").fill(email);
@@ -127,7 +143,7 @@ test.describe("recorrido de UX", () => {
     const { data: token } = await admin!.from("perfiles").select("enlace_token").eq("id", talento.id).single();
 
     // ── Sin cuenta ──
-    const anon = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
+    const anon = await (await browser.newContext({ viewport: { width: ANCHO, height: 844 } })).newPage();
     for (const [ruta, nombre] of [
       ["/bienvenida", "anon-landing"],
       ["/ingresar", "anon-ingresar"],
