@@ -7,6 +7,7 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { GENEROS_BUSCABLES, type Genero } from "@/lib/constantes";
 import type { TipoRol } from "@/lib/supabase/types";
+import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
 const MAX_ROLES = 10;
 
@@ -163,6 +164,7 @@ export function FormularioRol({
         onChange={(e) => setDescripcion(e.target.value)}
         className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
       />
+      <MejorarRedaccion tipo="rol" texto={descripcion} onUsar={setDescripcion} />
 
       {error && <p className="text-xs text-error-600">{error}</p>}
 

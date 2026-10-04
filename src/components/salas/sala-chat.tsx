@@ -7,6 +7,7 @@ import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { Imagen } from "@/components/ui/imagen";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import { notificarMensajeNuevo } from "@/app/acciones-push";
+import { borradorSaludo } from "@/app/acciones-ia";
 import { useNoLeidos } from "./no-leidos";
 
 /** Primer nombre: en el chat no hay lugar para nombre y apellido, y desambigua con la
@@ -37,14 +38,34 @@ export function SalaChat({
   userId,
   mensajesIniciales,
   integrantes,
+  esDueno = false,
 }: {
   salaId: string;
   userId: string;
   mensajesIniciales: Mensaje[];
   integrantes: Integrante[];
+  /** Es la sala de un Proyecto o Equipo propio: se ofrece el saludo con IA (#322). */
+  esDueno?: boolean;
 }) {
   const [mensajes, setMensajes] = useState(mensajesIniciales);
   const [texto, setTexto] = useState("");
+  const [saludo, setSaludo] = useState<"listo" | "escribiendo" | string>("listo");
+  // #322: mientras quien armó el proyecto no escribió nada en su chat, se le ofrece un saludo.
+  const ofrecerSaludo =
+    esDueno && integrantes.length > 1 && !mensajes.some((m) => m.autor_id === userId) && !texto;
+
+  async function escribirSaludo() {
+    setSaludo("escribiendo");
+    try {
+      const r = await borradorSaludo(salaId);
+      if (!r.ok) return setSaludo(r.error);
+      // Si mientras tanto la persona empezó a escribir, no se le pisa lo suyo.
+      setTexto((prev) => (prev.trim() ? prev : r.texto));
+      setSaludo("listo");
+    } catch {
+      setSaludo("No pudimos escribirlo ahora. Probá de nuevo.");
+    }
+  }
   const [mostrarIntegrantes, setMostrarIntegrantes] = useState(false);
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const finRef = useRef<HTMLDivElement>(null);
@@ -299,10 +320,28 @@ export function SalaChat({
         )}
       </div>
 
+      {(ofrecerSaludo || (saludo !== "listo" && saludo !== "escribiendo")) && (
+        <div className="flex flex-col items-start gap-1 border-t border-borde bg-superficie px-3 pt-2">
+          {ofrecerSaludo && (
+            <button
+              type="button"
+              onClick={escribirSaludo}
+              disabled={saludo === "escribiendo"}
+              className="rounded-full border border-borde px-3 py-1 text-xs font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
+            >
+              {saludo === "escribiendo" ? "Escribiendo…" : "✨ Escribir un saludo al grupo"}
+            </button>
+          )}
+          {saludo !== "listo" && saludo !== "escribiendo" && <p className="text-xs text-error-600">{saludo}</p>}
+        </div>
+      )}
       <form onSubmit={enviar} className="safe-bottom flex gap-2 border-t border-borde bg-superficie p-3">
         <input
           value={texto}
-          onChange={(e) => setTexto(e.target.value)}
+          onChange={(e) => {
+            setTexto(e.target.value);
+            if (saludo !== "listo" && saludo !== "escribiendo") setSaludo("listo");
+          }}
           maxLength={2000}
           placeholder="Escribí un mensaje…"
           className="flex-1 rounded-full border border-borde bg-superficie px-4 py-2.5 text-base text-texto placeholder:text-texto-tenue focus:border-accion"

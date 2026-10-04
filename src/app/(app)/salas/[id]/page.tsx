@@ -105,7 +105,13 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
           />
         )}
       </div>
-      <SalaChat salaId={params.id} userId={user.id} mensajesIniciales={mensajes ?? []} integrantes={integrantes} />
+      <SalaChat
+        salaId={params.id}
+        userId={user.id}
+        mensajesIniciales={mensajes ?? []}
+        integrantes={integrantes}
+        esDueno={esDeIniciativa && esDueno}
+      />
     </div>
   );
 }

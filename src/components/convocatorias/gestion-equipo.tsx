@@ -16,6 +16,7 @@ import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-e
 import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/client";
+import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
 export interface EquipoActivo {
   id: string;
@@ -76,6 +77,7 @@ function FormEquipo({
           onChange={(e) => setDescripcion(e.target.value)}
           className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
         />
+        <MejorarRedaccion tipo="equipo" texto={descripcion} onUsar={setDescripcion} />
       </div>
       <div className="flex flex-col gap-1.5">
         <span className="text-sm font-medium text-texto">Cuántas personas querés sumar</span>

@@ -2,12 +2,31 @@
 
 import { useEffect, useState } from "react";
 import { mejorarRedaccion } from "@/app/acciones-ia";
+import type { TipoRedaccion } from "@/lib/ia-prompts";
+
+const MINIMO = 15;
+
+const AYUDA: Record<TipoRedaccion, string> = {
+  experiencia: "Pegá tu CV como lo tengas (aunque esté desordenado) y te lo dejamos bien redactado.",
+  sinopsis: "Escribilo como te salga y te lo dejamos claro y atractivo para quien lo lea.",
+  equipo: "Escribilo como te salga y te lo dejamos claro para quien lo lea.",
+  rol: "Escribí cómo es el personaje y qué buscás, y te lo dejamos claro y concreto.",
+};
 
 /**
- * «✨ Mejorar redacción» bajo la Experiencia (#313): manda el texto a la IA y muestra la
- * propuesta; recién con «Usar este texto» reemplaza lo escrito. Nada se guarda solo.
+ * «✨ Mejorar redacción» (#313, #319): bajo la Experiencia, la sinopsis del Proyecto, la
+ * descripción del Equipo y la de un rol. Manda el texto a la IA y muestra la propuesta;
+ * recién con «Usar este texto» reemplaza lo escrito. Nada se guarda solo.
  */
-export function MejorarRedaccion({ texto, onUsar }: { texto: string; onUsar: (nuevo: string) => void }) {
+export function MejorarRedaccion({
+  texto,
+  onUsar,
+  tipo = "experiencia",
+}: {
+  texto: string;
+  onUsar: (nuevo: string) => void;
+  tipo?: TipoRedaccion;
+}) {
   const [estado, setEstado] = useState<"listo" | "pensando">("listo");
   // La propuesta va con el texto del que salió: si la persona lo sigue editando, ya no aplica.
   const [propuesta, setPropuesta] = useState<{ de: string; texto: string } | null>(null);
@@ -23,7 +42,7 @@ export function MejorarRedaccion({ texto, onUsar }: { texto: string; onUsar: (nu
     setError(null);
     setPropuesta(null);
     try {
-      const r = await mejorarRedaccion(de);
+      const r = await mejorarRedaccion(de, tipo);
       if (!r.ok) return setError(r.error);
       setPropuesta({ de, texto: r.texto });
     } catch {
@@ -38,14 +57,14 @@ export function MejorarRedaccion({ texto, onUsar }: { texto: string; onUsar: (nu
       <button
         type="button"
         onClick={pedir}
-        disabled={estado === "pensando" || texto.trim().length < 20}
+        disabled={estado === "pensando" || texto.trim().length < MINIMO}
         className="self-start rounded-full border border-borde px-3.5 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
       >
         {estado === "pensando" ? "Mejorando…" : "✨ Mejorar redacción"}
       </button>
-      {texto.trim().length < 20 && (
+      {texto.trim().length < MINIMO && (
         <p className="text-xs text-texto-tenue">
-          Pegá tu CV como lo tengas (aunque esté desordenado) y te lo dejamos bien redactado.
+          {AYUDA[tipo]}
         </p>
       )}
       {error && <p className="text-xs text-error-600">{error}</p>}
