@@ -59,7 +59,8 @@ export const viewport: Viewport = {
   // Si lo declara Next, al hidratar vuelve a insertar el suyo y quedan dos.
   width: "device-width",
   initialScale: 1,
-  maximumScale: 1,
+  // Sin `maximumScale`: bloquear el zoom deja afuera a quien necesita agrandar (#345). Los
+  // campos tienen 16 px, así que iOS no agranda solo al tocarlos.
   viewportFit: "cover",
   // Al abrirse el teclado en el teléfono, la ventana de layout se achica en lugar de que
   // el teclado tape el contenido. Es lo que hace que en el chat (`salas/[id]`) el cuadro
