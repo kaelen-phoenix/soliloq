@@ -43,16 +43,22 @@ export function AccionesObra({
     const supabase = createClient();
     // #329: se cuenta en el momento. Los números que vinieron con la página quedaban viejos al
     // subir una foto o agregar un rol, y el aviso no se iba hasta salir y volver a entrar.
-    const [{ count: roles }, { count: fotos }] = await Promise.all([
+    const [{ count: roles, error: errorRoles }, { count: fotos, error: errorFotos }] = await Promise.all([
       supabase.from("roles").select("id", { count: "exact", head: true }).eq("obra_id", obraId),
       supabase.from("fotos_obra").select("id", { count: "exact", head: true }).eq("obra_id", obraId),
     ]);
-    if ((roles ?? cantidadRoles) === 0) {
+    // Sin poder contar no se publica: mejor un reintento que una convocatoria sin foto.
+    if (errorRoles || errorFotos || roles == null || fotos == null) {
+      setCargando(false);
+      setError("No pudimos verificar el proyecto. Probá de nuevo.");
+      return;
+    }
+    if (roles === 0) {
       setCargando(false);
       setError("Definí al menos un rol antes de publicar.");
       return;
     }
-    if ((fotos ?? cantidadFotos) < MIN_FOTOS) {
+    if (fotos < MIN_FOTOS) {
       setCargando(false);
       setError("Subí al menos una foto antes de publicar.");
       return;

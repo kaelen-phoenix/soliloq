@@ -7,7 +7,7 @@ import { borrarUsuarios } from "../flujos/limpieza";
 /**
  * Formularios en celulares angostos (#328): abre cada formulario (crear proyecto y equipo,
  * editar proyecto, rol, filtros de búsqueda, perfil, ajustes) a 320 y 360 px de ancho, guarda
- * una captura y lista todo elemento que se sale por la derecha. No afirma: informa.
+ * una captura y lista todo elemento que se sale por la derecha. Falla si alguno se sale.
  *
  *   E2E_FORMULARIOS=1 E2E_RECORRIDO_DIR=/tmp/f npx playwright test e2e/local/formularios-ancho.spec.ts
  */
@@ -58,7 +58,7 @@ test.describe("formularios en pantallas angostas", () => {
     return page;
   }
 
-  async function revisar(page: Page, nombre: string, ancho: number, informe: string[]) {
+  async function revisar(page: Page, nombre: string, ancho: number, informe: string[], fallas: string[]) {
     await page.waitForLoadState("networkidle").catch(() => {});
     await page.waitForTimeout(500);
     const fuera = await page.evaluate((w) => {
@@ -74,7 +74,10 @@ test.describe("formularios en pantallas angostas", () => {
       }
       return { salidos: salidos.slice(0, 12), scroll: document.documentElement.scrollWidth };
     }, ancho);
-    informe.push(`${ancho}px ${nombre}: scrollWidth=${fuera.scroll}${fuera.salidos.length ? "\n    " + fuera.salidos.join("\n    ") : " OK"}`);
+    const ok = fuera.salidos.length === 0 && fuera.scroll <= ancho;
+    const separador = "\n    ";
+    informe.push(`${ancho}px ${nombre}: scrollWidth=${fuera.scroll}` + (ok ? " OK" : separador + fuera.salidos.join(separador)));
+    if (!ok) fallas.push(`${ancho}px ${nombre}`);
     fs.mkdirSync(DIR, { recursive: true });
     await page.screenshot({ path: path.join(DIR, `${ancho}-${nombre}.png`), fullPage: true });
   }
@@ -82,33 +85,34 @@ test.describe("formularios en pantallas angostas", () => {
   test("formularios", async ({ browser }) => {
     const { email, obraId } = await cuenta();
     const informe: string[] = [];
+    const fallas: string[] = [];
     for (const ancho of [320, 360]) {
       const page = await entrar(browser, email, ancho);
 
       await page.goto("/proyectos");
-      await page.getByRole("button", { name: /Crear un proyecto/ }).click({ timeout: 3000 }).catch(() => {});
-      await revisar(page, "crear-proyecto", ancho, informe);
+      await page.getByRole("button", { name: /Crear un proyecto/ }).click();
+      await revisar(page, "crear-proyecto", ancho, informe, fallas);
 
       await page.goto("/proyectos");
       await page.getByRole("tab", { name: "Armar equipo" }).click();
-      await page.getByRole("button", { name: /Armar un equipo/ }).click({ timeout: 3000 }).catch(() => {});
-      await revisar(page, "crear-equipo", ancho, informe);
+      await page.getByRole("button", { name: /Armar un equipo/ }).click();
+      await revisar(page, "crear-equipo", ancho, informe, fallas);
 
       await page.goto(`/obras/${obraId}`);
-      await revisar(page, "proyecto", ancho, informe);
+      await revisar(page, "proyecto", ancho, informe, fallas);
       await page.goto(`/obras/${obraId}?editar=1`);
-      await revisar(page, "editar-proyecto", ancho, informe);
+      await revisar(page, "editar-proyecto", ancho, informe, fallas);
 
       await page.goto(`/talentos?obra=${obraId}`);
-      await page.getByRole("button", { name: /^Filtros/ }).click({ timeout: 3000 }).catch(() => {});
-      await revisar(page, "buscar-filtros", ancho, informe);
+      await page.getByRole("button", { name: /^Filtros/ }).click();
+      await revisar(page, "buscar-filtros", ancho, informe, fallas);
 
       await page.goto("/perfil?editar=1");
-      await page.getByRole("button", { name: /Sumar más/ }).click({ timeout: 3000 }).catch(() => {});
-      await revisar(page, "perfil-editar", ancho, informe);
+      // Al editar, lo opcional ya está desplegado (el «Sumar más» es solo del alta).
+      await revisar(page, "perfil-editar", ancho, informe, fallas);
 
       await page.goto("/ajustes");
-      await revisar(page, "ajustes", ancho, informe);
+      await revisar(page, "ajustes", ancho, informe, fallas);
       await page.context().close();
     }
     fs.writeFileSync(path.join(DIR, "informe.txt"), informe.join("\n"));
