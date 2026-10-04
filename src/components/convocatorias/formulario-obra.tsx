@@ -8,6 +8,7 @@ import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
 import { aColumnas, type Ubicacion } from "@/lib/ubicacion";
+import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
 const MAX_ROLES = 10;
 
@@ -148,6 +149,7 @@ export function FormularioObra({ creadorId }: { creadorId: string }) {
           onChange={(e) => setSinopsis(e.target.value)}
           className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
         />
+        <MejorarRedaccion tipo="sinopsis" texto={sinopsis} onUsar={setSinopsis} />
       </div>
 
       <CampoUbicacion

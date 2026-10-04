@@ -26,6 +26,7 @@ import { aColumnas, desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/u
 import { esVideoreelValido } from "@/lib/videoreel";
 import { formatearMientrasSeEscribe, isoATexto, textoAIso } from "@/lib/fecha-escrita";
 import { MejorarRedaccion } from "./mejorar-redaccion";
+import { SugerirHabilidades } from "./sugerir-habilidades";
 import { FOTOS_RECOMENDADAS, MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
 import { importarFotoDeGoogle } from "@/app/completar-perfil/acciones";
 
@@ -572,6 +573,7 @@ export function FormularioTalento({
                 </button>
               ))}
             </div>
+            <SugerirHabilidades experiencia={experiencia} marcadas={habilidades} onMarcar={setHabilidades} />
           </section>
 
           <section className="flex flex-col gap-4">
