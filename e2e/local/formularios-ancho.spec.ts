@@ -117,5 +117,6 @@ test.describe("formularios en pantallas angostas", () => {
     }
     fs.writeFileSync(path.join(DIR, "informe.txt"), informe.join("\n"));
     console.log(informe.join("\n"));
+    if (fallas.length) throw new Error(`Se sale de la pantalla en: ${fallas.join(", ")}`);
   });
 });
