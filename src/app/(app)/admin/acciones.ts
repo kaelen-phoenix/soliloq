@@ -9,7 +9,7 @@ import { enviarBienvenidasPendientes, type ResumenBienvenidas } from "@/lib/bien
 import { correoConfigurado, enviarCorreo } from "@/lib/correo";
 import { mailBienvenida } from "@/lib/correos/bienvenida";
 import { mailInvitacion } from "@/lib/correos/acceso";
-import { consumirUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
+import { consumirUsoIa, devolverUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
 import { INSTRUCCIONES_MODERACION } from "@/lib/ia-prompts";
 
 type Resultado = { ok: true } | { ok: false; error: string };
@@ -191,6 +191,7 @@ export async function adminRevisarConIa(): Promise<
   const estado = await leerEstadoCuenta(supabase, user.id);
   if (!estado.esAdmin) return { ok: false, error: "No autorizado." };
 
+  let usoId: number | null = null;
   try {
     // Service role: los textos de otras cuentas no se leen con la sesión (RLS, 0089).
     const admin = createAdminClient();
@@ -231,8 +232,9 @@ export async function adminRevisarConIa(): Promise<
     ];
     if (items.length === 0) return { ok: true, marcados: [], revisados: 0 };
 
-    const tope = await consumirUsoIa(supabase);
-    if (tope) return { ok: false, error: tope };
+    const uso = await consumirUsoIa(supabase);
+    if (uso.error !== undefined) return { ok: false, error: uso.error };
+    usoId = uso.usoId;
 
     const listado = items.map((it, i) => `${i + 1}. [${it.tipo}] ${it.texto.replace(/\s+/g, " ").slice(0, 2000)}`).join("\n");
     const crudo = await llamarModelo({
@@ -241,18 +243,37 @@ export async function adminRevisarConIa(): Promise<
       maxTokens: 800,
       json: true,
     });
-    const crudos = objetoJson(crudo).marcados;
+    const crudos = objetoJson(crudo)?.marcados;
     // Sin la lista no se sabe nada: no se puede informar «no encontramos nada».
-    if (!Array.isArray(crudos)) return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+    if (!Array.isArray(crudos)) {
+      await devolverUsoIa(uso.usoId).catch(() => {});
+      return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+    }
     const lista = crudos as { n?: unknown; motivo?: unknown }[];
+    // Una entrada que no apunta a una publicación revisada (n fuera de rango) o sin motivo
+    // invalida la respuesta entera: no se informa una revisión a medias como completa.
+    const valida = (m: { n?: unknown; motivo?: unknown }) =>
+      m !== null &&
+      typeof m === "object" &&
+      Number.isInteger(m.n) &&
+      (m.n as number) >= 1 &&
+      (m.n as number) <= items.length &&
+      typeof m.motivo === "string" &&
+      m.motivo.trim().length > 0;
+    if (!lista.every(valida)) {
+      await devolverUsoIa(uso.usoId).catch(() => {});
+      return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+    }
     const marcados = lista.flatMap((m) => {
-      const it = typeof m.n === "number" ? items[m.n - 1] : undefined;
+      const it = items[(m.n as number) - 1];
       if (!it || typeof m.motivo !== "string") return [];
       const { texto: _texto, ...resto } = it;
       return [{ ...resto, motivo: m.motivo.slice(0, 200) }];
     });
     return { ok: true, marcados, revisados: items.length };
   } catch (e) {
+    // #343: si falló después de consumir, el uso no cuenta.
+    if (usoId !== null) await devolverUsoIa(usoId).catch(() => {});
     return { ok: false, error: e instanceof Error ? e.message : "No se pudo revisar." };
   }
 }

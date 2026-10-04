@@ -897,7 +897,9 @@ export interface Database {
       /** El Creador cierra el aviso de un Match nuevo (issue #194). Idempotente. */
       marcar_match_mostrado: { Args: { p_match_id: string }; Returns: undefined };
       /** Anota un uso de IA y rechaza pasado el tope diario (#313, 0100). */
-      consumir_uso_ia: { Args: Record<string, never>; Returns: undefined };
+      consumir_uso_ia: { Args: Record<string, never>; Returns: number };
+      /** Devuelve el último uso de IA si la llamada falló (#343, 0103). */
+      devolver_uso_ia: { Args: { p_uso_id: number }; Returns: undefined };
       /** Salas propias con mensajes de otros sin leer (#216); solo vienen las que tienen alguno. */
       /** La fila propia entera de `perfiles_talento`, con las columnas privadas (#255, 0089). */
       mi_perfil_talento: {

@@ -3,7 +3,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { revisarFidelidad } from "@/lib/fidelidad-ia";
-import { consumirUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
+import { consumirUsoIa, devolverUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
 import { GENEROS_BUSCABLES, HABILIDADES } from "@/lib/constantes";
 import {
   ERROR_SIN_DATOS,
@@ -37,8 +37,8 @@ export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "exp
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sin sesión." };
-  const tope = await consumirUsoIa(supabase);
-  if (tope) return { ok: false, error: tope };
+  const uso = await consumirUsoIa(supabase);
+  if (uso.error !== undefined) return { ok: false, error: uso.error };
 
   try {
     const salida = (
@@ -46,6 +46,8 @@ export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "exp
     ).slice(0, MAX_SALIDA);
     const veredicto = revisarFidelidad(entrada, salida);
     if (!veredicto.ok) {
+      // La persona no recibe nada: el uso no cuenta (#343).
+      await devolverUsoIa(uso.usoId).catch(() => {});
       return {
         ok: false,
         error:
@@ -56,6 +58,8 @@ export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "exp
     }
     return { ok: true, texto: salida };
   } catch (e) {
+    // #343: si falló, el uso no cuenta.
+    await devolverUsoIa(uso.usoId).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "mejorar redacción", tipo } });
     return { ok: false, error: "No pudimos mejorarlo ahora. Probá de nuevo en un rato." };
   }
@@ -77,16 +81,23 @@ export async function sugerirHabilidades(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sin sesión." };
-  const tope = await consumirUsoIa(supabase);
-  if (tope) return { ok: false, error: tope };
+  const uso = await consumirUsoIa(supabase);
+  if (uso.error !== undefined) return { ok: false, error: uso.error };
 
   try {
     const crudo = await llamarModelo({ sistema: INSTRUCCIONES_HABILIDADES, usuario: enBloque("texto", entrada), maxTokens: 200, json: true });
-    const crudas = objetoJson(crudo).habilidades;
-    const lista: unknown[] = Array.isArray(crudas) ? crudas : [];
+    const json = objetoJson(crudo);
+    // Una respuesta que no es JSON es una falla (y el uso se devuelve en el catch).
+    if (!json) throw new Error("sugerir habilidades: la respuesta no es un objeto JSON");
+    const crudas = json.habilidades;
+    // Sin la lista no es «no hay habilidades»: es una respuesta que no sirve.
+    if (!Array.isArray(crudas)) throw new Error("sugerir habilidades: falta la lista");
+    const lista: unknown[] = crudas;
     const validas = HABILIDADES.filter((h) => lista.includes(h));
     return { ok: true, habilidades: validas };
   } catch (e) {
+    // #343: si falló, el uso no cuenta.
+    await devolverUsoIa(uso.usoId).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "sugerir habilidades" } });
     return { ok: false, error: "No pudimos sugerirlas ahora. Probá de nuevo en un rato." };
   }
@@ -118,8 +129,8 @@ export async function interpretarBusqueda(
     data: { user },
   } = await supabase.auth.getUser();
   if (!user) return { ok: false, error: "Sin sesión." };
-  const tope = await consumirUsoIa(supabase);
-  if (tope) return { ok: false, error: tope };
+  const uso = await consumirUsoIa(supabase);
+  if (uso.error !== undefined) return { ok: false, error: uso.error };
 
   try {
     const crudo = await llamarModelo({
@@ -128,7 +139,10 @@ export async function interpretarBusqueda(
       maxTokens: 200,
       json: true,
     });
-    const j = objetoJson(crudo) as Record<string, any>;
+    const json = objetoJson(crudo);
+    // Mal formada no es «sin filtros»: es una falla (#343), y el uso se devuelve en el catch.
+    if (!json) throw new Error("interpretar búsqueda: la respuesta no es un objeto JSON");
+    const j = json as Record<string, any>;
     const edad = (v: unknown) =>
       typeof v === "number" && Number.isInteger(v) && v >= 16 && v <= 100 ? v : undefined;
     const generosValidos = GENEROS_BUSCABLES.map((g) => g.valor as string);
@@ -145,6 +159,8 @@ export async function interpretarBusqueda(
     }
     return { ok: true, filtros };
   } catch (e) {
+    // #343: si falló, el uso no cuenta.
+    await devolverUsoIa(uso.usoId).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "interpretar búsqueda" } });
     return { ok: false, error: "No pudimos interpretarlo ahora. Usá los filtros de abajo." };
   }
@@ -210,12 +226,14 @@ export async function borradorSaludo(salaId: string): Promise<Resultado> {
     .filter(Boolean)
     .join("\n");
 
-  const tope = await consumirUsoIa(supabase);
-  if (tope) return { ok: false, error: tope };
+  const uso = await consumirUsoIa(supabase);
+  if (uso.error !== undefined) return { ok: false, error: uso.error };
   try {
     const salida = await llamarModelo({ sistema: INSTRUCCIONES_SALUDO, usuario: enBloque("datos", datos), maxTokens: 400 });
     return { ok: true, texto: salida.slice(0, 600) };
   } catch (e) {
+    // #343: si falló, el uso no cuenta.
+    await devolverUsoIa(uso.usoId).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "borrador saludo" } });
     return { ok: false, error: "No pudimos escribirlo ahora. Probá de nuevo en un rato." };
   }
