@@ -3,6 +3,7 @@ import { createClient } from "@/lib/supabase/server";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
 import { COLUMNAS_PUBLICAS_TALENTO } from "@/lib/constantes";
+import { redesDeJson } from "@/lib/redes";
 
 export default async function PerfilTalentoPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -25,7 +26,7 @@ export default async function PerfilTalentoPage({ params }: { params: { id: stri
   return (
     <main className="px-5 py-5">
       {/* Solo visualización: el interés se marca desde la pila de `/talentos` (#124). */}
-      <PerfilTalentoDetalle talento={{ ...talento, edad: edad ?? null, fotos: fotosConUrl }} />
+      <PerfilTalentoDetalle talento={{ ...talento, redes: redesDeJson(talento.redes), edad: edad ?? null, fotos: fotosConUrl }} />
 
       <div className="mt-8">
         <BotonDenuncia perfilDenunciadoId={talento.id} queSeDenuncia={`a ${talento.nombre}`} />

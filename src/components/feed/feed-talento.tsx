@@ -1,4 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
+import { aRolFeed } from "@/lib/feed-roles";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { PilaTarjetas } from "./pila-tarjetas";
 import type { RolFeed } from "./tarjeta-rol";
@@ -29,13 +30,8 @@ export async function FeedTalento({ talentoId }: { talentoId: string }) {
   const publicUrl = (p: string) =>
     supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl;
 
-  // Las fotos de la obra y la del creador vienen como rutas de Storage; se resuelven acá a
-  // URL pública (la del creador sale de su Perfil de Talento, ver 0072).
-  const roles: RolFeed[] = (rolesRaw ?? []).map((r) => ({
-    ...r,
-    creador_imagen_url: r.creador_foto_path ? publicUrl(r.creador_foto_path) : null,
-    fotos: (r.obra_fotos ?? []).map(publicUrl),
-  }));
+  // La foto del creador sale de su Perfil de Talento (0072).
+  const roles: RolFeed[] = (rolesRaw ?? []).map((r) => aRolFeed(r, publicUrl));
 
   const equipos: EquipoFeed[] = (equiposRaw ?? []).map((e) => ({
     equipo_id: e.equipo_id,
