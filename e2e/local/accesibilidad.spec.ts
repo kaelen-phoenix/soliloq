@@ -26,6 +26,8 @@ test.describe("accesibilidad", () => {
   const usuarios: string[] = [];
   const informe: string[] = [];
   const fallas: string[] = [];
+  // #356: corre en el CI, así que una violación seria o crítica hace fallar el test.
+  const conViolaciones: string[] = [];
 
   test.afterAll(async () => {
     // El informe primero: si la limpieza falla, igual queda escrito.
@@ -52,6 +54,7 @@ test.describe("accesibilidad", () => {
         }));
     });
     informe.push(r.length ? `${nombre}:` : `${nombre}: OK`);
+    if (r.length) conViolaciones.push(nombre);
     for (const v of r) informe.push(`  [${v.impact}] ${v.id} ×${v.n} — ${v.help}\n      ${v.ejemplos.join("\n      ")}`);
   }
 
@@ -137,5 +140,8 @@ test.describe("accesibilidad", () => {
 
     console.log(informe.join("\n"));
     if (fallas.length) throw new Error(`No se pudieron revisar: ${fallas.join(" | ")}`);
+    if (conViolaciones.length) {
+      throw new Error(`Violaciones serias o críticas de accesibilidad en: ${conViolaciones.join(", ")}`);
+    }
   });
 });
