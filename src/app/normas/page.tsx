@@ -16,6 +16,7 @@ const NUMEROS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] as const;
 
 export default async function NormasPage() {
   const t = await getTranslations("normas");
+  const tLegal = await getTranslations("legal");
 
   return (
     <div data-tema="light" className="flex min-h-screen flex-col bg-[#fbfaf7] text-ink-900">
@@ -47,6 +48,11 @@ export default async function NormasPage() {
             </section>
           ))}
         </div>
+
+        <nav className="mt-10 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-700">
+          <Link href="/terminos" className="hover:text-brand-600">{tLegal("enlaceTerminos")}</Link>
+          <Link href="/privacidad" className="hover:text-brand-600">{tLegal("enlacePrivacidad")}</Link>
+        </nav>
       </main>
     </div>
   );
