@@ -1,12 +1,12 @@
 "use server";
 
 import * as Sentry from "@sentry/nextjs";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { revisarFidelidad } from "@/lib/fidelidad-ia";
 import { consumirUsoIa, devolverUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
 import { GENEROS_BUSCABLES, HABILIDADES } from "@/lib/constantes";
 import {
-  ERROR_SIN_DATOS,
   INSTRUCCIONES,
   INSTRUCCIONES_BUSQUEDA,
   INSTRUCCIONES_HABILIDADES,
@@ -25,18 +25,19 @@ type Resultado = { ok: true; texto: string } | { ok: false; error: string };
  * (#317). La persona la ve y elige si la usa.
  */
 export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "experiencia"): Promise<Resultado> {
+  const t = await getTranslations("admin.ia");
   const entrada = texto.trim();
-  if (!Object.hasOwn(INSTRUCCIONES, tipo)) return { ok: false, error: "No se puede mejorar este texto." };
-  if (entrada.length < 15) return { ok: false, error: "Escribí o pegá un poco más de texto primero." };
+  if (!Object.hasOwn(INSTRUCCIONES, tipo)) return { ok: false, error: t("noSePuedeMejorar") };
+  if (entrada.length < 15) return { ok: false, error: t("masTexto") };
   if (entrada.length > MAX_ENTRADA) {
-    return { ok: false, error: `El texto es muy largo (máximo ${MAX_ENTRADA} caracteres).` };
+    return { ok: false, error: t("muyLargoMaximo", { max: MAX_ENTRADA }) };
   }
 
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  if (!user) return { ok: false, error: t("sinSesion") };
   const uso = await consumirUsoIa(supabase);
   if (uso.error !== undefined) return { ok: false, error: uso.error };
 
@@ -52,8 +53,8 @@ export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "exp
         ok: false,
         error:
           veredicto.motivo === "sin_datos"
-            ? ERROR_SIN_DATOS[tipo]
-            : "No pudimos mejorarlo sin cambiarle el contenido. Probá con un texto más completo.",
+            ? t(`sinDatos.${tipo}`)
+            : t("noSinCambiar"),
       };
     }
     return { ok: true, texto: salida };
@@ -61,7 +62,7 @@ export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "exp
     // #343: si falló, el uso no cuenta.
     await devolverUsoIa(uso.usoId).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "mejorar redacción", tipo } });
-    return { ok: false, error: "No pudimos mejorarlo ahora. Probá de nuevo en un rato." };
+    return { ok: false, error: t("mejorarFallo") };
   }
 }
 
@@ -72,15 +73,16 @@ export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "exp
 export async function sugerirHabilidades(
   texto: string,
 ): Promise<{ ok: true; habilidades: string[] } | { ok: false; error: string }> {
+  const t = await getTranslations("admin.ia");
   const entrada = texto.trim();
-  if (entrada.length < 15) return { ok: false, error: "Primero escribí tu experiencia." };
-  if (entrada.length > MAX_ENTRADA) return { ok: false, error: "El texto es muy largo." };
+  if (entrada.length < 15) return { ok: false, error: t("primeroExperiencia") };
+  if (entrada.length > MAX_ENTRADA) return { ok: false, error: t("muyLargo") };
 
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  if (!user) return { ok: false, error: t("sinSesion") };
   const uso = await consumirUsoIa(supabase);
   if (uso.error !== undefined) return { ok: false, error: uso.error };
 
@@ -99,7 +101,7 @@ export async function sugerirHabilidades(
     // #343: si falló, el uso no cuenta.
     await devolverUsoIa(uso.usoId).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "sugerir habilidades" } });
-    return { ok: false, error: "No pudimos sugerirlas ahora. Probá de nuevo en un rato." };
+    return { ok: false, error: t("sugerirFallo") };
   }
 }
 
@@ -120,15 +122,16 @@ export interface FiltrosBusqueda {
 export async function interpretarBusqueda(
   consulta: string,
 ): Promise<{ ok: true; filtros: FiltrosBusqueda } | { ok: false; error: string }> {
+  const t = await getTranslations("admin.ia");
   const entrada = consulta.trim();
-  if (entrada.length < 3) return { ok: false, error: "Escribí qué estás buscando." };
-  if (entrada.length > 300) return { ok: false, error: "Escribilo más corto (hasta 300 caracteres)." };
+  if (entrada.length < 3) return { ok: false, error: t("escribiQueBuscas") };
+  if (entrada.length > 300) return { ok: false, error: t("masCorto", { max: 300 }) };
 
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  if (!user) return { ok: false, error: t("sinSesion") };
   const uso = await consumirUsoIa(supabase);
   if (uso.error !== undefined) return { ok: false, error: uso.error };
 
@@ -162,7 +165,7 @@ export async function interpretarBusqueda(
     // #343: si falló, el uso no cuenta.
     await devolverUsoIa(uso.usoId).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "interpretar búsqueda" } });
-    return { ok: false, error: "No pudimos interpretarlo ahora. Usá los filtros de abajo." };
+    return { ok: false, error: t("interpretarFallo") };
   }
 }
 
@@ -172,11 +175,12 @@ export async function interpretarBusqueda(
  * campo de texto para editarlo; no se manda solo.
  */
 export async function borradorSaludo(salaId: string): Promise<Resultado> {
+  const t = await getTranslations("admin.ia");
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  if (!user) return { ok: false, error: t("sinSesion") };
 
   const { data: sala } = await supabase
     .from("salas")
@@ -192,7 +196,7 @@ export async function borradorSaludo(salaId: string): Promise<Resultado> {
     | null
     | undefined;
   if (!sala || (obra?.creador_id ?? equipo?.creador_id) !== user.id) {
-    return { ok: false, error: "Solo quien armó el proyecto puede usar esto." };
+    return { ok: false, error: t("soloQuienArmo") };
   }
 
   const { data: integrantes } = await supabase
@@ -201,7 +205,7 @@ export async function borradorSaludo(salaId: string): Promise<Resultado> {
     .eq("sala_id", salaId)
     .neq("perfil_id", user.id);
   const ids = (integrantes ?? []).map((i) => i.perfil_id);
-  if (ids.length === 0) return { ok: false, error: "Todavía no se sumó nadie al chat." };
+  if (ids.length === 0) return { ok: false, error: t("nadieSeSumo") };
   const { data: talentos } = await supabase.from("perfiles_talento").select("id, nombre").in("id", ids);
 
   // El rol de cada uno, si es un Proyecto (un Equipo no tiene roles).
@@ -235,6 +239,6 @@ export async function borradorSaludo(salaId: string): Promise<Resultado> {
     // #343: si falló, el uso no cuenta.
     await devolverUsoIa(uso.usoId).catch(() => {});
     Sentry.captureException(e, { extra: { accion: "borrador saludo" } });
-    return { ok: false, error: "No pudimos escribirlo ahora. Probá de nuevo en un rato." };
+    return { ok: false, error: t("saludoFallo") };
   }
 }

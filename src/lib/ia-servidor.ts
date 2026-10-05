@@ -1,5 +1,6 @@
 import * as Sentry from "@sentry/nextjs";
 import { getVercelOidcToken } from "@vercel/oidc";
+import { getTranslations } from "next-intl/server";
 import type { SupabaseClient } from "@supabase/supabase-js";
 import type { Database } from "./supabase/types";
 import { createAdminClient } from "./supabase/admin";
@@ -19,11 +20,12 @@ export async function consumirUsoIa(
 ): Promise<{ usoId: number; error?: undefined } | { error: string; usoId?: undefined }> {
   const { data, error } = await supabase.rpc("consumir_uso_ia");
   if (!error && typeof data === "number") return { usoId: data };
-  if (error?.message?.includes("limite_ia")) {
-    return { error: "Llegaste al máximo de usos de IA de las últimas 24 horas. Probá más tarde." };
-  }
+  // El mensaje sale en el idioma del request (cookie `NEXT_LOCALE`): esto solo corre en
+  // server actions.
+  const t = await getTranslations("admin.ia");
+  if (error?.message?.includes("limite_ia")) return { error: t("limite") };
   Sentry.captureException(error ?? new Error("consumir_uso_ia sin id"), { extra: { accion: "consumir_uso_ia" } });
-  return { error: "No pudimos hacerlo ahora. Probá de nuevo." };
+  return { error: t("errorGenerico") };
 }
 
 /**

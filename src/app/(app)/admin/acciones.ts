@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
@@ -22,15 +23,16 @@ type Resultado = { ok: true } | { ok: false; error: string };
  * service-role (`borrarUsuarioYArchivos`), que saltea RLS; se chequea a mano.
  */
 export async function adminBorrarUsuario(idObjetivo: string): Promise<Resultado> {
+  const t = await getTranslations("admin.acciones");
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  if (!user) return { ok: false, error: t("sinSesion") };
 
   const estado = await leerEstadoCuenta(supabase, user.id);
-  if (!estado.esAdmin) return { ok: false, error: "No autorizado." };
-  if (idObjetivo === user.id) return { ok: false, error: "No podés borrarte a vos mismo." };
+  if (!estado.esAdmin) return { ok: false, error: t("noAutorizado") };
+  if (idObjetivo === user.id) return { ok: false, error: t("noBorrarteAVos") };
 
   // `perfiles_select_propio` (0001) solo deja leer la fila propia: con el cliente de
   // sesión, mirar el perfil de otra persona siempre da null, sea quien sea. Hace falta el
@@ -44,12 +46,12 @@ export async function adminBorrarUsuario(idObjetivo: string): Promise<Resultado>
       .select("es_admin")
       .eq("id", idObjetivo)
       .maybeSingle();
-    if (!objetivo) return { ok: false, error: "Ese usuario no existe." };
-    if (objetivo.es_admin) return { ok: false, error: "No podés borrar a otro admin." };
+    if (!objetivo) return { ok: false, error: t("noExiste") };
+    if (objetivo.es_admin) return { ok: false, error: t("noBorrarOtroAdmin") };
 
     await borrarUsuarioYArchivos(idObjetivo);
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "No se pudo borrar." };
+    return { ok: false, error: e instanceof Error ? e.message : t("noSeBorro") };
   }
 
   revalidatePath("/admin");
@@ -64,18 +66,19 @@ export async function adminBorrarUsuario(idObjetivo: string): Promise<Resultado>
 export async function adminEnviarBienvenidas(): Promise<
   { ok: true; resumen: ResumenBienvenidas } | { ok: false; error: string }
 > {
+  const t = await getTranslations("admin.acciones");
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  if (!user) return { ok: false, error: t("sinSesion") };
   const estado = await leerEstadoCuenta(supabase, user.id);
-  if (!estado.esAdmin) return { ok: false, error: "No autorizado." };
+  if (!estado.esAdmin) return { ok: false, error: t("noAutorizado") };
 
   try {
     return { ok: true, resumen: await enviarBienvenidasPendientes({ limite: 200 }) };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "No se pudo enviar." };
+    return { ok: false, error: e instanceof Error ? e.message : t("noSeEnvio") };
   }
 }
 
@@ -97,12 +100,13 @@ async function adminActual() {
 export async function adminEnviarmePruebaBienvenida(): Promise<
   { ok: true; para: string } | { ok: false; error: string }
 > {
+  const t = await getTranslations("admin.acciones");
   const user = await adminActual();
-  if (!user?.email) return { ok: false, error: "No autorizado." };
-  if (!correoConfigurado()) return { ok: false, error: "Falta RESEND_API_KEY en Vercel." };
+  if (!user?.email) return { ok: false, error: t("noAutorizado") };
+  if (!correoConfigurado()) return { ok: false, error: t("faltaResend") };
   const mail = mailBienvenida({ discord: process.env.NEXT_PUBLIC_DISCORD_INVITACION });
   const r = await enviarCorreo({ para: user.email, asunto: mail.asunto, html: mail.html, texto: mail.texto });
-  if (!r.ok) return { ok: false, error: "error" in r ? r.error : "No está configurado el envío." };
+  if (!r.ok) return { ok: false, error: "error" in r ? r.error : t("envioNoConfigurado") };
   return { ok: true, para: user.email };
 }
 
@@ -112,7 +116,8 @@ export type EstadoBienvenida = { id: string; email: string; enviadaEn: string | 
 export async function adminEstadoBienvenidas(): Promise<
   { ok: true; cuentas: EstadoBienvenida[] } | { ok: false; error: string }
 > {
-  if (!(await adminActual())) return { ok: false, error: "No autorizado." };
+  const t = await getTranslations("admin.acciones");
+  if (!(await adminActual())) return { ok: false, error: t("noAutorizado") };
   try {
     const admin = createAdminClient();
     const { data: perfiles, error } = await admin
@@ -127,16 +132,16 @@ export async function adminEstadoBienvenidas(): Promise<
     for (let page = 1; ; page++) {
       const { data, error: errorUsuarios } = await admin.auth.admin.listUsers({ page, perPage: 1000 });
       if (errorUsuarios) return { ok: false, error: errorUsuarios.message };
-      for (const u of data.users) email.set(u.id, u.email ?? "(sin email)");
+      for (const u of data.users) email.set(u.id, u.email ?? t("sinEmail"));
       if (data.users.length < 1000) break;
     }
     const cuentas = (perfiles ?? [])
-      .map((p) => ({ id: p.id, email: email.get(p.id) ?? "(sin email)", enviadaEn: p.bienvenida_enviada_en }))
+      .map((p) => ({ id: p.id, email: email.get(p.id) ?? t("sinEmail"), enviadaEn: p.bienvenida_enviada_en }))
       // Primero quienes faltan; después por fecha de envío.
       .sort((a, b) => (a.enviadaEn ? 1 : 0) - (b.enviadaEn ? 1 : 0) || a.email.localeCompare(b.email));
     return { ok: true, cuentas };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "No se pudo leer." };
+    return { ok: false, error: e instanceof Error ? e.message : t("noSeLeyo") };
   }
 }
 
@@ -148,7 +153,8 @@ export async function adminEstadoBienvenidas(): Promise<
 export async function adminMandarInvitacion(email: string): Promise<
   { ok: true; enviado: boolean } | { ok: false; error: string }
 > {
-  if (!(await adminActual())) return { ok: false, error: "No autorizado." };
+  const t = await getTranslations("admin.acciones");
+  if (!(await adminActual())) return { ok: false, error: t("noAutorizado") };
   if (!correoConfigurado()) return { ok: true, enviado: false };
   const destino = email.trim().toLowerCase();
   try {
@@ -162,9 +168,9 @@ export async function adminMandarInvitacion(email: string): Promise<
     if (!invitacion || invitacion.usado_en) return { ok: true, enviado: false };
     const mail = mailInvitacion();
     const r = await enviarCorreo({ para: destino, asunto: mail.asunto, html: mail.html, texto: mail.texto });
-    return r.ok ? { ok: true, enviado: true } : { ok: false, error: "error" in r ? r.error : "No se pudo enviar." };
+    return r.ok ? { ok: true, enviado: true } : { ok: false, error: "error" in r ? r.error : t("noSeEnvio") };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "No se pudo enviar." };
+    return { ok: false, error: e instanceof Error ? e.message : t("noSeEnvio") };
   }
 }
 
@@ -183,13 +189,14 @@ export interface MarcaModeracion {
 export async function adminRevisarConIa(): Promise<
   { ok: true; marcados: MarcaModeracion[]; revisados: number } | { ok: false; error: string }
 > {
+  const t = await getTranslations("admin.acciones");
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  if (!user) return { ok: false, error: t("sinSesion") };
   const estado = await leerEstadoCuenta(supabase, user.id);
-  if (!estado.esAdmin) return { ok: false, error: "No autorizado." };
+  if (!estado.esAdmin) return { ok: false, error: t("noAutorizado") };
 
   let usoId: number | null = null;
   try {
@@ -207,7 +214,7 @@ export async function adminRevisarConIa(): Promise<
         .limit(30),
     ]);
     const fallida = consultas.find((c) => c.error);
-    if (fallida?.error) return { ok: false, error: `No se pudo leer lo publicado: ${fallida.error.message}` };
+    if (fallida?.error) return { ok: false, error: t("noSeLeyoPublicado", { error: fallida.error.message }) };
     const [{ data: cuentas }, { data: obras }, { data: equipos }, { data: roles }] = consultas;
     // De las cuentas más nuevas, las primeras 40 que tienen Experiencia escrita (sin texto no
     // hay nada que revisar, y no tienen que ocupar el cupo).
@@ -217,7 +224,7 @@ export async function adminRevisarConIa(): Promise<
       .select("id, nombre, experiencia")
       .in("id", orden)
       .not("experiencia", "is", null);
-    if (errorPerfiles) return { ok: false, error: `No se pudieron leer los perfiles: ${errorPerfiles.message}` };
+    if (errorPerfiles) return { ok: false, error: t("noSeLeyeronPerfiles", { error: errorPerfiles.message }) };
     const perfiles = (conTexto ?? [])
       .sort((a, b) => orden.indexOf(a.id) - orden.indexOf(b.id))
       .slice(0, 40);
@@ -247,7 +254,7 @@ export async function adminRevisarConIa(): Promise<
     // Sin la lista no se sabe nada: no se puede informar «no encontramos nada».
     if (!Array.isArray(crudos)) {
       await devolverUsoIa(uso.usoId).catch(() => {});
-      return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+      return { ok: false, error: t("respuestaInvalida") };
     }
     const lista = crudos as { n?: unknown; motivo?: unknown }[];
     // Una entrada que no apunta a una publicación revisada (n fuera de rango) o sin motivo
@@ -262,7 +269,7 @@ export async function adminRevisarConIa(): Promise<
       m.motivo.trim().length > 0;
     if (!lista.every(valida)) {
       await devolverUsoIa(uso.usoId).catch(() => {});
-      return { ok: false, error: "La IA no devolvió una respuesta válida. Probá de nuevo." };
+      return { ok: false, error: t("respuestaInvalida") };
     }
     const marcados = lista.flatMap((m) => {
       const it = items[(m.n as number) - 1];
@@ -274,6 +281,6 @@ export async function adminRevisarConIa(): Promise<
   } catch (e) {
     // #343: si falló después de consumir, el uso no cuenta.
     if (usoId !== null) await devolverUsoIa(usoId).catch(() => {});
-    return { ok: false, error: e instanceof Error ? e.message : "No se pudo revisar." };
+    return { ok: false, error: e instanceof Error ? e.message : t("noSeReviso") };
   }
 }
