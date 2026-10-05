@@ -147,15 +147,17 @@ jobs:
 
       # #356: los que antes se corrían solo a mano. Accesibilidad (axe en cada pantalla),
       # formularios que no se salgan en 320–414 px, y todos los formularios enviados de verdad.
-      # Usan la misma app y el mismo staging; los informes quedan como artefacto.
-      - name: e2e accesibilidad y formularios (staging)
+      # Usan la misma app y el mismo staging; los informes quedan como artefacto. #354: y la app
+      # en inglés, sin castellano visible.
+      - name: e2e accesibilidad, formularios e inglés (staging)
         if: env.E2E_SUPABASE_URL != ''
-        run: npx playwright test e2e/local/accesibilidad.spec.ts e2e/local/formularios-ancho.spec.ts e2e/local/todos-los-formularios.spec.ts
+        run: npx playwright test e2e/local/accesibilidad.spec.ts e2e/local/formularios-ancho.spec.ts e2e/local/todos-los-formularios.spec.ts e2e/local/ingles.spec.ts
         env:
           E2E_BASE_URL: http://localhost:3100
           E2E_A11Y: "1"
           E2E_FORMULARIOS: "1"
           E2E_FORMULARIOS_TODOS: "1"
+          E2E_INGLES: "1"
           E2E_RECORRIDO_DIR: informes-e2e
 
       - name: subir informes
