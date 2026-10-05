@@ -76,7 +76,7 @@
       "cerrar": "Close casting call",
       "cerrada": "This casting call is closed.",
       "borrar": "Delete project",
-      "confirmarBorrado": "This deletes the project with its roles, photos, the interest it received and its chat room. The Talent you called will show up again in Find talent. This can't be undone. Type BORRAR to confirm.",
+      "confirmarBorrado": "This deletes the project with its roles, photos, the interest it received and its chat room. The Talent you called will show up again in Find talent. This can't be undone. Type {palabra} to confirm.",
       "borrarDefinitivamente": "Delete permanently"
     },
     "cobertura": {
@@ -196,7 +196,7 @@
       "cerrar": "Close the team",
       "ayudaSumar": "To add people to the team, find talent and swipe. When the interest is mutual you'll see them in <b>Casting calls</b>, and from there you call them to the room.",
       "eliminar": "Delete team",
-      "confirmarBorrado": "This deletes the team with its photos and its chat room. The Talent you called will show up again in Find talent. This can't be undone. Type BORRAR to confirm.",
+      "confirmarBorrado": "This deletes the team with its photos and its chat room. The Talent you called will show up again in Find talent. This can't be undone. Type {palabra} to confirm.",
       "eliminarDefinitivamente": "Delete permanently",
       "invitacion": "Build a team and start by meeting people who want to create, like you; the idea can come along the way.",
       "armarUnEquipo": "Build a team"
@@ -268,7 +268,6 @@
       "sinopsis": "Synopsis"
     },
     "pila": {
-      "todoElMundo": "Anywhere",
       "errorActualizar": "We couldn't update the feed. Try again.",
       "limiteMeInteresa": "You've reached today's limit of 20 “I'm interested”. Try again later.",
       "errorDecision": "We couldn't save your choice. Try again.",
@@ -294,7 +293,6 @@
       "filtrosSinZona": "We applied the filters. We couldn't find “{zona}”: pick the area below.",
       "filtrosAplicados": "We applied the filters: check them below.",
       "errorInterpretar": "We couldn't interpret that right now. Use the filters below.",
-      "todoElMundo": "Anywhere",
       "describi": "✨ Describe who you're looking for",
       "describiPlaceholder": "Actress, 30 to 40, who sings, near Palermo",
       "buscarPlaceholder": "Name, skill or experience",

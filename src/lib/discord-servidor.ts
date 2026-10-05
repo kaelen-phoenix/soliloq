@@ -189,22 +189,25 @@ export async function sincronizarEspacio(salaId: string): Promise<boolean> {
  * El dueño abre el espacio de su Proyecto o Equipo: crea el canal de texto y el de voz en la
  * categoría que corresponde, privados (solo el bot y los integrantes), y sincroniza.
  */
+/** Por qué no se pudo abrir: el texto lo pone quien llama (`chats.accionesDiscord.espacio`, #354). */
+export type ErrorEspacio = "sinConfigurar" | "sinSala" | "sinIniciativa" | "noEsDueno" | "sinConexion";
+
 export async function abrirEspacio(
   salaId: string,
   usuarioId: string,
-): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
-  if (!discordConfigurado()) return { ok: false, error: "Discord no está configurado." };
+): Promise<{ ok: true; url: string } | { ok: false; error: ErrorEspacio }> {
+  if (!discordConfigurado()) return { ok: false, error: "sinConfigurar" };
   const sala = await leerSala(salaId);
-  if (!sala) return { ok: false, error: "No existe esa sala." };
-  if (!sala.duenoId) return { ok: false, error: "Solo los Proyectos y Equipos tienen espacio en Discord." };
-  if (sala.duenoId !== usuarioId) return { ok: false, error: "Solo quien creó el Proyecto o Equipo puede abrirlo." };
+  if (!sala) return { ok: false, error: "sinSala" };
+  if (!sala.duenoId) return { ok: false, error: "sinIniciativa" };
+  if (sala.duenoId !== usuarioId) return { ok: false, error: "noEsDueno" };
 
   if (sala.discord_canal_id && (await sincronizarEspacio(salaId))) {
     return { ok: true, url: urlCanal(sala.discord_canal_id) };
   }
 
   const bot = await botId();
-  if (!bot || !GUILD) return { ok: false, error: "No se pudo hablar con Discord." };
+  if (!bot || !GUILD) return { ok: false, error: "sinConexion" };
   const categoria = sala.esEquipo ? process.env.DISCORD_CATEGORIA_EQUIPOS : process.env.DISCORD_CATEGORIA_PROYECTOS;
   const privado: Overwrite[] = [
     { id: GUILD, type: 0, allow: "0", deny: P.VIEW.toString() }, // @everyone no lo ve
@@ -221,7 +224,8 @@ export async function abrirEspacio(
     type: 0,
     topic: `Espacio privado de «${sala.titulo}» en Yalope.`,
   });
-  if (!texto.ok || !texto.datos) return { ok: false, error: `Discord respondió ${texto.status}.` };
+  // Quien llama lo reporta a Sentry y muestra «no se pudo crear».
+  if (!texto.ok || !texto.datos) throw new Error(`Discord respondió ${texto.status} al crear el canal.`);
   const voz = await crear({ name: `🎭 ${sala.titulo}`.slice(0, 100), type: 2 });
 
   await createAdminClient()

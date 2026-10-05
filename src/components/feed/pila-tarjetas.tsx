@@ -8,7 +8,7 @@ import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { createClient } from "@/lib/supabase/client";
 import { aRolFeed } from "@/lib/feed-roles";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import { ROLES_EJEMPLO } from "@/lib/onboarding-ejemplo";
+import { rolesEjemplo } from "@/lib/onboarding-ejemplo";
 import { opcionesDeRadio, radioMasCercano, type UnidadDistancia } from "@/lib/ubicacion";
 import { TarjetaRol, type RolFeed } from "./tarjeta-rol";
 import { TarjetaEquipo, type EquipoFeed } from "./tarjeta-equipo";
@@ -50,7 +50,8 @@ export function PilaTarjetas({
   // la distancia, y si los ejemplos vivieran ahí adentro desaparecerían a mitad del
   // onboarding por tocar un filtro.
   const t = useTranslations("proyectos.pila");
-  const [ejemplos, setEjemplos] = useState<RolFeed[]>(mostrarEjemplos ? ROLES_EJEMPLO : []);
+  const tEtiquetas = useTranslations("perfil.etiquetas");
+  const [ejemplos, setEjemplos] = useState<RolFeed[]>(mostrarEjemplos ? rolesEjemplo(tEtiquetas) : []);
   const [roles, setRoles] = useState(rolesIniciales);
   // Los equipos van al final de la pila, después de los roles. No entran en "Deshacer":
   // marcar interés le avisa al creador, y deshacer eso es raro. Al decidir, se sacan de acá.
@@ -90,11 +91,8 @@ export function PilaTarjetas({
   const actual = pila[0];
   const siguiente = pila[1];
 
-  const opciones = opcionesDeRadio(unidad);
-  const opcionActual = radioMasCercano(radio, unidad);
-  // «Todo el mundo» viene armado en castellano desde `lib/ubicacion`: acá se traduce.
-  const etiquetaOpcion = (o: { etiqueta: string; metros: number | null }) =>
-    o.metros === null ? t("todoElMundo") : o.etiqueta;
+  const opciones = opcionesDeRadio(unidad, tEtiquetas);
+  const opcionActual = radioMasCercano(radio, unidad, tEtiquetas);
 
   /**
    * Cambiar el radio es volver a pedir el feed, no filtrar lo que ya está en memoria:
@@ -345,7 +343,7 @@ export function PilaTarjetas({
         >
           {opciones.map((o) => (
             <option key={o.etiqueta} value={o.metros ?? ""}>
-              {etiquetaOpcion(o)}
+              {o.etiqueta}
             </option>
           ))}
         </select>
@@ -441,7 +439,7 @@ export function PilaTarjetas({
                   {t("nadaCercaTitulo")}
                 </p>
                 <p className="mt-1 text-sm text-texto-tenue">
-                  {t("nadaCercaTexto", { distancia: etiquetaOpcion(opcionActual) })}
+                  {t("nadaCercaTexto", { distancia: opcionActual.etiqueta })}
                 </p>
                 <button
                   type="button"

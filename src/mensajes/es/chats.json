@@ -114,7 +114,14 @@
     "accionesDiscord": {
       "sinSesion": "Sin sesión.",
       "errorCrear": "No se pudo crear el espacio en Discord. Probá de nuevo.",
-      "errorDesvincular": "No se pudo desvincular."
+      "errorDesvincular": "No se pudo desvincular.",
+      "espacio": {
+        "sinConfigurar": "Discord no está configurado.",
+        "sinSala": "No existe esa sala.",
+        "sinIniciativa": "Solo los Proyectos y Equipos tienen espacio en Discord.",
+        "noEsDueno": "Solo quien creó el Proyecto o Equipo puede abrirlo.",
+        "sinConexion": "No se pudo hablar con Discord."
+      }
     }
   }
 }

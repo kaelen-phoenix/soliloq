@@ -76,7 +76,7 @@
       "cerrar": "Cerrar convocatoria",
       "cerrada": "Esta convocatoria está cerrada.",
       "borrar": "Borrar proyecto",
-      "confirmarBorrado": "Se borra el proyecto con sus roles, fotos, el interés recibido y su sala de chat. Los Talentos que convocaste vuelven a aparecer en Buscar Talentos. No se puede deshacer. Escribí BORRAR para confirmar.",
+      "confirmarBorrado": "Se borra el proyecto con sus roles, fotos, el interés recibido y su sala de chat. Los Talentos que convocaste vuelven a aparecer en Buscar Talentos. No se puede deshacer. Escribí {palabra} para confirmar.",
       "borrarDefinitivamente": "Borrar definitivamente"
     },
     "cobertura": {
@@ -196,7 +196,7 @@
       "cerrar": "Cerrar el equipo",
       "ayudaSumar": "Para sumar gente al equipo, buscá talento y deslizá. Cuando el interés es mutuo lo ves en <b>Convocatorias</b> y desde ahí lo convocás a la sala.",
       "eliminar": "Eliminar equipo",
-      "confirmarBorrado": "Se elimina el equipo con sus fotos y su sala de chat. Los Talentos que convocaste vuelven a aparecer en Buscar Talentos. No se puede deshacer. Escribí BORRAR para confirmar.",
+      "confirmarBorrado": "Se elimina el equipo con sus fotos y su sala de chat. Los Talentos que convocaste vuelven a aparecer en Buscar Talentos. No se puede deshacer. Escribí {palabra} para confirmar.",
       "eliminarDefinitivamente": "Eliminar definitivamente",
       "invitacion": "Armá equipo y empezá por conocer a quienes tienen ganas de crear como vos y la idea puede surgir en el camino.",
       "armarUnEquipo": "Armar un equipo"
@@ -268,7 +268,6 @@
       "sinopsis": "Sinopsis"
     },
     "pila": {
-      "todoElMundo": "Todo el mundo",
       "errorActualizar": "No pudimos actualizar el feed. Probá de nuevo.",
       "limiteMeInteresa": "Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde.",
       "errorDecision": "No pudimos registrar tu decisión. Probá de nuevo.",
@@ -294,7 +293,6 @@
       "filtrosSinZona": "Aplicamos los filtros. No encontramos «{zona}»: elegí la zona abajo.",
       "filtrosAplicados": "Aplicamos los filtros: revisalos abajo.",
       "errorInterpretar": "No pudimos interpretarlo ahora. Usá los filtros de abajo.",
-      "todoElMundo": "Todo el mundo",
       "describi": "✨ Describí a quién buscás",
       "describiPlaceholder": "Actriz de 30 a 40 que cante, cerca de Palermo",
       "buscarPlaceholder": "Nombre, habilidad o experiencia",

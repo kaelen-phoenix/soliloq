@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
-import { comprimirImagen } from "@/lib/comprimir-imagen";
+import { comprimirImagen, ErrorImagen } from "@/lib/comprimir-imagen";
 import { createClient } from "@/lib/supabase/client";
 
 export interface FotoEquipo {
@@ -42,6 +42,7 @@ export function FotosEquipo({
   // servidor; sin refrescar, seguía viendo cero aunque ya hubiera una.
   const router = useRouter();
   const t = useTranslations("proyectos.fotos");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
   const [error, setError] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
 
@@ -70,7 +71,7 @@ export function FotosEquipo({
       foto = await comprimirImagen(archivo, { maxBytes: MAX_BYTES });
     } catch (err) {
       setSubiendo(false);
-      setError(err instanceof Error ? err.message : t("procesar"));
+      setError(err instanceof ErrorImagen ? tEtiquetas(`imagen.${err.clave}`, err.valores) : t("procesar"));
       return;
     }
 

@@ -37,7 +37,8 @@ export async function abrirEspacioDiscord(
   if (!user) return { ok: false, error: t("sinSesion") };
   try {
     const r = await abrirEspacio(salaId, user.id);
-    if (r.ok) revalidatePath(`/salas/${salaId}`);
+    if (!r.ok) return { ok: false, error: t(`espacio.${r.error}`) };
+    revalidatePath(`/salas/${salaId}`);
     return r;
   } catch (e) {
     reportar(e, "abrirEspacioDiscord");

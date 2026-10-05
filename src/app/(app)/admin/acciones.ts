@@ -1,7 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
@@ -104,7 +104,9 @@ export async function adminEnviarmePruebaBienvenida(): Promise<
   const user = await adminActual();
   if (!user?.email) return { ok: false, error: t("noAutorizado") };
   if (!correoConfigurado()) return { ok: false, error: t("faltaResend") };
-  const mail = mailBienvenida({ discord: process.env.NEXT_PUBLIC_DISCORD_INVITACION });
+  // La prueba sale en el idioma en que el admin está usando la app.
+  const idioma = (await getLocale()) === "en" ? "en" : "es";
+  const mail = mailBienvenida({ discord: process.env.NEXT_PUBLIC_DISCORD_INVITACION, idioma });
   const r = await enviarCorreo({ para: user.email, asunto: mail.asunto, html: mail.html, texto: mail.texto });
   if (!r.ok) return { ok: false, error: "error" in r ? r.error : t("envioNoConfigurado") };
   return { ok: true, para: user.email };
@@ -166,7 +168,8 @@ export async function adminMandarInvitacion(email: string): Promise<
       .maybeSingle();
     // Sin invitación (no se creó) o ya usada (tenía cuenta): no corresponde este mail.
     if (!invitacion || invitacion.usado_en) return { ok: true, enviado: false };
-    const mail = mailInvitacion();
+    // Sin cuenta todavía no hay idioma elegido: sale en castellano, el de la comunidad.
+    const mail = mailInvitacion("es");
     const r = await enviarCorreo({ para: destino, asunto: mail.asunto, html: mail.html, texto: mail.texto });
     return r.ok ? { ok: true, enviado: true } : { ok: false, error: "error" in r ? r.error : t("noSeEnvio") };
   } catch (e) {

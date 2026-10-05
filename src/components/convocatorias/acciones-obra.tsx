@@ -33,6 +33,7 @@ export function AccionesObra({
 }) {
   const router = useRouter();
   const t = useTranslations("proyectos.accionesObra");
+  const tUi = useTranslations("cuenta.ui");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
@@ -147,7 +148,7 @@ export function AccionesObra({
             </Boton>
           ) : (
             <ConfirmarBorrado
-              mensaje={t("confirmarBorrado")}
+              mensaje={t("confirmarBorrado", { palabra: tUi("palabraBorrar") })}
               textoBoton={t("borrarDefinitivamente")}
               cargando={cargando}
               onConfirmar={borrar}

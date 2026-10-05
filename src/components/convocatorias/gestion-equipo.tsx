@@ -122,6 +122,7 @@ export function GestionEquipo({
 }) {
   const router = useRouter();
   const t = useTranslations("proyectos.equipo");
+  const tUi = useTranslations("cuenta.ui");
   const [abierto, setAbierto] = useState(abiertoInicial);
   const [titulo, setTitulo] = useState(equipo?.titulo ?? "");
   const [descripcion, setDescripcion] = useState(equipo?.descripcion ?? "");
@@ -328,7 +329,7 @@ export function GestionEquipo({
                 </Boton>
               ) : (
                 <ConfirmarBorrado
-                  mensaje={t("confirmarBorrado")}
+                  mensaje={t("confirmarBorrado", { palabra: tUi("palabraBorrar") })}
                   textoBoton={t("eliminarDefinitivamente")}
                   cargando={cargando}
                   onConfirmar={borrar}

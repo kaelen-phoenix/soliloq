@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
-import { GENEROS_BUSCABLES, type Genero } from "@/lib/constantes";
+import { GENEROS_BUSCABLES, claveGenero, type Genero } from "@/lib/constantes";
 import type { TipoRol } from "@/lib/supabase/types";
 import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
@@ -22,6 +22,7 @@ export function FormularioRol({
   const router = useRouter();
   const t = useTranslations("proyectos.formularioRol");
   const tc = useTranslations("comun");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
   const [abierto, setAbierto] = useState(false);
   const [nombre, setNombre] = useState("");
   const [tipo, setTipo] = useState<TipoRol>("actuacion");
@@ -140,7 +141,7 @@ export function FormularioRol({
                   : "border-borde text-texto-tenue"
               }`}
             >
-              {g.etiqueta}
+              {tEtiquetas(claveGenero(g.valor))}
             </button>
           ))}
         </div>

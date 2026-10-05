@@ -114,7 +114,14 @@
     "accionesDiscord": {
       "sinSesion": "You're not signed in.",
       "errorCrear": "Couldn't create the Discord space. Please try again.",
-      "errorDesvincular": "Couldn't unlink."
+      "errorDesvincular": "Couldn't unlink.",
+      "espacio": {
+        "sinConfigurar": "Discord isn't set up.",
+        "sinSala": "That room doesn't exist.",
+        "sinIniciativa": "Only Projects and Teams have a Discord space.",
+        "noEsDueno": "Only the person who created the Project or Team can open it.",
+        "sinConexion": "Couldn't reach Discord."
+      }
     }
   }
 }

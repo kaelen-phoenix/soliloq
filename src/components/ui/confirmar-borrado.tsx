@@ -6,7 +6,7 @@ import { Boton } from "./boton";
 
 /**
  * Confirmación de una acción irreversible: hace falta tipear una palabra exacta (por
- * defecto BORRAR) para habilitar el botón. Un `window.confirm` se cierra con un click sin
+ * defecto BORRAR, o DELETE en inglés) para habilitar el botón. Un `window.confirm` se cierra con un click sin
  * leer; esto obliga a parar un segundo y escribir, para estar 100% seguro.
  */
 export function ConfirmarBorrado({
@@ -14,7 +14,7 @@ export function ConfirmarBorrado({
   textoBoton,
   textoCargando,
   textoCancelar,
-  palabra = "BORRAR",
+  palabra: palabraPedida,
   onConfirmar,
   onCancelar,
   cargando = false,
@@ -31,6 +31,7 @@ export function ConfirmarBorrado({
   className?: string;
 }) {
   const t = useTranslations("cuenta.ui");
+  const palabra = palabraPedida ?? t("palabraBorrar");
   const [texto, setTexto] = useState("");
   const habilitado = texto.trim().toUpperCase() === palabra;
 

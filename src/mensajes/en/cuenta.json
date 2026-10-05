@@ -86,7 +86,8 @@
       "cancelar": "Cancel",
       "escribiParaConfirmar": "Type {palabra} to confirm",
       "codigoQr": "QR code for the profile link",
-      "irAlInicio": "Go to home"
+      "irAlInicio": "Go to home",
+      "palabraBorrar": "DELETE"
     },
     "denuncia": {
       "motivos": {

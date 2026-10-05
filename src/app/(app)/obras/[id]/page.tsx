@@ -10,7 +10,7 @@ import { MetricasObra } from "@/components/convocatorias/metricas-obra";
 import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { getTranslations } from "next-intl/server";
 import { Icono } from "@/components/ui/icono";
-import { etiquetaGenero } from "@/lib/constantes";
+import { claveGenero } from "@/lib/constantes";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 export default async function DetalleObraPage({
@@ -22,6 +22,7 @@ export default async function DetalleObraPage({
 }) {
   const supabase = createClient();
   const t = await getTranslations("proyectos.obra");
+  const tEtiquetas = await getTranslations("perfil.etiquetas");
 
   const { data: obra } = await supabase.from("obras").select("*").eq("id", params.id).single();
   if (!obra) notFound();
@@ -155,7 +156,7 @@ export default async function DetalleObraPage({
                     <p className="mt-0.5 text-xs text-texto-tenue">
                       {rol.generos_buscados.length === 0
                         ? t("cualquierGenero")
-                        : rol.generos_buscados.map(etiquetaGenero).join(", ")}
+                        : rol.generos_buscados.map((g) => tEtiquetas(claveGenero(g))).join(", ")}
                     </p>
                   </li>
                 ))}

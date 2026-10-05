@@ -86,7 +86,8 @@
       "cancelar": "Cancelar",
       "escribiParaConfirmar": "Escribí {palabra} para confirmar",
       "codigoQr": "Código QR del enlace del perfil",
-      "irAlInicio": "Ir al inicio"
+      "irAlInicio": "Ir al inicio",
+      "palabraBorrar": "BORRAR"
     },
     "denuncia": {
       "motivos": {

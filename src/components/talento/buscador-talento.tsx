@@ -7,7 +7,7 @@ import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Esqueleto } from "@/components/ui/esqueleto";
 import { Icono } from "@/components/ui/icono";
-import { GENEROS_BUSCABLES, HABILIDADES, type Genero } from "@/lib/constantes";
+import { GENEROS_BUSCABLES, HABILIDADES, claveGenero, etiquetaHabilidad, type Genero } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { opcionesDeRadio, RADIO_INICIAL_METROS, SesionUbicacion, type Ubicacion } from "@/lib/ubicacion";
@@ -23,6 +23,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
   const supabase = createClient();
   const t = useTranslations("proyectos.buscador");
   const tc = useTranslations("comun");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
 
   const [texto, setTexto] = useState("");
   const [edadMin, setEdadMin] = useState("");
@@ -143,10 +144,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
     return () => clearTimeout(t);
   }, [buscar]);
 
-  const opcionesRadio = opcionesDeRadio("km");
-  // «Todo el mundo» viene armado en castellano desde `lib/ubicacion`: acá se traduce.
-  const etiquetaRadio = (o: { etiqueta: string; metros: number | null }) =>
-    o.metros === null ? t("todoElMundo") : o.etiqueta;
+  const opcionesRadio = opcionesDeRadio("km", tEtiquetas);
 
   const hayFiltros =
     texto.trim() !== "" ||
@@ -272,7 +270,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
                     : "border-borde text-texto-tenue"
                 }`}
               >
-                {g.etiqueta}
+                {tEtiquetas(claveGenero(g.valor))}
               </button>
             ))}
           </div>
@@ -292,7 +290,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
                     : "border-borde text-texto-tenue"
                 }`}
               >
-                {h}
+                {etiquetaHabilidad(h, tEtiquetas)}
               </button>
             ))}
           </div>
@@ -318,7 +316,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
             >
               {opcionesRadio.map((o) => (
                 <option key={o.etiqueta} value={o.metros ?? ""}>
-                  {etiquetaRadio(o)}
+                  {o.etiqueta}
                 </option>
               ))}
             </select>
