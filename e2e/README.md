@@ -93,13 +93,24 @@ El mismo circuito de match ya está cubierto a nivel SQL en
 `supabase/tests/match_convocatoria.sql` (corre contra prod en CI, `db-tests`) — `flujos/`
 suma la capa de UI que eso no toca (swipe, placa, `/matches`, `/salas`).
 
-## `local/` — solo en una PC, no en CI
+## `local/` — los que necesitan una PC, y tres que también corren en CI
+
+Tres de esta carpeta corren en CI (#356), en el job `e2e-flujos`, con la misma app contra
+staging. Sus informes y capturas quedan en el artefacto `informes-e2e` del run:
+- `local/accesibilidad.spec.ts` (`E2E_A11Y=1`): axe-core en cada pantalla. Falla con cualquier
+  violación seria o crítica.
+- `local/formularios-ancho.spec.ts` (`E2E_FORMULARIOS=1`): ningún formulario se sale de la
+  pantalla entre 320 y 414 px.
+- `local/todos-los-formularios.spec.ts` (`E2E_FORMULARIOS_TODOS=1`): cada formulario se envía
+  de verdad y se verifica en la base.
+
+Los demás necesitan Chrome real o un servidor externo y se corren a mano:
 
 `local/push-chrome.spec.ts` (#232): notificaciones push de punta a punta. El receptor activa
 las notificaciones en Ajustes, sale de la app, otra persona le escribe y la notificación llega
 a su service worker con título, texto y la URL de la sala. Necesita **Google Chrome
 instalado**: el Chromium de Playwright no trae servicio de push, y por eso no corre en CI
-(que solo corre `publico.spec.ts` y `flujos/`). Se saltea sin `E2E_PUSH_CHROME=1`. Abre una
+(donde no hay Chrome con servicio de push). Se saltea sin `E2E_PUSH_CHROME=1`. Abre una
 ventana de Chrome de verdad, y la notificación puede aparecer en el sistema.
 
 `local/push-acceso.spec.ts` (#247, #248): los avisos de acceso por push. Un admin con las
