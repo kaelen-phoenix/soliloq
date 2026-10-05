@@ -18,10 +18,21 @@ export function resolverIdioma(): Idioma {
   return detectarIdioma(headers().get("accept-language"));
 }
 
+/**
+ * Los textos de cada área viven en su propio archivo (`mensajes/<idioma>/<área>.json`, #354),
+ * con un namespace del mismo nombre, y se suman a los generales de `mensajes/<idioma>.json`.
+ */
+export const AREAS = ["perfil", "proyectos", "chats", "cuenta", "admin", "correos"] as const;
+
+export async function mensajesDe(idioma: Idioma) {
+  const [general, ...areas] = await Promise.all([
+    import(`@/mensajes/${idioma}.json`),
+    ...AREAS.map((area) => import(`@/mensajes/${idioma}/${area}.json`)),
+  ]);
+  return Object.assign({}, general.default, ...areas.map((m) => m.default));
+}
+
 export default getRequestConfig(async () => {
   const locale = resolverIdioma();
-  return {
-    locale,
-    messages: (await import(`@/mensajes/${locale}.json`)).default,
-  };
+  return { locale, messages: await mensajesDe(locale) };
 });
