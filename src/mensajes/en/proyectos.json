@@ -42,7 +42,7 @@
       "vacioProyectosTitulo": "No one to call yet",
       "vacioProyectosConIniciativa": "Find talent from your project or team. When someone you're interested in is interested back, they show up here so you can call them.",
       "vacioProyectosSinIniciativa": "Once you set up a project or team and look for talent, you'll see who to call here.",
-      "vacioTalentoTitulo": "No casting calls yet",
+      "vacioTalentoTitulo": "No applications yet",
       "vacioTalentoDetalle": "Tap “I'm interested” in Explore. If they're interested in your profile too, it shows up here.",
       "errores": {
         "cerrarAviso": "Couldn't close the notice.",
@@ -62,8 +62,8 @@
       },
       "pestanas": {
         "etiqueta": "Casting calls",
-        "misProyectos": "My projects",
-        "misConvocatorias": "My casting calls"
+        "convocatorias": "My casting calls",
+        "postulaciones": "My applications"
       }
     },
     "accionesObra": {

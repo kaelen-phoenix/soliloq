@@ -42,7 +42,7 @@
       "vacioProyectosTitulo": "Todavía nadie para convocar",
       "vacioProyectosConIniciativa": "Buscá talento desde tu proyecto o equipo. Cuando alguien que te interesa también lo marca, aparece acá para convocarlo.",
       "vacioProyectosSinIniciativa": "Cuando armes un proyecto o equipo y busques talento, acá vas a ver a quién convocar.",
-      "vacioTalentoTitulo": "Todavía no tenés convocatorias",
+      "vacioTalentoTitulo": "Todavía no tenés postulaciones",
       "vacioTalentoDetalle": "Marcá «Me interesa» en Explorar. Si del otro lado también les interesa tu perfil, aparece acá.",
       "errores": {
         "cerrarAviso": "No se pudo cerrar el aviso.",
@@ -62,8 +62,8 @@
       },
       "pestanas": {
         "etiqueta": "Convocatorias",
-        "misProyectos": "Mis proyectos",
-        "misConvocatorias": "Mis convocatorias"
+        "convocatorias": "Mis convocatorias",
+        "postulaciones": "Mis postulaciones"
       }
     },
     "accionesObra": {
