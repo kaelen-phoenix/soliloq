@@ -18,6 +18,7 @@ import {
   HABILIDADES,
   MAX_GENERO_DESCRIPCION,
   REDES,
+  calcularEdad,
   type ClaveRed,
   type Genero,
 } from "@/lib/constantes";
@@ -256,12 +257,8 @@ export function FormularioTalento({
       nuevos.fecha_nacimiento = "Ingresá tu fecha de nacimiento.";
     } else if (!fechaIso) {
       nuevos.fecha_nacimiento = "Escribila así: día/mes/año, por ejemplo 07/05/1995.";
-    } else {
-      const hace16 = new Date();
-      hace16.setFullYear(hace16.getFullYear() - 16);
-      if (new Date(fechaIso) > hace16) {
-        nuevos.fecha_nacimiento = "La plataforma es para mayores de 16 años.";
-      }
+    } else if (calcularEdad(fechaIso) < 16) {
+      nuevos.fecha_nacimiento = "La plataforma es para personas de 16 años o más.";
     }
     if (!ubicacion) nuevos.ubicacion = "Elegí tu ubicación de la lista de sugerencias.";
     if (!genero) nuevos.genero = "Elegí una opción.";

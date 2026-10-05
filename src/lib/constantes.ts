@@ -203,12 +203,13 @@ export const COLUMNAS_PUBLICAS_TALENTO =
   "id, nombre, edad_visible, ubicacion_publica, ubicacion_pais, genero, genero_descripcion, videoreel_url, experiencia, habilidades, redes, aparece_en_buscador";
 
 export function calcularEdad(fechaNacimiento: string): number {
-  const nacimiento = new Date(fechaNacimiento);
+  // Se lee «aaaa-mm-dd» por partes: `new Date("1990-10-06")` es medianoche UTC, que al oeste
+  // de Greenwich (Argentina) cae el día anterior y sumaba el año un día antes (#355).
+  const [anio, mes, dia] = fechaNacimiento.slice(0, 10).split("-").map(Number);
   const hoy = new Date();
-  let edad = hoy.getFullYear() - nacimiento.getFullYear();
+  let edad = hoy.getFullYear() - anio;
   const aunNoCumplio =
-    hoy.getMonth() < nacimiento.getMonth() ||
-    (hoy.getMonth() === nacimiento.getMonth() && hoy.getDate() < nacimiento.getDate());
+    hoy.getMonth() + 1 < mes || (hoy.getMonth() + 1 === mes && hoy.getDate() < dia);
   if (aunNoCumplio) edad -= 1;
   return edad;
 }
