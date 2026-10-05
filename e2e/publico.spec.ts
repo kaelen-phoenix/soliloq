@@ -32,6 +32,25 @@ test.describe("landing", () => {
     await expect(page.getByRole("heading", { level: 1, name: "Apoyá Yalope" })).toBeVisible();
   });
 
+  // #352: Política de Privacidad y Términos se ven sin sesión y el alta las enlaza.
+  for (const [ruta, titulo] of [
+    ["/privacidad", "Política de Privacidad"],
+    ["/terminos", "Términos y Condiciones"],
+  ] as const) {
+    test(`${ruta} se ve sin sesión`, async ({ page }) => {
+      const res = await page.goto(ruta);
+      expect(res?.status()).toBe(200);
+      await expect(page).toHaveURL(new RegExp(`${ruta}$`));
+      await expect(page.getByRole("heading", { level: 1, name: titulo })).toBeVisible();
+    });
+  }
+
+  test("el alta enlaza Términos y Política de Privacidad", async ({ page }) => {
+    await page.goto("/ingresar");
+    await page.getByRole("link", { name: "Política de Privacidad" }).click();
+    await expect(page).toHaveURL(/\/privacidad$/);
+  });
+
   test("/ raíz sirve la landing para anónimos", async ({ page }) => {
     const res = await page.goto("/");
     expect(res?.status()).toBe(200);

@@ -247,5 +247,163 @@
     },
     "errorGuardar": "No pudimos guardarlo. Probá de nuevo.",
     "guardando": "Guardando…"
+  },
+  "legal": {
+    "volverApp": "Ir a la app",
+    "actualizado": "Última actualización: 5 de octubre de 2026",
+    "contacto": "Por cualquier consulta sobre estos temas escribinos a info@yalope.com.",
+    "privacidad": {
+      "titulo": "Política de Privacidad",
+      "descripcion": "Qué datos guarda Yalope, para qué los usa, quién los ve y cómo ejercer tus derechos.",
+      "intro": "Yalope (en adelante, «Yalope», «nosotros») es una plataforma que conecta actores, actrices y creadores de proyectos artísticos. Esta política explica qué datos personales tratamos cuando usás yalope.com y la app, para qué, con quién los compartimos y cómo podés ejercer tus derechos, según la Ley 25.326 de Protección de los Datos Personales de la República Argentina. Responsable: Yalope — info@yalope.com.",
+      "secciones": [
+        {
+          "titulo": "1. Qué datos guardamos",
+          "parrafos": [
+            "Cuenta: tu email y tu contraseña (guardada cifrada por nuestro proveedor; nadie de Yalope puede verla). Si entrás con Google, recibimos tu nombre, tu email y, solo si elegís usarla, tu foto de Google.",
+            "Perfil: nombre, fecha de nacimiento, ubicación, género (y su aclaración si elegís «Otro»), fotos, videoreel, experiencia, habilidades, redes sociales y tus preferencias de visibilidad.",
+            "Proyectos y equipos que crees: títulos, descripciones, roles, fotos y locación de ensayos.",
+            "Actividad en la app: los «Me interesa» que marcás, tus matches y convocatorias, los mensajes de los chats, las notificaciones, las denuncias y los bloqueos.",
+            "Datos técnicos: si activás las notificaciones, la suscripción de tu navegador; si vinculás Discord, tu identificador y nombre de usuario de Discord; tus preferencias de tema e idioma; la cantidad de veces que usás las funciones de IA (no guardamos los textos que mandás); y registros de errores con datos técnicos (navegador, sistema operativo y la pantalla donde ocurrió el error).",
+            "Si escribís desde el formulario de «Apoyar»: tu nombre, tu email y tu mensaje."
+          ]
+        },
+        {
+          "titulo": "2. Para qué los usamos",
+          "parrafos": [
+            "Para que la app funcione: mostrar tu perfil a quienes buscan talento, mostrarte proyectos y equipos cerca tuyo, armar matches y convocatorias, y abrir los chats de cada proyecto.",
+            "Para avisarte de lo que pasa: mails (por ejemplo, cuando se aprueba tu acceso) y notificaciones en el teléfono si las activás.",
+            "Para cuidar la comunidad: aprobar las cuentas nuevas, atender denuncias y revisar lo publicado (con ayuda de IA, siempre con revisión de una persona antes de tomar una medida).",
+            "Para corregir errores y mejorar la app.",
+            "No vendemos tus datos ni los usamos para publicidad."
+          ]
+        },
+        {
+          "titulo": "3. Quién ve tu información",
+          "parrafos": [
+            "Tu perfil lo ven las personas con una cuenta aprobada en Yalope. Tu ubicación se muestra solo como barrio o ciudad: la dirección exacta nunca se publica. Tu edad se puede ocultar, y podés ocultar tu perfil a personas nuevas.",
+            "Si activás el enlace público de tu perfil, quien tenga ese enlace ve tu perfil sin tus redes sociales.",
+            "Los mensajes de un chat los ven solo quienes forman parte de ese chat.",
+            "El equipo de administración de Yalope puede acceder a la información cuando hace falta para aprobar cuentas, atender denuncias o resolver problemas técnicos."
+          ]
+        },
+        {
+          "titulo": "4. Servicios que usamos",
+          "parrafos": [
+            "Para funcionar, Yalope usa proveedores que tratan datos por cuenta nuestra: Supabase (base de datos, archivos y cuentas), Vercel (alojamiento de la app), Resend (envío de mails), Sentry (registro de errores), Google (inicio de sesión con Google y búsqueda de lugares), OpenAI a través de Vercel (solo cuando usás un botón de IA, se le manda el texto de ese momento) y Discord (solo si vinculás tu cuenta).",
+            "Algunos de estos proveedores procesan los datos fuera de la Argentina, principalmente en los Estados Unidos. Al usar Yalope aceptás esa transferencia internacional, que se hace con proveedores que aplican medidas de seguridad."
+          ]
+        },
+        {
+          "titulo": "5. Cuánto tiempo los guardamos",
+          "parrafos": [
+            "Mientras tengas tu cuenta. Desde Ajustes → «Borrar mi cuenta» se borran tu cuenta y todo tu contenido (perfil, fotos, proyectos, equipos, chats y mensajes). Los registros técnicos de nuestros proveedores se eliminan según sus propios plazos."
+          ]
+        },
+        {
+          "titulo": "6. Tus derechos",
+          "parrafos": [
+            "Podés acceder a tus datos, rectificarlos, actualizarlos y pedir que se supriman. Casi todo lo podés hacer desde la app (editar tu perfil o borrar tu cuenta); para lo demás, escribinos a info@yalope.com.",
+            "El titular de los datos personales tiene la facultad de ejercer el derecho de acceso a los mismos en forma gratuita a intervalos no inferiores a seis meses, salvo que se acredite un interés legítimo al efecto conforme lo establecido en el artículo 14, inciso 3 de la Ley N° 25.326.",
+            "La Agencia de Acceso a la Información Pública, en su carácter de Órgano de Control de la Ley N° 25.326, tiene la atribución de atender las denuncias y reclamos que interpongan quienes resulten afectados en sus derechos por incumplimiento de las normas vigentes en materia de protección de datos personales."
+          ]
+        },
+        {
+          "titulo": "7. Edad mínima",
+          "parrafos": [
+            "Yalope es para mayores de 16 años: el perfil no acepta una fecha de nacimiento que indique menos edad."
+          ]
+        },
+        {
+          "titulo": "8. Cookies y almacenamiento",
+          "parrafos": [
+            "Usamos cookies para mantener tu sesión iniciada y guardamos en tu navegador tus preferencias (tema, idioma) y, mientras completás tu perfil, un borrador para no perder lo que cargaste. No usamos cookies de publicidad ni de seguimiento de terceros."
+          ]
+        },
+        {
+          "titulo": "9. Seguridad",
+          "parrafos": [
+            "La información viaja cifrada y el acceso a los datos está restringido por permisos: cada persona ve lo que le corresponde. Ningún sistema es infalible; si detectamos un problema que afecte tus datos, te vamos a avisar."
+          ]
+        },
+        {
+          "titulo": "10. Cambios",
+          "parrafos": [
+            "Si cambiamos esta política, vamos a actualizar la fecha de arriba y, si el cambio es importante, te vamos a avisar en la app."
+          ]
+        }
+      ]
+    },
+    "terminos": {
+      "titulo": "Términos y Condiciones",
+      "descripcion": "Las reglas para usar Yalope.",
+      "intro": "Estos términos regulan el uso de yalope.com y de la app de Yalope. Al crear una cuenta o usar el servicio, los aceptás. Si no estás de acuerdo, no uses Yalope.",
+      "secciones": [
+        {
+          "titulo": "1. Qué es Yalope",
+          "parrafos": [
+            "Yalope es una plataforma que conecta actores, actrices y creadores de proyectos artísticos: permite crear un perfil, publicar proyectos y equipos, marcar interés, convocar y conversar en chats.",
+            "Yalope facilita el contacto entre las personas, pero no participa en la organización, contratación, pago ni ejecución de los proyectos, y no es parte de los acuerdos que hagan entre ellas."
+          ]
+        },
+        {
+          "titulo": "2. Tu cuenta",
+          "parrafos": [
+            "Tenés que tener al menos 16 años y dar datos verdaderos. Cada cuenta es personal.",
+            "Mientras la comunidad crece, las cuentas nuevas pasan por una aprobación antes de poder usar la app.",
+            "Sos responsable de cuidar tu contraseña y de lo que se haga desde tu cuenta."
+          ]
+        },
+        {
+          "titulo": "3. Normas de la Comunidad",
+          "parrafos": [
+            "Al usar Yalope aceptás las Normas de la Comunidad, que forman parte de estos términos. Entre otras cosas, no se permiten el acoso, la discriminación, las convocatorias falsas o engañosas, los perfiles falsos, las estafas ni los pagos engañosos."
+          ]
+        },
+        {
+          "titulo": "4. Lo que publicás",
+          "parrafos": [
+            "Lo que subís (fotos, textos, proyectos, mensajes) sigue siendo tuyo. Nos das permiso para guardarlo y mostrarlo dentro de Yalope a las personas que corresponda, solo para que el servicio funcione. Ese permiso termina cuando lo borrás o borrás tu cuenta.",
+            "Tenés que tener derecho a publicar lo que subís: por ejemplo, no subas fotos de otras personas sin su autorización ni contenido de terceros protegido.",
+            "Quien crea un proyecto o equipo es responsable de la información que publica y de su desarrollo."
+          ]
+        },
+        {
+          "titulo": "5. Funciones de IA",
+          "parrafos": [
+            "Algunas funciones usan inteligencia artificial para proponer textos o filtros. Las propuestas pueden tener errores: revisalas antes de usarlas. Hay un límite de usos por día."
+          ]
+        },
+        {
+          "titulo": "6. Moderación y medidas",
+          "parrafos": [
+            "Podemos revisar el contenido denunciado o publicado y, si incumple estos términos o las Normas, advertir, quitar contenido, suspender o eliminar cuentas."
+          ]
+        },
+        {
+          "titulo": "7. El servicio",
+          "parrafos": [
+            "Yalope es gratuito. Las donaciones y los aportes de sponsors son voluntarios y no dan beneficios dentro de la app más allá de lo que se indica en «Apoyar».",
+            "Hacemos lo posible para que Yalope funcione bien, pero el servicio se ofrece tal como está, puede tener interrupciones o errores, y puede cambiar. No respondemos por los acuerdos entre usuarios ni por lo que ocurra fuera de la plataforma, incluidos los encuentros presenciales."
+          ]
+        },
+        {
+          "titulo": "8. Privacidad",
+          "parrafos": [
+            "Cómo tratamos tus datos está explicado en la Política de Privacidad."
+          ]
+        },
+        {
+          "titulo": "9. Cambios y ley aplicable",
+          "parrafos": [
+            "Podemos actualizar estos términos; si el cambio es importante, te vamos a avisar en la app. Se rigen por las leyes de la República Argentina."
+          ]
+        }
+      ]
+    },
+    "aceptacionAlta": "Al crear tu cuenta aceptás los <terminos>Términos</terminos> y la <privacidad>Política de Privacidad</privacidad>.",
+    "enlaceTerminos": "Términos",
+    "enlacePrivacidad": "Política de Privacidad",
+    "enlaceNormas": "Normas de la Comunidad"
   }
 }
