@@ -1,6 +1,7 @@
 "use client";
 
 import { useMemo } from "react";
+import { useTranslations } from "next-intl";
 import qrcode from "qrcode-generator";
 
 /**
@@ -18,6 +19,7 @@ export function CodigoQr({
   tam?: number;
   className?: string;
 }) {
+  const t = useTranslations("cuenta.ui");
   const svg = useMemo(() => {
     const qr = qrcode(0, "M");
     qr.addData(valor);
@@ -41,7 +43,7 @@ export function CodigoQr({
       className={`text-texto [&>svg]:block [&>svg]:h-full [&>svg]:w-full ${className}`}
       style={{ width: tam, height: tam }}
       role="img"
-      aria-label="Código QR del enlace del perfil"
+      aria-label={t("codigoQr")}
       dangerouslySetInnerHTML={{ __html: svg }}
     />
   );

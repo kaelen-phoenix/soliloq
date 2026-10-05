@@ -2,13 +2,17 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
-import { mensajeErrorAuth, validarClave } from "@/lib/clave";
+import { LARGO_MINIMO_CLAVE, mensajeErrorAuth, validarClave } from "@/lib/clave";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 
 export function CambiarClaveFormulario({ destinoAlTerminar }: { destinoAlTerminar: string }) {
   const router = useRouter();
+  const t = useTranslations("cuenta.cambiarClave");
+  const tIngresar = useTranslations("cuenta.ingresar");
+  const tError = useTranslations("cuenta.errores");
   const [clave, setClave] = useState("");
   const [repetida, setRepetida] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -21,11 +25,11 @@ export function CambiarClaveFormulario({ destinoAlTerminar }: { destinoAlTermina
 
     const errorClave = validarClave(clave);
     if (errorClave) {
-      setError(errorClave);
+      setError(tError(errorClave, { minimo: LARGO_MINIMO_CLAVE }));
       return;
     }
     if (clave !== repetida) {
-      setError("Las contraseñas no coinciden.");
+      setError(tError("noCoinciden"));
       return;
     }
 
@@ -35,7 +39,7 @@ export function CambiarClaveFormulario({ destinoAlTerminar }: { destinoAlTermina
     setCargando(false);
 
     if (errorCambio) {
-      setError(mensajeErrorAuth(errorCambio.code, errorCambio.message));
+      setError(tError(mensajeErrorAuth(errorCambio.code), { minimo: LARGO_MINIMO_CLAVE }));
       return;
     }
 
@@ -47,7 +51,7 @@ export function CambiarClaveFormulario({ destinoAlTerminar }: { destinoAlTermina
   if (listo) {
     return (
       <p className="rounded-xl bg-exito-50 px-4 py-3 text-sm text-exito-800">
-        Listo, tu contraseña quedó actualizada.
+        {t("listo")}
       </p>
     );
   }
@@ -56,16 +60,16 @@ export function CambiarClaveFormulario({ destinoAlTerminar }: { destinoAlTermina
     <form onSubmit={enviar} className="flex flex-col gap-4">
       <CampoTexto
         id="clave"
-        etiqueta="Contraseña nueva"
+        etiqueta={t("nueva")}
         type="password"
         autoComplete="new-password"
-        placeholder="Al menos 8 caracteres"
+        placeholder={tIngresar("placeholderClaveNueva")}
         value={clave}
         onChange={(e) => setClave(e.target.value)}
       />
       <CampoTexto
         id="clave-repetida"
-        etiqueta="Repetila"
+        etiqueta={t("repetila")}
         type="password"
         autoComplete="new-password"
         value={repetida}
@@ -73,7 +77,7 @@ export function CambiarClaveFormulario({ destinoAlTerminar }: { destinoAlTermina
         error={error ?? undefined}
       />
       <Boton type="submit" cargando={cargando}>
-        Guardar contraseña
+        {t("guardar")}
       </Boton>
     </form>
   );

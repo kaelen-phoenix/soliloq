@@ -5,7 +5,7 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { EMAIL_REGEX, mensajeErrorAuth, urlCallback, validarClave } from "@/lib/clave";
+import { EMAIL_REGEX, LARGO_MINIMO_CLAVE, mensajeErrorAuth, urlCallback, validarClave } from "@/lib/clave";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 
@@ -16,6 +16,9 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
   const router = useRouter();
   const [modo, setModo] = useState<Modo>(modoInicial);
   const tLegal = useTranslations("legal");
+  const t = useTranslations("cuenta.ingresar");
+  const tError = useTranslations("cuenta.errores");
+  const tComun = useTranslations("comun");
   const [email, setEmail] = useState("");
   const [clave, setClave] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -33,18 +36,18 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
     setError(null);
 
     if (!EMAIL_REGEX.test(email)) {
-      setError("Ingresá un email válido.");
+      setError(tError("emailInvalido"));
       return;
     }
 
     if (modo === "registrarme") {
       const errorClave = validarClave(clave);
       if (errorClave) {
-        setError(errorClave);
+        setError(tError(errorClave, { minimo: LARGO_MINIMO_CLAVE }));
         return;
       }
     } else if (!clave) {
-      setError("Ingresá tu contraseña.");
+      setError(tError("claveVacia"));
       return;
     }
 
@@ -58,7 +61,7 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
       });
       setCargando(false);
       if (errorIngreso) {
-        setError(mensajeErrorAuth(errorIngreso.code, errorIngreso.message));
+        setError(tError(mensajeErrorAuth(errorIngreso.code), { minimo: LARGO_MINIMO_CLAVE }));
         return;
       }
       // Sin `next` el middleware decide el destino real según el estado de la cuenta.
@@ -75,7 +78,7 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
     setCargando(false);
 
     if (errorAlta) {
-      setError(mensajeErrorAuth(errorAlta.code, errorAlta.message));
+      setError(tError(mensajeErrorAuth(errorAlta.code), { minimo: LARGO_MINIMO_CLAVE }));
       return;
     }
 
@@ -107,11 +110,12 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
   if (verificacionEnviada) {
     return (
       <div className="rounded-2xl border border-borde p-6">
-        <h2 className="text-lg font-semibold text-texto">Confirmá tu email</h2>
+        <h2 className="text-lg font-semibold text-texto">{t("confirmaTitulo")}</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-texto-tenue">
-          Te enviamos un enlace de verificación a{" "}
-          <span className="text-texto">{email}</span>. Abrilo y vas a entrar con la contraseña
-          que acabás de elegir.
+          {t.rich("confirmaTexto", {
+            email,
+            b: (texto) => <span className="text-texto">{texto}</span>,
+          })}
         </p>
         <Boton
           variante="fantasma"
@@ -121,7 +125,7 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
             cambiarModo("ingresar");
           }}
         >
-          Volver
+          {tComun("volver")}
         </Boton>
       </div>
     );
@@ -139,7 +143,7 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
               modo === m ? "bg-superficie text-texto shadow-sm" : "text-texto-tenue hover:text-texto"
             }`}
           >
-            {m === "ingresar" ? "Ingresar" : "Crear cuenta"}
+            {m === "ingresar" ? t("ingresar") : t("crearCuenta")}
           </button>
         ))}
       </div>
@@ -147,25 +151,25 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
       <form onSubmit={enviar} className="flex flex-col gap-4">
         <CampoTexto
           id="email"
-          etiqueta="Tu email"
+          etiqueta={t("tuEmail")}
           type="email"
           autoComplete="email"
-          placeholder="vos@ejemplo.com"
+          placeholder={t("placeholderEmail")}
           value={email}
           onChange={(e) => setEmail(e.target.value)}
         />
         <CampoTexto
           id="clave"
-          etiqueta="Contraseña"
+          etiqueta={t("clave")}
           type="password"
           autoComplete={modo === "ingresar" ? "current-password" : "new-password"}
-          placeholder={modo === "ingresar" ? "Tu contraseña" : "Al menos 8 caracteres"}
+          placeholder={modo === "ingresar" ? t("placeholderClave") : t("placeholderClaveNueva")}
           value={clave}
           onChange={(e) => setClave(e.target.value)}
           error={error ?? undefined}
         />
-        <Boton type="submit" cargando={cargando} textoCargando="Un momento…">
-          {modo === "ingresar" ? "Ingresar" : "Crear cuenta"}
+        <Boton type="submit" cargando={cargando} textoCargando={t("unMomento")}>
+          {modo === "ingresar" ? t("ingresar") : t("crearCuenta")}
         </Boton>
       </form>
 
@@ -174,18 +178,18 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
           href="/recuperar"
           className="self-start text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
         >
-          Olvidé mi contraseña
+          {t("olvide")}
         </Link>
       )}
 
       <div className="flex items-center gap-3 text-2xs uppercase tracking-wide text-texto-tenue">
         <div className="h-px flex-1 bg-ink-100" />
-        o
+        {t("o")}
         <div className="h-px flex-1 bg-ink-100" />
       </div>
 
       <Boton variante="secundario" onClick={ingresarConGoogle} type="button">
-        Continuar con Google
+        {t("google")}
       </Boton>
 
       {/* #352: Google también crea la cuenta, así que el aviso va en los dos modos. */}

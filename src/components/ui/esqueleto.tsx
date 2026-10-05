@@ -1,3 +1,5 @@
+import { useTranslations } from "next-intl";
+
 /**
  * Bloque gris que ocupa el lugar de un contenido que todavía no llegó.
  *
@@ -26,8 +28,9 @@ export function PantallaCargando({
   children: React.ReactNode;
   className?: string;
 }) {
+  const t = useTranslations("cuenta.ui");
   return (
-    <div role="status" aria-busy="true" aria-label="Cargando" className={className}>
+    <div role="status" aria-busy="true" aria-label={t("cargando")} className={className}>
       {children}
     </div>
   );

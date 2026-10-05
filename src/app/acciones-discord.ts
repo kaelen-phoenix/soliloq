@@ -3,6 +3,7 @@
 import * as Sentry from "@sentry/nextjs";
 import { createHmac, timingSafeEqual } from "node:crypto";
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import {
@@ -32,26 +33,28 @@ export async function abrirEspacioDiscord(
   salaId: string,
 ): Promise<{ ok: true; url: string } | { ok: false; error: string }> {
   const { user } = await usuarioActual();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  const t = await getTranslations("chats.accionesDiscord");
+  if (!user) return { ok: false, error: t("sinSesion") };
   try {
     const r = await abrirEspacio(salaId, user.id);
     if (r.ok) revalidatePath(`/salas/${salaId}`);
     return r;
   } catch (e) {
     reportar(e, "abrirEspacioDiscord");
-    return { ok: false, error: "No se pudo crear el espacio en Discord. Probá de nuevo." };
+    return { ok: false, error: t("errorCrear") };
   }
 }
 
 /** Desvincular el Discord propio: sale de todos los espacios privados. */
 export async function desvincularDiscord(): Promise<{ ok: true } | { ok: false; error: string }> {
   const { user } = await usuarioActual();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  const t = await getTranslations("chats.accionesDiscord");
+  if (!user) return { ok: false, error: t("sinSesion") };
   const { error } = await createAdminClient()
     .from("perfiles")
     .update({ discord_user_id: null, discord_usuario: null })
     .eq("id", user.id);
-  if (error) return { ok: false, error: "No se pudo desvincular." };
+  if (error) return { ok: false, error: t("errorDesvincular") };
   try {
     // Ya sin su cuenta en la base, la sincronización le saca el acceso a cada canal.
     await sincronizarEspaciosDe(user.id);

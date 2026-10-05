@@ -1,1 +1,129 @@
-{ "cuenta": {} }
+{
+  "cuenta": {
+    "metadatos": {
+      "titulo": "Yalope — The match for actors and actresses",
+      "descripcion": "Yalope connects actors, actresses and creators with a quick, visual match: when the interest is mutual, the chat opens. Build your team and share your profile as a booking page.",
+      "solicitudPendiente": "Request pending — Yalope",
+      "aceptarNormas": "Community Guidelines — Yalope",
+      "suspendido": "Account suspended — Yalope"
+    },
+    "manifest": {
+      "nombre": "Yalope — The Actors' Match",
+      "descripcion": "Yalope connects actors, actresses and creators with a quick, visual match: when the interest is mutual, the chat opens."
+    },
+    "errores": {
+      "emailInvalido": "Enter a valid email.",
+      "claveVacia": "Enter your password.",
+      "claveCorta": "Your password needs at least {minimo} characters.",
+      "noCoinciden": "The passwords don't match.",
+      "credenciales": "Wrong email or password.",
+      "emailSinConfirmar": "You haven't confirmed your email yet. Check your inbox and open the link.",
+      "yaExiste": "There's already an account with that email. Try signing in.",
+      "demasiadosIntentos": "Too many attempts. Wait a few minutes and try again.",
+      "mismaClave": "Your new password must be different from the current one.",
+      "emailNoValido": "That email doesn't look valid. Check it and try again.",
+      "emailNoAutorizado": "We couldn't send an email to that address. Try another one.",
+      "altaDeshabilitada": "New accounts can't be created right now.",
+      "suspendida": "This account is suspended.",
+      "sesionVencida": "Your session expired. Please sign in again.",
+      "enlaceVencido": "The link expired. Request a new one.",
+      "generico": "Something went wrong. Please try again in a few minutes."
+    },
+    "ingresar": {
+      "confirmaTitulo": "Confirm your email",
+      "confirmaTexto": "We sent a verification link to <b>{email}</b>. Open it and you'll sign in with the password you just chose.",
+      "ingresar": "Sign in",
+      "crearCuenta": "Create account",
+      "tuEmail": "Your email",
+      "placeholderEmail": "you@example.com",
+      "clave": "Password",
+      "placeholderClave": "Your password",
+      "placeholderClaveNueva": "At least 8 characters",
+      "unMomento": "One moment…",
+      "olvide": "I forgot my password",
+      "o": "or",
+      "google": "Continue with Google"
+    },
+    "recuperar": {
+      "titulo": "Recover access",
+      "bajada": "We'll send you a link to choose a new password.",
+      "volverIngreso": "Back to sign in",
+      "revisaTitulo": "Check your email",
+      "revisaTexto": "If there's an account for <b>{email}</b>, we sent you a link to choose a new password.",
+      "enviando": "Sending…",
+      "enviar": "Send me the link"
+    },
+    "cambiarClave": {
+      "titulo": "Your password",
+      "bajada": "Choose a new password for {email}.",
+      "cancelar": "Cancel",
+      "listo": "Done, your password has been updated.",
+      "nueva": "New password",
+      "repetila": "Repeat it",
+      "guardar": "Save password"
+    },
+    "cerrarSesion": "Sign out",
+    "layout": {
+      "sinLeer": "{etiqueta}, {n} unread",
+      "notificaciones": "Notifications"
+    },
+    "marcoAcceso": {
+      "titulo": "Theater takes a crowd.",
+      "texto": "Yalope connects people with an idea to people who want to make it happen.",
+      "argumento1Titulo": "Answer casting calls",
+      "argumento1Detalle": "Real roles in productions coming together near you.",
+      "argumento2Titulo": "Build a team without a project",
+      "argumento2Detalle": "Meet people eager to create, even before you have the idea.",
+      "argumento3Titulo": "Coordinate in one place",
+      "argumento3Detalle": "Once there's a team, a room opens with the whole cast.",
+      "pie": "The match for actors and actresses · Argentina"
+    },
+    "ui": {
+      "avisoGuardado": "Changes saved.",
+      "guardando": "Saving…",
+      "cargando": "Loading",
+      "borrando": "Deleting…",
+      "cancelar": "Cancel",
+      "escribiParaConfirmar": "Type {palabra} to confirm",
+      "codigoQr": "QR code for the profile link",
+      "irAlInicio": "Go to home"
+    },
+    "denuncia": {
+      "motivos": {
+        "acoso": "Harassment or intimidation",
+        "discriminacion": "Discrimination",
+        "perfil_falso": "Fake profile or impersonation",
+        "estafa": "Scam or request for money",
+        "convocatoria_enganosa": "Misleading casting call",
+        "contenido_inapropiado": "Inappropriate content",
+        "otro": "Other"
+      },
+      "sinSesion": "You need to sign in to report.",
+      "yaEnviada": "You already sent a report about this. We're reviewing it.",
+      "error": "We couldn't send the report. Please try again.",
+      "denunciar": "Report",
+      "recibidaTitulo": "We got your report",
+      "recibidaTexto": "We'll review it. If you need to stop seeing this person right now, write to us and we'll sort it out.",
+      "titulo": "Report {que}",
+      "cerrar": "Close",
+      "motivo": "Reason",
+      "placeholder": "Tell us what happened (optional, but it helps a lot).",
+      "enviando": "Sending…",
+      "enviar": "Send report"
+    },
+    "error": {
+      "titulo": "The curtain fell on us",
+      "detalle": "Something failed on our end. Try again: most of the time it works on the second try.",
+      "reintentar": "Try again"
+    },
+    "noEncontrado": {
+      "titulo": "Nothing here",
+      "detalle": "The page you're looking for doesn't exist, or the content is no longer available."
+    },
+    "errorGlobal": {
+      "titulo": "The curtain fell on us",
+      "detalle": "Something failed while loading the app. Please try again in a moment.",
+      "reintentar": "Try again"
+    }
+  }
+}

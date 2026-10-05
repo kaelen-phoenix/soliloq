@@ -3,10 +3,10 @@ import { getTranslations } from "next-intl/server";
 import { CerrarSesionBoton } from "@/components/cerrar-sesion-boton";
 import { Logotipo } from "@/components/ui/logotipo";
 
-export const metadata: Metadata = {
-  title: "Cuenta suspendida — Yalope",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("cuenta.metadatos");
+  return { title: t("suspendido"), robots: { index: false, follow: false } };
+}
 
 /**
  * A donde cae una cuenta suspendida por un admin (el gate está en `(app)/layout.tsx`).

@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Logotipo } from "./logotipo";
 
 /**
@@ -20,6 +21,7 @@ export function PantallaMensaje({
   detalle: string;
   accion?: React.ReactNode;
 }) {
+  const t = useTranslations("cuenta.ui");
   return (
     <main className="mx-auto flex min-h-screen max-w-sm flex-col justify-center px-6 py-12">
       <Logotipo tamano="sm" />
@@ -35,7 +37,7 @@ export function PantallaMensaje({
           href="/"
           className="text-sm font-medium text-texto-tenue underline underline-offset-4 hover:text-texto"
         >
-          Ir al inicio
+          {t("irAlInicio")}
         </Link>
       </div>
     </main>

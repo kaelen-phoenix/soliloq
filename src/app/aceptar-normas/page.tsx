@@ -5,10 +5,10 @@ import { FormularioAceptarNormas } from "@/components/normas/formulario-aceptar-
 import { Logotipo } from "@/components/ui/logotipo";
 import { createClient } from "@/lib/supabase/server";
 
-export const metadata: Metadata = {
-  title: "Normas de la Comunidad — Yalope",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("cuenta.metadatos");
+  return { title: t("aceptarNormas"), robots: { index: false, follow: false } };
+}
 
 /**
  * Paso obligatorio para toda cuenta nueva (issue #180), justo después del alta y antes de

@@ -1,19 +1,21 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "./boton";
 import { Icono } from "./icono";
 import type { MotivoDenuncia } from "@/lib/supabase/types";
 
-const MOTIVOS: { valor: MotivoDenuncia; etiqueta: string }[] = [
-  { valor: "acoso", etiqueta: "Acoso o intimidación" },
-  { valor: "discriminacion", etiqueta: "Discriminación" },
-  { valor: "perfil_falso", etiqueta: "Perfil falso o suplantación" },
-  { valor: "estafa", etiqueta: "Estafa o pedido de dinero" },
-  { valor: "convocatoria_enganosa", etiqueta: "Convocatoria engañosa" },
-  { valor: "contenido_inapropiado", etiqueta: "Contenido inapropiado" },
-  { valor: "otro", etiqueta: "Otro" },
+/** Valores del enum de la base; la etiqueta de cada uno está en `cuenta.denuncia.motivos`. */
+const MOTIVOS: MotivoDenuncia[] = [
+  "acoso",
+  "discriminacion",
+  "perfil_falso",
+  "estafa",
+  "convocatoria_enganosa",
+  "contenido_inapropiado",
+  "otro",
 ];
 
 /**
@@ -35,9 +37,10 @@ export function BotonDenuncia({
   perfilDenunciadoId?: string;
   obraId?: string;
   salaId?: string;
-  /** Cómo nombrar lo denunciado en el encabezado. Ej: "a Natalia", "esta convocatoria". */
+  /** Cómo nombrar lo denunciado en el encabezado, ya traducido. Ej: "a Natalia", "esta convocatoria". */
   queSeDenuncia: string;
 }) {
+  const t = useTranslations("cuenta.denuncia");
   const [abierto, setAbierto] = useState(false);
   const [motivo, setMotivo] = useState<MotivoDenuncia | null>(null);
   const [detalle, setDetalle] = useState("");
@@ -58,7 +61,7 @@ export function BotonDenuncia({
     } = await supabase.auth.getUser();
     if (!user) {
       setEnviando(false);
-      setError("Tenés que iniciar sesión para denunciar.");
+      setError(t("sinSesion"));
       return;
     }
 
@@ -77,8 +80,8 @@ export function BotonDenuncia({
       // El índice único deja pasar una sola denuncia abierta por objeto y denunciante.
       setError(
         errorBd.code === "23505"
-          ? "Ya enviaste una denuncia sobre esto. La estamos revisando."
-          : "No pudimos enviar la denuncia. Probá de nuevo."
+          ? t("yaEnviada")
+          : t("error")
       );
       return;
     }
@@ -94,7 +97,7 @@ export function BotonDenuncia({
         className="inline-flex items-center gap-1.5 text-xs text-texto-tenue underline underline-offset-4 hover:text-texto"
       >
         <Icono nombre="bandera" className="h-3.5 w-3.5" />
-        Denunciar
+        {t("denunciar")}
       </button>
     );
   }
@@ -102,10 +105,9 @@ export function BotonDenuncia({
   if (enviada) {
     return (
       <div className="rounded-xl border border-borde bg-fondo-sutil p-4">
-        <p className="text-base font-medium text-texto">Recibimos tu denuncia</p>
+        <p className="text-base font-medium text-texto">{t("recibidaTitulo")}</p>
         <p className="mt-1 text-sm leading-relaxed text-texto-tenue">
-          La vamos a revisar. Si necesitás dejar de ver a esta persona ahora mismo, escribinos
-          y lo resolvemos.
+          {t("recibidaTexto")}
         </p>
       </div>
     );
@@ -114,33 +116,33 @@ export function BotonDenuncia({
   return (
     <form onSubmit={enviar} className="flex flex-col gap-3 rounded-xl border border-borde p-4">
       <div className="flex items-start justify-between gap-3">
-        <p className="text-base font-medium text-texto">Denunciar {queSeDenuncia}</p>
+        <p className="text-base font-medium text-texto">{t("titulo", { que: queSeDenuncia })}</p>
         <button
           type="button"
           onClick={() => setAbierto(false)}
           className="shrink-0 text-texto-tenue hover:text-texto"
-          aria-label="Cerrar"
+          aria-label={t("cerrar")}
         >
           <Icono nombre="cruz" className="h-4 w-4" />
         </button>
       </div>
 
       <fieldset className="flex flex-col gap-1.5">
-        <legend className="sr-only">Motivo</legend>
+        <legend className="sr-only">{t("motivo")}</legend>
         {MOTIVOS.map((m) => (
           <label
-            key={m.valor}
+            key={m}
             className="flex cursor-pointer items-center gap-2.5 text-sm text-texto"
           >
             <input
               type="radio"
               name="motivo"
-              value={m.valor}
-              checked={motivo === m.valor}
-              onChange={() => setMotivo(m.valor)}
+              value={m}
+              checked={motivo === m}
+              onChange={() => setMotivo(m)}
               className="h-3.5 w-3.5 accent-brand-500"
             />
-            {m.etiqueta}
+            {t(`motivos.${m}`)}
           </label>
         ))}
       </fieldset>
@@ -150,14 +152,14 @@ export function BotonDenuncia({
         maxLength={1000}
         value={detalle}
         onChange={(e) => setDetalle(e.target.value)}
-        placeholder="Contanos qué pasó (opcional pero ayuda mucho)."
+        placeholder={t("placeholder")}
         className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
       />
 
       {error && <p className="text-xs text-error-600">{error}</p>}
 
-      <Boton type="submit" disabled={!motivo} cargando={enviando} textoCargando="Enviando…">
-        Enviar denuncia
+      <Boton type="submit" disabled={!motivo} cargando={enviando} textoCargando={t("enviando")}>
+        {t("enviar")}
       </Boton>
     </form>
   );

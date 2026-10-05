@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect } from "react";
+import { useTranslations } from "next-intl";
 import * as Sentry from "@sentry/nextjs";
 import { Boton } from "@/components/ui/boton";
 import { PantallaMensaje } from "@/components/ui/pantalla-mensaje";
@@ -20,6 +21,7 @@ export default function Error({
   error: Error & { digest?: string };
   reset: () => void;
 }) {
+  const t = useTranslations("cuenta.error");
   useEffect(() => {
     // Next.js atrapa el error antes que Sentry acá — sin este captureException manual,
     // este límite (el más genérico, el que ve cualquiera) no manda nada.
@@ -28,9 +30,9 @@ export default function Error({
 
   return (
     <PantallaMensaje
-      titulo="Se nos cayó el telón"
-      detalle="Algo falló de nuestro lado. Probá de nuevo: la mayoría de las veces se resuelve al segundo intento."
-      accion={<Boton onClick={reset}>Reintentar</Boton>}
+      titulo={t("titulo")}
+      detalle={t("detalle")}
+      accion={<Boton onClick={reset}>{t("reintentar")}</Boton>}
     />
   );
 }

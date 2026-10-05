@@ -2,52 +2,69 @@ export const EMAIL_REGEX = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
 
 export const LARGO_MINIMO_CLAVE = 8;
 
-/** Devuelve el mensaje de error, o null si la contraseña sirve. */
-export function validarClave(clave: string): string | null {
-  if (clave.length < LARGO_MINIMO_CLAVE) {
-    return `La contraseña necesita al menos ${LARGO_MINIMO_CLAVE} caracteres.`;
-  }
+/**
+ * Clave del error en `cuenta.errores` de los mensajes (#354): el texto lo pone el formulario,
+ * en el idioma de quien lo ve. `claveCorta` lleva el parámetro `minimo` (`LARGO_MINIMO_CLAVE`).
+ */
+export type ErrorAuth =
+  | "claveCorta"
+  | "credenciales"
+  | "emailSinConfirmar"
+  | "yaExiste"
+  | "demasiadosIntentos"
+  | "mismaClave"
+  | "emailNoValido"
+  | "emailNoAutorizado"
+  | "altaDeshabilitada"
+  | "suspendida"
+  | "sesionVencida"
+  | "enlaceVencido"
+  | "generico";
+
+/** Devuelve la clave del error, o null si la contraseña sirve. */
+export function validarClave(clave: string): "claveCorta" | null {
+  if (clave.length < LARGO_MINIMO_CLAVE) return "claveCorta";
   return null;
 }
 
 /**
- * Traduce los errores de Supabase Auth a mensajes en castellano.
+ * Traduce los errores de Supabase Auth a la clave de un mensaje propio.
  * Los códigos que no reconocemos caen en un mensaje genérico.
  */
-export function mensajeErrorAuth(codigo: string | undefined, mensaje: string): string {
+export function mensajeErrorAuth(codigo: string | undefined): ErrorAuth {
   switch (codigo) {
     case "invalid_credentials":
-      return "Email o contraseña incorrectos.";
+      return "credenciales";
     case "email_not_confirmed":
-      return "Todavía no confirmaste tu email. Revisá tu correo y abrí el enlace.";
+      return "emailSinConfirmar";
     case "user_already_exists":
     case "email_exists":
-      return "Ya existe una cuenta con ese email. Probá ingresando.";
+      return "yaExiste";
     case "weak_password":
-      return `La contraseña necesita al menos ${LARGO_MINIMO_CLAVE} caracteres.`;
+      return "claveCorta";
     case "over_email_send_rate_limit":
     case "over_request_rate_limit":
-      return "Demasiados intentos. Esperá unos minutos y probá de nuevo.";
+      return "demasiadosIntentos";
     case "same_password":
-      return "La contraseña nueva tiene que ser distinta de la actual.";
+      return "mismaClave";
     case "email_address_invalid":
     case "validation_failed":
-      return "Ese email no parece válido. Revisalo y probá de nuevo.";
+      return "emailNoValido";
     case "email_address_not_authorized":
-      return "No pudimos mandarle un correo a ese email. Probá con otro.";
+      return "emailNoAutorizado";
     case "signup_disabled":
-      return "Por ahora no se pueden crear cuentas nuevas.";
+      return "altaDeshabilitada";
     case "user_banned":
-      return "Esta cuenta está suspendida.";
+      return "suspendida";
     case "session_expired":
     case "session_not_found":
     case "refresh_token_not_found":
-      return "Tu sesión venció. Volvé a ingresar.";
+      return "sesionVencida";
     case "otp_expired":
-      return "El enlace venció. Pedí uno nuevo.";
+      return "enlaceVencido";
     default:
       // #349: el texto de Supabase viene en inglés; nunca se muestra tal cual.
-      return "Algo salió mal. Probá de nuevo en unos minutos.";
+      return "generico";
   }
 }
 

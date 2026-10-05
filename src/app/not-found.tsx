@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { PantallaMensaje } from "@/components/ui/pantalla-mensaje";
 
 /**
@@ -7,10 +8,6 @@ import { PantallaMensaje } from "@/components/ui/pantalla-mensaje";
  * verlo" filtra justamente lo que las políticas esconden.
  */
 export default function NoEncontrado() {
-  return (
-    <PantallaMensaje
-      titulo="Acá no hay nada"
-      detalle="La página que buscás no existe, o el contenido ya no está disponible."
-    />
-  );
+  const t = useTranslations("cuenta.noEncontrado");
+  return <PantallaMensaje titulo={t("titulo")} detalle={t("detalle")} />;
 }

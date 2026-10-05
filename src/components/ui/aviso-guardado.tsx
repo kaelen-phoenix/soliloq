@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 
 /**
  * Confirmación efímera de "se guardó".
@@ -25,12 +26,13 @@ export function useAvisoGuardado(milisegundos = 4000) {
 }
 
 export function AvisoGuardado({ visible }: { visible: boolean }) {
+  const t = useTranslations("cuenta.ui");
   if (!visible) return null;
   return (
     // `role="status"` y `aria-live` para que un lector de pantalla lo anuncie: si el cambio
     // es sólo visual, quien no ve la pantalla se queda sin la confirmación.
     <p role="status" aria-live="polite" className="text-sm font-medium text-exito-600">
-      Cambios guardados.
+      {t("avisoGuardado")}
     </p>
   );
 }
