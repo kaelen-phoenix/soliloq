@@ -65,7 +65,8 @@
     "cerrarSesion": "Cerrar sesión",
     "layout": {
       "sinLeer": "{etiqueta}, {n} sin leer",
-      "notificaciones": "Notificaciones"
+      "notificaciones": "Notificaciones",
+      "convocatoriasNuevas": "{etiqueta}, hay talento nuevo"
     },
     "marcoAcceso": {
       "titulo": "El teatro se hace de a muchos.",

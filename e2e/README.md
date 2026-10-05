@@ -24,9 +24,8 @@ Los flujos con sesión (circuito de match: swipe → placa → `/matches` → sa
   (`auth.admin.createUser` / `deleteUser`).
 
 `flujos/match.spec.ts` recorre el circuito completo por UI: Talento se postula a una Obra
-(swipe), Creador marca "Me interesa" (match en el acto), placa "Hay interés" → "Ahora no",
-aviso "¡Tenés un Match!" (#194) → "Aceptar", Matches → "Aceptar" (pasa a Convocados),
-"Convocar" en firme, Talento acepta en `/convocatoria` → entra a `/salas`. La aprobación
+(swipe), Creador marca "Me interesa" (match en el acto), ventana "Hay interés" → "Aceptar"
+(#365, único botón), el corazón de Convocatorias se resalta hasta entrar (#366), "Convocar" en firme, Talento acepta en `/convocatoria` → entra a `/salas`. La aprobación
 manual (#182), las Normas (#180) y el onboarding con ubicación por Google Places se siembran
 directo con el cliente admin en vez de navegarse — ver los comentarios del archivo.
 

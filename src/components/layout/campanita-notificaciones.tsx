@@ -5,6 +5,7 @@ import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { EVENTO_NOTIFICACIONES } from "@/lib/notificaciones-cliente";
+import { avisarConvocatoriasNuevas } from "@/components/convocatorias/convocatorias-nuevas";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
@@ -56,7 +57,12 @@ export function CampanitaNotificaciones({ userId }: { userId: string }) {
         .on(
           "postgres_changes",
           { event: "*", schema: "public", table: "notificaciones", filter: `destinatario_id=eq.${userId}` },
-          () => setRevision((r) => r + 1),
+          () => {
+            setRevision((r) => r + 1);
+            // Un match formado del otro lado llega como notificación `nuevo_match`: el corazón
+            // de Convocatorias (#366) recuenta en el momento, sin esperar a que se navegue.
+            avisarConvocatoriasNuevas();
+          },
         )
         .subscribe(),
     );

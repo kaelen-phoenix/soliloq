@@ -233,11 +233,8 @@
       "retirarme": "Retirarme"
     },
     "nuevoMatch": {
-      "etiqueta": "Nuevo match",
-      "titulo": "¡Tenés un Match!",
-      "conTuEquipo": "{nombre} hizo match con tu equipo.",
-      "conTuProyecto": "{nombre} hizo match con tu proyecto.",
-      "listo": "Listo"
+      "titulo": "Hay interés",
+      "aceptar": "Aceptar"
     },
     "tablero": {
       "estado": {
@@ -317,9 +314,7 @@
       "noMeInteresa": "No me interesa",
       "meInteresa": "Me interesa",
       "hayInteres": "Hay interés",
-      "nombreYTitulo": "{nombre} y «{titulo}»",
-      "convocar": "Convocar",
-      "ahoraNo": "Ahora no"
+      "aceptar": "Aceptar"
     }
   }
 }

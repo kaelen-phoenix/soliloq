@@ -37,3 +37,8 @@ next-env.d.ts
 /playwright-report/
 /blob-report/
 /playwright/.cache/
+
+# Informes de los e2e de local/ cuando no se les pasa E2E_RECORRIDO_DIR
+/accesibilidad/
+/formularios-ancho/
+/informes-e2e/

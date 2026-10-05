@@ -7,6 +7,7 @@ import { Encabezado } from "@/components/layout/encabezado";
 import { TransicionPagina } from "@/components/ui/transicion-pagina";
 import { AvisoConvocatoria } from "@/components/talento/aviso-convocatoria";
 import { ProveedorNoLeidos, type FilaNoLeidos } from "@/components/salas/no-leidos";
+import { ProveedorConvocatoriasNuevas } from "@/components/convocatorias/convocatorias-nuevas";
 import { TourGuiado } from "@/components/tour/tour-guiado";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { createClient } from "@/lib/supabase/server";
@@ -24,9 +25,11 @@ export default async function AppLayout({ children }: { children: React.ReactNod
   // Mensajes sin leer de Salas (#216): la primera carga viene de acá para que el badge no
   // aparezca un instante después; de ahí en más lo mantiene `ProveedorNoLeidos`. Sale en
   // paralelo con el estado de la cuenta: son dos viajes a la base que no dependen uno del otro.
-  const [estado, { data: noLeidos, error: errorNoLeidos }] = await Promise.all([
+  // Lo mismo para el corazón de Convocatorias (#366).
+  const [estado, { data: noLeidos, error: errorNoLeidos }, { data: convocatoriasNuevas }] = await Promise.all([
     estadoCuentaDeLaRequest(user.id),
     supabase.rpc("salas_no_leidas"),
+    supabase.rpc("hay_convocatorias_nuevas"),
   ]);
   if (estado.suspendido) redirect("/suspendido");
   if (!estado.normasAceptadas) redirect("/aceptar-normas");
@@ -50,6 +53,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
     // Lo único que sigue siendo por breakpoint es la navegación, y ahí corresponde: una
     // barra abajo y una lateral no son la misma forma con otro tamaño.
     <ProveedorNoLeidos userId={user.id} inicial={(noLeidos ?? []) as FilaNoLeidos[]}>
+    <ProveedorConvocatoriasNuevas inicial={convocatoriasNuevas === true}>
       <div className="min-h-screen pb-20 sm:bg-fondo-sutil sm:pb-28 lg:flex lg:gap-0 lg:pb-0"
       >
         <ActualizarAlVolver />
@@ -69,6 +73,7 @@ export default async function AppLayout({ children }: { children: React.ReactNod
           <TourGuiado userId={user.id} visto={estado.tourVisto} />
         </Suspense>
       </div>
+    </ProveedorConvocatoriasNuevas>
     </ProveedorNoLeidos>
   );
 }
