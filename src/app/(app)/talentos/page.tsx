@@ -1,6 +1,7 @@
 import { redirect } from "next/navigation";
 import { BuscadorTalento } from "@/components/talento/buscador-talento";
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { iniciativaParaBuscar } from "@/lib/iniciativa-servidor";
 import { createClient } from "@/lib/supabase/server";
@@ -17,6 +18,7 @@ export default async function BuscarTalentoPage({
   searchParams: { obra?: string; equipo?: string };
 }) {
   const supabase = createClient();
+  const t = await getTranslations("proyectos.talentos");
   const user = await usuarioDeLaRequest();
   if (!user) redirect("/ingresar");
 
@@ -27,14 +29,14 @@ export default async function BuscarTalentoPage({
       <main className="px-5 py-5">
         <EstadoVacio
           icono="buscar"
-          titulo="Primero armá tu proyecto o equipo"
-          detalle="Buscás talento para algo concreto: creá un Proyecto o un Equipo y buscá desde ahí."
+          titulo={t("sinIniciativaTitulo")}
+          detalle={t("sinIniciativaDetalle")}
           accion={
             <Link
               href="/proyectos"
               className="inline-flex items-center rounded-full bg-accion px-4 py-2 text-sm font-semibold text-accion-texto"
             >
-              Ir a Mis proyectos
+              {t("irAMisProyectos")}
             </Link>
           }
         />
@@ -70,8 +72,10 @@ export default async function BuscarTalentoPage({
     <main className="px-5 py-5">
       {/* El título lo pone el encabezado (titulo-seccion). Acá va solo la bajada. */}
       <p className="mb-5 text-sm text-texto-tenue">
-        Para <span className="font-medium text-texto">«{iniciativa.titulo}»</span>. Encontrá
-        artistas por nombre, habilidad o experiencia, y filtrá por edad, género o zona.
+        {t.rich("bajada", {
+          titulo: iniciativa.titulo,
+          b: (chunks) => <span className="font-medium text-texto">{chunks}</span>,
+        })}
       </p>
       <BuscadorTalento
         iniciativa={{

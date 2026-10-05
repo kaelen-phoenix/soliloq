@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { responderConvocatoria } from "@/app/(app)/convocatoria/acciones";
@@ -17,6 +18,7 @@ export interface FilaConvocatoria {
 
 export function ConvocatoriasLista({ filas: filasIniciales }: { filas: FilaConvocatoria[] }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.convocatoria");
   const [filas, setFilas] = useState(filasIniciales);
   const [ocupadoId, setOcupadoId] = useState<string | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +47,7 @@ export function ConvocatoriasLista({ filas: filasIniciales }: { filas: FilaConvo
             className="rounded-2xl border border-borde bg-superficie p-5 text-center"
           >
             <p className="text-2xs font-semibold uppercase tracking-wide text-coral-700">
-              {f.esEquipo ? "Hay equipo" : "Hay proyecto"}
+              {f.esEquipo ? t("hayEquipo") : t("hayProyecto")}
             </p>
             <div className="mt-4 flex items-center justify-center gap-3">
               {f.talentoFotoUrl ? (
@@ -77,7 +79,11 @@ export function ConvocatoriasLista({ filas: filasIniciales }: { filas: FilaConvo
               )}
             </div>
             <p className="mt-3 text-sm text-texto">
-              {f.creadorNombre} te convoca a <span className="font-medium">{f.iniciativaTitulo}</span>
+              {t.rich("teConvocaA", {
+                nombre: f.creadorNombre,
+                titulo: f.iniciativaTitulo,
+                b: (chunks) => <span className="font-medium">{chunks}</span>,
+              })}
             </p>
             <button
               type="button"
@@ -85,7 +91,7 @@ export function ConvocatoriasLista({ filas: filasIniciales }: { filas: FilaConvo
               onClick={() => responder(f, true)}
               className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
             >
-              {ocupadoId === f.convocatoriaId ? "…" : "Aceptar"}
+              {ocupadoId === f.convocatoriaId ? "…" : t("aceptar")}
             </button>
             <button
               type="button"
@@ -93,7 +99,7 @@ export function ConvocatoriasLista({ filas: filasIniciales }: { filas: FilaConvo
               onClick={() => responder(f, false)}
               className="mt-2 w-full py-1.5 text-xs font-medium text-texto-tenue hover:text-texto disabled:opacity-50"
             >
-              Ahora no puedo
+              {t("ahoraNoPuedo")}
             </button>
           </li>
         ))}

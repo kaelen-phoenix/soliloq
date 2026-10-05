@@ -3,6 +3,7 @@
 import { useId, useState } from "react";
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import {
@@ -52,19 +53,21 @@ function FormEquipo({
 }) {
   // Puede haber varios equipos en pantalla (#330): los ids de los campos no se pueden repetir.
   const idBase = useId();
+  const t = useTranslations("proyectos.equipo");
+  const tc = useTranslations("comun");
   return (
     <form onSubmit={onGuardar} className="mt-3 flex flex-col gap-4">
       <CampoTexto
         id={`${idBase}-titulo`}
-        etiqueta="Título — por qué querés armar el equipo"
-        placeholder="Escribamos juntos"
+        etiqueta={t("tituloEtiqueta")}
+        placeholder={t("tituloPlaceholder")}
         maxLength={MAX_TITULO}
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
       />
       <div className="flex flex-col gap-1.5">
         <label htmlFor={`${idBase}-descripcion`} className="text-sm font-medium text-texto">
-          Descripción (opcional)
+          {t("descripcion")}
         </label>
         <textarea
           id={`${idBase}-descripcion`}
@@ -80,14 +83,14 @@ function FormEquipo({
 
       <div className="flex gap-2">
         <Boton type="submit" cargando={cargando}>
-          {editando ? "Guardar" : "Armar equipo"}
+          {editando ? tc("guardar") : t("armarEquipo")}
         </Boton>
         <button
           type="button"
           onClick={onCancelar}
           className="rounded-xl px-4 text-sm font-medium text-texto-tenue transition-colors hover:text-texto"
         >
-          Cancelar
+          {tc("cancelar")}
         </button>
       </div>
     </form>
@@ -118,6 +121,7 @@ export function GestionEquipo({
   onCancelar?: () => void;
 }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.equipo");
   const [abierto, setAbierto] = useState(abiertoInicial);
   const [titulo, setTitulo] = useState(equipo?.titulo ?? "");
   const [descripcion, setDescripcion] = useState(equipo?.descripcion ?? "");
@@ -131,7 +135,7 @@ export function GestionEquipo({
     e.preventDefault();
     setError(null);
     if (titulo.trim().length < 1) {
-      setError("Ponele un título al equipo.");
+      setError(t("errorTitulo"));
       return;
     }
 
@@ -158,8 +162,8 @@ export function GestionEquipo({
     if (res.error) {
       setError(
         editando
-          ? "No pudimos guardar los cambios. Probá de nuevo."
-          : "No pudimos crear el equipo. Probá de nuevo."
+          ? t("errorGuardar")
+          : t("errorCrear")
       );
       return;
     }
@@ -183,7 +187,7 @@ export function GestionEquipo({
       .eq("id", equipo.id);
     setCargando(false);
     if (err) {
-      setError("No pudimos cerrar el equipo. Probá de nuevo.");
+      setError(t("errorCerrar"));
       return;
     }
     // Cerrado: su espacio en Discord queda de solo lectura (#269).
@@ -207,7 +211,7 @@ export function GestionEquipo({
       .eq("equipo_id", equipo.id);
     if (errorFotos) {
       setCargando(false);
-      setError("No se pudo eliminar el equipo. Probá de nuevo.");
+      setError(t("errorEliminar"));
       return;
     }
     // Primero la fila y después el Storage (no cascadea): si el borrado de la fila falla, el
@@ -217,7 +221,7 @@ export function GestionEquipo({
     const { error: errorBd } = await supabase.from("equipos").delete().eq("id", equipo.id);
     if (errorBd) {
       setCargando(false);
-      setError("No se pudo eliminar el equipo. Probá de nuevo.");
+      setError(t("errorEliminar"));
       return;
     }
     // Recién con el equipo borrado se borran sus canales.
@@ -258,12 +262,12 @@ export function GestionEquipo({
       <section className="rounded-2xl border border-borde bg-superficie p-4">
         <div className="min-w-0">
           <span className="inline-block rounded-md bg-coral px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide text-ink-950">
-            Armar equipo
+            {t("armarEquipo")}
           </span>
           <p className="mt-2 text-base font-medium text-texto">{equipo.titulo}</p>
           {equipo.cupo != null && (
             <p className="mt-0.5 text-sm text-texto-tenue">
-              Hasta {equipo.cupo} {equipo.cupo === 1 ? "integrante" : "integrantes"}
+              {t("hastaIntegrantes", { cupo: equipo.cupo })}
             </p>
           )}
           {equipo.descripcion && (
@@ -280,7 +284,7 @@ export function GestionEquipo({
               className="brillo-accion mt-4 flex max-w-sm items-center justify-center gap-1.5 rounded-full bg-accion px-4 py-3 text-sm font-semibold text-accion-texto transition hover:brightness-110"
             >
               <Icono nombre="buscar" className="h-4 w-4" />
-              Buscar talento para este equipo
+              {t("buscarTalento")}
             </Link>
             <div className="mt-4 flex flex-wrap gap-2">
               <button
@@ -289,7 +293,7 @@ export function GestionEquipo({
                 className="inline-flex items-center gap-1.5 rounded-lg border border-borde px-3 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil"
               >
                 <Icono nombre="cambiar" className="h-3.5 w-3.5" />
-                Editar
+                {t("editar")}
               </button>
               <button
                 type="button"
@@ -297,14 +301,14 @@ export function GestionEquipo({
                 disabled={cargando}
                 className="rounded-lg px-3 py-1.5 text-sm font-medium text-texto-tenue transition-colors hover:text-error-600 disabled:opacity-50"
               >
-                Cerrar el equipo
+                {t("cerrar")}
               </button>
             </div>
             <FotosEquipo equipoId={equipo.id} creadorId={creadorId} fotosIniciales={fotos} />
             <p className="mt-4 rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
-              Para sumar gente al equipo, buscá talento y deslizá. Cuando el interés es mutuo
-              lo ves en <span className="font-medium text-texto">Convocatorias</span> y desde ahí lo
-              convocás a la sala.
+              {t.rich("ayudaSumar", {
+                b: (chunks) => <span className="font-medium text-texto">{chunks}</span>,
+              })}
             </p>
             <div className="mt-4">
               <CoberturaIniciativa filas={cobertura} esEquipo />
@@ -320,12 +324,12 @@ export function GestionEquipo({
                     setConfirmarBorrado(true);
                   }}
                 >
-                  Eliminar equipo
+                  {t("eliminar")}
                 </Boton>
               ) : (
                 <ConfirmarBorrado
-                  mensaje="Se elimina el equipo con sus fotos y su sala de chat. Los Talentos que convocaste vuelven a aparecer en Buscar Talentos. No se puede deshacer. Escribí BORRAR para confirmar."
-                  textoBoton="Eliminar definitivamente"
+                  mensaje={t("confirmarBorrado")}
+                  textoBoton={t("eliminarDefinitivamente")}
                   cargando={cargando}
                   onConfirmar={borrar}
                   onCancelar={() => setConfirmarBorrado(false)}
@@ -345,8 +349,7 @@ export function GestionEquipo({
   ) : (
     <div className="flex flex-col gap-2">
       <p className="text-sm text-texto-tenue">
-        Armá equipo y empezá por conocer a quienes tienen ganas de crear como vos y la idea
-        puede surgir en el camino.
+        {t("invitacion")}
       </p>
       <button
         type="button"
@@ -354,7 +357,7 @@ export function GestionEquipo({
         className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-borde px-4 py-3 text-sm font-medium text-texto-tenue transition-colors hover:border-texto hover:text-texto"
       >
         <Icono nombre="corazon" className="h-4 w-4" />
-        Armar un equipo
+        {t("armarUnEquipo")}
       </button>
     </div>
   );

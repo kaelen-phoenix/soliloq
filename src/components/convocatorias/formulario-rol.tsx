@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
@@ -19,6 +20,8 @@ export function FormularioRol({
   cantidadRoles: number;
 }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.formularioRol");
+  const tc = useTranslations("comun");
   const [abierto, setAbierto] = useState(false);
   const [nombre, setNombre] = useState("");
   const [tipo, setTipo] = useState<TipoRol>("actuacion");
@@ -37,18 +40,18 @@ export function FormularioRol({
     setError(null);
 
     if (!nombre.trim()) {
-      setError("Ingresá el nombre del rol.");
+      setError(t("errorNombre"));
       return;
     }
     const min = edadMinima ? Number(edadMinima) : null;
     const max = edadMaxima ? Number(edadMaxima) : null;
     if (min !== null && max !== null && min > max) {
-      setError("La edad mínima no puede ser mayor que la máxima.");
+      setError(t("errorEdades"));
       return;
     }
     const vacantesNum = Number(vacantes);
     if (!Number.isInteger(vacantesNum) || vacantesNum < 1) {
-      setError("Debe haber al menos una vacante.");
+      setError(t("errorVacantes"));
       return;
     }
 
@@ -68,7 +71,7 @@ export function FormularioRol({
     setCargando(false);
 
     if (errorInsert) {
-      setError("No pudimos guardar el rol. Intentá de nuevo.");
+      setError(t("errorGuardar"));
       return;
     }
 
@@ -85,14 +88,14 @@ export function FormularioRol({
   if (!abierto) {
     return (
       <Boton variante="secundario" onClick={() => setAbierto(true)} type="button">
-        + Agregar rol
+        {t("agregarRol")}
       </Boton>
     );
   }
 
   return (
     <form onSubmit={agregar} className="flex max-w-2xl flex-col gap-3 rounded-xl border border-dashed border-borde p-4">
-      <CampoTexto id="rol_nombre" etiqueta="Nombre del rol" value={nombre} onChange={(e) => setNombre(e.target.value)} />
+      <CampoTexto id="rol_nombre" etiqueta={t("nombre")} value={nombre} onChange={(e) => setNombre(e.target.value)} />
 
       <div className="flex gap-3">
         <button
@@ -100,25 +103,25 @@ export function FormularioRol({
           onClick={() => setTipo("actuacion")}
           className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "actuacion" ? "border-accion bg-accion text-accion-texto" : "border-borde"}`}
         >
-          Actuación
+          {t("actuacion")}
         </button>
         <button
           type="button"
           onClick={() => setTipo("tecnica")}
           className={`flex-1 rounded-xl border px-3 py-2 text-sm ${tipo === "tecnica" ? "border-accion bg-accion text-accion-texto" : "border-borde"}`}
         >
-          Técnica
+          {t("tecnica")}
         </button>
       </div>
 
       <div className="grid grid-cols-3 gap-3">
-        <CampoTexto id="edad_min" etiqueta="Edad mín." type="number" value={edadMinima} onChange={(e) => setEdadMinima(e.target.value)} />
-        <CampoTexto id="edad_max" etiqueta="Edad máx." type="number" value={edadMaxima} onChange={(e) => setEdadMaxima(e.target.value)} />
-        <CampoTexto id="vacantes" etiqueta="Vacantes" type="number" min={1} value={vacantes} onChange={(e) => setVacantes(e.target.value)} />
+        <CampoTexto id="edad_min" etiqueta={t("edadMin")} type="number" value={edadMinima} onChange={(e) => setEdadMinima(e.target.value)} />
+        <CampoTexto id="edad_max" etiqueta={t("edadMax")} type="number" value={edadMaxima} onChange={(e) => setEdadMaxima(e.target.value)} />
+        <CampoTexto id="vacantes" etiqueta={t("vacantes")} type="number" min={1} value={vacantes} onChange={(e) => setVacantes(e.target.value)} />
       </div>
 
       <div className="flex flex-col gap-1.5">
-        <p className="text-sm font-medium text-texto">Géneros buscados (opcional)</p>
+        <p className="text-sm font-medium text-texto">{t("generos")}</p>
         <div className="flex flex-wrap gap-2">
           {GENEROS_BUSCABLES.map((g) => (
             <button
@@ -143,14 +146,14 @@ export function FormularioRol({
         </div>
         <p className="text-xs text-texto-tenue">
           {generos.length === 0
-            ? "Sin marcar nada, el rol le llega a cualquier persona."
-            : "Solo le llega a quien coincida, y a quien prefirió no declarar su género."}
+            ? t("generosVacio")
+            : t("generosMarcados")}
         </p>
       </div>
 
       <textarea
         rows={3}
-        placeholder="Descripción del rol"
+        placeholder={t("descripcion")}
         value={descripcion}
         onChange={(e) => setDescripcion(e.target.value)}
         className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
@@ -161,10 +164,10 @@ export function FormularioRol({
 
       <div className="flex gap-2">
         <Boton type="submit" cargando={cargando}>
-          Guardar rol
+          {t("guardar")}
         </Boton>
         <Boton type="button" variante="fantasma" onClick={() => setAbierto(false)}>
-          Cancelar
+          {tc("cancelar")}
         </Boton>
       </div>
     </form>

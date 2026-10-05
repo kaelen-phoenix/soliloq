@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
@@ -23,6 +24,7 @@ export interface EquipoFeed {
  * cara de quien lo arma, no con un rol.
  */
 export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
+  const t = useTranslations("proyectos.tarjeta");
   const [expandido, setExpandido] = useState(false);
   const [perfilAbierto, setPerfilAbierto] = useState(false);
 
@@ -42,7 +44,7 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
 
         <div className="absolute inset-x-0 top-0 flex items-center gap-2 p-4">
           <span className="rounded-md bg-coral px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-ink-950">
-            Armar equipo
+            {t("armarEquipo")}
           </span>
         </div>
 
@@ -52,7 +54,7 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
           </h2>
           {equipo.cupo != null && (
             <p className="mt-2 text-sm text-white/70">
-              Hasta {equipo.cupo} {equipo.cupo === 1 ? "integrante" : "integrantes"}
+              {t("hastaIntegrantes", { cupo: equipo.cupo })}
             </p>
           )}
         </div>
@@ -91,7 +93,7 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
           onClick={() => setExpandido((v) => !v)}
           className="inline-flex items-center gap-1 text-xs font-medium text-texto-tenue hover:text-texto"
         >
-          {expandido ? "Menos" : "Detalle"}
+          {expandido ? t("menos") : t("detalle")}
           <Icono
             nombre="chevron"
             className={`h-3.5 w-3.5 transition-transform ${expandido ? "rotate-180" : ""}`}
@@ -120,7 +122,7 @@ export function TarjetaEquipo({ equipo }: { equipo: EquipoFeed }) {
             onClick={() => setPerfilAbierto(true)}
             className="inline-flex items-center gap-1 font-medium text-texto hover:underline"
           >
-            Ver perfil de {equipo.creador_nombre}
+            {t("verPerfil", { nombre: equipo.creador_nombre })}
             <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
           </button>
         </div>

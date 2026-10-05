@@ -2,6 +2,7 @@
 
 import { useCallback, useEffect, useMemo, useState } from "react";
 import { animate, motion, useMotionValue, useTransform } from "framer-motion";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { createClient } from "@/lib/supabase/client";
@@ -48,6 +49,7 @@ export function PilaTarjetas({
   // Se guardan aparte de `roles` a propósito: `recargar` reemplaza el feed entero al cambiar
   // la distancia, y si los ejemplos vivieran ahí adentro desaparecerían a mitad del
   // onboarding por tocar un filtro.
+  const t = useTranslations("proyectos.pila");
   const [ejemplos, setEjemplos] = useState<RolFeed[]>(mostrarEjemplos ? ROLES_EJEMPLO : []);
   const [roles, setRoles] = useState(rolesIniciales);
   // Los equipos van al final de la pila, después de los roles. No entran en "Deshacer":
@@ -90,6 +92,9 @@ export function PilaTarjetas({
 
   const opciones = opcionesDeRadio(unidad);
   const opcionActual = radioMasCercano(radio, unidad);
+  // «Todo el mundo» viene armado en castellano desde `lib/ubicacion`: acá se traduce.
+  const etiquetaOpcion = (o: { etiqueta: string; metros: number | null }) =>
+    o.metros === null ? t("todoElMundo") : o.etiqueta;
 
   /**
    * Cambiar el radio es volver a pedir el feed, no filtrar lo que ya está en memoria:
@@ -113,7 +118,7 @@ export function PilaTarjetas({
     if (error) {
       reportarErrorSupabase(error, { rpc: "feed_para_talento", talentoId });
       setRecargando(false);
-      setAvisoError("No pudimos actualizar el feed. Probá de nuevo.");
+      setAvisoError(t("errorActualizar"));
       return;
     }
 
@@ -169,8 +174,8 @@ export function PilaTarjetas({
       if (!esLimite) reportarErrorSupabase(errInteres, { rpc: "marcar_interes", rolId: rol.rol_id });
       setAvisoError(
         esLimite
-          ? "Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde."
-          : "No pudimos registrar tu decisión. Probá de nuevo.",
+          ? t("limiteMeInteresa")
+          : t("errorDecision"),
       );
       setRoles((prev) => [rol, ...prev]);
       setHistorial((prev) => prev.filter((h) => h.rol.rol_id !== rol.rol_id));
@@ -210,8 +215,8 @@ export function PilaTarjetas({
         reportarErrorSupabase(errInteres, { rpc: "marcar_interes", equipoId: equipo.equipo_id });
       setAvisoError(
         esLimite
-          ? "Llegaste al límite de 20 «Me interesa» por hoy. Probá más tarde."
-          : "No pudimos registrar tu decisión. Probá de nuevo.",
+          ? t("limiteMeInteresa")
+          : t("errorDecision"),
       );
       setEquipos((prev) => [equipo, ...prev]);
     }
@@ -286,8 +291,8 @@ export function PilaTarjetas({
       if (!esMatch) reportarErrorSupabase(error, { rpc: "deshacer_interes", obraId: ultima.rol.obra_id });
       setAvisoError(
         esMatch
-          ? "Ya hay match con ese proyecto: no se puede deshacer."
-          : "No pudimos deshacer. Probá de nuevo.",
+          ? t("deshacerConMatch")
+          : t("errorDeshacer"),
       );
       setHistorial((prev) => [...prev, ultima]);
       setIndice((i) => i + 1);
@@ -329,7 +334,7 @@ export function PilaTarjetas({
     <main className="flex flex-col px-5 py-4">
       <div className="mb-4 flex items-center gap-2">
         <label htmlFor="radio" className="text-2xs font-medium text-texto-tenue">
-          Distancia
+          {t("distancia")}
         </label>
         <select
           id="radio"
@@ -340,7 +345,7 @@ export function PilaTarjetas({
         >
           {opciones.map((o) => (
             <option key={o.etiqueta} value={o.metros ?? ""}>
-              {o.etiqueta}
+              {etiquetaOpcion(o)}
             </option>
           ))}
         </select>
@@ -369,7 +374,7 @@ export function PilaTarjetas({
             className="ml-auto inline-flex items-center gap-1 text-2xs font-medium text-texto-tenue transition-colors hover:text-texto disabled:opacity-50"
           >
             <Icono nombre="cambiar" className="h-3.5 w-3.5" />
-            Deshacer
+            {t("deshacer")}
           </button>
         )}
       </div>
@@ -380,12 +385,9 @@ export function PilaTarjetas({
           como algo que termina, no como el estado normal de la app. */}
       {actual?.kind === "rol" && actual.data.es_ejemplo && (
         <div className="mb-3 rounded-xl border border-brand-500/30 bg-brand-500/5 px-3.5 py-2.5">
-          <p className="text-sm font-medium text-texto">Así funciona Yalope</p>
+          <p className="text-sm font-medium text-texto">{t("asiFunciona")}</p>
           <p className="mt-0.5 text-xs leading-snug text-texto-tenue">
-            Deslizá a la derecha si te interesa, a la izquierda si no. Cuando el interés es
-            mutuo y te convocan, se abre una sala para hablar. Estas {ejemplos.length}{" "}
-            {ejemplos.length === 1 ? "tarjeta es un ejemplo" : "tarjetas son ejemplos"} — después
-            siguen las propuestas reales.
+            {t("asiFuncionaTexto", { n: ejemplos.length })}
           </p>
         </div>
       )}
@@ -421,13 +423,13 @@ export function PilaTarjetas({
               style={{ opacity: opacidadSi }}
               className="pointer-events-none absolute left-5 top-6 -rotate-12 rounded-lg border-2 border-exito-600 px-3 py-1 text-lg font-bold uppercase tracking-wide text-exito-600"
             >
-              Me interesa
+              {t("meInteresa")}
             </motion.div>
             <motion.div
               style={{ opacity: opacidadNo }}
               className="pointer-events-none absolute right-5 top-6 rotate-12 rounded-lg border-2 border-ink-400 px-3 py-1 text-lg font-bold uppercase tracking-wide text-ink-400"
             >
-              Paso
+              {t("paso")}
             </motion.div>
           </motion.div>
         ) : (
@@ -436,27 +438,26 @@ export function PilaTarjetas({
             {hayFueraDelRadio ? (
               <>
                 <p className="mt-3 text-base font-medium text-texto">
-                  No hay convocatorias tan cerca
+                  {t("nadaCercaTitulo")}
                 </p>
                 <p className="mt-1 text-sm text-texto-tenue">
-                  Hay convocatorias más lejos de {opcionActual.etiqueta}. Ampliá la distancia para
-                  verlas.
+                  {t("nadaCercaTexto", { distancia: etiquetaOpcion(opcionActual) })}
                 </p>
                 <button
                   type="button"
                   onClick={() => cambiarRadio(null)}
                   className="mt-4 rounded-lg border border-texto px-3 py-1.5 text-xs font-medium text-texto"
                 >
-                  Buscar en todo el mundo
+                  {t("buscarEnTodoElMundo")}
                 </button>
               </>
             ) : (
               <>
                 <p className="mt-3 text-base font-medium text-texto">
-                  No hay propuestas nuevas
+                  {t("vacioTitulo")}
                 </p>
                 <p className="mt-1 text-sm text-texto-tenue">
-                  Volvé más tarde a ver nuevos proyectos y equipos.
+                  {t("vacioTexto")}
                 </p>
                 {historial.length > 0 && (
                   <button
@@ -465,7 +466,7 @@ export function PilaTarjetas({
                     className="mt-4 inline-flex items-center gap-1.5 rounded-lg border border-texto px-3 py-1.5 text-xs font-medium text-texto"
                   >
                     <Icono nombre="cambiar" className="h-3.5 w-3.5" />
-                    Deshacer la última
+                    {t("deshacerUltima")}
                   </button>
                 )}
               </>
@@ -481,7 +482,7 @@ export function PilaTarjetas({
             onClick={() => salir("descartar")}
             disabled={recargando}
             className="flex h-14 w-14 items-center justify-center rounded-full border border-borde bg-superficie text-texto-tenue transition-colors hover:border-ink-300 hover:text-texto disabled:opacity-50"
-            aria-label="Descartar"
+            aria-label={t("descartar")}
           >
             <Icono nombre="cruz" className="h-6 w-6" />
           </button>
@@ -490,7 +491,7 @@ export function PilaTarjetas({
             onClick={() => salir("postular")}
             disabled={recargando}
             className="flex h-16 w-16 items-center justify-center rounded-full bg-accion text-white brillo-accion transition hover:brightness-110 disabled:opacity-50"
-            aria-label="Postularme"
+            aria-label={t("postularme")}
             data-tour="me-interesa"
           >
             <Icono nombre="corazon" className="h-7 w-7" relleno />

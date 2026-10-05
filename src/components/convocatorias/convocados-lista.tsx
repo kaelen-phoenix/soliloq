@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Boton } from "@/components/ui/boton";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
@@ -31,11 +32,11 @@ export interface FilaConvocado {
   cupoLleno?: boolean;
 }
 
-function diasRestantes(expiraEn: string) {
+function diasRestantes(expiraEn: string, t: (clave: string, v?: { dias: number }) => string) {
   const dias = Math.ceil((new Date(expiraEn).getTime() - Date.now()) / 86_400_000);
-  if (dias <= 0) return "Vence hoy";
-  if (dias === 1) return "Vence mañana";
-  return `Vence en ${dias} días`;
+  if (dias <= 0) return t("venceHoy");
+  if (dias === 1) return t("venceManana");
+  return t("venceEn", { dias });
 }
 
 export interface RolDisponible {
@@ -44,10 +45,11 @@ export interface RolDisponible {
   disponible: boolean;
 }
 
-const CHIP: Record<Estado, { texto: string; clase: string }> = {
-  en_convocados: { texto: "Para convocar", clase: "bg-fondo-sutil text-texto-tenue" },
-  esperando_confirmacion: { texto: "Esperando confirmación", clase: "bg-alerta-50 text-alerta-800" },
-  en_sala: { texto: "En la sala", clase: "bg-accion text-accion-texto" },
+// El texto de cada chip sale de `proyectos.convocados.estado.<estado>`.
+const CHIP: Record<Estado, { clase: string }> = {
+  en_convocados: { clase: "bg-fondo-sutil text-texto-tenue" },
+  esperando_confirmacion: { clase: "bg-alerta-50 text-alerta-800" },
+  en_sala: { clase: "bg-accion text-accion-texto" },
 };
 
 export function ConvocadosLista({
@@ -59,6 +61,8 @@ export function ConvocadosLista({
   rolesPorObra: Record<string, RolDisponible[]>;
 }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.convocados");
+  const tc = useTranslations("comun");
   const [filas, setFilas] = useState(filasIniciales);
   const [ocupadoId, setOcupadoId] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState<string | null>(null);
@@ -164,10 +168,10 @@ export function ConvocadosLista({
                 <span
                   className={`mt-1 inline-block rounded px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide ${CHIP[f.estado].clase}`}
                 >
-                  {CHIP[f.estado].texto}
+                  {t(`estado.${f.estado}`)}
                 </span>
                 {f.estado === "en_convocados" && f.expiraEn && (
-                  <span className="ml-2 text-xs text-texto-tenue">{diasRestantes(f.expiraEn)}</span>
+                  <span className="ml-2 text-xs text-texto-tenue">{diasRestantes(f.expiraEn, t)}</span>
                 )}
               </div>
 
@@ -180,14 +184,14 @@ export function ConvocadosLista({
                     disabled={f.cupoLleno}
                     onClick={() => alConvocar(f)}
                   >
-                    {f.cupoLleno ? "Cupo lleno" : "Convocar"}
+                    {f.cupoLleno ? t("cupoLleno") : t("convocar")}
                   </Boton>
                   <button
                     type="button"
                     onClick={() => setConfirmando(f.matchId)}
                     className="rounded-lg border border-error-400 px-2.5 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50"
                   >
-                    Descartar
+                    {t("descartar")}
                   </button>
                 </div>
               )}
@@ -197,7 +201,7 @@ export function ConvocadosLista({
                   onClick={() => setConfirmando(f.matchId)}
                   className="shrink-0 rounded-lg border border-error-400 px-2.5 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50"
                 >
-                  Dar de baja
+                  {t("darDeBaja")}
                 </button>
               )}
             </div>
@@ -206,8 +210,8 @@ export function ConvocadosLista({
               <div className="flex flex-col gap-2 border-t border-borde px-3.5 py-3">
                 <p className="text-sm text-texto">
                   {f.estado === "en_sala"
-                    ? `¿Dar de baja a ${f.nombre}? Sale de la sala y se libera un lugar.`
-                    : `¿Descartar a ${f.nombre}? Se libera el lugar.`}
+                    ? t("confirmarBaja", { nombre: f.nombre })
+                    : t("confirmarDescarte", { nombre: f.nombre })}
                 </p>
                 <div className="flex gap-2">
                   <Boton
@@ -217,14 +221,14 @@ export function ConvocadosLista({
                     textoCargando="…"
                     onClick={() => (f.estado === "en_sala" ? baja(f) : descartar(f))}
                   >
-                    {f.estado === "en_sala" ? "Dar de baja" : "Descartar"}
+                    {f.estado === "en_sala" ? t("darDeBaja") : t("descartar")}
                   </Boton>
                   <Boton
                     variante="secundario"
                     disabled={ocupadoId === f.matchId}
                     onClick={() => setConfirmando(null)}
                   >
-                    Cancelar
+                    {tc("cancelar")}
                   </Boton>
                 </div>
               </div>
@@ -234,10 +238,10 @@ export function ConvocadosLista({
       </ul>
 
       {eligiendoRol && (
-        <Superposicion onCerrar={() => setEligiendoRol(null)} etiqueta="Elegir rol">
+        <Superposicion onCerrar={() => setEligiendoRol(null)} etiqueta={t("elegirRol")}>
           <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 shadow-tarjeta">
             <p className="text-base font-medium text-texto">
-              ¿Para qué rol convocás a {eligiendoRol.nombre}?
+              {t("paraQueRol", { nombre: eligiendoRol.nombre })}
             </p>
             {error && <p className="mt-2 text-xs text-error-600">{error}</p>}
             <div className="mt-4 flex flex-col gap-1.5">
@@ -250,7 +254,7 @@ export function ConvocadosLista({
                   className="rounded-xl border border-borde px-3.5 py-2.5 text-left text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:cursor-not-allowed disabled:opacity-40"
                 >
                   {r.nombre}
-                  {!r.disponible && <span className="ml-1.5 text-xs text-texto-tenue">— cubierto</span>}
+                  {!r.disponible && <span className="ml-1.5 text-xs text-texto-tenue">{t("cubierto")}</span>}
                 </button>
               ))}
             </div>
@@ -260,7 +264,7 @@ export function ConvocadosLista({
               onClick={() => setEligiendoRol(null)}
               className="mt-3 w-full py-1.5 text-xs font-medium text-texto-tenue hover:text-texto disabled:opacity-50"
             >
-              Cancelar
+              {tc("cancelar")}
             </button>
           </div>
         </Superposicion>
