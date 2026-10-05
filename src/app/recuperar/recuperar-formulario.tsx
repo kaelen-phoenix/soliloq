@@ -1,12 +1,16 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
-import { EMAIL_REGEX, mensajeErrorAuth, urlCallback } from "@/lib/clave";
+import { EMAIL_REGEX, LARGO_MINIMO_CLAVE, mensajeErrorAuth, urlCallback } from "@/lib/clave";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 
 export function RecuperarFormulario() {
+  const t = useTranslations("cuenta.recuperar");
+  const tIngresar = useTranslations("cuenta.ingresar");
+  const tError = useTranslations("cuenta.errores");
   const [email, setEmail] = useState("");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
@@ -17,7 +21,7 @@ export function RecuperarFormulario() {
     setError(null);
 
     if (!EMAIL_REGEX.test(email)) {
-      setError("Ingresá un email válido.");
+      setError(tError("emailInvalido"));
       return;
     }
 
@@ -29,7 +33,7 @@ export function RecuperarFormulario() {
     setCargando(false);
 
     if (errorEnvio) {
-      setError(mensajeErrorAuth(errorEnvio.code, errorEnvio.message));
+      setError(tError(mensajeErrorAuth(errorEnvio.code), { minimo: LARGO_MINIMO_CLAVE }));
       return;
     }
 
@@ -39,10 +43,12 @@ export function RecuperarFormulario() {
   if (enviado) {
     return (
       <div className="rounded-2xl border border-borde p-6">
-        <h2 className="text-lg font-semibold text-texto">Revisá tu correo</h2>
+        <h2 className="text-lg font-semibold text-texto">{t("revisaTitulo")}</h2>
         <p className="mt-1.5 text-sm leading-relaxed text-texto-tenue">
-          Si existe una cuenta con <span className="text-texto">{email}</span>, te enviamos un
-          enlace para elegir una contraseña nueva.
+          {t.rich("revisaTexto", {
+            email,
+            b: (texto) => <span className="text-texto">{texto}</span>,
+          })}
         </p>
       </div>
     );
@@ -52,16 +58,16 @@ export function RecuperarFormulario() {
     <form onSubmit={enviar} className="flex flex-col gap-4">
       <CampoTexto
         id="email"
-        etiqueta="Tu email"
+        etiqueta={tIngresar("tuEmail")}
         type="email"
         autoComplete="email"
-        placeholder="vos@ejemplo.com"
+        placeholder={tIngresar("placeholderEmail")}
         value={email}
         onChange={(e) => setEmail(e.target.value)}
         error={error ?? undefined}
       />
-      <Boton type="submit" cargando={cargando} textoCargando="Enviando…">
-        Enviarme el enlace
+      <Boton type="submit" cargando={cargando} textoCargando={t("enviando")}>
+        {t("enviar")}
       </Boton>
     </form>
   );

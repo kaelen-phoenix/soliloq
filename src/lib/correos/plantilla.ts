@@ -6,12 +6,18 @@
  * naranja de `.bg-accion`, sólido porque Outlook no pinta degradés). Siempre sale también la
  * versión en texto plano.
  */
+import type { Idioma } from "@/i18n/request";
+import { textosCorreo } from "./textos";
+
 export const SITIO = "https://yalope.com";
+const CORREO = "info@yalope.com";
 const ISOTIPO = `${SITIO}/icons/icon-192.png?v=2`;
 
 export type BotonMail = { href: string; texto: string; primario?: boolean };
 
 export function armarMail(contenido: {
+  /** El de quien recibe el mail: el pie y el `lang` salen en ese idioma. */
+  idioma: Idioma;
   asunto: string;
   /** Texto corto que muestran las bandejas al lado del asunto. */
   previa: string;
@@ -45,8 +51,10 @@ export function armarMail(contenido: {
       </td></tr>`
     : "";
 
+  const pie = textosCorreo(contenido.idioma)("plantilla.pie", { correo: CORREO });
+
   const html = `<!doctype html>
-<html lang="es">
+<html lang="${contenido.idioma}">
 <head>
 <meta charset="utf-8">
 <meta name="viewport" content="width=device-width,initial-scale=1">
@@ -71,7 +79,7 @@ export function armarMail(contenido: {
       <tr><td style="padding-bottom:20px;"></td></tr>
       ${lista}
       <tr><td style="padding-top:32px;">
-        <p style="margin:0;font-size:12px;line-height:1.6;color:#8c8079;">${esc(contenido.motivo)} ¿Preguntas? Respondé este mail o escribinos a <a href="mailto:info@yalope.com" style="color:#8c8079;">info@yalope.com</a>.<br><a href="${SITIO}" style="color:#8c8079;">yalope.com</a></p>
+        <p style="margin:0;font-size:12px;line-height:1.6;color:#8c8079;">${esc(contenido.motivo)} ${esc(pie).replace(CORREO, `<a href="mailto:${CORREO}" style="color:#8c8079;">${CORREO}</a>`)}<br><a href="${SITIO}" style="color:#8c8079;">yalope.com</a></p>
       </td></tr>
     </table>
   </td></tr>
@@ -89,7 +97,7 @@ export function armarMail(contenido: {
     ...contenido.botones.map((b) => `${b.texto}: ${b.href}`),
     ...(contenido.lista ? ["", `${contenido.lista.titulo}:`, ...contenido.lista.items.map((i) => `- ${sinHtml(i).trim()}`)] : []),
     "",
-    `${contenido.motivo} ¿Preguntas? Respondé este mail o escribinos a info@yalope.com.`,
+    `${contenido.motivo} ${pie}`,
     SITIO,
   ].join("\n");
 

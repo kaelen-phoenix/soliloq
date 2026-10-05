@@ -25,6 +25,16 @@ describe("revisarFidelidad (#317)", () => {
   it("rechaza un texto mucho más largo que el original", () => {
     expect(revisarFidelidad("actor", "actor ".repeat(100))).toEqual({ ok: false, motivo: "inventado" });
   });
+  it("#354: en inglés, acepta la reescritura y detecta el pedido de datos", () => {
+    const original = "studied acting with Lucia Perez in 2019. did improv and a short film. i sing and dance tango.";
+    const propuesta =
+      "I studied acting with Lucia Perez in 2019. I have experience in improv and performed in a short film. I also sing and dance tango.";
+    expect(revisarFidelidad(original, propuesta)).toEqual({ ok: true });
+    expect(revisarFidelidad("hi", "I couldn't find enough details. Please provide more information.")).toEqual({
+      ok: false,
+      motivo: "sin_datos",
+    });
+  });
   it("rechaza un texto que es mayormente otro", () => {
     const propuesta =
       "Apasionada comunicadora, enfocada siempre, generando vínculos auténticos, transmitiendo emociones profundas, explorando lenguajes contemporáneos.";

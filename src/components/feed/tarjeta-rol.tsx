@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
@@ -27,11 +28,12 @@ export interface RolFeed {
 }
 
 export function TarjetaRol({ rol }: { rol: RolFeed }) {
+  const t = useTranslations("proyectos.tarjeta");
   const [expandido, setExpandido] = useState(false);
   const [perfilAbierto, setPerfilAbierto] = useState(false);
 
   const rango =
-    rol.edad_minima && rol.edad_maxima ? `${rol.edad_minima}–${rol.edad_maxima} años` : null;
+    rol.edad_minima && rol.edad_maxima ? t("rangoEdad", { min: rol.edad_minima, max: rol.edad_maxima }) : null;
   const foto = rol.fotos?.[0];
 
   return (
@@ -50,17 +52,17 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
               una real es peor que no mostrar nada. */}
           {rol.es_ejemplo ? (
             <span className="rounded-md bg-brand-500 px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-white">
-              Ejemplo
+              {t("ejemplo")}
             </span>
           ) : (
             /* Distintivo de tipo de propuesta (#58 / #101): "Proyecto" en el rojo `brand`,
                contra el `coral` del "Armar equipo". */
             <span className="rounded-md bg-brand-600 px-2 py-1 text-2xs font-semibold uppercase tracking-wide text-white">
-              Proyecto
+              {t("proyecto")}
             </span>
           )}
           <span className="rounded-md bg-superficie/10 px-2 py-1 text-2xs font-medium uppercase tracking-wide text-white/70">
-            {rol.rol_tipo === "tecnica" ? "Técnica" : "Actuación"}
+            {rol.rol_tipo === "tecnica" ? t("tecnica") : t("actuacion")}
           </span>
           <span className="text-2xs text-white/50">{rol.obra_ubicacion_texto}</span>
         </div>
@@ -108,7 +110,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           onClick={() => setExpandido((v) => !v)}
           className="inline-flex items-center gap-1 text-xs font-medium text-texto-tenue hover:text-texto"
         >
-          {expandido ? "Menos" : "Detalle"}
+          {expandido ? t("menos") : t("detalle")}
           <Icono
             nombre="chevron"
             className={`h-3.5 w-3.5 transition-transform ${expandido ? "rotate-180" : ""}`}
@@ -120,14 +122,13 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
         <div className="max-h-44 space-y-3 overflow-y-auto px-5 py-4 text-sm leading-relaxed text-texto-tenue">
           {rol.es_ejemplo && (
             <p className="rounded-lg bg-fondo-sutil px-3 py-2 text-xs text-texto-tenue">
-              Esta convocatoria no existe: es un ejemplo para mostrarte cómo funciona Yalope.
-              Deslizá o usá los botones — no se le avisa a nadie.
+              {t("avisoEjemplo")}
             </p>
           )}
           {rol.rol_descripcion && (
             <div>
               <p className="mb-1 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-                Sobre el rol
+                {t("sobreElRol")}
               </p>
               <p>{rol.rol_descripcion}</p>
             </div>
@@ -135,7 +136,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
           {rol.obra_sinopsis && (
             <div>
               <p className="mb-1 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-                Sinopsis
+                {t("sinopsis")}
               </p>
               <p>{rol.obra_sinopsis}</p>
             </div>
@@ -147,7 +148,7 @@ export function TarjetaRol({ rol }: { rol: RolFeed }) {
               onClick={() => setPerfilAbierto(true)}
               className="inline-flex items-center gap-1 font-medium text-texto hover:underline"
             >
-              Ver perfil de {rol.creador_nombre}
+              {t("verPerfil", { nombre: rol.creador_nombre })}
               <Icono nombre="flecha-derecha" className="h-3.5 w-3.5" />
             </button>
           )}

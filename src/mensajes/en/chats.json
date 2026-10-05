@@ -1,0 +1,127 @@
+{
+  "chats": {
+    "lista": {
+      "directo": "Direct",
+      "miEquipo": "My team",
+      "miProyecto": "My project",
+      "equipo": "Team",
+      "proyecto": "Project",
+      "salaRecienCreada": "New room",
+      "sinLeer": ", {n} unread",
+      "opciones": "Chat options",
+      "destacar": "Star",
+      "quitarDestacado": "Unstar",
+      "desvincularme": "Leave",
+      "confirmarDesvincular": "Are you sure you want to leave “{titulo}”? You'll lose access to this chat.",
+      "saliendo": "Leaving…",
+      "aceptar": "Leave",
+      "rechazar": "Cancel"
+    },
+    "acciones": {
+      "sinSesion": "You're not signed in.",
+      "errorDestacar": "Couldn't star this chat.",
+      "errorQuitarDestacado": "Couldn't unstar this chat.",
+      "errorDueno": "You can't leave your own project or team.",
+      "errorGenerico": "Couldn't apply that. Please try again."
+    },
+    "sala": {
+      "errorSaludo": "We couldn't write it right now. Please try again.",
+      "integrantes": "{n, plural, one {# member} other {# members}}",
+      "queSeDenuncia": "what's happening in this room",
+      "vacio": "This room opened because you have a team. Coordinate audition dates and share scripts here.",
+      "verPerfilDe": "View {nombre}'s profile",
+      "integranteGenerico": "member",
+      "integrante": "Member",
+      "noEnviado": "Not sent — retry",
+      "aceptar": "OK",
+      "escribiendo": "Writing…",
+      "escribirSaludo": "✨ Write a greeting to the group",
+      "placeholder": "Write a message…",
+      "enviar": "Send"
+    },
+    "paginas": {
+      "perfilSinCompletar": "Incomplete profile",
+      "separadorNombres": " and ",
+      "proyecto": "Project",
+      "vacioTitulo": "No chats yet",
+      "vacioDetalle": "They open when you invite someone to your project, or when you're invited to one.",
+      "integrante": "Member",
+      "director": "Director",
+      "elenco": "Cast",
+      "contacto": "Contact",
+      "salaDeProyecto": "Project room",
+      "salaDeEquipo": "Team room",
+      "chatDirecto": "Direct chat"
+    },
+    "notificaciones": {
+      "unaObra": "a project",
+      "vacioTitulo": "No notifications",
+      "vacioDetalle": "You'll see alerts here when a team comes together and when a room opens.",
+      "marcarTodas": "Mark all as read",
+      "match": {
+        "titulo": "You've got a team!",
+        "texto": "You joined <b>{titulo}</b>"
+      },
+      "convocado": {
+        "titulo": "You're invited!",
+        "texto": "<b>{titulo}</b> wants you on board. Open it to confirm."
+      },
+      "equipo_armado": {
+        "titulo": "You connected!",
+        "texto": "The interest was mutual. You can start talking now."
+      },
+      "interes_recibido": "Someone tried to reach you from your profile",
+      "nuevo_match": {
+        "titulo": "You have a new match!",
+        "texto": "Someone is interested in your project or team. Check it out in Casting calls."
+      },
+      "solicitud_acceso": {
+        "titulo": "New access request",
+        "texto": "Someone asked to join Yalope. Review it in the admin panel."
+      },
+      "acceso_habilitado": {
+        "titulo": "You now have access to Yalope!",
+        "texto": "Your request was approved. Welcome to the community."
+      },
+      "espera_vencida": "Your application to <b>{titulo}</b> closed without a reply.",
+      "sala_creada": "The room for <b>{titulo}</b> is open"
+    },
+    "comunidad": {
+      "abrirEnDiscord": "Open in Discord",
+      "vinculaTuDiscord": "Link your Discord",
+      "vinculaTuDiscordAyuda": "Link your account to join the group's private space",
+      "creando": "Creating…",
+      "crearEspacio": "Create Discord space",
+      "compacta": "<b>Keep the conversation going with more people.</b> Join the Yalope community on Discord.",
+      "titulo": "Community",
+      "texto": "Yalope actors and creators on Discord: introductions, casting calls, chats by city and by discipline, and voice rooms for readings and rehearsals. The same Community Guidelines as in the app apply.",
+      "unite": "Join the community"
+    },
+    "vincularDiscord": {
+      "resultados": {
+        "vinculado": "Done! Your Discord is linked and you're now on the Yalope server.",
+        "en-uso": "That Discord account is already linked to another Yalope account.",
+        "cancelado": "You canceled the link in Discord.",
+        "error": "We couldn't link your Discord. Please try again.",
+        "no-configurado": "Linking with Discord isn't available yet."
+      },
+      "vinculadoComo": "Discord linked as <b>@{usuario}</b>",
+      "desvinculando": "Unlinking…",
+      "desvincular": "Unlink",
+      "ayuda": "Link your Discord account to join the private spaces (text and voice) of your Projects and Teams. Only their members and the Yalope server admins can see those channels.",
+      "boton": "Link my Discord"
+    },
+    "accionesDiscord": {
+      "sinSesion": "You're not signed in.",
+      "errorCrear": "Couldn't create the Discord space. Please try again.",
+      "errorDesvincular": "Couldn't unlink.",
+      "espacio": {
+        "sinConfigurar": "Discord isn't set up.",
+        "sinSala": "That room doesn't exist.",
+        "sinIniciativa": "Only Projects and Teams have a Discord space.",
+        "noEsDueno": "Only the person who created the Project or Team can open it.",
+        "sinConexion": "Couldn't reach Discord."
+      }
+    }
+  }
+}

@@ -1,10 +1,15 @@
+import type { Metadata } from "next";
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { PanelAdmin } from "@/components/admin/panel-admin";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 
-export const metadata = { title: "Admin — Yalope", robots: { index: false, follow: false } };
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("admin.pagina");
+  return { title: t("metaTitulo"), robots: { index: false, follow: false } };
+}
 
 export default async function AdminPage() {
   const supabase = createClient();
@@ -24,11 +29,12 @@ export default async function AdminPage() {
   ]);
   if (errorMetricas) reportarErrorSupabase(errorMetricas, { rpc: "admin_metricas" });
   if (errorUsuarios) reportarErrorSupabase(errorUsuarios, { rpc: "admin_usuarios" });
+  const t = await getTranslations("admin.pagina");
 
   return (
     <main className="px-5 py-5">
       <p className="mb-5 text-sm text-texto-tenue">
-        Métricas, usuarios, denuncias y bloqueos de la plataforma.
+        {t("intro")}
       </p>
       <PanelAdmin
         metricas={metricas?.[0] ?? null}

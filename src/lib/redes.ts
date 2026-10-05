@@ -1,4 +1,10 @@
-import { REDES, type ClaveRed, type Red } from "@/lib/constantes";
+import {
+  REDES,
+  traductorCastellano,
+  type ClaveRed,
+  type Red,
+  type TraductorEtiquetas,
+} from "@/lib/constantes";
 
 // Normalización y validación de las redes del perfil de talento.
 //
@@ -78,18 +84,20 @@ function queryConservada(red: Red, clave: ClaveRed, url: URL): string {
   return v ? `?v=${v}` : "";
 }
 
-function mensajeError(red: Red): string {
-  if (red.clave === "sitio") {
-    return "Ingresá una dirección web válida que empiece con https://";
-  }
-  return `Ese enlace no parece de ${red.etiqueta}. Revisá el usuario o la URL.`;
+function mensajeError(red: Red, t: TraductorEtiquetas): string {
+  if (red.clave === "sitio") return t("redes.errorSitio");
+  return t("redes.errorRed", { red: red.etiqueta });
 }
 
 /**
  * Aplica `normalizarRed` a cada campo no vacío. Los vacíos se omiten (la red queda sin
- * cargar). Un campo que no normaliza va a `errores` y no a `redes`.
+ * cargar). Un campo que no normaliza va a `errores` y no a `redes`. Los mensajes salen con
+ * `t` (traductor de `perfil.etiquetas`); sin él, en castellano.
  */
-export function validarRedes(entradas: Partial<Record<ClaveRed, string>>): {
+export function validarRedes(
+  entradas: Partial<Record<ClaveRed, string>>,
+  t: TraductorEtiquetas = traductorCastellano,
+): {
   redes: Record<string, string>;
   errores: Record<string, string>;
 } {
@@ -101,7 +109,7 @@ export function validarRedes(entradas: Partial<Record<ClaveRed, string>>): {
     if (!cruda) continue;
     const normal = normalizarRed(red.clave, cruda);
     if (normal) redes[red.clave] = normal;
-    else errores[red.clave] = mensajeError(red);
+    else errores[red.clave] = mensajeError(red, t);
   }
 
   return { redes, errores };

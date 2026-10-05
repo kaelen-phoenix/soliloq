@@ -1,0 +1,127 @@
+{
+  "chats": {
+    "lista": {
+      "directo": "Directo",
+      "miEquipo": "Mi equipo",
+      "miProyecto": "Mi proyecto",
+      "equipo": "Equipo",
+      "proyecto": "Proyecto",
+      "salaRecienCreada": "Sala recién creada",
+      "sinLeer": ", {n} sin leer",
+      "opciones": "Opciones del chat",
+      "destacar": "Destacar",
+      "quitarDestacado": "Quitar destacado",
+      "desvincularme": "Desvincularme",
+      "confirmarDesvincular": "¿Seguro que querés desvincularte de «{titulo}»? Vas a perder el acceso a este chat.",
+      "saliendo": "Saliendo…",
+      "aceptar": "Aceptar",
+      "rechazar": "Rechazar"
+    },
+    "acciones": {
+      "sinSesion": "Sin sesión.",
+      "errorDestacar": "No se pudo destacar.",
+      "errorQuitarDestacado": "No se pudo quitar el destacado.",
+      "errorDueno": "No podés desvincularte de tu propio proyecto o equipo.",
+      "errorGenerico": "No se pudo aplicar. Probá de nuevo."
+    },
+    "sala": {
+      "errorSaludo": "No pudimos escribirlo ahora. Probá de nuevo.",
+      "integrantes": "{n} integrantes",
+      "queSeDenuncia": "lo que pasa en esta sala",
+      "vacio": "Esta sala se abrió porque hay equipo. Coordinen fechas de audición y compartan textos acá.",
+      "verPerfilDe": "Ver perfil de {nombre}",
+      "integranteGenerico": "integrante",
+      "integrante": "Integrante",
+      "noEnviado": "No se envió — reintentar",
+      "aceptar": "Aceptar",
+      "escribiendo": "Escribiendo…",
+      "escribirSaludo": "✨ Escribir un saludo al grupo",
+      "placeholder": "Escribí un mensaje…",
+      "enviar": "Enviar"
+    },
+    "paginas": {
+      "perfilSinCompletar": "Perfil sin completar",
+      "separadorNombres": " y ",
+      "proyecto": "Proyecto",
+      "vacioTitulo": "Todavía no tenés chats",
+      "vacioDetalle": "Se abren cuando convocás a alguien a tu proyecto, o cuando te convocan a uno.",
+      "integrante": "Integrante",
+      "director": "Director/a",
+      "elenco": "Elenco",
+      "contacto": "Contacto",
+      "salaDeProyecto": "Sala de proyecto",
+      "salaDeEquipo": "Sala de equipo",
+      "chatDirecto": "Chat directo"
+    },
+    "notificaciones": {
+      "unaObra": "una obra",
+      "vacioTitulo": "Sin notificaciones",
+      "vacioDetalle": "Acá vas a ver los avisos cuando se arma un equipo y cuando se abre una sala.",
+      "marcarTodas": "Marcar todas como leídas",
+      "match": {
+        "titulo": "¡Hay equipo!",
+        "texto": "Te sumaste a <b>{titulo}</b>"
+      },
+      "convocado": {
+        "titulo": "¡Te convocaron!",
+        "texto": "<b>{titulo}</b> te quiere sumar. Entrá para confirmar."
+      },
+      "equipo_armado": {
+        "titulo": "¡Conectaron!",
+        "texto": "El interés fue mutuo. Ya pueden hablar."
+      },
+      "interes_recibido": "Alguien quiso contactarte desde tu perfil",
+      "nuevo_match": {
+        "titulo": "¡Tenés un nuevo match!",
+        "texto": "Alguien se interesó en tu proyecto o equipo. Revisalo en Convocatorias."
+      },
+      "solicitud_acceso": {
+        "titulo": "Nueva solicitud de acceso",
+        "texto": "Alguien pidió entrar a Yalope. Revisala en el panel de administración."
+      },
+      "acceso_habilitado": {
+        "titulo": "¡Ya tenés acceso a Yalope!",
+        "texto": "Tu solicitud fue aprobada. Te damos la bienvenida a la comunidad."
+      },
+      "espera_vencida": "Tu postulación a <b>{titulo}</b> se cerró sin respuesta.",
+      "sala_creada": "Se abrió la sala de <b>{titulo}</b>"
+    },
+    "comunidad": {
+      "abrirEnDiscord": "Abrir en Discord",
+      "vinculaTuDiscord": "Vinculá tu Discord",
+      "vinculaTuDiscordAyuda": "Vinculá tu cuenta para entrar al espacio privado del grupo",
+      "creando": "Creando…",
+      "crearEspacio": "Crear espacio en Discord",
+      "compacta": "<b>Seguí la charla con más gente.</b> Unite a la comunidad de Yalope en Discord.",
+      "titulo": "Comunidad",
+      "texto": "Actores, actrices y creadores de Yalope en Discord: presentaciones, convocatorias, charlas por ciudad y por disciplina, y salas de voz para lecturas y ensayos. Rigen las mismas Normas de la Comunidad que en la app.",
+      "unite": "Unite a la comunidad"
+    },
+    "vincularDiscord": {
+      "resultados": {
+        "vinculado": "¡Listo! Tu Discord quedó vinculado y ya estás en el servidor de Yalope.",
+        "en-uso": "Esa cuenta de Discord ya está vinculada a otra cuenta de Yalope.",
+        "cancelado": "Cancelaste la vinculación en Discord.",
+        "error": "No se pudo vincular tu Discord. Probá de nuevo.",
+        "no-configurado": "La vinculación con Discord todavía no está disponible."
+      },
+      "vinculadoComo": "Discord vinculado como <b>@{usuario}</b>",
+      "desvinculando": "Desvinculando…",
+      "desvincular": "Desvincular",
+      "ayuda": "Vinculá tu cuenta de Discord para entrar a los espacios privados (texto y voz) de tus Proyectos y Equipos. Esos canales los ven solo sus integrantes y los administradores del servidor de Yalope.",
+      "boton": "Vincular mi Discord"
+    },
+    "accionesDiscord": {
+      "sinSesion": "Sin sesión.",
+      "errorCrear": "No se pudo crear el espacio en Discord. Probá de nuevo.",
+      "errorDesvincular": "No se pudo desvincular.",
+      "espacio": {
+        "sinConfigurar": "Discord no está configurado.",
+        "sinSala": "No existe esa sala.",
+        "sinIniciativa": "Solo los Proyectos y Equipos tienen espacio en Discord.",
+        "noEsDueno": "Solo quien creó el Proyecto o Equipo puede abrirlo.",
+        "sinConexion": "No se pudo hablar con Discord."
+      }
+    }
+  }
+}

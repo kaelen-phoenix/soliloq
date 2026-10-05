@@ -24,6 +24,7 @@ export function BarraLateral({
 }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const tLayout = useTranslations("cuenta.layout");
   const items = itemsParaNavegacion({ esAdmin });
   const { total: noLeidos } = useNoLeidos();
 
@@ -44,7 +45,7 @@ export function BarraLateral({
                   href={item.href}
                   data-tour={idTourNav(item.href)}
                   aria-current={activo ? "page" : undefined}
-                  aria-label={badge > 0 ? `${t(item.clave)}, ${badge} sin leer` : undefined}
+                  aria-label={badge > 0 ? tLayout("sinLeer", { etiqueta: t(item.clave), n: badge }) : undefined}
                   className={`flex items-center gap-3 rounded-xl px-3 py-2.5 text-sm font-medium transition-colors ${
                     activo
                       ? "acento-fondo acento-texto"

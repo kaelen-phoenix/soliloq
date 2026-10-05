@@ -1,7 +1,14 @@
 "use client";
 
+import { useTranslations } from "next-intl";
 import { CampoTexto } from "@/components/ui/campo-texto";
-import { clasesDisciplina, DISCIPLINAS, MAX_OTRO_DETALLE } from "@/lib/constantes";
+import {
+  claveDisciplina,
+  clasesDisciplina,
+  DISCIPLINAS,
+  MAX_OTRO_DETALLE,
+  type TraductorEtiquetas,
+} from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 export interface DatosCreador {
@@ -15,16 +22,18 @@ export interface DatosCreador {
  * "Al menos una" solo se exige si ya tenía alguna (`exigirUna`): la fila de Creador la crea
  * un trigger sin disciplinas (0075), y ahora que esto va en el mismo formulario que el
  * Perfil de Talento, exigirla siempre dejaría a esas cuentas sin poder guardar nada.
+ *
+ * `t`: el traductor de `perfil.creador`, que tiene los mensajes.
  */
 export function validarCreador(
   disciplinas: DisciplinaArtistica[],
   otroDetalle: string,
-  { exigirUna }: { exigirUna: boolean },
+  { exigirUna, t }: { exigirUna: boolean; t: TraductorEtiquetas },
 ): Record<string, string> {
   const errores: Record<string, string> = {};
-  if (exigirUna && disciplinas.length === 0) errores.creador_disciplinas = "Elegí al menos una.";
+  if (exigirUna && disciplinas.length === 0) errores.creador_disciplinas = t("errorUna");
   if (disciplinas.includes("otro") && otroDetalle.trim().length < 2) {
-    errores.creador_otro_detalle = "Contanos qué hacés.";
+    errores.creador_otro_detalle = t("errorOtro");
   }
   return errores;
 }
@@ -53,13 +62,15 @@ export function CamposCreador({
   setOtroDetalle: (valor: string) => void;
   errores: Record<string, string>;
 }) {
+  const t = useTranslations("perfil.creador");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
   return (
     // Es múltiple porque en el medio se hace más de una cosa: quien dirige también actúa, y
     // obligar a elegir una sola falsea el perfil.
     <fieldset className="flex flex-col gap-2.5">
       <legend className="text-sm font-medium text-texto">
-        Perfil artístico como Creador
-        <span className="ml-1.5 font-normal text-texto-tenue">Elegí todo lo que hagas</span>
+        {t("titulo")}
+        <span className="ml-1.5 font-normal text-texto-tenue">{t("elegiTodo")}</span>
       </legend>
 
       <div className="flex flex-wrap gap-2">
@@ -83,7 +94,7 @@ export function CamposCreador({
                   : "border-borde text-texto-tenue hover:border-ink-300"
               }`}
             >
-              {d.etiqueta}
+              {tEtiquetas(claveDisciplina(d.valor))}
             </button>
           );
         })}
@@ -96,10 +107,10 @@ export function CamposCreador({
       {disciplinas.includes("otro") && (
         <CampoTexto
           id="otro-detalle"
-          etiqueta="¿Qué hacés?"
+          etiqueta={t("queHaces")}
           value={otroDetalle}
           maxLength={MAX_OTRO_DETALLE}
-          placeholder="Por ejemplo: titiritera, técnica de vuelo"
+          placeholder={t("queHacesPlaceholder")}
           onChange={(e) => setOtroDetalle(e.target.value)}
           error={errores.creador_otro_detalle}
         />

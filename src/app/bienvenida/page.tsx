@@ -1,71 +1,77 @@
 import type { Metadata } from "next";
-import { getTranslations } from "next-intl/server";
+import { getLocale, getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
 import { BotonInstalar } from "@/components/pwa/boton-instalar";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 
-const TITULO = "Yalope — El match de actores y actrices empieza acá";
-const DESCRIPCION =
-  "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat. Armá tu equipo y compartí tu perfil como booking.";
+/** Lo que el buscador y las redes ven de la portada, en el idioma del request. */
+async function textosPortada() {
+  const t = await getTranslations("admin.portada");
+  const idioma = await getLocale();
+  return {
+    titulo: t("metaTitulo"),
+    descripcion: t("metaDescripcion"),
+    palabrasClave: t.raw("palabrasClave") as string[],
+    ogLocale: idioma === "en" ? "en_US" : "es_AR",
+    inLanguage: idioma === "en" ? "en-US" : "es-AR",
+  };
+}
 
-export const metadata: Metadata = {
-  title: TITULO,
-  description: DESCRIPCION,
-  // La landing se sirve en `/` (rewrite para anónimos), así que esa es la URL canónica.
-  alternates: { canonical: "/" },
-  keywords: [
-    "match de actores",
-    "actores y actrices",
-    "casting online",
-    "booking de actores",
-    "convocatorias artísticas",
-    "buscar talento actoral",
-    "armar equipo artístico",
-    "comunidad artística Argentina",
-  ],
-  openGraph: {
-    type: "website",
-    url: "https://yalope.com/",
-    siteName: "Yalope",
-    locale: "es_AR",
-    title: TITULO,
-    description: DESCRIPCION,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: TITULO,
-    description: DESCRIPCION,
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const { titulo, descripcion, palabrasClave, ogLocale } = await textosPortada();
+  return {
+    title: titulo,
+    description: descripcion,
+    // La landing se sirve en `/` (rewrite para anónimos), así que esa es la URL canónica.
+    alternates: { canonical: "/" },
+    keywords: palabrasClave,
+    openGraph: {
+      type: "website",
+      url: "https://yalope.com/",
+      siteName: "Yalope",
+      locale: ogLocale,
+      title: titulo,
+      description: descripcion,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titulo,
+      description: descripcion,
+    },
+  };
+}
 
 // Datos estructurados: le dan al buscador el nombre, el logo y la caja de búsqueda del sitio.
-const JSON_LD = {
-  "@context": "https://schema.org",
-  "@graph": [
-    {
-      "@type": "Organization",
-      "@id": "https://yalope.com/#organizacion",
-      name: "Yalope",
-      url: "https://yalope.com",
-      logo: "https://yalope.com/icons/icon-512.png",
-      description: DESCRIPCION,
-    },
-    {
-      "@type": "WebSite",
-      "@id": "https://yalope.com/#sitio",
-      url: "https://yalope.com",
-      name: "Yalope",
-      inLanguage: "es-AR",
-      publisher: { "@id": "https://yalope.com/#organizacion" },
-    },
-  ],
-};
+function jsonLd(descripcion: string, inLanguage: string) {
+  return {
+    "@context": "https://schema.org",
+    "@graph": [
+      {
+        "@type": "Organization",
+        "@id": "https://yalope.com/#organizacion",
+        name: "Yalope",
+        url: "https://yalope.com",
+        logo: "https://yalope.com/icons/icon-512.png",
+        description: descripcion,
+      },
+      {
+        "@type": "WebSite",
+        "@id": "https://yalope.com/#sitio",
+        url: "https://yalope.com",
+        name: "Yalope",
+        inLanguage,
+        publisher: { "@id": "https://yalope.com/#organizacion" },
+      },
+    ],
+  };
+}
 
 export default async function BienvenidaPage() {
   const t = await getTranslations("landing");
   const tLegal = await getTranslations("legal");
+  const { descripcion, inLanguage } = await textosPortada();
   return (
     // #217: la portada pasa al negro de escena, como la primera pantalla de la referencia
     // (`docs/marca/referencias/interfaz-yalope-217.png`). Antes era una superficie de marca
@@ -73,7 +79,7 @@ export default async function BienvenidaPage() {
     <div data-tema="dark" className="flex min-h-screen flex-col bg-superficie text-texto">
       <script
         type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(JSON_LD) }}
+        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd(descripcion, inLanguage)) }}
       />
 
       <main className="flex-1">

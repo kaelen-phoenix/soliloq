@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 
 /**
@@ -20,6 +21,7 @@ export function InvitacionComunidad({
   /** Debajo del botón, en la sección del perfil (p. ej. «Vincular mi Discord», #269). */
   children?: React.ReactNode;
 }) {
+  const t = useTranslations("chats.comunidad");
   const url = process.env.NEXT_PUBLIC_DISCORD_INVITACION;
   if (!url) return null;
 
@@ -33,8 +35,9 @@ export function InvitacionComunidad({
       >
         <Icono nombre="salas" className="h-5 w-5 shrink-0 text-brand-400" />
         <span className="min-w-0 flex-1 text-texto-tenue">
-          <span className="font-medium text-texto">Seguí la charla con más gente.</span> Unite a la
-          comunidad de Yalope en Discord.
+          {t.rich("compacta", {
+            b: (texto) => <span className="font-medium text-texto">{texto}</span>,
+          })}
         </span>
         <Icono nombre="enlace" className="h-4 w-4 shrink-0 text-texto-tenue" />
       </a>
@@ -45,11 +48,9 @@ export function InvitacionComunidad({
     <section className="mt-8 max-w-2xl rounded-2xl border border-borde p-4">
       <div className="flex items-start justify-between gap-4">
         <div className="min-w-0">
-          <h2 className="text-base font-medium text-texto">Comunidad</h2>
+          <h2 className="text-base font-medium text-texto">{t("titulo")}</h2>
           <p className="mt-1 text-sm leading-relaxed text-texto-tenue">
-            Actores, actrices y creadores de Yalope en Discord: presentaciones, convocatorias,
-            charlas por ciudad y por disciplina, y salas de voz para lecturas y ensayos. Rigen
-            las mismas Normas de la Comunidad que en la app.
+            {t("texto")}
           </p>
         </div>
         <Icono nombre="salas" className="h-5 w-5 shrink-0 text-texto-tenue" />
@@ -60,7 +61,7 @@ export function InvitacionComunidad({
         rel="noopener noreferrer"
         className="bg-accion brillo-accion mt-4 inline-flex items-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium text-accion-texto"
       >
-        Unite a la comunidad
+        {t("unite")}
         <Icono nombre="enlace" className="h-4 w-4" />
       </a>
       {children}

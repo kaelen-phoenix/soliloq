@@ -1,0 +1,298 @@
+{
+  "perfil": {
+    "etiquetas": {
+      "genero": {
+        "mujer": "Mujer",
+        "varon": "Varón",
+        "no_binarie": "No binarie",
+        "otro": "Otro",
+        "sin_especificar": "Prefiero no decirlo"
+      },
+      "disciplina": {
+        "actuacion": "Actuación",
+        "direccion": "Dirección",
+        "guion": "Guion",
+        "produccion": "Producción",
+        "dramaturgia": "Dramaturgia",
+        "vestuario": "Vestuario",
+        "escenografia": "Escenografía",
+        "iluminacion": "Iluminación",
+        "sonido": "Sonido",
+        "coreografia": "Coreografía",
+        "danza": "Danza",
+        "musica": "Música",
+        "fotografia": "Fotografía",
+        "edicion": "Edición",
+        "maquillaje": "Maquillaje",
+        "asistencia_direccion": "Asistencia de dirección",
+        "otro": "Otro"
+      },
+      "habilidad": {
+        "canto": "Canto",
+        "danza": "Danza",
+        "acrobacia": "Acrobacia",
+        "instrumentos": "Instrumentos musicales",
+        "idiomas": "Idiomas",
+        "doblaje": "Doblaje / locución",
+        "esgrima": "Esgrima escénica",
+        "improvisacion": "Improvisación"
+      },
+      "red": {
+        "instagram": "Instagram",
+        "youtube": "YouTube",
+        "tiktok": "TikTok",
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "vimeo": "Vimeo",
+        "sitio": "Sitio web"
+      },
+      "redes": {
+        "errorSitio": "Ingresá una dirección web válida que empiece con https://",
+        "errorRed": "Ese enlace no parece de {red}. Revisá el usuario o la URL."
+      },
+      "unidad": {
+        "km": "km",
+        "mi": "millas"
+      },
+      "radio": {
+        "todoElMundo": "Todo el mundo"
+      },
+      "ubicacion": {
+        "faltaClave": "Falta configurar NEXT_PUBLIC_GOOGLE_MAPS_API_KEY.",
+        "noCargoBuscador": "No se pudo cargar el buscador de lugares.",
+        "elegiDeLaLista": "Elegí un lugar de la lista.",
+        "sinCoordenadas": "Ese lugar no tiene coordenadas; probá con otro.",
+        "sinPais": "Ese lugar no tiene país; probá con otro.",
+        "noIdentificada": "No pudimos identificar tu ubicación.",
+        "noIdentificadaEscribila": "No pudimos identificar tu ubicación. Escribila a mano.",
+        "paisNoIdentificado": "No pudimos identificar tu país. Escribí tu ubicación."
+      },
+      "imagen": {
+        "demasiadoGrande": "La imagen pesa {mb} MB. Elegí uno de hasta {max} MB.",
+        "noSeLee": "No pudimos leer la imagen.",
+        "noSeProcesa": "No pudimos procesar la imagen."
+      },
+      "ejemplos": {
+        "creador": "Obra de ejemplo",
+        "casaDeMunecas": {
+          "rol": "Nora Helmer",
+          "descripcion": "Protagonista. Atraviesa la obra entera desde la comodidad doméstica hasta la ruptura final. Pide manejo del silencio tanto como del texto.",
+          "titulo": "Casa de muñecas",
+          "sinopsis": "Henrik Ibsen, 1879. Nora sostiene un matrimonio aparentemente feliz sobre un secreto que ella misma firmó. Cuando sale a la luz, descubre cuánto de su vida era un papel escrito por otros."
+        },
+        "bodasDeSangre": {
+          "rol": "La Novia",
+          "descripcion": "Rol central. Se casa con un hombre mientras sigue atada a otro. Requiere cuerpo disponible: la obra pide trabajo físico y coro.",
+          "titulo": "Bodas de sangre",
+          "sinopsis": "Federico García Lorca, 1933. Una boda en el campo andaluz se rompe cuando la novia huye con Leonardo, el único personaje de la obra que tiene nombre propio. Tragedia en verso y prosa."
+        },
+        "romeoYJulieta": {
+          "rol": "Diseño de iluminación",
+          "descripcion": "Puesta en sala chica, con pocos artefactos y muchos cambios de clima. Se busca a alguien que haya iluminado teatro de texto.",
+          "titulo": "Romeo y Julieta",
+          "sinopsis": "William Shakespeare, c. 1595. Dos jóvenes de familias enfrentadas se enamoran y apuran un plan que termina mal. La versión más contada del amor imposible."
+        }
+      }
+    },
+    "formulario": {
+      "errores": {
+        "nombre": "Ingresá tu nombre.",
+        "fechaFalta": "Ingresá tu fecha de nacimiento.",
+        "fechaFormato": "Escribila así: día/mes/año, por ejemplo 07/05/1995.",
+        "fechaEdad": "La plataforma es para personas de 16 años o más.",
+        "ubicacion": "Elegí tu ubicación de la lista de sugerencias.",
+        "genero": "Elegí una opción.",
+        "maximoCaracteres": "Máximo {max} caracteres.",
+        "fotos": "Cargá al menos una foto.",
+        "videoreel": "No reconocemos ese enlace. Pegá el link de un video de YouTube o Vimeo.",
+        "revisar": "Revisá los campos marcados en rojo.",
+        "guardar": "No pudimos guardar tu perfil. Revisá los datos e intentá de nuevo.",
+        "guardarCreador": "Guardamos tu perfil, pero no el perfil artístico como Creador. Probá de nuevo."
+      },
+      "recuperado": "Recuperamos lo que habías cargado. Seguí desde acá.",
+      "fichaBasica": "Ficha básica",
+      "nombre": "Nombre completo",
+      "fechaNacimiento": "Fecha de nacimiento",
+      "fechaPlaceholder": "dd/mm/aaaa",
+      "edadVisible": "Tu edad se muestra en tu perfil",
+      "edadOculta": "Tu edad está oculta en tu perfil",
+      "fechaAyuda": "La fecha se guarda igual y se usa para priorizar las búsquedas por edad, la muestres o no.",
+      "ubicacion": "Ubicación",
+      "ubicacionAyuda": "Alcanza con tu ciudad o barrio. Nadie ve tu dirección: solo la zona, para mostrarte lo que tenés cerca.",
+      "genero": "Género",
+      "elegiUnaOpcion": "Elegí una opción",
+      "generoCual": "¿Cuál? (opcional)",
+      "portfolio": "Portfolio de fotos",
+      "trayendoFoto": "Trayendo tu foto…",
+      "usarFotoGoogle": "Usar mi foto de Google",
+      "fotosRecomendadas": "Te recomendamos {n} fotos o más: así quien busca talento te ve mejor.",
+      "sumarMas": "+ Sumar más (opcional)",
+      "sumarMasAyuda": "Videoreel, experiencia, habilidades y redes. También podés completarlo después desde tu Perfil.",
+      "videoreel": "Videoreel (opcional)",
+      "videoreelEtiqueta": "Enlace de YouTube o Vimeo",
+      "videoreelPlaceholder": "https://youtu.be/... o https://vimeo.com/...",
+      "videoreelAyuda": "Sirve el link normal, el de compartir, Shorts o el de la app del celular.",
+      "cvHabilidades": "CV y habilidades",
+      "experiencia": "Experiencia",
+      "experienciaPlaceholder": "Contá tu formación, obras en las que participaste, etc.",
+      "redes": "Redes sociales (opcional)",
+      "sitioPlaceholder": "https://tusitio.com",
+      "redPlaceholder": "@usuario o https://…",
+      "agregarRed": "+ Agregar otra red (YouTube, TikTok, X, LinkedIn, Vimeo, sitio web)",
+      "visibilidad": "Visibilidad",
+      "ocultarPerfil": "Ocultar mi perfil a personas nuevas",
+      "ocultarPerfilAyuda": "No salís en el buscador de Creadores y tu enlace público deja de mostrar tu perfil. Tus chats y tus Proyectos y Equipos siguen igual.",
+      "completar": "Completar perfil",
+      "guardarCambios": "Guardar cambios"
+    },
+    "creador": {
+      "errorUna": "Elegí al menos una.",
+      "errorOtro": "Contanos qué hacés.",
+      "titulo": "Perfil artístico como Creador",
+      "elegiTodo": "Elegí todo lo que hagas",
+      "queHaces": "¿Qué hacés?",
+      "queHacesPlaceholder": "Por ejemplo: titiritera, técnica de vuelo"
+    },
+    "disciplinas": {
+      "vacio": "Sumá tus disciplinas (actuación, dirección, técnica…) desde «Editar»."
+    },
+    "compartir": {
+      "errorActivar": "No pudimos activar el enlace. Probá de nuevo.",
+      "errorDesactivar": "No pudimos desactivar el enlace. Probá de nuevo.",
+      "errorRegenerar": "No pudimos regenerar el enlace. Probá de nuevo.",
+      "textoCompartir": "{nombre} en Yalope",
+      "titulo": "Compartir mi perfil",
+      "activo": "Tu enlace está activo: cualquiera que lo tenga ve tu perfil público —fotos, videoreel, experiencia, habilidades, zona, género y tu edad si la dejaste visible—, sin cuenta. Tus redes las ve solo quien tiene cuenta en Yalope.",
+      "inactivo": "Un enlace que se ve sin cuenta, como una carta de presentación: tus fotos, tu videoreel, tu experiencia, tus habilidades, tu zona, tu género y tu edad si la dejaste visible. Nunca tu correo, tu teléfono ni tu fecha de nacimiento, y tus redes las ve solo quien tiene cuenta en Yalope.",
+      "unMomento": "Un momento…",
+      "compartir": "Compartir",
+      "ocultarQr": "Ocultar QR",
+      "codigoQr": "Código QR",
+      "copiado": "Enlace copiado",
+      "qrAyuda": "Mostralo para que lo escaneen y abran tu perfil, sin cuenta. Es el mismo enlace:",
+      "whatsapp": "Compartir por WhatsApp",
+      "x": "Compartir en X",
+      "facebook": "Compartir en Facebook",
+      "instagram": "Compartir en Instagram",
+      "copiar": "Copiar enlace",
+      "regenerar": "Regenerar enlace",
+      "desactivar": "Desactivar enlace"
+    },
+    "mejorarRedaccion": {
+      "ayuda": {
+        "experiencia": "Pegá tu CV como lo tengas (aunque esté desordenado) y te lo dejamos bien redactado.",
+        "sinopsis": "Escribilo como te salga y te lo dejamos claro y atractivo para quien lo lea.",
+        "equipo": "Escribilo como te salga y te lo dejamos claro para quien lo lea.",
+        "rol": "Escribí cómo es el personaje y qué buscás, y te lo dejamos claro y concreto."
+      },
+      "error": "No pudimos mejorarlo ahora. Probá de nuevo.",
+      "mejorando": "Mejorando…",
+      "boton": "✨ Mejorar redacción",
+      "propuesta": "Propuesta",
+      "revisala": "Revisala: la IA puede equivocarse.",
+      "usar": "Usar este texto",
+      "descartar": "Descartar"
+    },
+    "sugerirHabilidades": {
+      "yaMarcadas": "Ya tenías marcadas las que aparecen en tu experiencia.",
+      "ninguna": "No encontramos habilidades de la lista en tu experiencia.",
+      "marcamos": "Marcamos: {lista}. Revisalas antes de guardar.",
+      "error": "No pudimos sugerirlas ahora. Probá de nuevo.",
+      "leyendo": "Leyendo tu experiencia…",
+      "boton": "✨ Sugerir desde mi experiencia"
+    },
+    "detalle": {
+      "edad": "{edad} años",
+      "edadOculta": "Tu edad está oculta: nadie más la ve.",
+      "experiencia": "Experiencia"
+    },
+    "placa": {
+      "etiqueta": "Perfil del Talento",
+      "error": "No pudimos cargar este perfil.",
+      "cerrar": "Cerrar"
+    },
+    "fotos": {
+      "tiposAdmitidos": "Solo se admiten imágenes JPEG, PNG o WebP.",
+      "errorSubir": "No pudimos subir la foto. Probá de nuevo.",
+      "errorGuardar": "No pudimos guardar la foto. Probá de nuevo.",
+      "maximo": "El máximo es {max} fotos.",
+      "subimosAlgunas": "Subimos {lugares} de {total}: el máximo es {max} fotos.",
+      "altFoto": "Foto de portfolio",
+      "principal": "Principal",
+      "eliminar": "Eliminar",
+      "subiendo": "Subiendo…",
+      "agregar": "Agregar fotos",
+      "contador": "{n}/{max} fotos — con una alcanza para empezar. Podés elegir varias juntas."
+    },
+    "videoreel": {
+      "titulo": "Videoreel"
+    },
+    "vidriera": {
+      "edad": "{edad} años",
+      "videoreel": "Videoreel",
+      "trayectoria": "Trayectoria",
+      "habilidades": "Habilidades",
+      "perfilArtistico": "Perfil artístico"
+    },
+    "vistaPropia": {
+      "asiTeVen": "Así te ven los demás.",
+      "editar": "Editar"
+    },
+    "pagina": {
+      "ajustes": "Ajustes",
+      "cambiarClave": "Cambiar contraseña",
+      "apoyar": "Apoyar Yalope",
+      "verMiPerfil": "Ver mi perfil",
+      "avisoVisible": "Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad.",
+      "avisoOculto": "Tu perfil está oculto a personas nuevas: solo te ven tus chats abiertos."
+    },
+    "completar": {
+      "titulo": "Contanos sobre vos",
+      "bajada": "Este es tu perfil: tu carta de presentación en Yalope. Más adelante, cuando armes un Proyecto o un Equipo, vas a poder convocar Talentos sin tener que crear nada más.",
+      "errores": {
+        "sinSesion": "Sin sesión.",
+        "sinFoto": "Tu cuenta de Google no tiene foto.",
+        "noSeTrajo": "No pudimos traer tu foto de Google. Subila desde el celular.",
+        "noSeGuardo": "No pudimos guardar la foto. Probá de nuevo."
+      }
+    },
+    "publico": {
+      "tituloMeta": "{nombre} · Yalope",
+      "descripcionMeta": "El perfil de {nombre} en Yalope.",
+      "irAYalope": "Ir a Yalope",
+      "booking": "Booking",
+      "teInteresa": "¿Te interesa trabajar con {nombre}?",
+      "sinCuenta": "Creá tu cuenta gratis en Yalope para ver el perfil completo de {nombre}, con sus redes.",
+      "esperandoAprobacion": "Tu cuenta está esperando aprobación. Cuando te habiliten vas a ver el perfil completo, con sus redes.",
+      "completaTuPerfil": "Completá tu perfil en Yalope para ver el perfil completo, con sus redes.",
+      "crearCuenta": "Crear cuenta",
+      "yaTengoCuenta": "Ya tengo cuenta",
+      "completarMiPerfil": "Completar mi perfil",
+      "volverAMiPerfil": "Volver a mi perfil",
+      "perfilEnYalope": "Perfil en Yalope"
+    },
+    "og": {
+      "edad": "{edad} años"
+    },
+    "ubicacion": {
+      "errorBuscar": "No se pudo buscar lugares. Probá de nuevo.",
+      "errorResolver": "No se pudo resolver ese lugar. Probá con otro.",
+      "sinGeolocalizacion": "Tu navegador no puede darnos tu ubicación. Escribila a mano.",
+      "noIdentificada": "No pudimos identificar tu ubicación.",
+      "sinPermiso": "No nos diste permiso para usar tu ubicación. Podés escribirla igual.",
+      "noSeObtuvo": "No pudimos obtener tu ubicación. Probá escribiéndola.",
+      "placeholder": "Dirección, barrio o ciudad",
+      "buscandoTuUbicacion": "Buscando tu ubicación…",
+      "usarMiUbicacion": "Usar mi ubicación actual",
+      "buscandoLugares": "Buscando lugares…",
+      "elegiDeLaLista": "Elegí un lugar de la lista para confirmarlo."
+    },
+    "galeria": {
+      "ampliar": "Ampliar foto {n} de {total}",
+      "ampliada": "Foto ampliada",
+      "cerrar": "Cerrar",
+      "anterior": "Foto anterior",
+      "siguiente": "Foto siguiente"
+    }
+  }
+}

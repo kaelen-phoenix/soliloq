@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Imagen } from "@/components/ui/imagen";
 import { createClient } from "@/lib/supabase/client";
@@ -33,8 +34,9 @@ function primero<T>(v: T | T[] | null): T | null {
   return Array.isArray(v) ? v[0] ?? null : v;
 }
 
-function tituloObra(n: Notificacion): string {
-  return primero(n.obras)?.titulo ?? "una obra";
+/** `null` si la obra no vino (p. ej. la esconde un bloqueo): el texto lo pone quien llama. */
+function tituloObra(n: Notificacion): string | null {
+  return primero(n.obras)?.titulo ?? null;
 }
 
 function fotoDelProyecto(n: Notificacion): string | null {
@@ -81,6 +83,10 @@ export function ListaNotificaciones({
 }) {
   const [notificaciones, setNotificaciones] = useState(notificacionesIniciales);
   const router = useRouter();
+  const t = useTranslations("chats.notificaciones");
+  const locale = useLocale();
+  const negrita = (texto: React.ReactNode) => <span className="font-medium">{texto}</span>;
+  const titulo = (n: Notificacion) => tituloObra(n) ?? t("unaObra");
 
   const hayNoLeidas = notificaciones.some((n) => !n.leida_en);
 
@@ -140,8 +146,8 @@ export function ListaNotificaciones({
     return (
       <EstadoVacio
         icono="campana"
-        titulo="Sin notificaciones"
-        detalle="Acá vas a ver los avisos cuando se arma un equipo y cuando se abre una sala."
+        titulo={t("vacioTitulo")}
+        detalle={t("vacioDetalle")}
       />
     );
   }
@@ -154,7 +160,7 @@ export function ListaNotificaciones({
           onClick={marcarTodasLeidas}
           className="self-end text-xs font-medium text-texto-tenue hover:text-texto"
         >
-          Marcar todas como leídas
+          {t("marcarTodas")}
         </button>
       )}
 
@@ -180,74 +186,72 @@ export function ListaNotificaciones({
                 {n.tipo === "match" ? (
                   <>
                     <p className="text-base font-semibold leading-snug text-texto">
-                      ¡Hay equipo!
+                      {t("match.titulo")}
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      Te sumaste a <span className="font-medium">{tituloObra(n)}</span>
+                      {t.rich("match.texto", { titulo: titulo(n), b: negrita })}
                     </p>
                   </>
                 ) : n.tipo === "convocado" ? (
                   <>
                     <p className="text-base font-semibold leading-snug text-texto">
-                      ¡Te convocaron!
+                      {t("convocado.titulo")}
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      <span className="font-medium">{tituloObra(n)}</span> te quiere sumar.
-                      Entrá para confirmar.
+                      {t.rich("convocado.texto", { titulo: titulo(n), b: negrita })}
                     </p>
                   </>
                 ) : n.tipo === "equipo_armado" ? (
                   <>
                     <p className="text-base font-semibold leading-snug text-texto">
-                      ¡Conectaron!
+                      {t("equipo_armado.titulo")}
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      El interés fue mutuo. Ya pueden hablar.
+                      {t("equipo_armado.texto")}
                     </p>
                   </>
                 ) : n.tipo === "interes_recibido" ? (
                   <p className="text-base leading-snug text-texto">
-                    Alguien quiso contactarte desde tu perfil
+                    {t("interes_recibido")}
                   </p>
                 ) : n.tipo === "nuevo_match" ? (
                   <>
                     <p className="text-base font-semibold leading-snug text-texto">
-                      ¡Tenés un nuevo match!
+                      {t("nuevo_match.titulo")}
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      Alguien se interesó en tu proyecto o equipo. Revisalo en Convocatorias.
+                      {t("nuevo_match.texto")}
                     </p>
                   </>
                 ) : n.tipo === "solicitud_acceso" ? (
                   <>
                     <p className="text-base font-semibold leading-snug text-texto">
-                      Nueva solicitud de acceso
+                      {t("solicitud_acceso.titulo")}
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      Alguien pidió entrar a Yalope. Revisala en el panel de administración.
+                      {t("solicitud_acceso.texto")}
                     </p>
                   </>
                 ) : n.tipo === "acceso_habilitado" ? (
                   <>
                     <p className="text-base font-semibold leading-snug text-texto">
-                      ¡Ya tenés acceso a Yalope!
+                      {t("acceso_habilitado.titulo")}
                     </p>
                     <p className="mt-0.5 text-sm leading-snug text-texto-tenue">
-                      Tu solicitud fue aprobada. Te damos la bienvenida a la comunidad.
+                      {t("acceso_habilitado.texto")}
                     </p>
                   </>
                 ) : n.tipo === "espera_vencida" ? (
                   <p className="text-base leading-snug text-texto-tenue">
-                    Tu postulación a <span className="font-medium">{tituloObra(n)}</span> se cerró
-                    sin respuesta.
+                    {t.rich("espera_vencida", { titulo: titulo(n), b: negrita })}
                   </p>
                 ) : (
                   <p className="text-base leading-snug text-texto">
-                    Se abrió la sala de <span className="font-medium">{tituloObra(n)}</span>
+                    {t.rich("sala_creada", { titulo: titulo(n), b: negrita })}
                   </p>
                 )}
                 <p className="mt-0.5 text-2xs text-texto-tenue">
-                  {new Date(n.creado_en).toLocaleString("es-AR", {
+                  {new Date(n.creado_en).toLocaleString(locale === "en" ? "en-US" : "es-AR", {
                     day: "numeric",
                     month: "short",
                     hour: "2-digit",

@@ -1,7 +1,7 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Inter } from "next/font/google";
 import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages } from "next-intl/server";
+import { getLocale, getMessages, getTranslations } from "next-intl/server";
 import "./globals.css";
 import { SplashMarca } from "@/components/ui/splash-marca";
 
@@ -23,36 +23,38 @@ const baloo = Baloo_2({
   weight: ["800"],
 });
 
-const DESCRIPCION =
-  "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat. Armá tu equipo y compartí tu perfil como booking.";
-
-export const metadata: Metadata = {
-  // Ancla las URLs relativas de `openGraph`: sin esto, la imagen para compartir se emite
-  // como ruta relativa y ninguna plataforma la resuelve.
-  metadataBase: new URL("https://yalope.com"),
-  title: "Yalope — El match de actores y actrices",
-  description: DESCRIPCION,
-  // El `<link rel="manifest">` lo inyecta Next desde `app/manifest.ts`.
-  // La imagen para compartir la genera `app/opengraph-image.tsx` (y Next la usa también
-  // para Twitter), así que no se declara acá.
-  openGraph: {
-    type: "website",
-    locale: "es_AR",
-    siteName: "Yalope",
-    title: "Yalope — El match de actores y actrices",
-    description: DESCRIPCION,
-  },
-  twitter: {
-    card: "summary_large_image",
-    title: "Yalope — El match de actores y actrices",
-    description: DESCRIPCION,
-  },
-  appleWebApp: {
-    capable: true,
-    statusBarStyle: "default",
-    title: "Yalope",
-  },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const [t, locale] = await Promise.all([getTranslations("cuenta.metadatos"), getLocale()]);
+  const titulo = t("titulo");
+  const descripcion = t("descripcion");
+  return {
+    // Ancla las URLs relativas de `openGraph`: sin esto, la imagen para compartir se emite
+    // como ruta relativa y ninguna plataforma la resuelve.
+    metadataBase: new URL("https://yalope.com"),
+    title: titulo,
+    description: descripcion,
+    // El `<link rel="manifest">` lo inyecta Next desde `app/manifest.ts`.
+    // La imagen para compartir la genera `app/opengraph-image.tsx` (y Next la usa también
+    // para Twitter), así que no se declara acá.
+    openGraph: {
+      type: "website",
+      locale: locale === "en" ? "en_US" : "es_AR",
+      siteName: "Yalope",
+      title: titulo,
+      description: descripcion,
+    },
+    twitter: {
+      card: "summary_large_image",
+      title: titulo,
+      description: descripcion,
+    },
+    appleWebApp: {
+      capable: true,
+      statusBarStyle: "default",
+      title: "Yalope",
+    },
+  };
+}
 
 export const viewport: Viewport = {
   // Sin `themeColor` acá: el meta lo maneja `SCRIPT_TEMA` según el tema que quedó (#217).

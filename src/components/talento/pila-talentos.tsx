@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { AnimatePresence, motion, useMotionValue, useTransform } from "framer-motion";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
@@ -38,6 +39,7 @@ export function PilaTalentos({
   onCasiVacia: () => void;
 }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.pilaTalentos");
   const prefiereReduccion = usePrefiereReduccion();
   const [descartados, setDescartados] = useState<Set<string>>(new Set());
   const [ocupado, setOcupado] = useState(false);
@@ -58,11 +60,13 @@ export function PilaTalentos({
   if (!iniciativa) {
     return (
       <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
-        Para buscar talento primero armá un proyecto o equipo en{" "}
-        <Link href="/proyectos" className="font-medium text-texto underline">
-          Mis proyectos
-        </Link>
-        .
+        {t.rich("sinIniciativa", {
+          enlace: (chunks) => (
+            <Link href="/proyectos" className="font-medium text-texto underline">
+              {chunks}
+            </Link>
+          ),
+        })}
       </p>
     );
   }
@@ -70,7 +74,7 @@ export function PilaTalentos({
   if (!arriba) {
     return (
       <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-3 text-sm text-texto-tenue">
-        Por ahora no hay más perfiles. Probá aflojando los filtros o volvé más tarde.
+        {t("sinMas")}
       </p>
     );
   }
@@ -170,13 +174,13 @@ export function PilaTalentos({
               style={{ opacity: opacityNo }}
               className="absolute left-4 top-4 rounded-lg border-2 border-white px-2 py-0.5 text-sm font-bold uppercase text-white"
             >
-              No
+              {t("selloNo")}
             </motion.span>
             <motion.span
               style={{ opacity: opacitySi }}
               className="absolute right-4 top-4 rounded-lg border-2 border-coral px-2 py-0.5 text-sm font-bold uppercase text-coral"
             >
-              Sí
+              {t("selloSi")}
             </motion.span>
 
             <div className="absolute inset-x-0 bottom-0 p-5 text-white">
@@ -200,7 +204,7 @@ export function PilaTalentos({
       <div className="flex items-center gap-6">
         <button
           type="button"
-          aria-label="No me interesa"
+          aria-label={t("noMeInteresa")}
           disabled={ocupado}
           onClick={() => decidir(false)}
           className={`${btnRedondo} border-borde text-texto-tenue`}
@@ -209,7 +213,7 @@ export function PilaTalentos({
         </button>
         <button
           type="button"
-          aria-label="Me interesa"
+          aria-label={t("meInteresa")}
           disabled={ocupado}
           onClick={() => decidir(true)}
           className={`${btnRedondo} brillo-accion border-transparent bg-accion text-white`}
@@ -221,10 +225,10 @@ export function PilaTalentos({
       {error && <p className="text-xs text-error-600">{error}</p>}
 
       {placa && (
-        <Superposicion onCerrar={cerrarPlaca} etiqueta="Hay interés">
+        <Superposicion onCerrar={cerrarPlaca} etiqueta={t("hayInteres")}>
           <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
             <p className="text-sm font-semibold uppercase tracking-wide text-coral-700">
-              Hay interés
+              {t("hayInteres")}
             </p>
             <div className="mt-4 flex items-center justify-center gap-3">
               {placa.talento.fotoUrl ? (
@@ -256,7 +260,7 @@ export function PilaTalentos({
               )}
             </div>
             <p className="mt-3 text-sm text-texto">
-              {placa.talento.nombre} y «{iniciativa.titulo}»
+              {t("nombreYTitulo", { nombre: placa.talento.nombre, titulo: iniciativa.titulo })}
             </p>
             {error && <p className="mt-2 text-xs text-error-600">{error}</p>}
             <button
@@ -265,7 +269,7 @@ export function PilaTalentos({
               onClick={irAConvocar}
               className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
             >
-              {ocupado ? "…" : "Convocar"}
+              {ocupado ? "…" : t("convocar")}
             </button>
             <button
               type="button"
@@ -273,7 +277,7 @@ export function PilaTalentos({
               onClick={cerrarPlaca}
               className="mt-2 w-full py-1.5 text-xs font-medium text-texto-tenue hover:text-texto disabled:opacity-50"
             >
-              Ahora no
+              {t("ahoraNo")}
             </button>
           </div>
         </Superposicion>

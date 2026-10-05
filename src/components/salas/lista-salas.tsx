@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Boton } from "@/components/ui/boton";
 import {
@@ -42,6 +43,7 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
   const [error, setError] = useState<string | null>(null);
   const { porSala: noLeidos, revision } = useNoLeidos();
   const router = useRouter();
+  const t = useTranslations("chats.lista");
 
   // #216: cuando llega un mensaje la sala se enciende en vivo, pero la vista previa del
   // último mensaje y el orden por actividad vienen del servidor — se piden de nuevo con
@@ -145,10 +147,10 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
                       }`}
                     >
                       {!s.esDeIniciativa
-                        ? "Directo"
+                        ? t("directo")
                         : s.esDueno
-                          ? s.esEquipo ? "Mi equipo" : "Mi proyecto"
-                          : s.esEquipo ? "Equipo" : "Proyecto"}
+                          ? s.esEquipo ? t("miEquipo") : t("miProyecto")
+                          : s.esEquipo ? t("equipo") : t("proyecto")}
                     </span>
                     <p
                       className={`truncate text-base text-texto ${sinLeer > 0 ? "font-semibold" : "font-medium"}`}
@@ -159,19 +161,19 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
                   <p
                     className={`mt-0.5 truncate text-sm ${sinLeer > 0 ? "font-medium text-texto" : "text-texto-tenue"}`}
                   >
-                    {s.ultimoMensaje ?? "Sala recién creada"}
+                    {s.ultimoMensaje ?? t("salaRecienCreada")}
                   </p>
                 </div>
                 {sinLeer > 0 && (
                   <>
-                    <span className="sr-only">{`, ${sinLeer} sin leer`}</span>
+                    <span className="sr-only">{t("sinLeer", { n: sinLeer })}</span>
                     <BadgeNoLeidos cantidad={sinLeer} className="shrink-0 ring-0" />
                   </>
                 )}
               </Link>
               <button
                 type="button"
-                aria-label="Opciones del chat"
+                aria-label={t("opciones")}
                 aria-expanded={menuAbierto === s.salaId}
                 data-sala-menu={s.salaId}
                 onClick={() => setMenuAbierto((m) => (m === s.salaId ? null : s.salaId))}
@@ -192,7 +194,7 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
                     className="flex w-full items-center gap-2 px-3.5 py-2 text-left text-sm text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
                   >
                     <Icono nombre="estrella" relleno={!!s.destacadoEn} className="h-4 w-4" />
-                    {s.destacadoEn ? "Quitar destacado" : "Destacar"}
+                    {s.destacadoEn ? t("quitarDestacado") : t("destacar")}
                   </button>
                   {!s.esDueno && (
                     <button
@@ -205,7 +207,7 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
                       className="flex w-full items-center gap-2 px-3.5 py-2 text-left text-sm text-error-600 transition-colors hover:bg-error-50 disabled:opacity-50"
                     >
                       <Icono nombre="cruz" className="h-4 w-4" />
-                      Desvincularme
+                      {t("desvincularme")}
                     </button>
                   )}
                 </div>
@@ -215,25 +217,24 @@ export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
             {confirmando === s.salaId && (
               <div className="flex flex-col gap-2 border-t border-borde px-4 py-3">
                 <p className="text-sm text-texto">
-                  ¿Seguro que querés desvincularte de «{s.titulo}»? Vas a perder el acceso a
-                  este chat.
+                  {t("confirmarDesvincular", { titulo: s.titulo })}
                 </p>
                 <div className="flex gap-2">
                   <Boton
                     variante="peligro"
                     className="border border-error-600"
                     cargando={ocupado}
-                    textoCargando="Saliendo…"
+                    textoCargando={t("saliendo")}
                     onClick={() => desvincular(s)}
                   >
-                    Aceptar
+                    {t("aceptar")}
                   </Boton>
                   <Boton
                     variante="secundario"
                     disabled={ocupado}
                     onClick={() => setConfirmando(null)}
                   >
-                    Rechazar
+                    {t("rechazar")}
                   </Boton>
                 </div>
               </div>

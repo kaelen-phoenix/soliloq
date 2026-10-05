@@ -1,0 +1,130 @@
+{
+  "cuenta": {
+    "metadatos": {
+      "titulo": "Yalope — El match de actores y actrices",
+      "descripcion": "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat. Armá tu equipo y compartí tu perfil como booking.",
+      "solicitudPendiente": "Solicitud pendiente — Yalope",
+      "aceptarNormas": "Normas de la Comunidad — Yalope",
+      "suspendido": "Cuenta suspendida — Yalope"
+    },
+    "manifest": {
+      "nombre": "Yalope — Match de Actores",
+      "descripcion": "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat."
+    },
+    "errores": {
+      "emailInvalido": "Ingresá un email válido.",
+      "claveVacia": "Ingresá tu contraseña.",
+      "claveCorta": "La contraseña necesita al menos {minimo} caracteres.",
+      "noCoinciden": "Las contraseñas no coinciden.",
+      "credenciales": "Email o contraseña incorrectos.",
+      "emailSinConfirmar": "Todavía no confirmaste tu email. Revisá tu correo y abrí el enlace.",
+      "yaExiste": "Ya existe una cuenta con ese email. Probá ingresando.",
+      "demasiadosIntentos": "Demasiados intentos. Esperá unos minutos y probá de nuevo.",
+      "mismaClave": "La contraseña nueva tiene que ser distinta de la actual.",
+      "emailNoValido": "Ese email no parece válido. Revisalo y probá de nuevo.",
+      "emailNoAutorizado": "No pudimos mandarle un correo a ese email. Probá con otro.",
+      "altaDeshabilitada": "Por ahora no se pueden crear cuentas nuevas.",
+      "suspendida": "Esta cuenta está suspendida.",
+      "sesionVencida": "Tu sesión venció. Volvé a ingresar.",
+      "enlaceVencido": "El enlace venció. Pedí uno nuevo.",
+      "generico": "Algo salió mal. Probá de nuevo en unos minutos."
+    },
+    "ingresar": {
+      "confirmaTitulo": "Confirmá tu email",
+      "confirmaTexto": "Te enviamos un enlace de verificación a <b>{email}</b>. Abrilo y vas a entrar con la contraseña que acabás de elegir.",
+      "ingresar": "Ingresar",
+      "crearCuenta": "Crear cuenta",
+      "tuEmail": "Tu email",
+      "placeholderEmail": "vos@ejemplo.com",
+      "clave": "Contraseña",
+      "placeholderClave": "Tu contraseña",
+      "placeholderClaveNueva": "Al menos 8 caracteres",
+      "unMomento": "Un momento…",
+      "olvide": "Olvidé mi contraseña",
+      "o": "o",
+      "google": "Continuar con Google"
+    },
+    "recuperar": {
+      "titulo": "Recuperar acceso",
+      "bajada": "Te mandamos un enlace para elegir una contraseña nueva.",
+      "volverIngreso": "Volver al ingreso",
+      "revisaTitulo": "Revisá tu correo",
+      "revisaTexto": "Si existe una cuenta con <b>{email}</b>, te enviamos un enlace para elegir una contraseña nueva.",
+      "enviando": "Enviando…",
+      "enviar": "Enviarme el enlace"
+    },
+    "cambiarClave": {
+      "titulo": "Tu contraseña",
+      "bajada": "Elegí una contraseña nueva para {email}.",
+      "cancelar": "Cancelar",
+      "listo": "Listo, tu contraseña quedó actualizada.",
+      "nueva": "Contraseña nueva",
+      "repetila": "Repetila",
+      "guardar": "Guardar contraseña"
+    },
+    "cerrarSesion": "Cerrar sesión",
+    "layout": {
+      "sinLeer": "{etiqueta}, {n} sin leer",
+      "notificaciones": "Notificaciones"
+    },
+    "marcoAcceso": {
+      "titulo": "El teatro se hace de a muchos.",
+      "texto": "Yalope conecta a quien tiene una idea con quien quiere hacerla.",
+      "argumento1Titulo": "Postulate a convocatorias",
+      "argumento1Detalle": "Roles reales de obras que se están armando cerca tuyo.",
+      "argumento2Titulo": "Armá equipo sin proyecto",
+      "argumento2Detalle": "Conocé gente con ganas de crear, incluso antes de tener la idea.",
+      "argumento3Titulo": "Coordiná en un solo lugar",
+      "argumento3Detalle": "Cuando hay equipo se abre una sala con todo el elenco.",
+      "pie": "Match de actores y actrices · Argentina"
+    },
+    "ui": {
+      "avisoGuardado": "Cambios guardados.",
+      "guardando": "Guardando…",
+      "cargando": "Cargando",
+      "borrando": "Borrando…",
+      "cancelar": "Cancelar",
+      "escribiParaConfirmar": "Escribí {palabra} para confirmar",
+      "codigoQr": "Código QR del enlace del perfil",
+      "irAlInicio": "Ir al inicio",
+      "palabraBorrar": "BORRAR"
+    },
+    "denuncia": {
+      "motivos": {
+        "acoso": "Acoso o intimidación",
+        "discriminacion": "Discriminación",
+        "perfil_falso": "Perfil falso o suplantación",
+        "estafa": "Estafa o pedido de dinero",
+        "convocatoria_enganosa": "Convocatoria engañosa",
+        "contenido_inapropiado": "Contenido inapropiado",
+        "otro": "Otro"
+      },
+      "sinSesion": "Tenés que iniciar sesión para denunciar.",
+      "yaEnviada": "Ya enviaste una denuncia sobre esto. La estamos revisando.",
+      "error": "No pudimos enviar la denuncia. Probá de nuevo.",
+      "denunciar": "Denunciar",
+      "recibidaTitulo": "Recibimos tu denuncia",
+      "recibidaTexto": "La vamos a revisar. Si necesitás dejar de ver a esta persona ahora mismo, escribinos y lo resolvemos.",
+      "titulo": "Denunciar {que}",
+      "cerrar": "Cerrar",
+      "motivo": "Motivo",
+      "placeholder": "Contanos qué pasó (opcional pero ayuda mucho).",
+      "enviando": "Enviando…",
+      "enviar": "Enviar denuncia"
+    },
+    "error": {
+      "titulo": "Se nos cayó el telón",
+      "detalle": "Algo falló de nuestro lado. Probá de nuevo: la mayoría de las veces se resuelve al segundo intento.",
+      "reintentar": "Reintentar"
+    },
+    "noEncontrado": {
+      "titulo": "Acá no hay nada",
+      "detalle": "La página que buscás no existe, o el contenido ya no está disponible."
+    },
+    "errorGlobal": {
+      "titulo": "Se nos cayó el telón",
+      "detalle": "Algo falló al cargar la aplicación. Probá de nuevo en un momento.",
+      "reintentar": "Reintentar"
+    }
+  }
+}

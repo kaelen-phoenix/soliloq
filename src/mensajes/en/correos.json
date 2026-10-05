@@ -1,0 +1,70 @@
+{
+  "correos": {
+    "plantilla": {
+      "pie": "Questions? Reply to this email or write to us at {correo}."
+    },
+    "bienvenida": {
+      "asunto": "🎭 Welcome to Yalope",
+      "previa": "You're now part of Yalope's community of actors and creators.",
+      "titulo": "Welcome to Yalope!",
+      "parrafo1": "You're now part of the community where actors and creators meet to put projects together: you swipe through profiles and proposals, and when the interest is mutual, a chat opens.",
+      "parrafo2": "You can now sign in and complete your profile to get started.",
+      "entrar": "Go to Yalope",
+      "comoFunciona": "See how it works",
+      "lista": {
+        "titulo": "Get off to a great start",
+        "fotos": "🎬 &nbsp;Add 3 or more photos and your reel: it's the first thing people look at.",
+        "notificaciones": "🔔 &nbsp;Turn on notifications to hear about every match and every message.",
+        "instalar": "📱 &nbsp;Install the app from your phone's browser: “Add to Home Screen”.",
+        "discord": "💬 &nbsp;Join the community on {discord}."
+      },
+      "motivo": "You're getting this email because you have a Yalope account."
+    },
+    "accesoHabilitado": {
+      "asunto": "🎭 You now have access to Yalope",
+      "previa": "Your request was approved: you can sign in now.",
+      "titulo": "You now have access to Yalope!",
+      "parrafo1": "Your request was approved. You can now sign in and create your profile to become part of the community.",
+      "parrafo2": "See you there!",
+      "boton": "Go to Yalope",
+      "motivo": "You're getting this email because you requested access to Yalope."
+    },
+    "solicitudAcceso": {
+      "asunto": "🔔 New access request for Yalope",
+      "previa": "{email} asked to join Yalope.",
+      "previaSinEmail": "Someone asked to join Yalope.",
+      "titulo": "New access request",
+      "parrafo1": "There's a new access request for Yalope waiting for review.",
+      "email": "Email: {email}",
+      "sinEmail": "(no email)",
+      "fecha": "Date: {fecha}",
+      "parrafo2": "Go to the admin panel to review it and decide whether to grant access.",
+      "boton": "View request",
+      "motivo": "You're getting this email because you're a Yalope admin."
+    },
+    "invitacion": {
+      "asunto": "🎭 You've been invited to Yalope",
+      "previa": "Create your account and get in right away, no approval needed.",
+      "titulo": "You've been invited to Yalope!",
+      "parrafo1": "Yalope is the community where actors and creators meet to put projects together: you swipe through profiles and proposals, and when the interest is mutual, a chat opens.",
+      "parrafo2": "You have an invitation: create your account with this same email (or with Google, if it's your Gmail account) and you're in right away, no approval needed.",
+      "crearCuenta": "Create my account",
+      "comoFunciona": "See how it works",
+      "motivo": "You're getting this email because someone on the Yalope team invited you."
+    },
+    "push": {
+      "mensaje": {
+        "alguien": "Someone"
+      },
+      "accesoHabilitado": {
+        "titulo": "You now have access to Yalope!",
+        "cuerpo": "Your request was approved. Sign in and complete your profile."
+      },
+      "solicitudAcceso": {
+        "titulo": "New access request",
+        "cuerpo": "{email} asked to join Yalope.",
+        "cuerpoSinEmail": "Someone asked to join Yalope."
+      }
+    }
+  }
+}

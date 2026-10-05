@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 
 /**
@@ -17,11 +18,12 @@ export function VistaPerfilPropio({
   hrefEditar: string;
   aviso?: string;
 }) {
+  const t = useTranslations("perfil.vistaPropia");
   return (
     <div className="flex flex-col gap-4">
       <div className="flex items-center justify-between gap-3 rounded-xl bg-fondo-sutil px-4 py-3">
         <p className="text-xs leading-snug text-texto-tenue">
-          Así te ven los demás.
+          {t("asiTeVen")}
           {aviso && <span className="block text-texto-tenue">{aviso}</span>}
         </p>
         <Link
@@ -29,7 +31,7 @@ export function VistaPerfilPropio({
           className="flex shrink-0 items-center gap-1.5 rounded-lg border border-borde bg-superficie px-3 py-1.5 text-sm font-medium text-texto transition-colors hover:border-ink-300"
         >
           <Icono nombre="editar" className="h-3.5 w-3.5" />
-          Editar
+          {t("editar")}
         </Link>
       </div>
 

@@ -2,6 +2,8 @@
 // de video. Todo el acceso a Google vive acá: cambiar de proveedor de geocoding tiene que ser
 // reemplazar este archivo, no auditar la aplicación.
 
+import { traductorCastellano, type TraductorEtiquetas } from "@/lib/constantes";
+
 export type Ubicacion = {
   /**
    * Lo que la persona eligió, con la precisión que haya querido: puede ser una calle y
@@ -54,8 +56,9 @@ export function unidadAMetros(valor: number, unidad: UnidadDistancia): number {
   return Math.round(valor * (unidad === "mi" ? METROS_POR_MILLA : METROS_POR_KM));
 }
 
-export function etiquetaUnidad(unidad: UnidadDistancia): string {
-  return unidad === "mi" ? "millas" : "km";
+/** `t`: traductor de `perfil.etiquetas` (ver `constantes.ts`); sin él, en castellano. */
+export function etiquetaUnidad(unidad: UnidadDistancia, t: TraductorEtiquetas = traductorCastellano): string {
+  return t(`unidad.${unidad}`);
 }
 
 // Los pasos son distintos por unidad y no se convierten entre sí: nadie quiere elegir
@@ -65,14 +68,17 @@ const PASOS_MI = [5, 10, 25, 50, 100];
 
 export type OpcionRadio = { etiqueta: string; metros: number | null };
 
-export function opcionesDeRadio(unidad: UnidadDistancia): OpcionRadio[] {
+export function opcionesDeRadio(
+  unidad: UnidadDistancia,
+  t: TraductorEtiquetas = traductorCastellano,
+): OpcionRadio[] {
   const pasos = unidad === "mi" ? PASOS_MI : PASOS_KM;
   return [
     ...pasos.map((paso) => ({
-      etiqueta: `${paso} ${etiquetaUnidad(unidad)}`,
+      etiqueta: `${paso} ${etiquetaUnidad(unidad, t)}`,
       metros: unidadAMetros(paso, unidad),
     })),
-    { etiqueta: "Todo el mundo", metros: null },
+    { etiqueta: t("radio.todoElMundo"), metros: null },
   ];
 }
 
@@ -80,8 +86,12 @@ export function opcionesDeRadio(unidad: UnidadDistancia): OpcionRadio[] {
  * El paso más cercano al radio guardado. Al cambiar de unidad el radio en metros no se toca:
  * se muestra el paso de la unidad nueva que mejor lo representa.
  */
-export function radioMasCercano(metros: number | null, unidad: UnidadDistancia): OpcionRadio {
-  const opciones = opcionesDeRadio(unidad);
+export function radioMasCercano(
+  metros: number | null,
+  unidad: UnidadDistancia,
+  t: TraductorEtiquetas = traductorCastellano,
+): OpcionRadio {
+  const opciones = opcionesDeRadio(unidad, t);
   if (metros === null) return opciones[opciones.length - 1];
   return opciones
     .filter((o): o is OpcionRadio & { metros: number } => o.metros !== null)
@@ -94,7 +104,25 @@ export function radioMasCercano(metros: number | null, unidad: UnidadDistancia):
 
 export type SugerenciaUbicacion = { id: string; texto: string };
 
-export class ErrorUbicacion extends Error {}
+/**
+ * `clave` es la del mensaje dentro de `perfil.etiquetas.ubicacion`: el componente lo muestra
+ * con `t("ubicacion." + e.clave)`. `message` queda en castellano para quien no traduce.
+ */
+export class ErrorUbicacion extends Error {
+  constructor(readonly clave: ClaveErrorUbicacion) {
+    super(traductorCastellano(`ubicacion.${clave}`));
+  }
+}
+
+export type ClaveErrorUbicacion =
+  | "faltaClave"
+  | "noCargoBuscador"
+  | "elegiDeLaLista"
+  | "sinCoordenadas"
+  | "sinPais"
+  | "noIdentificada"
+  | "noIdentificadaEscribila"
+  | "paisNoIdentificado";
 
 type PlacesLibrary = {
   AutocompleteSuggestion: {
@@ -151,11 +179,11 @@ function cargarPlaces(): Promise<PlacesLibrary> {
 
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
   if (!apiKey) {
-    return Promise.reject(new ErrorUbicacion("Falta configurar NEXT_PUBLIC_GOOGLE_MAPS_API_KEY."));
+    return Promise.reject(new ErrorUbicacion("faltaClave"));
   }
 
   cargaEnCurso = new Promise<PlacesLibrary>((resolver, rechazar) => {
-    const fallo = () => rechazar(new ErrorUbicacion("No se pudo cargar el buscador de lugares."));
+    const fallo = () => rechazar(new ErrorUbicacion("noCargoBuscador"));
 
     const entregar = () => {
       const places = window.google?.maps?.places;
@@ -231,7 +259,7 @@ export class SesionUbicacion {
   async resolver(id: string): Promise<Ubicacion> {
     const sugerencia = this.sugerencias.get(id);
     if (!sugerencia?.placePrediction) {
-      throw new ErrorUbicacion("Elegí un lugar de la lista.");
+      throw new ErrorUbicacion("elegiDeLaLista");
     }
 
     const { place } = await sugerencia.placePrediction
@@ -287,12 +315,12 @@ function aUbicacion(place: PlaceResuelto, textoPrediccion: string, placeId: stri
   const lat = place.location?.lat();
   const lng = place.location?.lng();
   if (typeof lat !== "number" || typeof lng !== "number") {
-    throw new ErrorUbicacion("Ese lugar no tiene coordenadas; probá con otro.");
+    throw new ErrorUbicacion("sinCoordenadas");
   }
 
   const pais = place.addressComponents?.find((c) => c.types.includes("country"))?.shortText;
   if (!pais) {
-    throw new ErrorUbicacion("Ese lugar no tiene país; probá con otro.");
+    throw new ErrorUbicacion("sinPais");
   }
 
   return {
@@ -328,16 +356,16 @@ type ResultadoGeocoding = {
  */
 export async function ubicacionDesdeCoordenadas(lat: number, lng: number): Promise<Ubicacion> {
   const apiKey = process.env.NEXT_PUBLIC_GOOGLE_MAPS_API_KEY;
-  if (!apiKey) throw new ErrorUbicacion("Falta configurar NEXT_PUBLIC_GOOGLE_MAPS_API_KEY.");
+  if (!apiKey) throw new ErrorUbicacion("faltaClave");
 
   const url = `https://maps.googleapis.com/maps/api/geocode/json?latlng=${lat},${lng}&key=${apiKey}&language=es`;
   const respuesta = await fetch(url);
-  if (!respuesta.ok) throw new ErrorUbicacion("No pudimos identificar tu ubicación.");
+  if (!respuesta.ok) throw new ErrorUbicacion("noIdentificada");
 
   const datos = (await respuesta.json()) as { status?: string; results?: ResultadoGeocoding[] };
   const primero = datos.results?.[0];
   if (datos.status !== "OK" || !primero) {
-    throw new ErrorUbicacion("No pudimos identificar tu ubicación. Escribila a mano.");
+    throw new ErrorUbicacion("noIdentificadaEscribila");
   }
 
   // La Geocoding API usa `long_name`/`short_name`; Places usa `longText`/`shortText`. Se
@@ -349,7 +377,7 @@ export async function ubicacionDesdeCoordenadas(lat: number, lng: number): Promi
   }));
 
   const pais = componentes.find((c) => c.types.includes("country"))?.shortText;
-  if (!pais) throw new ErrorUbicacion("No pudimos identificar tu país. Escribí tu ubicación.");
+  if (!pais) throw new ErrorUbicacion("paisNoIdentificado");
 
   const texto = primero.formatted_address ?? `${lat}, ${lng}`;
   return {

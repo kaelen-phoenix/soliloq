@@ -20,6 +20,7 @@ export function BarraNavegacion({
 }) {
   const pathname = usePathname();
   const t = useTranslations("nav");
+  const tLayout = useTranslations("cuenta.layout");
   const items = itemsParaNavegacion({ esAdmin });
   const { total: noLeidos } = useNoLeidos();
 
@@ -35,7 +36,7 @@ export function BarraNavegacion({
                 href={item.href}
                 data-tour={idTourNav(item.href)}
                 aria-current={activo ? "page" : undefined}
-                aria-label={badge > 0 ? `${t(item.clave)}, ${badge} sin leer` : undefined}
+                aria-label={badge > 0 ? tLayout("sinLeer", { etiqueta: t(item.clave), n: badge }) : undefined}
                 className={`flex flex-col items-center gap-1 pb-1.5 pt-2.5 text-2xs font-medium transition-colors ${
                   activo ? "acento-texto" : "text-texto-tenue hover:text-texto-tenue"
                 }`}

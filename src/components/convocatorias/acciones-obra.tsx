@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
@@ -31,6 +32,8 @@ export function AccionesObra({
   fotosPaths: string[];
 }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.accionesObra");
+  const tUi = useTranslations("cuenta.ui");
   const [error, setError] = useState<string | null>(null);
   const [cargando, setCargando] = useState(false);
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
@@ -57,17 +60,17 @@ export function AccionesObra({
     // Sin poder contar no se publica: mejor un reintento que una convocatoria sin foto.
     if (errorRoles || errorFotos || roles == null || fotos == null) {
       setCargando(false);
-      setError("No pudimos verificar el proyecto. Probá de nuevo.");
+      setError(t("errorVerificar"));
       return;
     }
     if (roles === 0) {
       setCargando(false);
-      setError("Definí al menos un rol antes de publicar.");
+      setError(t("faltaRol"));
       return;
     }
     if (fotos < MIN_FOTOS) {
       setCargando(false);
-      setError("Subí al menos una foto antes de publicar.");
+      setError(t("faltaFoto"));
       return;
     }
     await supabase.from("obras").update({ estado: "publicada" }).eq("id", obraId);
@@ -101,7 +104,7 @@ export function AccionesObra({
     const { error: errorBd } = await supabase.from("obras").delete().eq("id", obraId);
     if (errorBd) {
       setCargando(false);
-      setError("No se pudo borrar el proyecto. Probá de nuevo.");
+      setError(t("errorBorrar"));
       return;
     }
     // Recién con el proyecto borrado se borran sus canales.
@@ -116,17 +119,17 @@ export function AccionesObra({
       {error && <p className="text-xs text-error-600">{error}</p>}
       <div className="flex gap-2">
         {estado === "borrador" && (
-          <Boton onClick={publicar} cargando={cargando || subiendoFoto} textoCargando={subiendoFoto ? "Subiendo la foto…" : undefined}>
-            Publicar convocatoria
+          <Boton onClick={publicar} cargando={cargando || subiendoFoto} textoCargando={subiendoFoto ? t("subiendoFoto") : undefined}>
+            {t("publicar")}
           </Boton>
         )}
         {estado === "publicada" && (
           <Boton variante="peligro" onClick={cerrar} cargando={cargando}>
-            Cerrar convocatoria
+            {t("cerrar")}
           </Boton>
         )}
         {estado === "cerrada" && (
-          <p className="text-sm text-texto-tenue">Esta convocatoria está cerrada.</p>
+          <p className="text-sm text-texto-tenue">{t("cerrada")}</p>
         )}
       </div>
 
@@ -141,12 +144,12 @@ export function AccionesObra({
                 setConfirmarBorrado(true);
               }}
             >
-              Borrar proyecto
+              {t("borrar")}
             </Boton>
           ) : (
             <ConfirmarBorrado
-              mensaje="Se borra el proyecto con sus roles, fotos, el interés recibido y su sala de chat. Los Talentos que convocaste vuelven a aparecer en Buscar Talentos. No se puede deshacer. Escribí BORRAR para confirmar."
-              textoBoton="Borrar definitivamente"
+              mensaje={t("confirmarBorrado", { palabra: tUi("palabraBorrar") })}
+              textoBoton={t("borrarDefinitivamente")}
               cargando={cargando}
               onConfirmar={borrar}
               onCancelar={() => setConfirmarBorrado(false)}

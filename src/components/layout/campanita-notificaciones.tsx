@@ -3,12 +3,14 @@
 import Link from "next/link";
 import { usePathname } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { EVENTO_NOTIFICACIONES } from "@/lib/notificaciones-cliente";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
 
 export function CampanitaNotificaciones({ userId }: { userId: string }) {
+  const t = useTranslations("cuenta.layout");
   const [noLeidas, setNoLeidas] = useState(0);
   const pathname = usePathname();
   const [revision, setRevision] = useState(0);
@@ -64,7 +66,9 @@ export function CampanitaNotificaciones({ userId }: { userId: string }) {
     <Link
       href="/notificaciones"
       data-tour="campanita"
-      aria-label={noLeidas > 0 ? `Notificaciones, ${noLeidas} sin leer` : "Notificaciones"}
+      aria-label={
+        noLeidas > 0 ? t("sinLeer", { etiqueta: t("notificaciones"), n: noLeidas }) : t("notificaciones")
+      }
       className="relative inline-flex h-9 w-9 items-center justify-center rounded-full text-texto-tenue transition-colors hover:bg-fondo-sutil hover:text-texto"
     >
       <Icono nombre="campana" />

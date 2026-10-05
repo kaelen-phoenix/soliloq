@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import { notFound } from "next/navigation";
 import { cache } from "react";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
@@ -26,10 +27,11 @@ export async function generateMetadata({
 }): Promise<Metadata> {
   const perfil = await obtenerPerfil(params.token);
   if (!perfil) return {};
+  const t = await getTranslations("perfil.publico");
 
   return {
-    title: `${perfil.nombre} · Yalope`,
-    description: perfil.texto?.slice(0, 160) || `El perfil de ${perfil.nombre} en Yalope.`,
+    title: t("tituloMeta", { nombre: perfil.nombre }),
+    description: perfil.texto?.slice(0, 160) || t("descripcionMeta", { nombre: perfil.nombre }),
     // Un enlace pensado para pegar en un chat, no para que lo indexe un buscador.
     // La tarjeta al compartir la arma `opengraph-image.tsx`.
     robots: { index: false, follow: false },
@@ -42,6 +44,8 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
   const supabase = createClient();
   const perfil = await obtenerPerfil(params.token);
   if (!perfil) notFound();
+  const t = await getTranslations("perfil.publico");
+  const primerNombre = perfil.nombre.split(" ")[0];
 
   const {
     data: { user },
@@ -75,11 +79,11 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
     <div data-tema="light" className="min-h-screen bg-[#fbfaf7] text-ink-900">
       <div className="mx-auto max-w-xl px-5 py-8 sm:py-12">
         <header className="mb-8 flex items-center justify-between">
-          <Link href="/" aria-label="Ir a Yalope">
+          <Link href="/" aria-label={t("irAYalope")}>
             <Logotipo tamano="sm" />
           </Link>
           <span className="text-2xs font-medium uppercase tracking-[0.16em] text-ink-400">
-            Booking
+            {t("booking")}
           </span>
         </header>
 
@@ -90,14 +94,14 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
         {!esDueño && (!user || pendiente !== "app") ? (
           <section className="mt-10 rounded-2xl border border-ink-200 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
             <h2 className="font-display text-lg font-semibold tracking-[-0.02em] text-ink-900">
-              ¿Te interesa trabajar con {perfil.nombre.split(" ")[0]}?
+              {t("teInteresa", { nombre: primerNombre })}
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-600">
               {!user
-                ? `Creá tu cuenta gratis en Yalope para ver el perfil completo de ${perfil.nombre.split(" ")[0]}, con sus redes.`
+                ? t("sinCuenta", { nombre: primerNombre })
                 : pendiente === "solicitud-pendiente"
-                  ? "Tu cuenta está esperando aprobación. Cuando te habiliten vas a ver el perfil completo, con sus redes."
-                  : "Completá tu perfil en Yalope para ver el perfil completo, con sus redes."}
+                  ? t("esperandoAprobacion")
+                  : t("completaTuPerfil")}
             </p>
             {!user ? (
               <div className="mt-4 flex flex-wrap items-center gap-4">
@@ -105,10 +109,10 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
                   href={`/ingresar?modo=registrarme&next=${volverAca}`}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto transition-colors hover:opacity-90"
                 >
-                  Crear cuenta
+                  {t("crearCuenta")}
                 </Link>
                 <Link href={`/ingresar?next=${volverAca}`} className="text-sm font-medium text-ink-700 hover:text-brand-600">
-                  Ya tengo cuenta
+                  {t("yaTengoCuenta")}
                 </Link>
               </div>
             ) : pendiente !== "solicitud-pendiente" ? (
@@ -117,7 +121,7 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
                   href={`/${pendiente}?next=${volverAca}`}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto transition-colors hover:opacity-90"
                 >
-                  Completar mi perfil
+                  {t("completarMiPerfil")}
                 </Link>
               </div>
             ) : null}
@@ -127,12 +131,12 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
         <footer className="mt-12 flex items-center justify-between border-t border-ink-100 pt-5 text-sm text-ink-500">
           {esDueño ? (
             <Link href="/perfil" className="font-medium text-ink-700 hover:text-brand-600">
-              Volver a mi perfil
+              {t("volverAMiPerfil")}
             </Link>
           ) : (
             <span className="inline-flex items-center gap-1.5">
               <MarcaYalope className="h-4 w-4 text-ink-400" />
-              Perfil en Yalope
+              {t("perfilEnYalope")}
             </span>
           )}
           <Link href="/" className="font-medium text-ink-700 hover:text-brand-600">

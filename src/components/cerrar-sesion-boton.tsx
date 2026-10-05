@@ -1,11 +1,13 @@
 "use client";
 
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 
 export function CerrarSesionBoton() {
   const router = useRouter();
+  const t = useTranslations("cuenta");
 
   async function cerrarSesion() {
     const supabase = createClient();
@@ -16,7 +18,7 @@ export function CerrarSesionBoton() {
 
   return (
     <Boton variante="peligro" onClick={cerrarSesion}>
-      Cerrar sesión
+      {t("cerrarSesion")}
     </Boton>
   );
 }

@@ -2,6 +2,7 @@
 
 import { useEffect, useRef, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { AvisoGuardado, useAvisoGuardado } from "@/components/ui/aviso-guardado";
 import { Boton } from "@/components/ui/boton";
@@ -19,6 +20,9 @@ import {
   MAX_GENERO_DESCRIPCION,
   REDES,
   calcularEdad,
+  claveGenero,
+  claveRed,
+  etiquetaHabilidad,
   type ClaveRed,
   type Genero,
 } from "@/lib/constantes";
@@ -106,6 +110,10 @@ export function FormularioTalento({
   conFotoGoogle?: boolean;
 }) {
   const router = useRouter();
+  const t = useTranslations("perfil.formulario");
+  const tError = useTranslations("perfil.formulario.errores");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
+  const tCreador = useTranslations("perfil.creador");
   const [nombre, setNombre] = useState(datosIniciales?.nombre ?? nombreSugerido ?? "");
   // Lo que se escribe, «dd/mm/aaaa» (#307); se pasa a ISO al validar y guardar.
   const [fechaNacimiento, setFechaNacimiento] = useState(isoATexto(datosIniciales?.fecha_nacimiento));
@@ -251,31 +259,30 @@ export function FormularioTalento({
   function validar(): boolean {
     const nuevos: Record<string, string> = {};
 
-    if (nombre.trim().length < 2) nuevos.nombre = "Ingresá tu nombre.";
+    if (nombre.trim().length < 2) nuevos.nombre = tError("nombre");
     const fechaIso = textoAIso(fechaNacimiento);
     if (!fechaNacimiento) {
-      nuevos.fecha_nacimiento = "Ingresá tu fecha de nacimiento.";
+      nuevos.fecha_nacimiento = tError("fechaFalta");
     } else if (!fechaIso) {
-      nuevos.fecha_nacimiento = "Escribila así: día/mes/año, por ejemplo 07/05/1995.";
+      nuevos.fecha_nacimiento = tError("fechaFormato");
     } else if (calcularEdad(fechaIso) < 16) {
-      nuevos.fecha_nacimiento = "La plataforma es para personas de 16 años o más.";
+      nuevos.fecha_nacimiento = tError("fechaEdad");
     }
-    if (!ubicacion) nuevos.ubicacion = "Elegí tu ubicación de la lista de sugerencias.";
-    if (!genero) nuevos.genero = "Elegí una opción.";
+    if (!ubicacion) nuevos.ubicacion = tError("ubicacion");
+    if (!genero) nuevos.genero = tError("genero");
     if (generoDescripcion.length > MAX_GENERO_DESCRIPCION) {
-      nuevos.genero_descripcion = `Máximo ${MAX_GENERO_DESCRIPCION} caracteres.`;
+      nuevos.genero_descripcion = tError("maximoCaracteres", { max: MAX_GENERO_DESCRIPCION });
     }
     // El mínimo de fotos es para **completar** el perfil (el alta). Al editar no bloquea: las
     // fotos se guardan solas al subirlas o borrarlas, y trabar el resto del formulario por eso
     // dejaba a cuentas viejas sin poder guardar nada (#243). Se avisa abajo de las fotos.
-    if (esAlta && fotos.length < MIN_FOTOS) nuevos.fotos = "Cargá al menos una foto.";
+    if (esAlta && fotos.length < MIN_FOTOS) nuevos.fotos = tError("fotos");
     if (videoreelUrl && !esVideoreelValido(videoreelUrl)) {
-      nuevos.videoreel_url =
-        "No reconocemos ese enlace. Pegá el link de un video de YouTube o Vimeo.";
+      nuevos.videoreel_url = tError("videoreel");
     }
-    if (experiencia.length > 2000) nuevos.experiencia = "Máximo 2000 caracteres.";
+    if (experiencia.length > 2000) nuevos.experiencia = tError("maximoCaracteres", { max: 2000 });
 
-    const { errores: erroresRedes } = validarRedes(redes);
+    const { errores: erroresRedes } = validarRedes(redes, tEtiquetas);
     for (const [clave, mensaje] of Object.entries(erroresRedes)) {
       nuevos[`redes_${clave}`] = mensaje;
     }
@@ -285,6 +292,7 @@ export function FormularioTalento({
         nuevos,
         validarCreador(disciplinas, otroDetalle, {
           exigirUna: datosCreador.disciplinas.length > 0,
+          t: tCreador,
         }),
       );
     }
@@ -305,7 +313,7 @@ export function FormularioTalento({
     if (!validar()) {
       // El error puede estar lejos del botón (arriba, en las fotos o la fecha): se avisa acá
       // y se lleva la pantalla hasta el primer campo marcado (#243).
-      setErrorGeneral("Revisá los campos marcados en rojo.");
+      setErrorGeneral(tError("revisar"));
       requestAnimationFrame(() =>
         document
           .querySelector("[data-formulario-talento] .text-error-600")
@@ -343,7 +351,7 @@ export function FormularioTalento({
 
     if (error) {
       setCargando(false);
-      setErrorGeneral("No pudimos guardar tu perfil. Revisá los datos e intentá de nuevo.");
+      setErrorGeneral(tError("guardar"));
       return;
     }
 
@@ -378,9 +386,7 @@ export function FormularioTalento({
         .eq("id", userId);
       if (errorCreador) {
         setCargando(false);
-        setErrorGeneral(
-          "Guardamos tu perfil, pero no el perfil artístico como Creador. Probá de nuevo.",
-        );
+        setErrorGeneral(tError("guardarCreador"));
         return;
       }
     }
@@ -397,14 +403,14 @@ export function FormularioTalento({
     <form onSubmit={guardar} data-formulario-talento className="flex max-w-2xl flex-col gap-6">
       {recuperado && (
         <p className="rounded-xl border border-borde bg-fondo-sutil px-3.5 py-2.5 text-sm text-texto">
-          Recuperamos lo que habías cargado. Seguí desde acá.
+          {t("recuperado")}
         </p>
       )}
       <section className="flex flex-col gap-4">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Ficha básica</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("fichaBasica")}</h2>
         <CampoTexto
           id="nombre"
-          etiqueta="Nombre completo"
+          etiqueta={t("nombre")}
           value={nombre}
           onChange={(e) => setNombre(e.target.value)}
           error={errores.nombre}
@@ -412,10 +418,10 @@ export function FormularioTalento({
         <div className="flex flex-col gap-1.5">
           <CampoTexto
             id="fecha_nacimiento"
-            etiqueta="Fecha de nacimiento"
+            etiqueta={t("fechaNacimiento")}
             inputMode="numeric"
             autoComplete="bday"
-            placeholder="dd/mm/aaaa"
+            placeholder={t("fechaPlaceholder")}
             maxLength={10}
             value={fechaNacimiento}
             onChange={(e) => setFechaNacimiento(formatearMientrasSeEscribe(e.target.value))}
@@ -424,29 +430,27 @@ export function FormularioTalento({
           <ToggleVisibilidad
             visible={edadVisible}
             onCambio={setEdadVisible}
-            textoVisible="Tu edad se muestra en tu perfil"
-            textoOculto="Tu edad está oculta en tu perfil"
+            textoVisible={t("edadVisible")}
+            textoOculto={t("edadOculta")}
           />
           <p className="text-xs text-texto-tenue">
-            La fecha se guarda igual y se usa para priorizar las búsquedas por edad, la
-            muestres o no.
+            {t("fechaAyuda")}
           </p>
         </div>
         <CampoUbicacion
           id="ubicacion"
-          etiqueta="Ubicación"
+          etiqueta={t("ubicacion")}
           valor={ubicacion}
           onCambio={setUbicacion}
           error={errores.ubicacion}
         />
         <p className="-mt-2 text-xs text-texto-tenue">
-          Alcanza con tu ciudad o barrio. Nadie ve tu dirección: solo la zona, para mostrarte lo
-          que tenés cerca.
+          {t("ubicacionAyuda")}
         </p>
 
         <div className="flex flex-col gap-1.5">
           <label htmlFor="genero" className="text-sm font-medium text-texto">
-            Género
+            {t("genero")}
           </label>
           <select
             id="genero"
@@ -456,10 +460,10 @@ export function FormularioTalento({
               errores.genero ? "border-error-400" : "border-borde"
             }`}
           >
-            <option value="">Elegí una opción</option>
+            <option value="">{t("elegiUnaOpcion")}</option>
             {GENEROS.map((g) => (
               <option key={g.valor} value={g.valor}>
-                {g.etiqueta}
+                {tEtiquetas(claveGenero(g.valor))}
               </option>
             ))}
           </select>
@@ -471,7 +475,7 @@ export function FormularioTalento({
         {genero === "otro" && (
           <CampoTexto
             id="genero_descripcion"
-            etiqueta="¿Cuál? (opcional)"
+            etiqueta={t("generoCual")}
             maxLength={MAX_GENERO_DESCRIPCION}
             value={generoDescripcion}
             onChange={(e) => setGeneroDescripcion(e.target.value)}
@@ -481,7 +485,7 @@ export function FormularioTalento({
       </section>
 
       <section className="flex flex-col gap-3">
-        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Portfolio de fotos</h2>
+        <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("portfolio")}</h2>
         {esAlta && conFotoGoogle && fotoGoogle !== "usada" && (
           <div className="flex flex-col gap-1">
             <button
@@ -490,7 +494,7 @@ export function FormularioTalento({
               disabled={fotoGoogle === "trayendo"}
               className="self-start rounded-full border border-borde px-3.5 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
             >
-              {fotoGoogle === "trayendo" ? "Trayendo tu foto…" : "Usar mi foto de Google"}
+              {fotoGoogle === "trayendo" ? t("trayendoFoto") : t("usarFotoGoogle")}
             </button>
             {fotoGoogle !== "lista" && fotoGoogle !== "trayendo" && (
               <p className="text-xs text-error-600">{fotoGoogle}</p>
@@ -501,7 +505,7 @@ export function FormularioTalento({
         {errores.fotos && <p className="text-xs text-error-600">{errores.fotos}</p>}
         {fotos.length > 0 && fotos.length < FOTOS_RECOMENDADAS && (
           <p className="text-xs text-alerta-800">
-            Te recomendamos {FOTOS_RECOMENDADAS} fotos o más: así quien busca talento te ve mejor.
+            {t("fotosRecomendadas", { n: FOTOS_RECOMENDADAS })}
           </p>
         )}
       </section>
@@ -512,34 +516,33 @@ export function FormularioTalento({
           onClick={() => setVerOpcionales(true)}
           className="flex flex-col items-start rounded-xl border border-dashed border-borde px-4 py-3 text-left transition-colors hover:bg-fondo-sutil"
         >
-          <span className="text-sm font-medium text-texto">+ Sumar más (opcional)</span>
+          <span className="text-sm font-medium text-texto">{t("sumarMas")}</span>
           <span className="mt-0.5 text-xs text-texto-tenue">
-            Videoreel, experiencia, habilidades y redes. También podés completarlo después desde
-            tu Perfil.
+            {t("sumarMasAyuda")}
           </span>
         </button>
       ) : (
         <>
           <section className="flex flex-col gap-4">
-            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Videoreel (opcional)</h2>
+            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("videoreel")}</h2>
             <CampoTexto
               id="videoreel"
-              etiqueta="Enlace de YouTube o Vimeo"
-              placeholder="https://youtu.be/... o https://vimeo.com/..."
+              etiqueta={t("videoreelEtiqueta")}
+              placeholder={t("videoreelPlaceholder")}
               value={videoreelUrl}
               onChange={(e) => setVideoreelUrl(e.target.value)}
               error={errores.videoreel_url}
             />
             <p className="-mt-2 text-xs text-texto-tenue">
-              Sirve el link normal, el de compartir, Shorts o el de la app del celular.
+              {t("videoreelAyuda")}
             </p>
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">CV y habilidades</h2>
+            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("cvHabilidades")}</h2>
             <div className="flex flex-col gap-1.5">
               <label htmlFor="experiencia" className="text-sm font-medium text-texto">
-                Experiencia
+                {t("experiencia")}
               </label>
               <textarea
                 id="experiencia"
@@ -548,7 +551,7 @@ export function FormularioTalento({
                 value={experiencia}
                 onChange={(e) => setExperiencia(e.target.value)}
                 className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
-                placeholder="Contá tu formación, obras en las que participaste, etc."
+                placeholder={t("experienciaPlaceholder")}
               />
               <p className="text-right text-xs text-texto-tenue">{experiencia.length}/2000</p>
               <MejorarRedaccion texto={experiencia} onUsar={setExperiencia} />
@@ -566,7 +569,7 @@ export function FormularioTalento({
                       : "border-borde text-texto-tenue"
                   }`}
                 >
-                  {h}
+                  {etiquetaHabilidad(h, tEtiquetas)}
                 </button>
               ))}
             </div>
@@ -574,15 +577,15 @@ export function FormularioTalento({
           </section>
 
           <section className="flex flex-col gap-4">
-            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Redes sociales (opcional)</h2>
+            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("redes")}</h2>
             {REDES.filter(
               (red) => masRedes || red.clave === "instagram" || !!redes[red.clave] || !!errores[`redes_${red.clave}`],
             ).map((red) => (
               <CampoTexto
                 key={red.clave}
                 id={`red_${red.clave}`}
-                etiqueta={red.etiqueta}
-                placeholder={red.clave === "sitio" ? "https://tusitio.com" : "@usuario o https://…"}
+                etiqueta={tEtiquetas(claveRed(red.clave))}
+                placeholder={red.clave === "sitio" ? t("sitioPlaceholder") : t("redPlaceholder")}
                 value={redes[red.clave] ?? ""}
                 onChange={(e) => cambiarRed(red.clave, e.target.value)}
                 error={errores[`redes_${red.clave}`]}
@@ -594,13 +597,13 @@ export function FormularioTalento({
                 onClick={() => setMasRedes(true)}
                 className="self-start text-sm font-medium text-texto-tenue underline hover:text-texto"
               >
-                + Agregar otra red (YouTube, TikTok, X, LinkedIn, Vimeo, sitio web)
+                {t("agregarRed")}
               </button>
             )}
           </section>
 
           <section className="flex flex-col gap-3">
-            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Visibilidad</h2>
+            <h2 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("visibilidad")}</h2>
             {/* #265: se tilda para ocultarse. En la base sigue siendo `aparece_en_buscador`
                 (invertido); 0090 lo aplica a todo contacto nuevo, no solo al buscador. */}
             <label className="flex items-start gap-3">
@@ -611,10 +614,9 @@ export function FormularioTalento({
                 className="mt-0.5 h-4 w-4 rounded border-ink-300 text-texto focus:ring-accion"
               />
               <span className="text-sm text-texto">
-                Ocultar mi perfil a personas nuevas
+                {t("ocultarPerfil")}
                 <span className="mt-0.5 block text-xs text-texto-tenue">
-                  No salís en el buscador de Creadores y tu enlace público deja de mostrar tu
-                  perfil. Tus chats y tus Proyectos y Equipos siguen igual.
+                  {t("ocultarPerfilAyuda")}
                 </span>
               </span>
             </label>
@@ -639,7 +641,7 @@ export function FormularioTalento({
       <AvisoGuardado visible={guardado} />
 
       <Boton type="submit" cargando={cargando}>
-        {esAlta ? "Completar perfil" : "Guardar cambios"}
+        {esAlta ? t("completar") : t("guardarCambios")}
       </Boton>
     </form>
   );

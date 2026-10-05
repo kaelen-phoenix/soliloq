@@ -1,23 +1,25 @@
+import type { Idioma } from "@/i18n/request";
 import { armarMail, SITIO } from "./plantilla";
+import { localeDe, textosCorreo } from "./textos";
 
-/** A la persona, cuando un admin la habilita (#247). */
-export function mailAccesoHabilitado() {
+/** A la persona, cuando un admin la habilita (#247). En el idioma de esa persona. */
+export function mailAccesoHabilitado(idioma: Idioma) {
+  const t = textosCorreo(idioma);
   return armarMail({
-    asunto: "🎭 Ya tenés acceso a Yalope",
-    previa: "Tu solicitud fue aprobada: ya podés entrar.",
-    titulo: "¡Ya tenés acceso a Yalope!",
-    parrafos: [
-      "Tu solicitud fue aprobada. Ya podés entrar a la plataforma y crear tu perfil para empezar a formar parte de la comunidad.",
-      "¡Te esperamos!",
-    ],
-    botones: [{ href: `${SITIO}/ingresar`, texto: "Entrar a Yalope", primario: true }],
-    motivo: "Te llega este mail porque pediste acceso a Yalope.",
+    idioma,
+    asunto: t("accesoHabilitado.asunto"),
+    previa: t("accesoHabilitado.previa"),
+    titulo: t("accesoHabilitado.titulo"),
+    parrafos: [t("accesoHabilitado.parrafo1"), t("accesoHabilitado.parrafo2")],
+    botones: [{ href: `${SITIO}/ingresar`, texto: t("accesoHabilitado.boton"), primario: true }],
+    motivo: t("accesoHabilitado.motivo"),
   });
 }
 
-/** A cada admin, cuando alguien sin invitación pide entrar (#248). */
-export function mailSolicitudAcceso(datos: { email: string | null; fecha: Date }) {
-  const cuando = datos.fecha.toLocaleString("es-AR", {
+/** A cada admin, cuando alguien sin invitación pide entrar (#248). En el idioma del admin. */
+export function mailSolicitudAcceso(datos: { email: string | null; fecha: Date; idioma: Idioma }) {
+  const t = textosCorreo(datos.idioma);
+  const cuando = datos.fecha.toLocaleString(localeDe(datos.idioma), {
     timeZone: "America/Argentina/Buenos_Aires",
     day: "numeric",
     month: "long",
@@ -25,37 +27,38 @@ export function mailSolicitudAcceso(datos: { email: string | null; fecha: Date }
     minute: "2-digit",
   });
   return armarMail({
-    asunto: "🔔 Nueva solicitud de acceso a Yalope",
-    previa: `${datos.email ?? "Alguien"} pidió entrar a Yalope.`,
-    titulo: "Nueva solicitud de acceso",
+    idioma: datos.idioma,
+    asunto: t("solicitudAcceso.asunto"),
+    previa: datos.email ? t("solicitudAcceso.previa", { email: datos.email }) : t("solicitudAcceso.previaSinEmail"),
+    titulo: t("solicitudAcceso.titulo"),
     parrafos: [
-      "Hay una nueva solicitud de acceso a Yalope pendiente de revisión.",
-      `Email: ${datos.email ?? "(sin email)"}`,
-      `Fecha: ${cuando}`,
-      "Podés entrar al panel de administración para revisarla y decidir si habilitás el acceso.",
+      t("solicitudAcceso.parrafo1"),
+      t("solicitudAcceso.email", { email: datos.email ?? t("solicitudAcceso.sinEmail") }),
+      t("solicitudAcceso.fecha", { fecha: cuando }),
+      t("solicitudAcceso.parrafo2"),
     ],
-    botones: [{ href: `${SITIO}/admin`, texto: "Ver solicitud", primario: true }],
-    motivo: "Te llega este mail porque sos Administrador de Yalope.",
+    botones: [{ href: `${SITIO}/admin`, texto: t("solicitudAcceso.boton"), primario: true }],
+    motivo: t("solicitudAcceso.motivo"),
   });
 }
 
 /**
  * A un email que un admin invitó y todavía no tiene cuenta (#272): entra directo, sin
  * esperar aprobación (0078). El link abre «Crear cuenta»; con Google también sirve.
+ * Sin cuenta no hay `perfiles.idioma`: quien llama elige el idioma (por defecto, castellano).
  */
-export function mailInvitacion() {
+export function mailInvitacion(idioma: Idioma = "es") {
+  const t = textosCorreo(idioma);
   return armarMail({
-    asunto: "🎭 Te invitaron a Yalope",
-    previa: "Creá tu cuenta y entrá directo, sin esperar aprobación.",
-    titulo: "¡Te invitaron a Yalope!",
-    parrafos: [
-      "Yalope es la comunidad donde actores, actrices y creadores se encuentran para armar proyectos: deslizás perfiles y propuestas, y cuando el interés es de los dos lados, se abre el chat.",
-      "Tenés una invitación: creá tu cuenta con este mismo email (o con Google, si es tu cuenta de Gmail) y entrás directo, sin esperar aprobación.",
-    ],
+    idioma,
+    asunto: t("invitacion.asunto"),
+    previa: t("invitacion.previa"),
+    titulo: t("invitacion.titulo"),
+    parrafos: [t("invitacion.parrafo1"), t("invitacion.parrafo2")],
     botones: [
-      { href: `${SITIO}/ingresar?modo=registrarme`, texto: "Crear mi cuenta", primario: true },
-      { href: `${SITIO}/bienvenida`, texto: "Conocé cómo funciona" },
+      { href: `${SITIO}/ingresar?modo=registrarme`, texto: t("invitacion.crearCuenta"), primario: true },
+      { href: `${SITIO}/bienvenida`, texto: t("invitacion.comoFunciona") },
     ],
-    motivo: "Te llega este mail porque alguien del equipo de Yalope te invitó.",
+    motivo: t("invitacion.motivo"),
   });
 }

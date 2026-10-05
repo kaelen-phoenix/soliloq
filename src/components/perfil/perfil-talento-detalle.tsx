@@ -1,5 +1,6 @@
+import { useTranslations } from "next-intl";
 import { VideoreelEmbed } from "./videoreel-embed";
-import { etiquetaGenero, REDES, type Genero } from "@/lib/constantes";
+import { claveGenero, claveRed, etiquetaHabilidad, REDES, type Genero } from "@/lib/constantes";
 import { GaleriaFotos } from "@/components/ui/galeria-fotos";
 import { Icono } from "@/components/ui/icono";
 
@@ -37,6 +38,8 @@ export function PerfilTalentoDetalle({
    */
   esPropio?: boolean;
 }) {
+  const t = useTranslations("perfil.detalle");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
   const fotosOrdenadas = [...talento.fotos].sort((a, b) => a.orden - b.orden);
   const redes = REDES.filter((r) => talento.redes?.[r.clave]);
   const mostrarEdad = talento.edad != null && talento.edad_visible;
@@ -49,13 +52,13 @@ export function PerfilTalentoDetalle({
       <div>
         <h2 className="text-lg font-bold text-texto">{talento.nombre}</h2>
         <p className="text-sm text-texto-tenue">
-          {mostrarEdad && `${talento.edad} años · `}
+          {mostrarEdad && `${t("edad", { edad: talento.edad! })} · `}
           {talento.ubicacion_publica}
         </p>
-        {avisoEdadOculta && <p className="text-xs text-texto-tenue">Tu edad está oculta: nadie más la ve.</p>}
+        {avisoEdadOculta && <p className="text-xs text-texto-tenue">{t("edadOculta")}</p>}
         {(talento.genero_descripcion || talento.genero !== "sin_especificar") && (
           <p className="text-sm text-texto-tenue">
-            {talento.genero_descripcion || etiquetaGenero(talento.genero)}
+            {talento.genero_descripcion || tEtiquetas(claveGenero(talento.genero))}
           </p>
         )}
       </div>
@@ -68,7 +71,7 @@ export function PerfilTalentoDetalle({
               href={talento.redes[red.clave]}
               target="_blank"
               rel="noopener noreferrer"
-              aria-label={red.etiqueta}
+              aria-label={tEtiquetas(claveRed(red.clave))}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-borde text-texto-tenue transition-colors hover:border-ink-400 hover:text-texto"
             >
               <Icono nombre={red.icono} className="h-4 w-4" />
@@ -81,7 +84,7 @@ export function PerfilTalentoDetalle({
 
       {talento.experiencia && (
         <div>
-          <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Experiencia</h3>
+          <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("experiencia")}</h3>
           <p className="mt-1 max-w-prose whitespace-pre-line text-sm text-texto">{talento.experiencia}</p>
         </div>
       )}
@@ -90,7 +93,7 @@ export function PerfilTalentoDetalle({
         <div className="flex flex-wrap gap-2">
           {talento.habilidades.map((h) => (
             <span key={h} className="rounded-md bg-ink-100 px-2.5 py-1 text-xs font-medium text-texto">
-              {h}
+              {etiquetaHabilidad(h, tEtiquetas)}
             </span>
           ))}
         </div>

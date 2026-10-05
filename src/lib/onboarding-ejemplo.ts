@@ -1,4 +1,5 @@
 import type { RolFeed } from "@/components/feed/tarjeta-rol";
+import { traductorCastellano, type TraductorEtiquetas } from "@/lib/constantes";
 
 /**
  * Las tres tarjetas que ve una sola vez quien entra como talento, antes de las convocatorias
@@ -21,63 +22,64 @@ import type { RolFeed } from "@/components/feed/tarjeta-rol";
  * Shakespeare c. 1595—, elegidas para que la tarjeta se lea sin explicación previa. El
  * "creador" no es una persona inventada a propósito: atribuirle una obra falsa a un nombre
  * que suene real es exactamente lo que no queremos.
+ *
+ * Los textos están en `perfil.etiquetas.ejemplos` (#354): `rolesEjemplo(t)` con el traductor
+ * de `perfil.etiquetas` los da en el idioma activo; `ROLES_EJEMPLO` es la versión en castellano.
  */
-export const ROLES_EJEMPLO: RolFeed[] = [
-  {
-    rol_id: "ejemplo-casa-de-munecas",
-    rol_nombre: "Nora Helmer",
-    rol_tipo: "actuacion",
-    edad_minima: 28,
-    edad_maxima: 40,
-    rol_descripcion:
-      "Protagonista. Atraviesa la obra entera desde la comodidad doméstica hasta la ruptura final. Pide manejo del silencio tanto como del texto.",
-    vacantes: 1,
-    obra_id: "ejemplo-obra-casa-de-munecas",
-    obra_titulo: "Casa de muñecas",
-    obra_sinopsis:
-      "Henrik Ibsen, 1879. Nora sostiene un matrimonio aparentemente feliz sobre un secreto que ella misma firmó. Cuando sale a la luz, descubre cuánto de su vida era un papel escrito por otros.",
-    obra_ubicacion_texto: "Buenos Aires, Argentina",
-    creador_id: "ejemplo-creador",
-    creador_nombre: "Obra de ejemplo",
-    creador_imagen_url: null,
-    es_ejemplo: true,
-  },
-  {
-    rol_id: "ejemplo-bodas-de-sangre",
-    rol_nombre: "La Novia",
-    rol_tipo: "actuacion",
-    edad_minima: 22,
-    edad_maxima: 35,
-    rol_descripcion:
-      "Rol central. Se casa con un hombre mientras sigue atada a otro. Requiere cuerpo disponible: la obra pide trabajo físico y coro.",
-    vacantes: 1,
-    obra_id: "ejemplo-obra-bodas-de-sangre",
-    obra_titulo: "Bodas de sangre",
-    obra_sinopsis:
-      "Federico García Lorca, 1933. Una boda en el campo andaluz se rompe cuando la novia huye con Leonardo, el único personaje de la obra que tiene nombre propio. Tragedia en verso y prosa.",
-    obra_ubicacion_texto: "Rosario, Argentina",
-    creador_id: "ejemplo-creador",
-    creador_nombre: "Obra de ejemplo",
-    creador_imagen_url: null,
-    es_ejemplo: true,
-  },
-  {
-    rol_id: "ejemplo-romeo-y-julieta",
-    rol_nombre: "Diseño de iluminación",
-    rol_tipo: "tecnica",
-    edad_minima: null,
-    edad_maxima: null,
-    rol_descripcion:
-      "Puesta en sala chica, con pocos artefactos y muchos cambios de clima. Se busca a alguien que haya iluminado teatro de texto.",
-    vacantes: 1,
-    obra_id: "ejemplo-obra-romeo-y-julieta",
-    obra_titulo: "Romeo y Julieta",
-    obra_sinopsis:
-      "William Shakespeare, c. 1595. Dos jóvenes de familias enfrentadas se enamoran y apuran un plan que termina mal. La versión más contada del amor imposible.",
-    obra_ubicacion_texto: "Córdoba, Argentina",
-    creador_id: "ejemplo-creador",
-    creador_nombre: "Obra de ejemplo",
-    creador_imagen_url: null,
-    es_ejemplo: true,
-  },
-];
+export function rolesEjemplo(t: TraductorEtiquetas = traductorCastellano): RolFeed[] {
+  return [
+    {
+      rol_id: "ejemplo-casa-de-munecas",
+      rol_nombre: t("ejemplos.casaDeMunecas.rol"),
+      rol_tipo: "actuacion",
+      edad_minima: 28,
+      edad_maxima: 40,
+      rol_descripcion: t("ejemplos.casaDeMunecas.descripcion"),
+      vacantes: 1,
+      obra_id: "ejemplo-obra-casa-de-munecas",
+      obra_titulo: t("ejemplos.casaDeMunecas.titulo"),
+      obra_sinopsis: t("ejemplos.casaDeMunecas.sinopsis"),
+      obra_ubicacion_texto: "Buenos Aires, Argentina",
+      creador_id: "ejemplo-creador",
+      creador_nombre: t("ejemplos.creador"),
+      creador_imagen_url: null,
+      es_ejemplo: true,
+    },
+    {
+      rol_id: "ejemplo-bodas-de-sangre",
+      rol_nombre: t("ejemplos.bodasDeSangre.rol"),
+      rol_tipo: "actuacion",
+      edad_minima: 22,
+      edad_maxima: 35,
+      rol_descripcion: t("ejemplos.bodasDeSangre.descripcion"),
+      vacantes: 1,
+      obra_id: "ejemplo-obra-bodas-de-sangre",
+      obra_titulo: t("ejemplos.bodasDeSangre.titulo"),
+      obra_sinopsis: t("ejemplos.bodasDeSangre.sinopsis"),
+      obra_ubicacion_texto: "Rosario, Argentina",
+      creador_id: "ejemplo-creador",
+      creador_nombre: t("ejemplos.creador"),
+      creador_imagen_url: null,
+      es_ejemplo: true,
+    },
+    {
+      rol_id: "ejemplo-romeo-y-julieta",
+      rol_nombre: t("ejemplos.romeoYJulieta.rol"),
+      rol_tipo: "tecnica",
+      edad_minima: null,
+      edad_maxima: null,
+      rol_descripcion: t("ejemplos.romeoYJulieta.descripcion"),
+      vacantes: 1,
+      obra_id: "ejemplo-obra-romeo-y-julieta",
+      obra_titulo: t("ejemplos.romeoYJulieta.titulo"),
+      obra_sinopsis: t("ejemplos.romeoYJulieta.sinopsis"),
+      obra_ubicacion_texto: "Córdoba, Argentina",
+      creador_id: "ejemplo-creador",
+      creador_nombre: t("ejemplos.creador"),
+      creador_imagen_url: null,
+      es_ejemplo: true,
+    },
+  ];
+}
+
+export const ROLES_EJEMPLO: RolFeed[] = rolesEjemplo();

@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useLocale, useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
@@ -47,6 +48,8 @@ export function SalaChat({
   /** Es la sala de un Proyecto o Equipo propio: se ofrece el saludo con IA (#322). */
   esDueno?: boolean;
 }) {
+  const t = useTranslations("chats.sala");
+  const locale = useLocale();
   const [mensajes, setMensajes] = useState(mensajesIniciales);
   const [texto, setTexto] = useState("");
   const [saludo, setSaludo] = useState<"listo" | "escribiendo" | string>("listo");
@@ -63,7 +66,7 @@ export function SalaChat({
       setTexto((prev) => (prev.trim() ? prev : r.texto));
       setSaludo("listo");
     } catch {
-      setSaludo("No pudimos escribirlo ahora. Probá de nuevo.");
+      setSaludo(t("errorSaludo"));
     }
   }
   const [mostrarIntegrantes, setMostrarIntegrantes] = useState(false);
@@ -202,7 +205,7 @@ export function SalaChat({
         onClick={() => setMostrarIntegrantes((v) => !v)}
         className="border-b border-borde px-4 py-2 text-left text-2xs font-medium uppercase tracking-wide text-texto-tenue hover:text-texto"
       >
-        {integrantes.length} integrantes
+        {t("integrantes", { n: integrantes.length })}
       </button>
 
       {mostrarIntegrantes && (
@@ -231,7 +234,7 @@ export function SalaChat({
           {/* La denuncia vive acá, dentro de la lista de integrantes, y no en la cabecera:
               es donde alguien va a mirar cuando quiere reportar a una persona de la sala. */}
           <li className="pt-1">
-            <BotonDenuncia salaId={salaId} queSeDenuncia="lo que pasa en esta sala" />
+            <BotonDenuncia salaId={salaId} queSeDenuncia={t("queSeDenuncia")} />
           </li>
         </ul>
       )}
@@ -239,7 +242,7 @@ export function SalaChat({
       <div className="min-h-0 flex-1 overflow-y-auto px-4 py-3 [&>*]:mx-auto [&>*]:max-w-3xl">
         {mensajes.length === 0 && (
           <p className="mx-auto mt-10 max-w-[16rem] text-center text-sm leading-relaxed text-texto-tenue">
-            Esta sala se abrió porque hay equipo. Coordinen fechas de audición y compartan textos acá.
+            {t("vacio")}
           </p>
         )}
 
@@ -256,7 +259,7 @@ export function SalaChat({
                     <button
                       type="button"
                       onClick={() => setPerfilAbierto(m.autor_id)}
-                      aria-label={`Ver perfil de ${autor?.nombre ?? "integrante"}`}
+                      aria-label={t("verPerfilDe", { nombre: autor?.nombre ?? t("integranteGenerico") })}
                       className="mb-0.5 shrink-0"
                     >
                       {autor?.foto_url ? (
@@ -288,20 +291,20 @@ export function SalaChat({
                         onClick={() => setPerfilAbierto(m.autor_id)}
                         className="text-2xs font-medium opacity-60 hover:underline"
                       >
-                        {primerNombre(autor?.nombre ?? "Integrante")}
+                        {primerNombre(autor?.nombre ?? t("integrante"))}
                       </button>
                     ) : (
                       <p className="text-2xs font-medium opacity-60">
-                        {primerNombre(autor?.nombre ?? "Integrante")}
+                        {primerNombre(autor?.nombre ?? t("integrante"))}
                       </p>
                     ))}
                   <p className="text-base leading-snug">{m.contenido}</p>
                   <p className="mt-0.5 text-2xs opacity-50">
-                    {new Date(m.creado_en).toLocaleTimeString("es-AR", { hour: "2-digit", minute: "2-digit" })}
+                    {new Date(m.creado_en).toLocaleTimeString(locale === "en" ? "en-US" : "es-AR", { hour: "2-digit", minute: "2-digit" })}
                   </p>
                   {m.noEnviado && (
                     <button type="button" onClick={() => reintentar(m)} className="mt-1 block text-2xs underline">
-                      No se envió — reintentar
+                      {t("noEnviado")}
                     </button>
                   )}
                 </div>
@@ -315,7 +318,7 @@ export function SalaChat({
           <PlacaPerfilTalento
             talentoId={perfilAbierto}
             onCerrar={() => setPerfilAbierto(null)}
-            textoBoton="Aceptar"
+            textoBoton={t("aceptar")}
           />
         )}
       </div>
@@ -329,7 +332,7 @@ export function SalaChat({
               disabled={saludo === "escribiendo"}
               className="rounded-full border border-borde px-3 py-1 text-xs font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
             >
-              {saludo === "escribiendo" ? "Escribiendo…" : "✨ Escribir un saludo al grupo"}
+              {saludo === "escribiendo" ? t("escribiendo") : t("escribirSaludo")}
             </button>
           )}
           {saludo !== "listo" && saludo !== "escribiendo" && <p className="text-xs text-error-600">{saludo}</p>}
@@ -343,7 +346,7 @@ export function SalaChat({
             if (saludo !== "listo" && saludo !== "escribiendo") setSaludo("listo");
           }}
           maxLength={2000}
-          placeholder="Escribí un mensaje…"
+          placeholder={t("placeholder")}
           className="flex-1 rounded-full border border-borde bg-superficie px-4 py-2.5 text-base text-texto placeholder:text-texto-tenue focus:border-accion"
         />
         <button
@@ -351,7 +354,7 @@ export function SalaChat({
           disabled={!texto.trim()}
           className="rounded-full bg-accion px-4 py-2.5 text-sm font-medium text-accion-texto transition-colors hover:opacity-90 disabled:opacity-40"
         >
-          Enviar
+          {t("enviar")}
         </button>
       </form>
     </div>

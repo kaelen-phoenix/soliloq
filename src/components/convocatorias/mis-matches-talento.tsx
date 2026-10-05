@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Avatar } from "@/components/convocatorias/avatar";
 import { retirarmeDeMatch } from "@/app/(app)/matches/acciones";
 import { desvincularmeDeSala } from "@/app/(app)/salas/acciones";
@@ -19,10 +20,11 @@ export interface FilaMatchTalento {
   salaId: string | null;
 }
 
-const CHIP: Record<FilaMatchTalento["estado"], { texto: string; clase: string }> = {
-  match: { texto: "Interés mutuo", clase: "bg-fondo-sutil text-texto-tenue" },
-  convocado: { texto: "Te convocaron", clase: "bg-alerta-50 text-alerta-800" },
-  en_sala: { texto: "En el chat", clase: "bg-accion text-accion-texto" },
+// El texto de cada chip sale de `proyectos.misMatches.estado.<estado>`.
+const CHIP: Record<FilaMatchTalento["estado"], { clase: string }> = {
+  match: { clase: "bg-fondo-sutil text-texto-tenue" },
+  convocado: { clase: "bg-alerta-50 text-alerta-800" },
+  en_sala: { clase: "bg-accion text-accion-texto" },
 };
 
 const BOTON =
@@ -36,6 +38,7 @@ const BOTON_SALIR =
  */
 export function MisMatchesTalento({ filas: iniciales }: { filas: FilaMatchTalento[] }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.misMatches");
   const [filas, setFilas] = useState(iniciales);
   const [confirmando, setConfirmando] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState<string | null>(null);
@@ -76,13 +79,14 @@ export function MisMatchesTalento({ filas: iniciales }: { filas: FilaMatchTalent
                     titulo
                   )}
                   <span className="block truncate text-xs text-texto-tenue">
-                    {f.esEquipo ? "Equipo" : "Proyecto"}
-                    {f.creadorNombre ? ` de ${f.creadorNombre}` : ""}
+                    {f.creadorNombre
+                      ? t(f.esEquipo ? "equipoDe" : "proyectoDe", { nombre: f.creadorNombre })
+                      : t(f.esEquipo ? "equipo" : "proyecto")}
                   </span>
                   <span
                     className={`mt-1 inline-block rounded px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide ${CHIP[f.estado].clase}`}
                   >
-                    {CHIP[f.estado].texto}
+                    {t(`estado.${f.estado}`)}
                   </span>
                 </div>
               </div>
@@ -91,8 +95,8 @@ export function MisMatchesTalento({ filas: iniciales }: { filas: FilaMatchTalent
                 <div className="mt-3 flex flex-wrap items-center gap-2">
                   <span className="text-xs text-texto-tenue">
                     {f.estado === "en_sala"
-                      ? "¿Salir del chat? Dejás tu lugar en el grupo."
-                      : "¿Retirarte? Ya no van a poder convocarte para esto."}
+                      ? t("confirmarSalir")
+                      : t("confirmarRetirarte")}
                   </span>
                   <button
                     type="button"
@@ -100,26 +104,26 @@ export function MisMatchesTalento({ filas: iniciales }: { filas: FilaMatchTalent
                     onClick={() => salir(f)}
                     className={BOTON_SALIR}
                   >
-                    {ocupado === f.matchId ? "…" : f.estado === "en_sala" ? "Sí, salir" : "Sí, retirarme"}
+                    {ocupado === f.matchId ? "…" : f.estado === "en_sala" ? t("siSalir") : t("siRetirarme")}
                   </button>
                   <button type="button" onClick={() => setConfirmando(null)} className={BOTON}>
-                    No
+                    {t("no")}
                   </button>
                 </div>
               ) : (
                 <div className="mt-3 flex flex-wrap gap-2">
                   {f.estado === "convocado" && (
                     <Link href="/convocatoria" className={BOTON}>
-                      Responder
+                      {t("responder")}
                     </Link>
                   )}
                   {f.estado === "en_sala" && f.salaId && (
                     <Link href={`/salas/${f.salaId}`} className={BOTON}>
-                      Ir al chat
+                      {t("irAlChat")}
                     </Link>
                   )}
                   <button type="button" onClick={() => setConfirmando(f.matchId)} className={BOTON_SALIR}>
-                    {f.estado === "en_sala" ? "Salir del chat" : "Retirarme"}
+                    {f.estado === "en_sala" ? t("salirDelChat") : t("retirarme")}
                   </button>
                 </div>
               )}

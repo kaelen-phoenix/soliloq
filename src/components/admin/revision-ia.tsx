@@ -1,15 +1,9 @@
 "use client";
 
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { adminRevisarConIa, type MarcaModeracion } from "@/app/(app)/admin/acciones";
-
-const ETIQUETA: Record<MarcaModeracion["tipo"], string> = {
-  perfil: "Perfil",
-  proyecto: "Proyecto",
-  equipo: "Equipo",
-  rol: "Rol",
-};
 
 /** Adónde ir a mirar cada cosa marcada. Un Equipo no tiene página propia: se busca en Publicaciones. */
 function enlace(m: MarcaModeracion): string | null {
@@ -24,6 +18,7 @@ function enlace(m: MarcaModeracion): string | null {
  * toca nada: las medidas (suspender, borrar) se toman en las otras pestañas.
  */
 export function RevisionIa() {
+  const t = useTranslations("admin.revision");
   const [estado, setEstado] = useState<"listo" | "revisando">("listo");
   const [resultado, setResultado] = useState<{ marcados: MarcaModeracion[]; revisados: number } | null>(null);
   const [error, setError] = useState<string | null>(null);
@@ -36,7 +31,7 @@ export function RevisionIa() {
       if (!r.ok) return setError(r.error);
       setResultado({ marcados: r.marcados, revisados: r.revisados });
     } catch {
-      setError("No se pudo revisar. Probá de nuevo.");
+      setError(t("errorRevisar"));
     } finally {
       setEstado("listo");
     }
@@ -45,9 +40,7 @@ export function RevisionIa() {
   return (
     <div className="flex flex-col gap-4">
       <p className="max-w-prose text-sm text-texto-tenue">
-        La IA lee los perfiles, proyectos, equipos y roles más recientes y marca lo que parece un
-        problema: pedidos de plata para participar, contenido sexual, insultos, spam o datos de
-        contacto para sacar a la gente de la app. Es una ayuda: revisá cada caso antes de actuar.
+        {t("explicacion")}
       </p>
       <button
         type="button"
@@ -55,23 +48,23 @@ export function RevisionIa() {
         disabled={estado === "revisando"}
         className="self-start rounded-full bg-accion px-4 py-2 text-sm font-semibold text-accion-texto disabled:opacity-50"
       >
-        {estado === "revisando" ? "Revisando…" : "✨ Revisar lo reciente con IA"}
+        {estado === "revisando" ? t("revisando") : t("revisar")}
       </button>
       {error && <p className="text-sm text-error-600">{error}</p>}
       {resultado && (
         <div className="flex flex-col gap-2">
           <p className="text-sm text-texto">
-            Revisamos {resultado.revisados} publicaciones.{" "}
+            {t("revisamos", { n: resultado.revisados })}{" "}
             {resultado.marcados.length === 0
-              ? "No encontramos nada para mirar."
-              : `${resultado.marcados.length} para mirar:`}
+              ? t("nadaParaMirar")
+              : t("paraMirar", { n: resultado.marcados.length })}
           </p>
           <ul className="flex flex-col gap-2">
             {resultado.marcados.map((m, i) => {
               const href = enlace(m);
               return (
                 <li key={`${m.tipo}-${m.id}-${i}`} className="rounded-xl border border-borde bg-superficie p-3.5">
-                  <p className="text-2xs font-semibold uppercase tracking-wide text-texto-tenue">{ETIQUETA[m.tipo]}</p>
+                  <p className="text-2xs font-semibold uppercase tracking-wide text-texto-tenue">{t(`tipo.${m.tipo}`)}</p>
                   {href ? (
                     <Link href={href} className="text-sm font-medium text-texto hover:underline">
                       {m.titulo}

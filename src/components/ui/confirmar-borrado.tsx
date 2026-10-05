@@ -1,19 +1,20 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Boton } from "./boton";
 
 /**
  * Confirmación de una acción irreversible: hace falta tipear una palabra exacta (por
- * defecto BORRAR) para habilitar el botón. Un `window.confirm` se cierra con un click sin
+ * defecto BORRAR, o DELETE en inglés) para habilitar el botón. Un `window.confirm` se cierra con un click sin
  * leer; esto obliga a parar un segundo y escribir, para estar 100% seguro.
  */
 export function ConfirmarBorrado({
   mensaje,
   textoBoton,
-  textoCargando = "Borrando…",
-  textoCancelar = "Cancelar",
-  palabra = "BORRAR",
+  textoCargando,
+  textoCancelar,
+  palabra: palabraPedida,
   onConfirmar,
   onCancelar,
   cargando = false,
@@ -29,6 +30,8 @@ export function ConfirmarBorrado({
   cargando?: boolean;
   className?: string;
 }) {
+  const t = useTranslations("cuenta.ui");
+  const palabra = palabraPedida ?? t("palabraBorrar");
   const [texto, setTexto] = useState("");
   const habilitado = texto.trim().toUpperCase() === palabra;
 
@@ -42,7 +45,7 @@ export function ConfirmarBorrado({
         placeholder={palabra}
         autoComplete="off"
         autoFocus
-        aria-label={`Escribí ${palabra} para confirmar`}
+        aria-label={t("escribiParaConfirmar", { palabra })}
         className="w-32 rounded-lg border border-borde bg-superficie px-3 py-2 text-sm text-texto outline-none focus:border-error-600"
       />
       <div className="flex gap-2">
@@ -52,13 +55,13 @@ export function ConfirmarBorrado({
           className="border border-error-600"
           disabled={!habilitado || cargando}
           cargando={cargando}
-          textoCargando={textoCargando}
+          textoCargando={textoCargando ?? t("borrando")}
           onClick={onConfirmar}
         >
           {textoBoton}
         </Boton>
         <Boton type="button" variante="secundario" disabled={cargando} onClick={onCancelar}>
-          {textoCancelar}
+          {textoCancelar ?? t("cancelar")}
         </Boton>
       </div>
     </div>

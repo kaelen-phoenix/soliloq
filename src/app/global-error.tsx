@@ -1,5 +1,16 @@
 "use client";
 
+import { useEffect, useState } from "react";
+import es from "@/mensajes/es/cuenta.json";
+import en from "@/mensajes/en/cuenta.json";
+
+/** El idioma sin provider (#354): la cookie de Ajustes, si no el del navegador. */
+function idiomaDelNavegador(): "es" | "en" {
+  const cookie = document.cookie.match(/(?:^|; )NEXT_LOCALE=(es|en)/)?.[1];
+  if (cookie === "es" || cookie === "en") return cookie;
+  return navigator.language.toLowerCase().startsWith("en") ? "en" : "es";
+}
+
 /**
  * Último recurso: un error dentro del layout raíz, donde `error.tsx` todavía no existe.
  *
@@ -7,10 +18,23 @@
  * —no están cargadas— y por eso los estilos van en línea. Es la única pantalla de la app
  * que no usa Tailwind, y tiene que seguir siendo así: cualquier dependencia acá es una
  * dependencia que puede fallar justo cuando todo lo demás ya falló.
+ *
+ * Por lo mismo no usa next-intl —su provider vive en el layout que acaba de fallar—: los
+ * textos salen directo de los JSON de mensajes y el idioma se resuelve en el navegador.
  */
 export default function GlobalError({ reset }: { error: Error; reset: () => void }) {
+  const [idioma, setIdioma] = useState<"es" | "en">("es");
+  useEffect(() => {
+    try {
+      setIdioma(idiomaDelNavegador());
+    } catch {
+      // Queda en castellano.
+    }
+  }, []);
+  const t = (idioma === "en" ? en : es).cuenta.errorGlobal;
+
   return (
-    <html lang="es-AR">
+    <html lang={idioma === "en" ? "en-US" : "es-AR"}>
       <body
         style={{
           margin: 0,
@@ -37,7 +61,7 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
             }}
           />
           <h1 style={{ fontSize: "1.3125rem", marginTop: "2rem", marginBottom: 0 }}>
-            Se nos cayó el telón
+            {t.titulo}
           </h1>
           <p
             style={{
@@ -47,7 +71,7 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
               fontFamily: "system-ui, sans-serif",
             }}
           >
-            Algo falló al cargar la aplicación. Probá de nuevo en un momento.
+            {t.detalle}
           </p>
           <button
             onClick={reset}
@@ -64,7 +88,7 @@ export default function GlobalError({ reset }: { error: Error; reset: () => void
               cursor: "pointer",
             }}
           >
-            Reintentar
+            {t.reintentar}
           </button>
         </div>
       </body>

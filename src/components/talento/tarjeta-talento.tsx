@@ -1,4 +1,5 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
 import { Imagen } from "@/components/ui/imagen";
 
 export interface ResultadoTalento {
@@ -16,6 +17,7 @@ export interface ResultadoTalento {
  * segundo plano —son para descartar, no para elegir; eso pasa al abrir el perfil.
  */
 export function TarjetaTalento({ talento }: { talento: ResultadoTalento }) {
+  const t = useTranslations("proyectos.buscador");
   return (
     <Link
       href={`/talentos/${talento.id}`}
@@ -31,7 +33,7 @@ export function TarjetaTalento({ talento }: { talento: ResultadoTalento }) {
       <div className="flex flex-col gap-1 p-3">
         <p className="text-sm font-semibold text-texto">{talento.nombre}</p>
         <p className="text-xs text-texto-tenue">
-          {talento.edad != null && `${talento.edad} años · `}
+          {talento.edad != null && `${t("edad", { edad: talento.edad })} · `}
           {talento.ubicacion_publica}
         </p>
         {talento.habilidades.length > 0 && (

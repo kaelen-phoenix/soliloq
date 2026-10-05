@@ -1,12 +1,13 @@
 import type { MetadataRoute } from "next";
+import { getTranslations } from "next-intl/server";
 import { NARANJA, TINTA } from "./_marca-icono";
 
-export default function manifest(): MetadataRoute.Manifest {
+export default async function manifest(): Promise<MetadataRoute.Manifest> {
+  const t = await getTranslations("cuenta.manifest");
   return {
-    name: "Yalope — Match de Actores",
+    name: t("nombre"),
     short_name: "Yalope",
-    description:
-      "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat.",
+    description: t("descripcion"),
     start_url: "/",
     display: "standalone",
     background_color: TINTA,

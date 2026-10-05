@@ -1,6 +1,7 @@
 "use client";
 
 import Link from "next/link";
+import { useLocale, useTranslations } from "next-intl";
 import { useCallback, useEffect, useState } from "react";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
@@ -42,8 +43,11 @@ type Pestana =
   | "sponsors"
   | "revisión";
 
-function fecha(v: string | null) {
-  return v ? new Date(v).toLocaleDateString("es-AR", { day: "2-digit", month: "short", year: "numeric" }) : "—";
+/** Fecha corta en el idioma activo. */
+function useFecha() {
+  const idioma = useLocale() === "en" ? "en-US" : "es-AR";
+  return (v: string | null) =>
+    v ? new Date(v).toLocaleDateString(idioma, { day: "2-digit", month: "short", year: "numeric" }) : "—";
 }
 
 /** El enlace para ver un perfil "como en la app": el booking público si está activo, si no
@@ -54,13 +58,14 @@ function hrefPerfil(u: Usuario): string {
 }
 
 function VerEnApp({ href }: { href: string }) {
+  const t = useTranslations("admin.panel");
   return (
     <Link
       href={href}
       target="_blank"
       className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto-tenue transition-colors hover:bg-fondo-sutil"
     >
-      Ver ↗
+      {t("ver")}
     </Link>
   );
 }
@@ -76,6 +81,7 @@ export function PanelAdmin({
 }) {
   const supabase = createClient();
   const [pestana, setPestana] = useState<Pestana>("resumen");
+  const t = useTranslations("admin.panel.pestanas");
 
   return (
     <div className="flex flex-col gap-6">
@@ -91,7 +97,7 @@ export function PanelAdmin({
               pestana === p ? "bg-accion text-accion-texto" : "text-texto-tenue hover:bg-fondo-sutil"
             }`}
           >
-            {p}
+            {t(p === "revisión" ? "revision" : p)}
           </button>
         ))}
       </nav>
@@ -114,6 +120,8 @@ export function PanelAdmin({
 // --- Mensajes de contacto ---------------------------------------------------------------
 
 function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const t = useTranslations("admin.panel");
+  const fecha = useFecha();
   const [filas, setFilas] = useState<Mensaje[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -121,7 +129,7 @@ function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { data, error: e } = await supabase.rpc("admin_mensajes", { p_limite: 200, p_offset: 0 });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_mensajes" });
-      setError(e.message ?? "No se pudo leer.");
+      setError(t("comun.noSeLeyo"));
     } else setFilas(data ?? []);
   }, [supabase]);
 
@@ -136,14 +144,14 @@ function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_marcar_mensaje_leido", mensajeId: m.id });
-      setError(e.message ?? "No se pudo aplicar.");
+      setError(t("comun.noSeAplico"));
     } else setFilas((prev) => (prev ?? []).map((f) => (f.id === m.id ? { ...f, leido: !m.leido } : f)));
   }
 
   if (error) return <p className="text-sm text-error-600">{error}</p>;
-  if (filas === null) return <p className="text-sm text-texto-tenue">Cargando mensajes…</p>;
+  if (filas === null) return <p className="text-sm text-texto-tenue">{t("mensajes.cargando")}</p>;
   if (filas.length === 0)
-    return <EstadoVacio icono="campana" titulo="Sin mensajes" detalle="No hay mensajes de contacto." />;
+    return <EstadoVacio icono="campana" titulo={t("mensajes.vacioTitulo")} detalle={t("mensajes.vacioDetalle")} />;
 
   return (
     <ul className="flex flex-col gap-3">
@@ -170,7 +178,7 @@ function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
               onClick={() => alternarLeido(m)}
               className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto-tenue transition-colors hover:bg-fondo-sutil"
             >
-              {m.leido ? "No leído" : "Leído"}
+              {m.leido ? t("mensajes.noLeido") : t("mensajes.leido")}
             </button>
           </div>
         </li>
@@ -203,6 +211,7 @@ const VACIO: FormSponsor = {
 };
 
 function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const t = useTranslations("admin.panel");
   const [filas, setFilas] = useState<Sponsor[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [form, setForm] = useState<FormSponsor>(VACIO);
@@ -211,7 +220,7 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { data, error: e } = await supabase.rpc("admin_sponsors");
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_sponsors" });
-      setError(e.message ?? "No se pudo leer.");
+      setError(t("comun.noSeLeyo"));
     } else setFilas(data ?? []);
   }, [supabase]);
 
@@ -232,7 +241,7 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     });
     if (err) {
       reportarErrorSupabase(err, { rpc: "admin_guardar_sponsor", sponsorId: form.id });
-      setError(err.message ?? "No se pudo guardar.");
+      setError(t("comun.noSeGuardo"));
       return;
     }
     setError(null);
@@ -241,11 +250,11 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
   }
 
   async function borrar(s: Sponsor) {
-    if (!window.confirm(`¿Borrar a ${s.nombre}?`)) return;
+    if (!window.confirm(t("sponsors.confirmarBorrar", { nombre: s.nombre }))) return;
     const { error: e } = await supabase.rpc("admin_borrar_sponsor", { p_id: s.id });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_borrar_sponsor", sponsorId: s.id });
-      setError(e.message ?? "No se pudo borrar.");
+      setError(t("comun.noSeBorro"));
     } else setFilas((prev) => (prev ?? []).filter((f) => f.id !== s.id));
   }
 
@@ -262,10 +271,10 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
               <div className="min-w-0 flex-1 text-sm">
                 <p className="truncate text-texto">
                   {s.nombre}
-                  {!s.activo && <span className="ml-1.5 text-xs text-texto-tenue">(inactivo)</span>}
+                  {!s.activo && <span className="ml-1.5 text-xs text-texto-tenue">{t("sponsors.inactivo")}</span>}
                 </p>
                 <p className="truncate text-xs text-texto-tenue">
-                  {s.nivel} · orden {s.orden}
+                  {t("sponsors.nivelOrden", { nivel: s.nivel, orden: s.orden })}
                 </p>
               </div>
               <button
@@ -283,14 +292,14 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
                 }
                 className="rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto-tenue hover:bg-fondo-sutil"
               >
-                Editar
+                {t("comun.editar")}
               </button>
               <button
                 type="button"
                 onClick={() => borrar(s)}
                 className="rounded-lg border border-error-400 px-2.5 py-1 text-xs font-medium text-error-600 hover:bg-error-50"
               >
-                Borrar
+                {t("comun.borrar")}
               </button>
             </li>
           ))}
@@ -299,15 +308,15 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
 
       <form onSubmit={guardar} className="rounded-2xl border border-dashed border-borde p-4">
         <p className="mb-3 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-          {form.id ? "Editar sponsor" : "Nuevo sponsor"}
+          {form.id ? t("sponsors.editarTitulo") : t("sponsors.nuevoTitulo")}
         </p>
         <div className="flex flex-col gap-2">
-          <CampoTexto id="sp-nombre" etiqueta="Nombre" value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
-          <CampoTexto id="sp-logo" etiqueta="URL del logo (PNG/SVG transparente)" value={form.logo_url} onChange={(e) => setForm({ ...form, logo_url: e.target.value })} />
-          <CampoTexto id="sp-sitio" etiqueta="URL del sitio (opcional)" value={form.sitio_url} onChange={(e) => setForm({ ...form, sitio_url: e.target.value })} />
+          <CampoTexto id="sp-nombre" etiqueta={t("sponsors.nombre")} value={form.nombre} onChange={(e) => setForm({ ...form, nombre: e.target.value })} />
+          <CampoTexto id="sp-logo" etiqueta={t("sponsors.logo")} value={form.logo_url} onChange={(e) => setForm({ ...form, logo_url: e.target.value })} />
+          <CampoTexto id="sp-sitio" etiqueta={t("sponsors.sitio")} value={form.sitio_url} onChange={(e) => setForm({ ...form, sitio_url: e.target.value })} />
           <div className="flex gap-2">
             <label className="flex flex-col gap-1.5 text-sm font-medium text-texto">
-              Nivel
+              {t("sponsors.nivel")}
               <select
                 value={form.nivel}
                 onChange={(e) => setForm({ ...form, nivel: e.target.value as FormSponsor["nivel"] })}
@@ -320,20 +329,20 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
                 ))}
               </select>
             </label>
-            <CampoTexto id="sp-orden" etiqueta="Orden" type="number" value={String(form.orden)} onChange={(e) => setForm({ ...form, orden: Number(e.target.value) })} />
+            <CampoTexto id="sp-orden" etiqueta={t("sponsors.orden")} type="number" value={String(form.orden)} onChange={(e) => setForm({ ...form, orden: Number(e.target.value) })} />
             <label className="flex items-center gap-2 self-end pb-2.5 text-sm text-texto">
               <input type="checkbox" checked={form.activo} onChange={(e) => setForm({ ...form, activo: e.target.checked })} />
-              Activo
+              {t("sponsors.activo")}
             </label>
           </div>
         </div>
         <div className="mt-3 flex gap-2">
           <Boton variante="secundario" type="submit">
-            {form.id ? "Guardar" : "Agregar"}
+            {form.id ? t("sponsors.guardar") : t("sponsors.agregar")}
           </Boton>
           {form.id && (
             <button type="button" onClick={() => setForm(VACIO)} className="text-xs text-texto-tenue underline underline-offset-4">
-              Cancelar
+              {t("comun.cancelar")}
             </button>
           )}
         </div>
@@ -345,30 +354,31 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
 // --- Resumen -------------------------------------------------------------------------------
 
 function Resumen({ metricas }: { metricas: Metricas | null }) {
-  if (!metricas) return <EstadoVacio icono="admin" titulo="Sin datos" detalle="No se pudieron leer las métricas." />;
+  const t = useTranslations("admin.panel.resumen");
+  if (!metricas) return <EstadoVacio icono="admin" titulo={t("vacioTitulo")} detalle={t("vacioDetalle")} />;
   const tarjetas: { etiqueta: string; valor: number }[] = [
-    { etiqueta: "Usuarios", valor: metricas.total },
-    { etiqueta: "Con perfil de talento", valor: metricas.con_talento },
-    { etiqueta: "Con perfil de creador", valor: metricas.con_creador },
-    { etiqueta: "Con ambos perfiles", valor: metricas.con_ambos },
-    { etiqueta: "Altas últimos 7 días", valor: metricas.registros_7d },
-    { etiqueta: "Enlace público activo", valor: metricas.con_enlace_publico },
-    { etiqueta: "Suspendidos", valor: metricas.suspendidos },
-    { etiqueta: "Bloqueos", valor: metricas.bloqueos },
-    { etiqueta: "Denuncias abiertas", valor: metricas.denuncias_abiertas },
-    { etiqueta: "Obras publicadas", valor: metricas.obras_publicadas },
-    { etiqueta: "Equipos activos", valor: metricas.equipos_activos },
-    { etiqueta: "Matches vigentes", valor: metricas.matches_activos },
-    { etiqueta: "Convocatorias aceptadas", valor: metricas.convocatorias_aceptadas },
-    { etiqueta: "Salas", valor: metricas.salas },
-    { etiqueta: "«Me interesa» últimos 7 días", valor: metricas.interes_7d },
+    { etiqueta: t("total"), valor: metricas.total },
+    { etiqueta: t("con_talento"), valor: metricas.con_talento },
+    { etiqueta: t("con_creador"), valor: metricas.con_creador },
+    { etiqueta: t("con_ambos"), valor: metricas.con_ambos },
+    { etiqueta: t("registros_7d"), valor: metricas.registros_7d },
+    { etiqueta: t("con_enlace_publico"), valor: metricas.con_enlace_publico },
+    { etiqueta: t("suspendidos"), valor: metricas.suspendidos },
+    { etiqueta: t("bloqueos"), valor: metricas.bloqueos },
+    { etiqueta: t("denuncias_abiertas"), valor: metricas.denuncias_abiertas },
+    { etiqueta: t("obras_publicadas"), valor: metricas.obras_publicadas },
+    { etiqueta: t("equipos_activos"), valor: metricas.equipos_activos },
+    { etiqueta: t("matches_activos"), valor: metricas.matches_activos },
+    { etiqueta: t("convocatorias_aceptadas"), valor: metricas.convocatorias_aceptadas },
+    { etiqueta: t("salas"), valor: metricas.salas },
+    { etiqueta: t("interes_7d"), valor: metricas.interes_7d },
   ];
   return (
     <ul className="grid grid-cols-2 gap-3 sm:grid-cols-3">
-      {tarjetas.map((t) => (
-        <li key={t.etiqueta} className="rounded-2xl border border-borde bg-superficie p-4">
-          <p className="font-display text-2xl font-semibold text-texto">{t.valor}</p>
-          <p className="mt-0.5 text-xs text-texto-tenue">{t.etiqueta}</p>
+      {tarjetas.map((tarjeta) => (
+        <li key={tarjeta.etiqueta} className="rounded-2xl border border-borde bg-superficie p-4">
+          <p className="font-display text-2xl font-semibold text-texto">{tarjeta.valor}</p>
+          <p className="mt-0.5 text-xs text-texto-tenue">{tarjeta.etiqueta}</p>
         </li>
       ))}
     </ul>
@@ -386,6 +396,9 @@ function Usuarios({
   iniciales: Usuario[];
   miId: string;
 }) {
+  const t = useTranslations("admin.panel");
+  const tComun = useTranslations("comun");
+  const fecha = useFecha();
   const [texto, setTexto] = useState("");
   const [filas, setFilas] = useState<Usuario[]>(iniciales);
   const [offset, setOffset] = useState(iniciales.length);
@@ -406,7 +419,7 @@ function Usuarios({
       setCargando(false);
       if (e) {
         reportarErrorSupabase(e, { rpc: "admin_usuarios", texto: q });
-        setError("No se pudo buscar.");
+        setError(t("usuarios.noSeBusco"));
         return;
       }
       const nuevas = data ?? [];
@@ -422,8 +435,8 @@ function Usuarios({
     if (
       !window.confirm(
         suspender
-          ? `¿Suspender a ${u.nombre ?? u.email}? No podrá entrar hasta reactivarla.`
-          : `¿Reactivar a ${u.nombre ?? u.email}?`,
+          ? t("usuarios.confirmarSuspender", { nombre: u.nombre ?? u.email })
+          : t("usuarios.confirmarReactivar", { nombre: u.nombre ?? u.email }),
       )
     )
       return;
@@ -433,7 +446,14 @@ function Usuarios({
     });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_suspender_usuario", usuarioId: u.id });
-      setError(e.message ?? "No se pudo aplicar.");
+      // Los dos rechazos que pone la base a propósito (0040) se muestran con su motivo.
+      setError(
+        e.message.includes("a vos mismo")
+          ? t("usuarios.noATiMismo")
+          : e.message.includes("otro admin")
+            ? t("usuarios.noAOtroAdmin")
+            : t("comun.noSeAplico"),
+      );
       return;
     }
     setError(null);
@@ -445,7 +465,7 @@ function Usuarios({
     // Si la acción tira (red, servidor), también hay que salir de «Borrando…» (#229).
     const res = await adminBorrarUsuario(u.id).catch(() => ({
       ok: false as const,
-      error: "No se pudo borrar. Probá de nuevo.",
+      error: t("usuarios.noSeBorroReintentar"),
     }));
     setBorrandoId(null);
     if (!res.ok) {
@@ -468,14 +488,14 @@ function Usuarios({
       >
         <CampoTexto
           id="admin-buscar-usuario"
-          etiqueta="Buscar"
-          placeholder="Nombre o email"
+          etiqueta={t("comun.buscar")}
+          placeholder={t("usuarios.placeholder")}
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
         />
         <div className="self-end">
           <Boton variante="secundario" type="submit" cargando={cargando} textoCargando="…">
-            Buscar
+            {t("comun.buscar")}
           </Boton>
         </div>
       </form>
@@ -483,7 +503,7 @@ function Usuarios({
       {error && <p className="text-xs text-error-600">{error}</p>}
 
       {filas.length === 0 ? (
-        <EstadoVacio icono="perfil" titulo="Sin usuarios" detalle="No hay resultados para esa búsqueda." />
+        <EstadoVacio icono="perfil" titulo={t("usuarios.vacioTitulo")} detalle={t("usuarios.vacioDetalle")} />
       ) : (
         <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
           {filas.map((u) => (
@@ -491,20 +511,24 @@ function Usuarios({
               <div className="flex items-center gap-3">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-texto">
-                    {u.nombre ?? "(sin nombre)"}
+                    {u.nombre ?? t("comun.sinNombre")}
                     {u.es_admin && (
                       <span className="ml-1.5 rounded acento-fondo px-1.5 py-0.5 text-2xs font-semibold text-brand-600">
-                        admin
+                        {t("usuarios.admin")}
                       </span>
                     )}
                     {u.suspendido && (
                       <span className="ml-1.5 rounded bg-error-50 px-1.5 py-0.5 text-2xs font-semibold text-error-600">
-                        suspendido
+                        {t("usuarios.suspendido")}
                       </span>
                     )}
                   </p>
                   <p className="truncate text-xs text-texto-tenue">
-                    {u.email} · {u.roles.join(" + ") || "sin perfil"} · alta {fecha(u.creado_en)}
+                    {t("usuarios.detalle", {
+                      email: u.email,
+                      roles: u.roles.join(" + ") || t("usuarios.sinPerfil"),
+                      fecha: fecha(u.creado_en),
+                    })}
                   </p>
                 </div>
                 <VerEnApp href={hrefPerfil(u)} />
@@ -519,22 +543,28 @@ function Usuarios({
                           : "border-error-400 text-error-600 hover:bg-error-50"
                       }`}
                     >
-                      {u.suspendido ? "Reactivar" : "Suspender"}
+                      {u.suspendido ? t("usuarios.reactivar") : t("usuarios.suspender")}
                     </button>
                     <button
                       type="button"
                       onClick={() => setConfirmandoId(u.id)}
                       className="rounded-lg border border-error-400 px-2.5 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50"
                     >
-                      Borrar
+                      {t("comun.borrar")}
                     </button>
                   </div>
                 )}
               </div>
               {confirmandoId === u.id && (
                 <ConfirmarBorrado
-                  mensaje={`Se elimina la cuenta de ${u.nombre ?? u.email} con todo su contenido —perfil, proyectos, salas, mensajes—. Es irreversible; para una baja reversible usá Suspender. Escribí BORRAR para confirmar.`}
-                  textoBoton="Borrar definitivamente"
+                  mensaje={t("usuarios.confirmarBorrado", {
+                    nombre: u.nombre ?? u.email,
+                    palabra: t("usuarios.palabraBorrar"),
+                  })}
+                  palabra={t("usuarios.palabraBorrar")}
+                  textoBoton={t("usuarios.borrarDefinitivamente")}
+                  textoCargando={t("usuarios.borrando")}
+                  textoCancelar={tComun("cancelar")}
                   cargando={borrandoId === u.id}
                   onConfirmar={() => borrar(u)}
                   onCancelar={() => setConfirmandoId(null)}
@@ -547,8 +577,8 @@ function Usuarios({
 
       {hayMas && (
         <div className="flex justify-center">
-          <Boton variante="secundario" cargando={cargando} textoCargando="Cargando…" onClick={() => buscar(offset, texto)}>
-            Cargar más
+          <Boton variante="secundario" cargando={cargando} textoCargando={t("comun.cargando")} onClick={() => buscar(offset, texto)}>
+            {t("comun.cargarMas")}
           </Boton>
         </div>
       )}
@@ -564,6 +594,8 @@ function Usuarios({
 // completar su Perfil de Talento).
 
 function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const t = useTranslations("admin.panel");
+  const fecha = useFecha();
   const [email, setEmail] = useState("");
   const [invitando, setInvitando] = useState(false);
   const [pendientes, setPendientes] = useState<Solicitud[] | null>(null);
@@ -580,7 +612,7 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     if (eSol || eInv) {
       if (eSol) reportarErrorSupabase(eSol, { rpc: "admin_solicitudes_pendientes" });
       if (eInv) reportarErrorSupabase(eInv, { rpc: "admin_invitaciones" });
-      setError(eSol?.message ?? eInv?.message ?? "No se pudo leer.");
+      setError(t("comun.noSeLeyo"));
       return;
     }
     setPendientes(sol ?? []);
@@ -600,17 +632,17 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     setInvitando(false);
     if (err) {
       reportarErrorSupabase(err, { rpc: "admin_crear_invitacion" });
-      setError(err.message ?? "No se pudo enviar la invitación.");
+      setError(err.message.includes("email inválido") ? t("acceso.emailInvalido") : t("acceso.noSeInvito"));
       return;
     }
     const invitado = email.trim();
     const mail = await adminMandarInvitacion(invitado);
     setAviso(
       mail.ok && mail.enviado
-        ? `Invitación registrada y enviada por mail a ${invitado}.`
+        ? t("acceso.invitacionEnviada", { email: invitado })
         : mail.ok
-          ? `Invitación registrada para ${invitado}.`
-          : `Invitación registrada para ${invitado}, pero no se pudo mandar el mail (${mail.error}).`,
+          ? t("acceso.invitacionRegistrada", { email: invitado })
+          : t("acceso.invitacionSinMail", { email: invitado, error: mail.error }),
     );
     setEmail("");
     cargar();
@@ -624,7 +656,7 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     setAprobandoId(null);
     if (err) {
       reportarErrorSupabase(err, { rpc: "admin_aprobar_usuario", solicitudId: s.id });
-      setError(err.message ?? "No se pudo aprobar.");
+      setError(t("acceso.noSeAprobo"));
       return;
     }
     setError(null);
@@ -640,13 +672,13 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
 
       <form onSubmit={invitar} className="rounded-2xl border border-dashed border-borde p-4">
         <p className="mb-3 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-          Invitar por email
+          {t("acceso.invitarTitulo")}
         </p>
         <div className="flex gap-2">
           <div className="flex-1">
             <CampoTexto
               id="acceso-email"
-              etiqueta="Email"
+              etiqueta={t("acceso.email")}
               type="email"
               value={email}
               onChange={(e) => setEmail(e.target.value)}
@@ -654,12 +686,12 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
           </div>
           <div className="self-end">
             <Boton type="submit" cargando={invitando} textoCargando="…">
-              Invitar
+              {t("acceso.invitar")}
             </Boton>
           </div>
         </div>
         <p className="mt-2 text-xs text-texto-tenue">
-          Quien se registre con ese email entra directo, sin esperar aprobación.
+          {t("acceso.invitarAyuda")}
         </p>
       </form>
 
@@ -667,19 +699,19 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
 
       <div>
         <h3 className="mb-2 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-          Solicitudes pendientes
+          {t("acceso.pendientesTitulo")}
         </h3>
         {pendientes === null ? (
-          <p className="text-sm text-texto-tenue">Cargando…</p>
+          <p className="text-sm text-texto-tenue">{t("comun.cargando")}</p>
         ) : pendientes.length === 0 ? (
-          <EstadoVacio icono="perfil" titulo="Sin solicitudes" detalle="No hay registros esperando aprobación." />
+          <EstadoVacio icono="perfil" titulo={t("acceso.pendientesVacioTitulo")} detalle={t("acceso.pendientesVacioDetalle")} />
         ) : (
           <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
             {pendientes.map((s) => (
               <li key={s.id} className="flex items-center gap-3 p-3.5">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-texto">{s.email}</p>
-                  <p className="text-xs text-texto-tenue">Se registró el {fecha(s.creado_en)}</p>
+                  <p className="text-xs text-texto-tenue">{t("acceso.seRegistro", { fecha: fecha(s.creado_en) })}</p>
                 </div>
                 <button
                   type="button"
@@ -687,7 +719,7 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
                   disabled={aprobandoId === s.id}
                   className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
                 >
-                  {aprobandoId === s.id ? "…" : "Habilitar"}
+                  {aprobandoId === s.id ? "…" : t("acceso.habilitar")}
                 </button>
               </li>
             ))}
@@ -697,26 +729,26 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
 
       <div>
         <h3 className="mb-2 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-          Invitaciones enviadas
+          {t("acceso.invitacionesTitulo")}
         </h3>
         {invitaciones === null ? (
-          <p className="text-sm text-texto-tenue">Cargando…</p>
+          <p className="text-sm text-texto-tenue">{t("comun.cargando")}</p>
         ) : invitaciones.length === 0 ? (
-          <EstadoVacio icono="perfil" titulo="Sin invitaciones" detalle="Todavía no invitaste a nadie." />
+          <EstadoVacio icono="perfil" titulo={t("acceso.invitacionesVacioTitulo")} detalle={t("acceso.invitacionesVacioDetalle")} />
         ) : (
           <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
             {invitaciones.map((i) => (
               <li key={i.id} className="flex items-center gap-3 p-3.5">
                 <div className="min-w-0 flex-1">
                   <p className="truncate text-sm font-medium text-texto">{i.email}</p>
-                  <p className="text-xs text-texto-tenue">Enviada el {fecha(i.creado_en)}</p>
+                  <p className="text-xs text-texto-tenue">{t("acceso.enviadaEl", { fecha: fecha(i.creado_en) })}</p>
                 </div>
                 <span
                   className={`shrink-0 rounded px-1.5 py-0.5 text-2xs font-semibold uppercase tracking-wide ${
                     i.usado_en ? "acento-fondo text-brand-600" : "bg-fondo-sutil text-texto-tenue"
                   }`}
                 >
-                  {i.usado_en ? "usada" : "pendiente"}
+                  {i.usado_en ? t("acceso.usada") : t("acceso.pendiente")}
                 </span>
               </li>
             ))}
@@ -738,6 +770,8 @@ const COLOR_PUB: Record<string, string> = {
 };
 
 function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const t = useTranslations("admin.panel");
+  const fecha = useFecha();
   const [texto, setTexto] = useState("");
   const [filas, setFilas] = useState<Publicacion[] | null>(null);
   const [offset, setOffset] = useState(0);
@@ -756,7 +790,7 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
       setCargando(false);
       if (e) {
         reportarErrorSupabase(e, { rpc: "admin_publicaciones", texto: q });
-        setError(e.message ?? "No se pudo leer.");
+        setError(t("comun.noSeLeyo"));
         return;
       }
       setError(null);
@@ -783,14 +817,14 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
       >
         <CampoTexto
           id="admin-buscar-pub"
-          etiqueta="Buscar"
-          placeholder="Título, dueño o email"
+          etiqueta={t("comun.buscar")}
+          placeholder={t("publicaciones.placeholder")}
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
         />
         <div className="self-end">
           <Boton variante="secundario" type="submit" cargando={cargando} textoCargando="…">
-            Buscar
+            {t("comun.buscar")}
           </Boton>
         </div>
       </form>
@@ -798,9 +832,9 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
       {error && <p className="text-xs text-error-600">{error}</p>}
 
       {filas === null ? (
-        <p className="text-sm text-texto-tenue">Cargando publicaciones…</p>
+        <p className="text-sm text-texto-tenue">{t("publicaciones.cargando")}</p>
       ) : filas.length === 0 ? (
-        <EstadoVacio icono="tablero" titulo="Sin publicaciones" detalle="No hay resultados." />
+        <EstadoVacio icono="tablero" titulo={t("publicaciones.vacioTitulo")} detalle={t("publicaciones.vacioDetalle")} />
       ) : (
         <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
           {filas.map((p) => (
@@ -820,8 +854,8 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
                   </span>
                 </p>
                 <p className="truncate text-xs text-texto-tenue">
-                  {p.creador_nombre ?? "(sin nombre)"} · {p.creador_email} · {p.detalle} · {p.fotos}{" "}
-                  {p.fotos === 1 ? "foto" : "fotos"} · {fecha(p.creado_en)}
+                  {p.creador_nombre ?? t("comun.sinNombre")} · {p.creador_email} · {p.detalle} ·{" "}
+                  {t("publicaciones.fotos", { n: p.fotos })} · {fecha(p.creado_en)}
                 </p>
               </div>
               <VerEnApp
@@ -837,10 +871,10 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
           <Boton
             variante="secundario"
             cargando={cargando}
-            textoCargando="Cargando…"
+            textoCargando={t("comun.cargando")}
             onClick={() => cargar(offset, texto)}
           >
-            Cargar más
+            {t("comun.cargarMas")}
           </Boton>
         </div>
       )}
@@ -853,6 +887,8 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
 const ESTADOS_DENUNCIA = ["abierta", "en_revision", "resuelta", "descartada"] as const;
 
 function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const t = useTranslations("admin.panel");
+  const fecha = useFecha();
   const [filas, setFilas] = useState<Denuncia[] | null>(null);
   const [error, setError] = useState<string | null>(null);
 
@@ -860,7 +896,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
     const { data, error: e } = await supabase.rpc("admin_denuncias", { p_limite: 100, p_offset: 0 });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_denuncias" });
-      setError(e.message ?? "No se pudo leer.");
+      setError(t("comun.noSeLeyo"));
       return;
     }
     setFilas(data ?? []);
@@ -873,7 +909,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
   async function resolver(d: Denuncia, estado: string) {
     const resolucion =
       estado === "resuelta" || estado === "descartada"
-        ? window.prompt("Nota de resolución (opcional):") ?? undefined
+        ? window.prompt(t("denuncias.notaResolucion")) ?? undefined
         : undefined;
     const { error: e } = await supabase.rpc("admin_resolver_denuncia", {
       p_id: d.id,
@@ -882,7 +918,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
     });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_resolver_denuncia", denunciaId: d.id, estado });
-      setError(e.message ?? "No se pudo aplicar.");
+      setError(t("comun.noSeAplico"));
       return;
     }
     setError(null);
@@ -890,9 +926,9 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
   }
 
   if (error) return <p className="text-sm text-error-600">{error}</p>;
-  if (filas === null) return <p className="text-sm text-texto-tenue">Cargando denuncias…</p>;
+  if (filas === null) return <p className="text-sm text-texto-tenue">{t("denuncias.cargando")}</p>;
   if (filas.length === 0)
-    return <EstadoVacio icono="bandera" titulo="Sin denuncias" detalle="No hay denuncias registradas." />;
+    return <EstadoVacio icono="bandera" titulo={t("denuncias.vacioTitulo")} detalle={t("denuncias.vacioDetalle")} />;
 
   return (
     <ul className="flex flex-col gap-3">
@@ -908,7 +944,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
               </p>
               {d.detalle && <p className="mt-2 text-sm leading-relaxed text-texto">{d.detalle}</p>}
               {d.resolucion && (
-                <p className="mt-1 text-xs italic text-texto-tenue">Resolución: {d.resolucion}</p>
+                <p className="mt-1 text-xs italic text-texto-tenue">{t("denuncias.resolucion", { texto: d.resolucion })}</p>
               )}
             </div>
           </div>
@@ -920,7 +956,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
                 onClick={() => resolver(d, e)}
                 className="rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto-tenue transition-colors hover:bg-fondo-sutil"
               >
-                {e.replace("_", " ")}
+                {t(`denuncias.estados.${e}`)}
               </button>
             ))}
           </div>
@@ -933,6 +969,8 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
 // --- Bloqueos -----------------------------------------------------------------------------
 
 function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
+  const t = useTranslations("admin.panel");
+  const fecha = useFecha();
   const [filas, setFilas] = useState<Bloqueo[] | null>(null);
   const [error, setError] = useState<string | null>(null);
   const [aId, setAId] = useState("");
@@ -943,7 +981,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { data, error: e } = await supabase.rpc("admin_bloqueos", { p_limite: 100, p_offset: 0 });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_bloqueos" });
-      setError(e.message ?? "No se pudo leer.");
+      setError(t("comun.noSeLeyo"));
       return;
     }
     setFilas(data ?? []);
@@ -954,14 +992,14 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
   }, [cargar]);
 
   async function levantar(b: Bloqueo) {
-    if (!window.confirm(`¿Levantar el bloqueo entre ${b.nombre_menor ?? "?"} y ${b.nombre_mayor ?? "?"}?`)) return;
+    if (!window.confirm(t("bloqueos.confirmarLevantar", { a: b.nombre_menor ?? "?", b: b.nombre_mayor ?? "?" }))) return;
     const { error: e } = await supabase.rpc("admin_levantar_bloqueo", {
       p_menor: b.perfil_menor,
       p_mayor: b.perfil_mayor,
     });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_levantar_bloqueo" });
-      setError(e.message ?? "No se pudo levantar.");
+      setError(t("bloqueos.noSeLevanto"));
       return;
     }
     setError(null);
@@ -977,7 +1015,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     });
     if (err) {
       reportarErrorSupabase(err, { rpc: "admin_crear_bloqueo" });
-      setError(err.message ?? "No se pudo crear.");
+      setError(t("bloqueos.noSeCreo"));
       return;
     }
     setError(null);
@@ -987,14 +1025,14 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     setFilas(null);
   }
 
-  if (filas === null && !error) return <p className="text-sm text-texto-tenue">Cargando bloqueos…</p>;
+  if (filas === null && !error) return <p className="text-sm text-texto-tenue">{t("bloqueos.cargando")}</p>;
 
   return (
     <div className="flex flex-col gap-4">
       {error && <p className="text-xs text-error-600">{error}</p>}
 
       {(filas ?? []).length === 0 ? (
-        <EstadoVacio icono="perfil" titulo="Sin bloqueos" detalle="No hay bloqueos entre usuarios." />
+        <EstadoVacio icono="perfil" titulo={t("bloqueos.vacioTitulo")} detalle={t("bloqueos.vacioDetalle")} />
       ) : (
         <ul className="flex flex-col divide-y divide-ink-100 rounded-2xl border border-borde">
           {(filas ?? []).map((b) => (
@@ -1004,7 +1042,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
                   {b.nombre_menor ?? b.perfil_menor.slice(0, 8)} ↔ {b.nombre_mayor ?? b.perfil_mayor.slice(0, 8)}
                 </p>
                 <p className="truncate text-xs text-texto-tenue">
-                  puso {b.nombre_autor ?? "?"} · {fecha(b.creado_en)}
+                  {t("bloqueos.puso", { autor: b.nombre_autor ?? "?" })} · {fecha(b.creado_en)}
                   {b.motivo ? ` · ${b.motivo}` : ""}
                 </p>
               </div>
@@ -1013,7 +1051,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
                 onClick={() => levantar(b)}
                 className="shrink-0 rounded-lg border border-borde px-2.5 py-1 text-xs font-medium text-texto transition-colors hover:bg-fondo-sutil"
               >
-                Levantar
+                {t("bloqueos.levantar")}
               </button>
             </li>
           ))}
@@ -1022,18 +1060,18 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
 
       <form onSubmit={crear} className="rounded-2xl border border-dashed border-borde p-4">
         <p className="mb-3 text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-          Imponer un bloqueo (por id de perfil)
+          {t("bloqueos.imponerTitulo")}
         </p>
         <div className="flex flex-col gap-2 sm:flex-row">
-          <CampoTexto id="bloq-a" etiqueta="Perfil A" placeholder="uuid" value={aId} onChange={(e) => setAId(e.target.value)} />
-          <CampoTexto id="bloq-b" etiqueta="Perfil B" placeholder="uuid" value={bId} onChange={(e) => setBId(e.target.value)} />
+          <CampoTexto id="bloq-a" etiqueta={t("bloqueos.perfilA")} placeholder="uuid" value={aId} onChange={(e) => setAId(e.target.value)} />
+          <CampoTexto id="bloq-b" etiqueta={t("bloqueos.perfilB")} placeholder="uuid" value={bId} onChange={(e) => setBId(e.target.value)} />
         </div>
         <div className="mt-2">
-          <CampoTexto id="bloq-motivo" etiqueta="Motivo (opcional)" value={motivo} onChange={(e) => setMotivo(e.target.value)} />
+          <CampoTexto id="bloq-motivo" etiqueta={t("bloqueos.motivo")} value={motivo} onChange={(e) => setMotivo(e.target.value)} />
         </div>
         <div className="mt-3">
           <Boton variante="secundario" type="submit">
-            Bloquear
+            {t("bloqueos.bloquear")}
           </Boton>
         </div>
       </form>
@@ -1047,6 +1085,8 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
  * (la primera vez, a todos los usuarios). Cada cuenta lo recibe una sola vez.
  */
 function MailBienvenida() {
+  const t = useTranslations("admin.panel.bienvenida");
+  const idioma = useLocale() === "en" ? "en-US" : "es-AR";
   const [cuentas, setCuentas] = useState<EstadoBienvenida[] | null>(null);
   const [accion, setAccion] = useState<"prueba" | "envio" | null>(null);
   const [mensaje, setMensaje] = useState<string | null>(null);
@@ -1069,11 +1109,11 @@ function MailBienvenida() {
     setMensaje(null);
     const r = await adminEnviarmePruebaBienvenida();
     setAccion(null);
-    setMensaje(r.ok ? `Te mandamos la prueba a ${r.para}. Revisá la bandeja (y spam, por las dudas).` : r.error);
+    setMensaje(r.ok ? t("pruebaOk", { email: r.para }) : r.error);
   }
 
   async function enviar() {
-    if (!window.confirm(`¿Mandar el mail de bienvenida a ${faltan} ${faltan === 1 ? "persona" : "personas"}?`)) return;
+    if (!window.confirm(t("confirmarEnvio", { n: faltan }))) return;
     setAccion("envio");
     setMensaje(null);
     const r = await adminEnviarBienvenidas();
@@ -1085,28 +1125,29 @@ function MailBienvenida() {
     const { enviados, fallidos, sinCorreo } = r.resumen;
     setMensaje(
       sinCorreo
-        ? "Todavía no está configurado el envío de mails (falta RESEND_API_KEY en Vercel)."
-        : `Enviados: ${enviados}.${fallidos ? ` No se pudieron enviar: ${fallidos} (quedan para reintentar).` : ""}`,
+        ? t("sinCorreo")
+        : fallidos
+          ? t("enviadosConFallidos", { enviados, fallidos })
+          : t("enviados", { enviados }),
     );
     cargarEstado();
   }
 
   return (
     <div className="rounded-2xl border border-borde p-4">
-      <h3 className="text-sm font-medium text-texto">Mail de bienvenida</h3>
+      <h3 className="text-sm font-medium text-texto">{t("titulo")}</h3>
       <p className="mt-1 text-xs leading-relaxed text-texto-tenue">
-        A cada persona nueva le llega solo, al entrar por primera vez. Cada cuenta lo recibe una
-        sola vez.
+        {t("explicacion")}
       </p>
       {cuentas && (
         <p className="mt-2 text-sm text-texto">
-          Lo recibieron {cuentas.length - faltan} de {cuentas.length}.{" "}
+          {t("recibieron", { n: cuentas.length - faltan, total: cuentas.length })}{" "}
           <button
             type="button"
             onClick={() => setVerLista((v) => !v)}
             className="text-xs font-medium text-texto-tenue underline hover:text-texto"
           >
-            {verLista ? "Ocultar detalle" : "Ver detalle"}
+            {verLista ? t("ocultarDetalle") : t("verDetalle")}
           </button>
         </p>
       )}
@@ -1116,23 +1157,23 @@ function MailBienvenida() {
             <li key={c.id} className="flex items-center justify-between gap-3 px-3 py-2 text-xs">
               <span className="truncate text-texto">{c.email}</span>
               <span className={c.enviadaEn ? "shrink-0 text-exito-600" : "shrink-0 text-texto-tenue"}>
-                {c.enviadaEn ? `✓ ${new Date(c.enviadaEn).toLocaleDateString("es-AR")}` : "Pendiente"}
+                {c.enviadaEn ? `✓ ${new Date(c.enviadaEn).toLocaleDateString(idioma)}` : t("pendiente")}
               </span>
             </li>
           ))}
         </ul>
       )}
       <div className="mt-3 flex flex-wrap gap-2">
-        <Boton variante="secundario" onClick={prueba} cargando={accion === "prueba"} textoCargando="Enviando…">
-          Enviarme una prueba
+        <Boton variante="secundario" onClick={prueba} cargando={accion === "prueba"} textoCargando={t("enviando")}>
+          {t("enviarmePrueba")}
         </Boton>
         <Boton
           onClick={enviar}
           cargando={accion === "envio"}
-          textoCargando="Enviando…"
+          textoCargando={t("enviando")}
           disabled={!cuentas || faltan === 0 || accion !== null}
         >
-          {faltan === 0 && cuentas ? "Todos lo recibieron" : `Enviar a quienes faltan (${faltan})`}
+          {faltan === 0 && cuentas ? t("todosRecibieron") : t("enviarFaltan", { n: faltan })}
         </Boton>
       </div>
       {mensaje && <p className="mt-2 text-xs text-texto-tenue">{mensaje}</p>}

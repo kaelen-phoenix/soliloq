@@ -1,0 +1,70 @@
+{
+  "correos": {
+    "plantilla": {
+      "pie": "¿Preguntas? Respondé este mail o escribinos a {correo}."
+    },
+    "bienvenida": {
+      "asunto": "🎭 Te damos la bienvenida a Yalope",
+      "previa": "Ya sos parte de la comunidad de actores, actrices y creadores de Yalope.",
+      "titulo": "¡Te damos la bienvenida a Yalope!",
+      "parrafo1": "Ya sos parte de la comunidad donde actores, actrices y creadores se encuentran para armar proyectos: deslizás perfiles y propuestas, y cuando el interés es de los dos lados, se abre el chat.",
+      "parrafo2": "Ya podés entrar y completar tu perfil para empezar.",
+      "entrar": "Entrar a Yalope",
+      "comoFunciona": "Conocé cómo funciona",
+      "lista": {
+        "titulo": "Para arrancar con todo",
+        "fotos": "🎬 &nbsp;Sumá 3 fotos o más y tu videoreel: es lo primero que miran.",
+        "notificaciones": "🔔 &nbsp;Activá las notificaciones para enterarte de cada match y cada mensaje.",
+        "instalar": "📱 &nbsp;Instalá la app desde el navegador del celular: «Agregar a la pantalla de inicio».",
+        "discord": "💬 &nbsp;Sumate a la comunidad en {discord}."
+      },
+      "motivo": "Te llega este mail porque tenés una cuenta en Yalope."
+    },
+    "accesoHabilitado": {
+      "asunto": "🎭 Ya tenés acceso a Yalope",
+      "previa": "Tu solicitud fue aprobada: ya podés entrar.",
+      "titulo": "¡Ya tenés acceso a Yalope!",
+      "parrafo1": "Tu solicitud fue aprobada. Ya podés entrar a la plataforma y crear tu perfil para empezar a formar parte de la comunidad.",
+      "parrafo2": "¡Te esperamos!",
+      "boton": "Entrar a Yalope",
+      "motivo": "Te llega este mail porque pediste acceso a Yalope."
+    },
+    "solicitudAcceso": {
+      "asunto": "🔔 Nueva solicitud de acceso a Yalope",
+      "previa": "{email} pidió entrar a Yalope.",
+      "previaSinEmail": "Alguien pidió entrar a Yalope.",
+      "titulo": "Nueva solicitud de acceso",
+      "parrafo1": "Hay una nueva solicitud de acceso a Yalope pendiente de revisión.",
+      "email": "Email: {email}",
+      "sinEmail": "(sin email)",
+      "fecha": "Fecha: {fecha}",
+      "parrafo2": "Podés entrar al panel de administración para revisarla y decidir si habilitás el acceso.",
+      "boton": "Ver solicitud",
+      "motivo": "Te llega este mail porque sos Administrador de Yalope."
+    },
+    "invitacion": {
+      "asunto": "🎭 Te invitaron a Yalope",
+      "previa": "Creá tu cuenta y entrá directo, sin esperar aprobación.",
+      "titulo": "¡Te invitaron a Yalope!",
+      "parrafo1": "Yalope es la comunidad donde actores, actrices y creadores se encuentran para armar proyectos: deslizás perfiles y propuestas, y cuando el interés es de los dos lados, se abre el chat.",
+      "parrafo2": "Tenés una invitación: creá tu cuenta con este mismo email (o con Google, si es tu cuenta de Gmail) y entrás directo, sin esperar aprobación.",
+      "crearCuenta": "Crear mi cuenta",
+      "comoFunciona": "Conocé cómo funciona",
+      "motivo": "Te llega este mail porque alguien del equipo de Yalope te invitó."
+    },
+    "push": {
+      "mensaje": {
+        "alguien": "Alguien"
+      },
+      "accesoHabilitado": {
+        "titulo": "¡Ya tenés acceso a Yalope!",
+        "cuerpo": "Tu solicitud fue aprobada. Entrá y completá tu perfil."
+      },
+      "solicitudAcceso": {
+        "titulo": "Nueva solicitud de acceso",
+        "cuerpo": "{email} pidió entrar a Yalope.",
+        "cuerpoSinEmail": "Alguien pidió entrar a Yalope."
+      }
+    }
+  }
+}

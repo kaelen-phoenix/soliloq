@@ -8,6 +8,7 @@ import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 
 export function BorrarCuenta() {
   const t = useTranslations("ajustes");
+  const tUi = useTranslations("cuenta.ui");
   const [abierto, setAbierto] = useState(false);
   const [enviando, setEnviando] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -45,7 +46,7 @@ export function BorrarCuenta() {
             </p>
           )}
           <ConfirmarBorrado
-            mensaje={t("borrarCuentaConfirmar", { palabra: "BORRAR" })}
+            mensaje={t("borrarCuentaConfirmar", { palabra: tUi("palabraBorrar") })}
             textoBoton={t("borrarCuentaDefinitivo")}
             textoCargando={t("borrarCuentaEnCurso")}
             textoCancelar={t("cancelar")}

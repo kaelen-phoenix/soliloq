@@ -93,9 +93,9 @@ El mismo circuito de match ya está cubierto a nivel SQL en
 `supabase/tests/match_convocatoria.sql` (corre contra prod en CI, `db-tests`) — `flujos/`
 suma la capa de UI que eso no toca (swipe, placa, `/matches`, `/salas`).
 
-## `local/` — los que necesitan una PC, y tres que también corren en CI
+## `local/` — los que necesitan una PC, y cuatro que también corren en CI
 
-Tres de esta carpeta corren en CI (#356), en el job `e2e-flujos`, con la misma app contra
+Cuatro de esta carpeta corren en CI (#356), en el job `e2e-flujos`, con la misma app contra
 staging. Sus informes y capturas quedan en el artefacto `informes-e2e` del run:
 - `local/accesibilidad.spec.ts` (`E2E_A11Y=1`): axe-core en cada pantalla. Falla con cualquier
   violación seria o crítica.
@@ -103,6 +103,8 @@ staging. Sus informes y capturas quedan en el artefacto `informes-e2e` del run:
   pantalla entre 320 y 414 px.
 - `local/todos-los-formularios.spec.ts` (`E2E_FORMULARIOS_TODOS=1`): cada formulario se envía
   de verdad y se verifica en la base.
+- `local/ingles.spec.ts` (`E2E_INGLES=1`, #354): cada pantalla con `NEXT_LOCALE=en`. Falla si
+  aparece castellano en el texto visible o next-intl avisa una clave faltante.
 
 Los demás necesitan Chrome real o un servidor externo y se corren a mano:
 

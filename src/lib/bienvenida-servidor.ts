@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { correoConfigurado, enviarCorreo } from "@/lib/correo";
 import { mailBienvenida } from "@/lib/correos/bienvenida";
+import { idiomaDe } from "@/lib/correos/textos";
 
 export type ResumenBienvenidas = {
   enviados: number;
@@ -21,7 +22,8 @@ export type ResumenBienvenidas = {
  *
  * Cada cuenta se reclama marcando `bienvenida_enviada_en` en el mismo `update` que la elige,
  * así dos llamadas a la vez no mandan dos mails; si el envío falla, se libera para reintentar.
- * Sin clave de Resend no reclama nada: el mail queda pendiente para cuando esté.
+ * Sin clave de Resend no reclama nada: el mail queda pendiente para cuando esté. Cada mail
+ * sale en el idioma de la cuenta (`perfiles.idioma`, #354).
  */
 export async function enviarBienvenidasPendientes(
   opciones: { soloPerfil?: string; limite?: number } = {},
@@ -31,7 +33,7 @@ export async function enviarBienvenidasPendientes(
   const admin = createAdminClient();
   let candidatas = admin
     .from("perfiles")
-    .select("id")
+    .select("id, idioma")
     .not("aprobado_en", "is", null)
     .not("normas_aceptadas_en", "is", null)
     .is("suspendido_en", null)
@@ -41,12 +43,17 @@ export async function enviarBienvenidasPendientes(
   const { data: filas, error } = await candidatas;
   if (error || !filas) return { enviados: 0, fallidos: filas ? 0 : 1, sinCorreo: false };
 
-  const mail = mailBienvenida({ discord: process.env.NEXT_PUBLIC_DISCORD_INVITACION });
+  const discord = process.env.NEXT_PUBLIC_DISCORD_INVITACION;
+  const mails = {
+    es: mailBienvenida({ discord, idioma: "es" }),
+    en: mailBienvenida({ discord, idioma: "en" }),
+  };
   let enviados = 0;
   let fallidos = 0;
 
   // De a una: el plan gratis de Resend acepta ~2 envíos por segundo.
-  for (const { id } of filas) {
+  for (const { id, idioma } of filas) {
+    const mail = mails[idiomaDe(idioma)];
     const { data: reclamada } = await admin
       .from("perfiles")
       .update({ bienvenida_enviada_en: new Date().toISOString() })

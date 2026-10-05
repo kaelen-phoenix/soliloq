@@ -1,9 +1,10 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
-import { comprimirImagen } from "@/lib/comprimir-imagen";
+import { comprimirImagen, ErrorImagen } from "@/lib/comprimir-imagen";
 import { createClient } from "@/lib/supabase/client";
 
 export interface FotoTalento {
@@ -56,6 +57,8 @@ export function SubirFotos({
   onCambio: (fotos: FotoTalento[] | ((prev: FotoTalento[]) => FotoTalento[])) => void;
   persistir: boolean;
 }) {
+  const t = useTranslations("perfil.fotos");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
   const [error, setError] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
 
@@ -63,14 +66,16 @@ export function SubirFotos({
 
   /** Sube un archivo y devuelve la foto, o el motivo por el que no se pudo. */
   async function subirUna(archivo: File, orden: number): Promise<FotoTalento | string> {
-    if (!TIPOS_ADMITIDOS.includes(archivo.type)) return "Solo se admiten imágenes JPEG, PNG o WebP.";
+    if (!TIPOS_ADMITIDOS.includes(archivo.type)) return t("tiposAdmitidos");
 
     // Si la foto pesa o mide de más, se comprime acá en vez de rechazarla.
     let foto: File;
     try {
       foto = await comprimirImagen(archivo, { maxBytes: MAX_BYTES });
     } catch (e) {
-      return e instanceof Error ? e.message : "No pudimos procesar la imagen.";
+      return e instanceof ErrorImagen
+        ? tEtiquetas(`imagen.${e.clave}`, e.valores)
+        : tEtiquetas("imagen.noSeProcesa");
     }
 
     const supabase = createClient();
@@ -79,7 +84,7 @@ export function SubirFotos({
     const { error: errorSubida } = await supabase.storage
       .from("fotos-perfil")
       .upload(ruta, foto, { contentType: foto.type });
-    if (errorSubida) return "No pudimos subir la foto. Probá de nuevo.";
+    if (errorSubida) return t("errorSubir");
 
     const url = supabase.storage.from("fotos-perfil").getPublicUrl(ruta).data.publicUrl;
     if (!persistir) return { id: crypto.randomUUID(), storage_path: ruta, orden, url, enBd: false };
@@ -91,7 +96,7 @@ export function SubirFotos({
       .single();
     if (errorInsert || !fila) {
       await supabase.storage.from("fotos-perfil").remove([ruta]);
-      return "No pudimos guardar la foto. Probá de nuevo.";
+      return t("errorGuardar");
     }
     return { id: fila.id, storage_path: ruta, orden, url, enBd: true };
   }
@@ -105,14 +110,16 @@ export function SubirFotos({
 
     const lugares = MAX_FOTOS - fotos.length;
     if (lugares <= 0) {
-      setError(`El máximo es ${MAX_FOTOS} fotos.`);
+      setError(t("maximo", { max: MAX_FOTOS }));
       return;
     }
 
     setSubiendo(true);
     let actuales = fotos;
     let problema: string | null =
-      archivos.length > lugares ? `Subimos ${lugares} de ${archivos.length}: el máximo es ${MAX_FOTOS} fotos.` : null;
+      archivos.length > lugares
+        ? t("subimosAlgunas", { lugares, total: archivos.length, max: MAX_FOTOS })
+        : null;
     for (const archivo of archivos.slice(0, lugares)) {
       // max + 1: evita reusar el orden de una foto borrada del medio.
       const orden = actuales.reduce((max, f) => Math.max(max, f.orden), -1) + 1;
@@ -165,14 +172,14 @@ export function SubirFotos({
           <div key={foto.id} className="group relative aspect-[3/4] overflow-hidden rounded-lg bg-ink-100">
             <Imagen
               src={foto.url}
-              alt="Foto de portfolio"
+              alt={t("altFoto")}
               fill
               absoluto
               sizes="(max-width: 640px) 33vw, 200px"
             />
             {indice === 0 && (
               <span className="absolute left-1.5 top-1.5 rounded bg-ink-950/75 px-1.5 py-0.5 text-2xs font-medium uppercase tracking-wide text-white backdrop-blur-sm">
-                Principal
+                {t("principal")}
               </span>
             )}
             <div className="absolute inset-x-0 bottom-0 flex justify-between gap-1 bg-gradient-to-t from-ink-950/80 to-transparent px-1.5 pb-1.5 pt-4">
@@ -182,7 +189,7 @@ export function SubirFotos({
                   onClick={() => hacerPrincipal(foto)}
                   className="text-2xs font-medium text-white/90 hover:text-white"
                 >
-                  Principal
+                  {t("principal")}
                 </button>
               )}
               <button
@@ -190,7 +197,7 @@ export function SubirFotos({
                 onClick={() => eliminarFoto(foto)}
                 className="ml-auto text-2xs font-medium text-white/90 hover:text-white"
               >
-                Eliminar
+                {t("eliminar")}
               </button>
             </div>
           </div>
@@ -199,7 +206,7 @@ export function SubirFotos({
         {fotos.length < MAX_FOTOS && (
           <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-ink-300 text-texto-tenue transition-colors hover:border-texto hover:text-texto">
             <Icono nombre="mas" className="h-5 w-5" />
-            <span className="text-2xs font-medium">{subiendo ? "Subiendo…" : "Agregar fotos"}</span>
+            <span className="text-2xs font-medium">{subiendo ? t("subiendo") : t("agregar")}</span>
             <input
               type="file"
               accept={TIPOS_ADMITIDOS.join(",")}
@@ -214,7 +221,7 @@ export function SubirFotos({
 
       {error && <p className="text-xs text-error-600">{error}</p>}
       <p className="text-xs text-texto-tenue">
-        {fotos.length}/{MAX_FOTOS} fotos — con una alcanza para empezar. Podés elegir varias juntas.
+        {t("contador", { n: fotos.length, max: MAX_FOTOS })}
       </p>
     </div>
   );

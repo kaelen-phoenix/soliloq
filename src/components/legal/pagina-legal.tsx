@@ -24,7 +24,7 @@ export async function PaginaLegal({ doc }: { doc: "privacidad" | "terminos" }) {
 
       <main className="mx-auto w-full max-w-3xl flex-1 px-5 py-12">
         <h1 className="font-display text-3xl font-semibold tracking-[-0.02em]">{t(`${doc}.titulo`)}</h1>
-        <p className="mt-2 text-xs text-ink-500">{t("actualizado")}</p>
+        <p className="mt-2 text-xs text-ink-700">{t("actualizado")}</p>
         <p className="mt-6 text-sm leading-relaxed text-ink-700">{t(`${doc}.intro`)}</p>
 
         <div className="mt-8 flex flex-col gap-8">

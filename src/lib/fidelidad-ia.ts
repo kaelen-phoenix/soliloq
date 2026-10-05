@@ -18,13 +18,22 @@ const PERMITIDAS = new Set(
     "trabaje trabajos trabajo proyectos proyecto destacados destaca incluye incluyen otros otras " +
     "donde cuales ambos varios varias distintos diferentes diversas diversos anos " +
     "buscamos busca buscando formar realizar sumar sumarse personas persona integrantes grupo " +
-    "interesadas interesados invitamos necesitamos requiere requisitos ensayos ensayamos semana semanas"
+    "interesadas interesados invitamos necesitamos requiere requisitos ensayos ensayamos semana semanas " +
+    // Lo mismo en inglés (#354): la redacción responde en el idioma del texto.
+    "training trained studied studies studying experience experienced performed performing " +
+    "participated role roles character characters cast lead leading theater theatre plays " +
+    "film films short shorts feature commercial commercials acting actor actress also " +
+    "currently during between since until later previously skills languages fluent advanced " +
+    "intermediate basic worked work projects project including include includes other others " +
+    "several various different diverse years looking seeking join members group interested " +
+    "invite need required requirements rehearsals rehearse week weeks"
   ).split(" "),
 );
 
-// El modelo contesta en vez de reescribir («no encontré información…», «por favor enviá…»).
+// El modelo contesta en vez de reescribir («no encontré información…», «por favor enviá…»,
+// o en inglés «I couldn't find…», «please provide…»).
 const PEDIDO =
-  /no (se )?encontr|no hay (suficiente )?informacion|no poseo|no (se )?(ha )?proporcion|por favor|envie|envia(me)? |podrias|necesito mas/;
+  /no (se )?encontr|no hay (suficiente )?informacion|no poseo|no (se )?(ha )?proporcion|por favor|envie|envia(me)? |podrias|necesito mas|i (could not|couldn't|did not|didn't|cannot|can't) find|not enough information|please (provide|send|share)|could you (provide|send|share)|i need more/;
 
 function normalizar(texto: string): string {
   return texto

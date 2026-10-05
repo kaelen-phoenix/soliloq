@@ -1,7 +1,8 @@
 import { ImageResponse } from "next/og";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import { etiquetaDisciplina } from "@/lib/constantes";
+import { claveDisciplina, etiquetaHabilidad } from "@/lib/constantes";
 import { CREMA, NARANJA } from "@/app/_marca-icono";
 import { ISOTIPO_TRAZOS, ISOTIPO_VIEWBOX } from "@/lib/marca-isotipo";
 
@@ -41,6 +42,10 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
 
   try {
     const supabase = createClient();
+    const [t, tEtiquetas] = await Promise.all([
+      getTranslations("perfil.og"),
+      getTranslations("perfil.etiquetas"),
+    ]);
     const { data, error } = await supabase.rpc("perfil_publico", { p_token: params.token });
     if (error) reportarErrorSupabase(error, { rpc: "perfil_publico", token: params.token });
     const perfil = data?.[0];
@@ -58,7 +63,7 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
       }
 
       datos = [
-        perfil.edad != null ? `${perfil.edad} años` : null,
+        perfil.edad != null ? t("edad", { edad: perfil.edad }) : null,
         // Solo la localidad: "Caseros, Provincia de Buenos Aires, Argentina" no entra.
         perfil.ubicacion_publica?.split(",")[0]?.trim() || null,
       ]
@@ -68,8 +73,11 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
       // Habilidades de Talento primero; si no cargó ninguna, las disciplinas de Creador
       // (sólo existen si además tiene esa función activa).
       oficios = (perfil.habilidades ?? []).length > 0
-        ? perfil.habilidades.slice(0, 4).join("  ·  ")
-        : (perfil.disciplinas ?? []).slice(0, 4).map(etiquetaDisciplina).join("  ·  ");
+        ? perfil.habilidades.slice(0, 4).map((h) => etiquetaHabilidad(h, tEtiquetas)).join("  ·  ")
+        : (perfil.disciplinas ?? [])
+            .slice(0, 4)
+            .map((d) => tEtiquetas(claveDisciplina(d)))
+            .join("  ·  ");
     }
   } catch {
     // Cae a la tarjeta genérica de abajo.

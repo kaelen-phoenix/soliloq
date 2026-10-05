@@ -1,6 +1,7 @@
 "use client";
 
 import { forwardRef } from "react";
+import { useTranslations } from "next-intl";
 
 type Variante = "primario" | "secundario" | "fantasma" | "peligro";
 
@@ -28,23 +29,26 @@ export const Boton = forwardRef<HTMLButtonElement, Props>(
     {
       variante = "primario",
       cargando,
-      textoCargando = "Guardando…",
+      textoCargando,
       className = "",
       children,
       disabled,
       ...props
     },
     ref
-  ) => (
-    <button
-      ref={ref}
-      disabled={disabled || cargando}
-      className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100 ${estilosPorVariante[variante]} ${className}`}
-      {...props}
-    >
-      {cargando ? textoCargando : children}
-    </button>
-  )
+  ) => {
+    const t = useTranslations("cuenta.ui");
+    return (
+      <button
+        ref={ref}
+        disabled={disabled || cargando}
+        className={`inline-flex items-center justify-center gap-2 rounded-full px-5 py-2.5 text-sm font-medium transition active:scale-[0.98] disabled:cursor-not-allowed disabled:active:scale-100 ${estilosPorVariante[variante]} ${className}`}
+        {...props}
+      >
+        {cargando ? (textoCargando ?? t("guardando")) : children}
+      </button>
+    );
+  }
 );
 
 Boton.displayName = "Boton";

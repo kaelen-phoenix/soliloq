@@ -1,7 +1,11 @@
+import { getTranslations } from "next-intl/server";
 import { TableroCreador } from "@/components/convocatorias/tablero-creador";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
-export const metadata = { title: "Mis proyectos — Yalope" };
+export async function generateMetadata() {
+  const t = await getTranslations("titulos");
+  return { title: `${t("misProyectos")} — Yalope` };
+}
 
 /** Los Proyectos y Equipos propios. Sin modo Creador (#288): cualquiera arma el suyo desde acá. */
 export default async function ProyectosPage() {

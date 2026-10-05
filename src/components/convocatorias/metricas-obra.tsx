@@ -1,9 +1,11 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 
 export async function MetricasObra({ obraId }: { obraId: string }) {
   const supabase = createClient();
+  const t = await getTranslations("proyectos.metricas");
   const { data, error } = await supabase.rpc("metricas_obra", { p_obra_id: obraId });
   if (error) reportarErrorSupabase(error, { rpc: "metricas_obra", obraId });
   const m = data?.[0];
@@ -12,8 +14,8 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
     return (
       <EstadoVacio
         icono="tablero"
-        titulo="Todavía no hay roles"
-        detalle="Definí al menos un rol y publicá la obra: acá vas a ver cómo rinde la convocatoria."
+        titulo={t("sinRolesTitulo")}
+        detalle={t("sinRolesDetalle")}
       />
     );
   }
@@ -22,8 +24,8 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
     return (
       <EstadoVacio
         icono="feed"
-        titulo="Todavía nadie vio la convocatoria"
-        detalle="Cuando la obra esté publicada y aparezca en el feed, acá vas a ver a cuánta gente llegó y cuántos se interesaron."
+        titulo={t("sinAlcanceTitulo")}
+        detalle={t("sinAlcanceDetalle")}
       />
     );
   }
@@ -44,22 +46,22 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
           <span className="text-sm text-texto-tenue">%</span>
         </p>
         <p className="pb-0.5 text-xs leading-snug text-texto-tenue">
-          se interesó
+          {t("seIntereso")}
           <br />
-          de {m.alcance} {m.alcance === 1 ? "persona" : "personas"}
+          {t("dePersonas", { n: m.alcance })}
         </p>
       </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-borde pt-3.5">
         <div>
-          <dt className="text-2xs uppercase tracking-wide text-texto-tenue">Interés mutuo</dt>
+          <dt className="text-2xs uppercase tracking-wide text-texto-tenue">{t("interesMutuo")}</dt>
           <dd className="mt-0.5 text-lg font-semibold leading-none text-texto">{m.matches}</dd>
         </div>
         <div>
-          <dt className="text-2xs uppercase tracking-wide text-texto-tenue">Convocados</dt>
+          <dt className="text-2xs uppercase tracking-wide text-texto-tenue">{t("convocados")}</dt>
           <dd className="mt-0.5 text-lg font-semibold leading-none text-texto">
             {convocadosCubierto}
-            <span className="text-sm font-normal text-texto-tenue"> de {m.cupo}</span>
+            <span className="text-sm font-normal text-texto-tenue"> {t("deCupo", { cupo: m.cupo ?? "" })}</span>
           </dd>
         </div>
       </dl>

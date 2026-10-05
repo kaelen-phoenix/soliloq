@@ -2,6 +2,7 @@
 
 import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { abrirEspacioDiscord, sincronizarEspacioDeSala } from "@/app/acciones-discord";
 
 const pildora =
@@ -26,6 +27,7 @@ export function EspacioDiscord({
   vinculado: boolean;
 }) {
   const router = useRouter();
+  const t = useTranslations("chats.comunidad");
   const [creando, setCreando] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
@@ -49,14 +51,14 @@ export function EspacioDiscord({
   if (url && vinculado) {
     return (
       <a href={url} target="_blank" rel="noopener noreferrer" className={pildora}>
-        Abrir en Discord
+        {t("abrirEnDiscord")}
       </a>
     );
   }
   if (url) {
     return (
-      <a href={`/api/discord/vincular?volver=/salas/${salaId}`} className={pildora} title="Vinculá tu cuenta para entrar al espacio privado del grupo">
-        Vinculá tu Discord
+      <a href={`/api/discord/vincular?volver=/salas/${salaId}`} className={pildora} title={t("vinculaTuDiscordAyuda")}>
+        {t("vinculaTuDiscord")}
       </a>
     );
   }
@@ -64,7 +66,7 @@ export function EspacioDiscord({
   return (
     <span className="flex flex-col items-end gap-1">
       <button type="button" onClick={abrir} disabled={creando} className={pildora}>
-        {creando ? "Creando…" : "Crear espacio en Discord"}
+        {creando ? t("creando") : t("crearEspacio")}
       </button>
       {error && <span className="text-2xs text-error-600">{error}</span>}
     </span>

@@ -1,12 +1,13 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Esqueleto } from "@/components/ui/esqueleto";
 import { Icono } from "@/components/ui/icono";
-import { GENEROS_BUSCABLES, HABILIDADES, type Genero } from "@/lib/constantes";
+import { GENEROS_BUSCABLES, HABILIDADES, claveGenero, etiquetaHabilidad, type Genero } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { opcionesDeRadio, RADIO_INICIAL_METROS, SesionUbicacion, type Ubicacion } from "@/lib/ubicacion";
@@ -20,6 +21,9 @@ type Fila = Omit<ResultadoTalento, "fotoUrl"> & { foto_principal_path: string };
 
 export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | null }) {
   const supabase = createClient();
+  const t = useTranslations("proyectos.buscador");
+  const tc = useTranslations("comun");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
 
   const [texto, setTexto] = useState("");
   const [edadMin, setEdadMin] = useState("");
@@ -68,11 +72,11 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
       setVerFiltros(true);
       setAvisoConsulta(
         f.zona && !zona
-          ? `Aplicamos los filtros. No encontramos «${f.zona}»: elegí la zona abajo.`
-          : "Aplicamos los filtros: revisalos abajo.",
+          ? t("filtrosSinZona", { zona: f.zona })
+          : t("filtrosAplicados"),
       );
     } catch {
-      setAvisoConsulta("No pudimos interpretarlo ahora. Usá los filtros de abajo.");
+      setAvisoConsulta(t("errorInterpretar"));
     } finally {
       setInterpretando(false);
     }
@@ -140,7 +144,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
     return () => clearTimeout(t);
   }, [buscar]);
 
-  const opcionesRadio = opcionesDeRadio("km");
+  const opcionesRadio = opcionesDeRadio("km", tEtiquetas);
 
   const hayFiltros =
     texto.trim() !== "" ||
@@ -171,7 +175,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
       <div className="flex flex-col gap-4 rounded-2xl border border-borde bg-fondo-sutil/50 p-4">
         <form onSubmit={aplicarConsulta} className="flex flex-col gap-1.5">
           <label htmlFor="buscar-describi" className="text-sm font-medium text-texto">
-            ✨ Describí a quién buscás
+            {t("describi")}
           </label>
           <div className="flex gap-2">
             <input
@@ -179,7 +183,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
               value={consulta}
               onChange={(e) => setConsulta(e.target.value)}
               maxLength={300}
-              placeholder="Actriz de 30 a 40 que cante, cerca de Palermo"
+              placeholder={t("describiPlaceholder")}
               className="min-w-0 flex-1 rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto placeholder:text-texto-tenue focus:border-accion"
             />
             <button
@@ -187,7 +191,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
               disabled={interpretando || consulta.trim().length < 3}
               className="shrink-0 rounded-xl bg-accion px-3.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
             >
-              {interpretando ? "…" : "Buscar"}
+              {interpretando ? "…" : tc("buscar")}
             </button>
           </div>
           {avisoConsulta && <p className="text-xs text-texto-tenue">{avisoConsulta}</p>}
@@ -195,8 +199,8 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
 
         <CampoTexto
           id="buscar-nombre"
-          etiqueta="Buscar"
-          placeholder="Nombre, habilidad o experiencia"
+          etiqueta={tc("buscar")}
+          placeholder={t("buscarPlaceholder")}
           value={texto}
           onChange={(e) => setTexto(e.target.value)}
         />
@@ -208,7 +212,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
             aria-expanded={verFiltros}
             className="inline-flex items-center gap-1.5 text-sm font-medium text-texto-tenue hover:text-texto"
           >
-            Filtros
+            {t("filtros")}
             {nAvanzados > 0 && (
               <span className="rounded-full bg-accion px-1.5 text-2xs font-semibold text-accion-texto">
                 {nAvanzados}
@@ -225,7 +229,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
               onClick={limpiarFiltros}
               className="text-xs font-medium text-texto-tenue underline decoration-ink-300 underline-offset-2 hover:text-texto"
             >
-              Limpiar
+              {t("limpiar")}
             </button>
           )}
         </div>
@@ -234,7 +238,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
         <div className="grid grid-cols-2 gap-3">
           <CampoTexto
             id="edad-min"
-            etiqueta="Edad mínima"
+            etiqueta={t("edadMinima")}
             type="number"
             inputMode="numeric"
             min={16}
@@ -243,7 +247,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
           />
           <CampoTexto
             id="edad-max"
-            etiqueta="Edad máxima"
+            etiqueta={t("edadMaxima")}
             type="number"
             inputMode="numeric"
             min={16}
@@ -253,7 +257,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-texto">Género</span>
+          <span className="text-sm font-medium text-texto">{t("genero")}</span>
           <div className="flex flex-wrap gap-2">
             {GENEROS_BUSCABLES.map((g) => (
               <button
@@ -266,14 +270,14 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
                     : "border-borde text-texto-tenue"
                 }`}
               >
-                {g.etiqueta}
+                {tEtiquetas(claveGenero(g.valor))}
               </button>
             ))}
           </div>
         </div>
 
         <div className="flex flex-col gap-1.5">
-          <span className="text-sm font-medium text-texto">Habilidades</span>
+          <span className="text-sm font-medium text-texto">{t("habilidades")}</span>
           <div className="flex flex-wrap gap-2">
             {HABILIDADES.map((h) => (
               <button
@@ -286,7 +290,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
                     : "border-borde text-texto-tenue"
                 }`}
               >
-                {h}
+                {etiquetaHabilidad(h, tEtiquetas)}
               </button>
             ))}
           </div>
@@ -294,15 +298,15 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
 
         <CampoUbicacion
           id="buscar-ubicacion"
-          etiqueta="Cerca de"
+          etiqueta={t("cercaDe")}
           valor={ubicacion}
           onCambio={setUbicacion}
-          placeholder="Ciudad o barrio"
+          placeholder={t("cercaDePlaceholder")}
         />
         {ubicacion && (
           <div className="flex flex-col gap-1.5">
             <label htmlFor="buscar-radio" className="text-2xs font-medium text-texto-tenue">
-              Radio
+              {t("radio")}
             </label>
             <select
               id="buscar-radio"
@@ -325,7 +329,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
         <div
           className="grid grid-cols-[repeat(auto-fill,minmax(150px,1fr))] gap-3"
           role="status"
-          aria-label="Buscando"
+          aria-label={t("buscando")}
         >
           {Array.from({ length: 6 }).map((_, i) => (
             <div key={i} className="flex flex-col gap-2">
@@ -338,8 +342,8 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
       ) : resultados.length === 0 ? (
         <EstadoVacio
           icono="buscar"
-          titulo="Sin coincidencias"
-          detalle="No hay talento que coincida con esos filtros. Probá aflojando alguno."
+          titulo={t("vacioTitulo")}
+          detalle={t("vacioDetalle")}
         />
       ) : (
         <PilaTalentos

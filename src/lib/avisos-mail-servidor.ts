@@ -2,6 +2,7 @@ import * as Sentry from "@sentry/nextjs";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { correoConfigurado, enviarCorreo } from "@/lib/correo";
 import { mailAccesoHabilitado, mailSolicitudAcceso } from "@/lib/correos/acceso";
+import { idiomaDe } from "@/lib/correos/textos";
 
 /**
  * Los avisos de acceso por mail (#247, #248, 0093), el mismo circuito que el push
@@ -12,6 +13,8 @@ import { mailAccesoHabilitado, mailSolicitudAcceso } from "@/lib/correos/acceso"
  *   (sin leer: al habilitar a la persona, 0092 la marca leída).
  * - `acceso_habilitado` → mail a la persona, aunque ya lo haya visto en la campanita: el mail
  *   es lo que le avisa si no tiene la app abierta.
+ *
+ * Cada mail sale en el idioma de quien lo recibe (`perfiles.idioma`, #354).
  *
  * Últimas 24 h, reserva atómica, y si el envío falla se libera para reintentar. Sin clave de
  * Resend no reclama nada.
@@ -47,6 +50,14 @@ export async function despacharMailsDeAcceso() {
     ...(solicitudes.data ?? []).map((a) => ({ ...a, tipo: "solicitud_acceso" as const })),
     ...(habilitados.data ?? []).map((a) => ({ ...a, tipo: "acceso_habilitado" as const })),
   ];
+  if (avisos.length === 0) return;
+
+  // El idioma de cada destinatario, en una sola consulta. Si falla, castellano.
+  const { data: idiomas } = await admin
+    .from("perfiles")
+    .select("id, idioma")
+    .in("id", Array.from(new Set(avisos.map((a) => a.destinatario_id))));
+  const idiomaPorPerfil = new Map((idiomas ?? []).map((p) => [p.id, idiomaDe(p.idioma)]));
 
   // De a uno: el plan gratis de Resend acepta ~2 envíos por segundo.
   for (const a of avisos) {
@@ -56,10 +67,11 @@ export async function despacharMailsDeAcceso() {
     try {
       const para = await emailDe(a.destinatario_id);
       if (para) {
+        const idioma = idiomaPorPerfil.get(a.destinatario_id) ?? "es";
         const mail =
           a.tipo === "acceso_habilitado"
-            ? mailAccesoHabilitado()
-            : mailSolicitudAcceso({ email: await emailDe(a.de_perfil), fecha: new Date(a.creado_en) });
+            ? mailAccesoHabilitado(idioma)
+            : mailSolicitudAcceso({ email: await emailDe(a.de_perfil), fecha: new Date(a.creado_en), idioma });
         liberar = !(await enviarCorreo({ para, asunto: mail.asunto, html: mail.html, texto: mail.texto })).ok;
       }
     } catch {

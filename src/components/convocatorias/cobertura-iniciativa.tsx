@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useMemo, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
@@ -24,7 +25,7 @@ interface Grupo {
   ocupantes: { convocatoriaId: string; talentoId: string; nombre: string; fotoUrl: string | null }[];
 }
 
-function agrupar(filas: FilaCobertura[]): Grupo[] {
+function agrupar(filas: FilaCobertura[], sinNombre: string): Grupo[] {
   const grupos = new Map<string, Grupo>();
   for (const f of filas) {
     const clave = f.rolId ?? "__equipo__";
@@ -35,7 +36,7 @@ function agrupar(filas: FilaCobertura[]): Grupo[] {
       grupos.get(clave)!.ocupantes.push({
         convocatoriaId: f.convocatoriaId,
         talentoId: f.talentoId,
-        nombre: f.talentoNombre ?? "Talento",
+        nombre: f.talentoNombre ?? sinNombre,
         fotoUrl: f.talentoFotoUrl,
       });
     }
@@ -60,7 +61,10 @@ function Avatar({ url, nombre }: { url: string | null; nombre: string }) {
  */
 export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[]; esEquipo: boolean }) {
   const router = useRouter();
-  const grupos = useMemo(() => agrupar(filas), [filas]);
+  const t = useTranslations("proyectos.cobertura");
+  const tc = useTranslations("comun");
+  const sinNombre = t("talento");
+  const grupos = useMemo(() => agrupar(filas, sinNombre), [filas, sinNombre]);
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);
@@ -87,7 +91,9 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
   return (
     <section className="flex flex-col gap-2.5">
       <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-        {esEquipo ? `Participantes — ${totalOcupados} de ${totalLugares}` : `Roles — ${totalOcupados} de ${totalLugares} cubiertos`}
+        {esEquipo
+          ? t("participantes", { ocupados: totalOcupados, lugares: totalLugares })
+          : t("rolesCubiertos", { ocupados: totalOcupados, lugares: totalLugares })}
       </h3>
 
       {error && <p className="text-xs text-error-600">{error}</p>}
@@ -119,11 +125,11 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
                       onClick={() => setConfirmando(unico.convocatoriaId)}
                       className="shrink-0 rounded-lg border border-error-400 px-2 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50"
                     >
-                      Quitar
+                      {t("quitar")}
                     </button>
                   </>
                 ) : (
-                  <span className="shrink-0 text-sm text-texto-tenue">Disponible</span>
+                  <span className="shrink-0 text-sm text-texto-tenue">{t("disponible")}</span>
                 )}
               </li>
             );
@@ -133,8 +139,7 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
             <li key={g.rolId ?? "equipo"} className="rounded-xl border border-borde bg-superficie p-3.5">
               {!esEquipo && (
                 <p className="mb-2 text-sm font-medium text-texto">
-                  {g.rolNombre} — {g.ocupantes.length}/{g.vacantes} cubierto
-                  {g.ocupantes.length === 1 ? "" : "s"}
+                  {t("rolCubierto", { rol: g.rolNombre ?? "", ocupados: g.ocupantes.length, vacantes: g.vacantes })}
                 </p>
               )}
               <ul className="flex flex-col gap-2">
@@ -153,14 +158,15 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
                       onClick={() => setConfirmando(o.convocatoriaId)}
                       className="shrink-0 rounded-lg border border-error-400 px-2 py-1 text-xs font-medium text-error-600 transition-colors hover:bg-error-50"
                     >
-                      Quitar
+                      {t("quitar")}
                     </button>
                   </li>
                 ))}
                 {disponibles > 0 && (
                   <li className="text-sm text-texto-tenue">
-                    {disponibles} {esEquipo ? "lugar" : "vacante"}
-                    {disponibles === 1 ? "" : "s"} disponible{disponibles === 1 ? "" : "s"}
+                    {esEquipo
+                      ? t("lugaresDisponibles", { n: disponibles })
+                      : t("vacantesDisponibles", { n: disponibles })}
                   </li>
                 )}
               </ul>
@@ -170,11 +176,10 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
       </ul>
 
       {confirmando && (
-        <Superposicion onCerrar={() => setConfirmando(null)} etiqueta="Confirmar">
+        <Superposicion onCerrar={() => setConfirmando(null)} etiqueta={t("confirmar")}>
           <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
             <p className="text-sm text-texto">
-              ¿Quitar a esta persona {esEquipo ? "del equipo" : "del rol"}? Sale de la sala y el
-              lugar vuelve a quedar disponible.
+              {esEquipo ? t("confirmarQuitarEquipo") : t("confirmarQuitarRol")}
             </p>
             <div className="mt-4 flex gap-2">
               <button
@@ -183,7 +188,7 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
                 onClick={() => quitar(confirmando)}
                 className="flex-1 rounded-xl border border-error-600 bg-superficie px-4 py-2.5 text-sm font-medium text-error-600 disabled:opacity-50"
               >
-                {ocupado ? "…" : "Quitar"}
+                {ocupado ? "…" : t("quitar")}
               </button>
               <button
                 type="button"
@@ -191,7 +196,7 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
                 onClick={() => setConfirmando(null)}
                 className="flex-1 rounded-xl border border-borde px-4 py-2.5 text-sm font-medium text-texto disabled:opacity-50"
               >
-                Cancelar
+                {tc("cancelar")}
               </button>
             </div>
           </div>

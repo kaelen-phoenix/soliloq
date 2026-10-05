@@ -1,17 +1,11 @@
 import Link from "next/link";
+import { getTranslations } from "next-intl/server";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { CrearProyecto } from "@/components/convocatorias/crear-proyecto";
 import { createClient } from "@/lib/supabase/server";
 
-const ETIQUETA_ESTADO: Record<string, string> = {
-  borrador: "Borrador",
-  publicada: "Publicada",
-  cerrada: "Cerrada",
-  activo: "Activo",
-  cerrado: "Cerrado",
-};
-
+// La etiqueta de cada estado sale de `proyectos.tablero.estado.<estado>`.
 const COLOR_ESTADO: Record<string, string> = {
   borrador: "bg-ink-100 text-texto-tenue",
   publicada: "bg-accion text-accion-texto",
@@ -36,6 +30,7 @@ interface Item {
  */
 export async function TableroCreador({ creadorId }: { creadorId: string }) {
   const supabase = createClient();
+  const t = await getTranslations("proyectos.tablero");
 
   const [{ data: obras }, { data: equipos }] = await Promise.all([
     supabase.from("obras").select("id, titulo, estado, creado_en").eq("creador_id", creadorId),
@@ -66,8 +61,8 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
       {items.length === 0 ? (
         <EstadoVacio
           icono="tablero"
-          titulo="Todavía no armaste ningún proyecto"
-          detalle="Creá un proyecto con los roles que buscás, o armá un equipo para crear con otras personas."
+          titulo={t("vacioTitulo")}
+          detalle={t("vacioDetalle")}
         />
       ) : (
         <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(min(18rem,100%),1fr))]">
@@ -86,12 +81,12 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
                         it.tipo === "equipo" ? "bg-coral text-ink-950" : "bg-brand-600 text-white"
                       }`}
                     >
-                      {it.tipo === "equipo" ? "Equipo" : "Proyecto"}
+                      {it.tipo === "equipo" ? t("equipo") : t("proyecto")}
                     </span>
                     <span
                       className={`inline-block rounded-md px-1.5 py-0.5 text-2xs font-medium uppercase tracking-wide ${COLOR_ESTADO[it.estado]}`}
                     >
-                      {ETIQUETA_ESTADO[it.estado]}
+                      {t(`estado.${it.estado}`)}
                     </span>
                   </div>
                 </div>

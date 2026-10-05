@@ -2,18 +2,49 @@
 // coordenadas (ver `src/lib/ubicacion.ts`). El filtro del feed compara distancias, no textos.
 
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
+import mensajesPerfilEs from "@/mensajes/es/perfil.json";
+
+// --- Etiquetas traducibles (#354) -------------------------------------------------------
+//
+// Los textos de esta lista (y los de `ubicacion.ts`, `redes.ts`, `comprimir-imagen.ts` y
+// `onboarding-ejemplo.ts`) viven en `mensajes/<idioma>/perfil.json`, bajo `perfil.etiquetas`.
+// Desde un componente se traducen con un traductor parado en ese namespace:
+//
+//   const t = useTranslations("perfil.etiquetas");   // o getTranslations(...) en el servidor
+//   t(claveGenero(valor))  ·  etiquetaHabilidad(h, t)  ·  opcionesDeRadio(unidad, t)
+//
+// Sin traductor, las funciones devuelven el castellano, leído del mismo JSON: así quien
+// todavía no pasa `t` sigue viendo lo de siempre.
+
+/** Lo que devuelve `useTranslations("perfil.etiquetas")`, reducido a lo que se usa acá. */
+export type TraductorEtiquetas = (clave: string, valores?: Record<string, string | number>) => string;
+
+/** El castellano de `perfil.etiquetas`, sin depender de next-intl (sirve fuera de React). */
+export const traductorCastellano: TraductorEtiquetas = (clave, valores) => {
+  let nodo: unknown = mensajesPerfilEs.perfil.etiquetas;
+  for (const parte of clave.split(".")) {
+    nodo = nodo && typeof nodo === "object" ? (nodo as Record<string, unknown>)[parte] : undefined;
+  }
+  if (typeof nodo !== "string") return clave;
+  return nodo.replace(/\{(\w+)\}/g, (_, v: string) => String(valores?.[v] ?? `{${v}}`));
+};
 
 export type Genero = "mujer" | "varon" | "no_binarie" | "otro" | "sin_especificar";
 
 // El enum es lo único que participa del match. La autodescripción libre del perfil no se
 // filtra nunca.
-export const GENEROS: { valor: Genero; etiqueta: string }[] = [
-  { valor: "mujer", etiqueta: "Mujer" },
-  { valor: "varon", etiqueta: "Varón" },
-  { valor: "no_binarie", etiqueta: "No binarie" },
-  { valor: "otro", etiqueta: "Otro" },
-  { valor: "sin_especificar", etiqueta: "Prefiero no decirlo" },
-];
+// `etiqueta` es el castellano; para el idioma activo, `t(claveGenero(g.valor))`.
+const VALORES_GENERO: Genero[] = ["mujer", "varon", "no_binarie", "otro", "sin_especificar"];
+
+/** Clave de la etiqueta dentro de `perfil.etiquetas`. */
+export function claveGenero(valor: Genero): string {
+  return `genero.${valor}`;
+}
+
+export const GENEROS: { valor: Genero; etiqueta: string }[] = VALORES_GENERO.map((valor) => ({
+  valor,
+  etiqueta: traductorCastellano(claveGenero(valor)),
+}));
 
 // Buscar gente que no declaró su género no es un criterio de casting, así que
 // `sin_especificar` no se ofrece como género buscable en un rol.
@@ -21,31 +52,42 @@ export const GENEROS_BUSCABLES = GENEROS.filter((g) => g.valor !== "sin_especifi
 
 export const MAX_GENERO_DESCRIPCION = 60;
 
+/** En castellano. Para el idioma activo: `t(claveGenero(valor))`. */
 export function etiquetaGenero(valor: Genero): string {
   return GENEROS.find((g) => g.valor === valor)?.etiqueta ?? "";
 }
 
 // Perfil artístico: qué hace la persona en el medio. Reemplazó al par director/compañía.
 // El orden es el del documento de producto, no alfabético: arranca por lo más frecuente.
-export const DISCIPLINAS: { valor: DisciplinaArtistica; etiqueta: string }[] = [
-  { valor: "actuacion", etiqueta: "Actuación" },
-  { valor: "direccion", etiqueta: "Dirección" },
-  { valor: "guion", etiqueta: "Guion" },
-  { valor: "produccion", etiqueta: "Producción" },
-  { valor: "dramaturgia", etiqueta: "Dramaturgia" },
-  { valor: "vestuario", etiqueta: "Vestuario" },
-  { valor: "escenografia", etiqueta: "Escenografía" },
-  { valor: "iluminacion", etiqueta: "Iluminación" },
-  { valor: "sonido", etiqueta: "Sonido" },
-  { valor: "coreografia", etiqueta: "Coreografía" },
-  { valor: "danza", etiqueta: "Danza" },
-  { valor: "musica", etiqueta: "Música" },
-  { valor: "fotografia", etiqueta: "Fotografía" },
-  { valor: "edicion", etiqueta: "Edición" },
-  { valor: "maquillaje", etiqueta: "Maquillaje" },
-  { valor: "asistencia_direccion", etiqueta: "Asistencia de dirección" },
-  { valor: "otro", etiqueta: "Otro" },
+const VALORES_DISCIPLINA: DisciplinaArtistica[] = [
+  "actuacion",
+  "direccion",
+  "guion",
+  "produccion",
+  "dramaturgia",
+  "vestuario",
+  "escenografia",
+  "iluminacion",
+  "sonido",
+  "coreografia",
+  "danza",
+  "musica",
+  "fotografia",
+  "edicion",
+  "maquillaje",
+  "asistencia_direccion",
+  "otro",
 ];
+
+/** Clave de la etiqueta dentro de `perfil.etiquetas`. */
+export function claveDisciplina(valor: DisciplinaArtistica): string {
+  return `disciplina.${valor}`;
+}
+
+// `etiqueta` es el castellano; para el idioma activo, `t(claveDisciplina(d.valor))`.
+export const DISCIPLINAS: { valor: DisciplinaArtistica; etiqueta: string }[] = VALORES_DISCIPLINA.map(
+  (valor) => ({ valor, etiqueta: traductorCastellano(claveDisciplina(valor)) }),
+);
 
 export const MAX_OTRO_DETALLE = 80;
 
@@ -105,10 +147,13 @@ export function clasesDisciplina(valor: DisciplinaArtistica): string {
   return CLASES_FAMILIA[familiaDeDisciplina(valor)];
 }
 
+/** En castellano. Para el idioma activo: `t(claveDisciplina(valor))`. */
 export function etiquetaDisciplina(valor: DisciplinaArtistica): string {
   return DISCIPLINAS.find((d) => d.valor === valor)?.etiqueta ?? "";
 }
 
+// Se guardan en la base tal cual (en castellano): son el valor, no la etiqueta. Por eso no
+// salen del JSON — cambiarlas ahí no puede cambiar lo que ya está guardado.
 export const HABILIDADES = [
   "Canto",
   "Danza",
@@ -119,6 +164,26 @@ export const HABILIDADES = [
   "Esgrima escénica",
   "Improvisación",
 ] as const;
+
+const CLAVE_HABILIDAD: Record<(typeof HABILIDADES)[number], string> = {
+  Canto: "canto",
+  Danza: "danza",
+  Acrobacia: "acrobacia",
+  "Instrumentos musicales": "instrumentos",
+  Idiomas: "idiomas",
+  "Doblaje / locución": "doblaje",
+  "Esgrima escénica": "esgrima",
+  Improvisación: "improvisacion",
+};
+
+/**
+ * La habilidad guardada, en el idioma de `t`. Una que no está en la lista (de antes, o
+ * escrita a mano) se muestra tal cual se guardó.
+ */
+export function etiquetaHabilidad(habilidad: string, t: TraductorEtiquetas = traductorCastellano): string {
+  const clave = CLAVE_HABILIDAD[habilidad as (typeof HABILIDADES)[number]];
+  return clave ? t(`habilidad.${clave}`) : habilidad;
+}
 
 // Redes sociales del perfil de talento. El conjunto es chico y estable, así que vive acá
 // como lista cerrada (igual que `GENEROS` o `DISCIPLINAS`). La lógica de normalizar un
@@ -133,6 +198,7 @@ export type ClaveRed = "instagram" | "youtube" | "tiktok" | "x" | "linkedin" | "
 
 export interface Red {
   clave: ClaveRed;
+  /** En castellano. Para el idioma activo: `t(claveRed(red.clave))`. */
   etiqueta: string;
   hosts: string[];
   prefijoCanonico: string;
@@ -186,12 +252,17 @@ export const REDES: Red[] = [
   },
   {
     clave: "sitio",
-    etiqueta: "Sitio web",
+    etiqueta: traductorCastellano("red.sitio"),
     hosts: [],
     prefijoCanonico: "",
     icono: "sitio",
   },
 ];
+
+/** Clave del nombre de la red dentro de `perfil.etiquetas` (solo «Sitio web» cambia). */
+export function claveRed(clave: ClaveRed): string {
+  return `red.${clave}`;
+}
 
 /**
  * Las columnas de `perfiles_talento` que puede leer cualquiera que vea el perfil (#255).
