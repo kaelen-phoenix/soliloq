@@ -36,6 +36,13 @@ export function AccionesObra({
   const [confirmarBorrado, setConfirmarBorrado] = useState(false);
   // Al subir una foto o agregar un rol, el aviso viejo («Subí al menos una foto…») se va.
   useEffect(() => setError(null), [cantidadFotos, cantidadRoles]);
+  // Mientras FotosObra sube una foto, publicar espera (#349).
+  const [subiendoFoto, setSubiendoFoto] = useState(false);
+  useEffect(() => {
+    const alCambiar = (e: Event) => setSubiendoFoto(Boolean((e as CustomEvent<boolean>).detail));
+    window.addEventListener("yalope:subiendo-fotos-obra", alCambiar);
+    return () => window.removeEventListener("yalope:subiendo-fotos-obra", alCambiar);
+  }, []);
 
   async function publicar() {
     setError(null);
@@ -109,7 +116,7 @@ export function AccionesObra({
       {error && <p className="text-xs text-error-600">{error}</p>}
       <div className="flex gap-2">
         {estado === "borrador" && (
-          <Boton onClick={publicar} cargando={cargando}>
+          <Boton onClick={publicar} cargando={cargando || subiendoFoto} textoCargando={subiendoFoto ? "Subiendo la foto…" : undefined}>
             Publicar convocatoria
           </Boton>
         )}

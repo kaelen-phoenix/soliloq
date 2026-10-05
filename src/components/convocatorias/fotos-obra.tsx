@@ -1,6 +1,6 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { useRouter } from "next/navigation";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
@@ -41,6 +41,10 @@ export function FotosObra({
   const router = useRouter();
   const [error, setError] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
+  // #349: «Publicar» espera mientras se sube una foto (si no, tocándolo apurado contaba cero).
+  useEffect(() => {
+    window.dispatchEvent(new CustomEvent("yalope:subiendo-fotos-obra", { detail: subiendo }));
+  }, [subiendo]);
 
   const ordenadas = [...fotos].sort((a, b) => a.orden - b.orden);
   const faltan = Math.max(0, MIN_FOTOS_OBRA - fotos.length);
