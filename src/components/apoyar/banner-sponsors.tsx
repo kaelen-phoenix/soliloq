@@ -33,7 +33,8 @@ export async function BannerSponsors({
       .in("nivel", niveles)
       .order("nivel")
       .order("orden");
-    sponsors = data ?? [];
+    // `nivel` es texto con check en la base (`sponsors_nivel_check`): llega como string.
+    sponsors = (data ?? []).map((s) => ({ ...s, nivel: s.nivel as Nivel }));
   } catch {
     // Sin sponsors o sin base disponible: el banner simplemente no aparece.
   }

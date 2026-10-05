@@ -6,7 +6,7 @@ export interface ResultadoTalento {
   nombre: string;
   /** #110: `null` si el talento tiene la edad oculta. */
   edad: number | null;
-  ubicacion_publica: string;
+  ubicacion_publica: string | null;
   habilidades: string[];
   fotoUrl: string;
 }

@@ -106,3 +106,14 @@ export function validarRedes(entradas: Partial<Record<ClaveRed, string>>): {
 
   return { redes, errores };
 }
+
+/**
+ * La columna `redes` es jsonb y llega tipada como `Json` (#353): se queda con los pares
+ * `red → URL` de texto y descarta cualquier otra cosa (un null, un objeto viejo, etc.).
+ */
+export function redesDeJson(valor: unknown): Record<string, string> {
+  if (!valor || typeof valor !== "object" || Array.isArray(valor)) return {};
+  return Object.fromEntries(
+    Object.entries(valor).filter((par): par is [string, string] => typeof par[1] === "string"),
+  );
+}

@@ -5,6 +5,7 @@ import { createClient } from "@/lib/supabase/client";
 import { COLUMNAS_PUBLICAS_TALENTO } from "@/lib/constantes";
 import { Superposicion } from "@/components/ui/superposicion";
 import { PerfilTalentoDetalle, type TalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
+import { redesDeJson } from "@/lib/redes";
 
 /**
  * Placa de perfil reutilizable: sala de chat (#149) y Matches / Convocados (#151). Pide
@@ -43,6 +44,7 @@ export function PlacaPerfilTalento({
       }
       setTalento({
         ...perfil,
+        redes: redesDeJson(perfil.redes),
         edad: edad ?? null,
         fotos: (fotos ?? []).map((f) => ({
           id: f.id,

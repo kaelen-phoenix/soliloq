@@ -66,7 +66,7 @@ interface DatosIniciales {
   fecha_nacimiento: string | null;
   edad_visible: boolean;
   ubicacion_texto: string;
-  ubicacion_publica: string;
+  ubicacion_publica: string | null;
   ubicacion_place_id: string | null;
   ubicacion_lat: number;
   ubicacion_lng: number;
