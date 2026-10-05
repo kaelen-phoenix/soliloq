@@ -22,6 +22,7 @@ El detalle funcional completo está en `openspec/changes/`.
    ```
 2. Crear un proyecto en [supabase.com](https://supabase.com) (plan Free).
 3. En el SQL Editor del proyecto, ejecutar las migraciones de `supabase/migrations/` **en orden numérico** (o usar `supabase db push` si tenés la Supabase CLI instalada y el proyecto vinculado).
+   Después de aplicar una migración, regenerar los tipos con `npm run tipos-db` (escribe `src/lib/supabase/database.generated.ts` desde staging; necesita `SUPABASE_ACCESS_TOKEN`) y commitearlos: el CI falla si no coinciden con la base.
 4. Copiar `.env.example` a `.env.local` y completar con los valores de *Project Settings → API*:
    ```
    NEXT_PUBLIC_SUPABASE_URL=

@@ -12,6 +12,7 @@ import { PerfilCreadorDetalle } from "@/components/perfil/perfil-creador-detalle
 import { calcularEdad } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/server";
 import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
+import { redesDeJson } from "@/lib/redes";
 
 function AccionesCuenta() {
   return (
@@ -101,7 +102,9 @@ export default async function PerfilPage({
           <FormularioTalento
             userId={user.id}
             esAlta={!perfilTalento}
-            datosIniciales={perfilTalento ?? undefined}
+            datosIniciales={
+              perfilTalento ? { ...perfilTalento, redes: redesDeJson(perfilTalento.redes) } : undefined
+            }
             fotosIniciales={fotosConUrl}
             datosCreador={perfilCreador ?? undefined}
           />
@@ -119,6 +122,7 @@ export default async function PerfilPage({
           <PerfilTalentoDetalle
             talento={{
               ...perfilTalento,
+              redes: redesDeJson(perfilTalento.redes),
               edad: perfilTalento.fecha_nacimiento ? calcularEdad(perfilTalento.fecha_nacimiento) : null,
               fotos: fotosConUrl,
             }}

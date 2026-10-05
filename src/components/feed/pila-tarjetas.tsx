@@ -5,6 +5,7 @@ import { animate, motion, useMotionValue, useTransform } from "framer-motion";
 import { Icono } from "@/components/ui/icono";
 import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { createClient } from "@/lib/supabase/client";
+import { aRolFeed } from "@/lib/feed-roles";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { ROLES_EJEMPLO } from "@/lib/onboarding-ejemplo";
 import { opcionesDeRadio, radioMasCercano, type UnidadDistancia } from "@/lib/ubicacion";
@@ -118,11 +119,7 @@ export function PilaTarjetas({
 
     const publicUrl = (p: string) =>
       supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl;
-    const nuevos: RolFeed[] = (data ?? []).map((r) => ({
-      ...r,
-      creador_imagen_url: r.creador_foto_path ? publicUrl(r.creador_foto_path) : null,
-      fotos: (r.obra_fotos ?? []).map(publicUrl),
-    }));
+    const nuevos: RolFeed[] = (data ?? []).map((r) => aRolFeed(r, publicUrl));
     setRoles(nuevos);
     setIndice(0);
     // El feed cambió entero: lo que había para deshacer ya no está en pantalla.
