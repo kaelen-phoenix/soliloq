@@ -247,5 +247,163 @@
     },
     "errorGuardar": "We couldn't save it. Please try again.",
     "guardando": "Saving…"
+  },
+  "legal": {
+    "volverApp": "Go to the app",
+    "actualizado": "Last updated: October 5, 2026",
+    "contacto": "For any questions about these topics, write to us at info@yalope.com.",
+    "privacidad": {
+      "titulo": "Privacy Policy",
+      "descripcion": "What data Yalope keeps, what it uses it for, who sees it and how to exercise your rights.",
+      "intro": "Yalope (“Yalope”, “we”) is a platform that connects actors and creators of artistic projects. This policy explains what personal data we process when you use yalope.com and the app, why, who we share it with and how you can exercise your rights, under Argentina's Personal Data Protection Law No. 25,326. Data controller: Yalope — info@yalope.com.",
+      "secciones": [
+        {
+          "titulo": "1. What data we keep",
+          "parrafos": [
+            "Account: your email and your password (stored encrypted by our provider; nobody at Yalope can see it). If you sign in with Google, we receive your name, your email and, only if you choose to use it, your Google photo.",
+            "Profile: name, date of birth, location, gender (and its description if you choose “Other”), photos, video reel, experience, skills, social links and your visibility preferences.",
+            "Projects and teams you create: titles, descriptions, roles, photos and rehearsal location.",
+            "Activity in the app: the “I'm interested” marks you make, your matches and casting calls, chat messages, notifications, reports and blocks.",
+            "Technical data: if you turn on notifications, your browser's subscription; if you link Discord, your Discord ID and username; your theme and language preferences; how many times you use the AI features (we don't store the texts you send); and error logs with technical data (browser, operating system and the screen where the error happened).",
+            "If you write to us through the “Support” form: your name, your email and your message."
+          ]
+        },
+        {
+          "titulo": "2. What we use it for",
+          "parrafos": [
+            "To make the app work: showing your profile to people looking for talent, showing you projects and teams near you, setting up matches and casting calls, and opening each project's chats.",
+            "To let you know what's happening: emails (for example, when your access is approved) and phone notifications if you turn them on.",
+            "To look after the community: approving new accounts, handling reports and reviewing published content (with AI assistance, always reviewed by a person before any action is taken).",
+            "To fix errors and improve the app.",
+            "We don't sell your data or use it for advertising."
+          ]
+        },
+        {
+          "titulo": "3. Who sees your information",
+          "parrafos": [
+            "Your profile is visible to people with an approved Yalope account. Your location is shown only as a neighborhood or city: the exact address is never published. You can hide your age, and you can hide your profile from new people.",
+            "If you turn on your profile's public link, anyone with that link sees your profile without your social links.",
+            "Chat messages are visible only to the members of that chat.",
+            "Yalope's admin team can access information when needed to approve accounts, handle reports or solve technical problems."
+          ]
+        },
+        {
+          "titulo": "4. Services we use",
+          "parrafos": [
+            "To run, Yalope uses providers that process data on our behalf: Supabase (database, files and accounts), Vercel (app hosting), Resend (email delivery), Sentry (error logging), Google (Google sign-in and place search), OpenAI through Vercel (only when you use an AI button; the text from that moment is sent) and Discord (only if you link your account).",
+            "Some of these providers process data outside Argentina, mainly in the United States. By using Yalope you accept that international transfer, which is made with providers that apply security measures."
+          ]
+        },
+        {
+          "titulo": "5. How long we keep it",
+          "parrafos": [
+            "For as long as you have your account. From Settings → “Delete my account” your account and all your content (profile, photos, projects, teams, chats and messages) are deleted. Our providers' technical logs are deleted according to their own retention periods."
+          ]
+        },
+        {
+          "titulo": "6. Your rights",
+          "parrafos": [
+            "You can access, rectify, update and request deletion of your data. You can do almost everything from the app (editing your profile or deleting your account); for anything else, write to info@yalope.com.",
+            "The data subject has the right to access their personal data free of charge at intervals of no less than six months, unless a legitimate interest is shown, as established in article 14, paragraph 3 of Law No. 25,326.",
+            "The Agency for Access to Public Information, as the Control Body of Law No. 25,326, is empowered to handle complaints and claims filed by those whose rights are affected by non-compliance with the rules on personal data protection."
+          ]
+        },
+        {
+          "titulo": "7. Minimum age",
+          "parrafos": [
+            "Yalope is for people aged 16 and over: the profile doesn't accept a date of birth indicating a younger age."
+          ]
+        },
+        {
+          "titulo": "8. Cookies and storage",
+          "parrafos": [
+            "We use cookies to keep you signed in and to remember your preferences (theme, language), and while you complete your profile we keep a draft in your browser so you don't lose what you entered. We don't use advertising or third-party tracking cookies."
+          ]
+        },
+        {
+          "titulo": "9. Security",
+          "parrafos": [
+            "Information travels encrypted and access to data is restricted by permissions: each person sees what concerns them. No system is infallible; if we detect a problem affecting your data, we will let you know."
+          ]
+        },
+        {
+          "titulo": "10. Changes",
+          "parrafos": [
+            "If we change this policy, we will update the date above and, if the change is significant, we will let you know in the app."
+          ]
+        }
+      ]
+    },
+    "terminos": {
+      "titulo": "Terms and Conditions",
+      "descripcion": "The rules for using Yalope.",
+      "intro": "These terms govern the use of yalope.com and the Yalope app. By creating an account or using the service, you accept them. If you don't agree, don't use Yalope.",
+      "secciones": [
+        {
+          "titulo": "1. What Yalope is",
+          "parrafos": [
+            "Yalope is a platform that connects actors and creators of artistic projects: it lets you create a profile, publish projects and teams, mark interest, send casting calls and talk in chats.",
+            "Yalope makes contact between people easier, but it doesn't take part in organizing, hiring, paying for or carrying out the projects, and it isn't a party to the agreements people make with each other."
+          ]
+        },
+        {
+          "titulo": "2. Your account",
+          "parrafos": [
+            "You must be at least 16 years old and provide true information. Each account is personal.",
+            "While the community grows, new accounts go through an approval before they can use the app.",
+            "You are responsible for keeping your password safe and for what is done from your account."
+          ]
+        },
+        {
+          "titulo": "3. Community Guidelines",
+          "parrafos": [
+            "By using Yalope you accept the Community Guidelines, which are part of these terms. Among other things, harassment, discrimination, false or misleading casting calls, fake profiles, scams and deceptive payment requests are not allowed."
+          ]
+        },
+        {
+          "titulo": "4. What you publish",
+          "parrafos": [
+            "What you upload (photos, texts, projects, messages) remains yours. You give us permission to store it and show it within Yalope to the appropriate people, only so that the service works. That permission ends when you delete it or delete your account.",
+            "You must have the right to publish what you upload: for example, don't upload photos of other people without their permission or protected third-party content.",
+            "Whoever creates a project or team is responsible for the information they publish and for how it is carried out."
+          ]
+        },
+        {
+          "titulo": "5. AI features",
+          "parrafos": [
+            "Some features use artificial intelligence to suggest texts or filters. Suggestions may contain errors: review them before using them. There is a daily usage limit."
+          ]
+        },
+        {
+          "titulo": "6. Moderation and measures",
+          "parrafos": [
+            "We may review reported or published content and, if it breaches these terms or the Guidelines, warn, remove content, or suspend or delete accounts."
+          ]
+        },
+        {
+          "titulo": "7. The service",
+          "parrafos": [
+            "Yalope is free. Donations and sponsor contributions are voluntary and give no benefits within the app beyond what is described in “Support”.",
+            "We do our best to keep Yalope working well, but the service is provided as is, may have interruptions or errors, and may change. We are not responsible for agreements between users or for what happens outside the platform, including in-person meetings."
+          ]
+        },
+        {
+          "titulo": "8. Privacy",
+          "parrafos": [
+            "How we handle your data is explained in the Privacy Policy."
+          ]
+        },
+        {
+          "titulo": "9. Changes and governing law",
+          "parrafos": [
+            "We may update these terms; if the change is significant, we will let you know in the app. They are governed by the laws of the Argentine Republic."
+          ]
+        }
+      ]
+    },
+    "aceptacionAlta": "By creating your account you accept the <terminos>Terms</terminos> and the <privacidad>Privacy Policy</privacidad>.",
+    "enlaceTerminos": "Terms",
+    "enlacePrivacidad": "Privacy Policy",
+    "enlaceNormas": "Community Guidelines"
   }
 }

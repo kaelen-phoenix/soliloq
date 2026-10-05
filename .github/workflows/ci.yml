@@ -82,6 +82,13 @@ jobs:
   # correr nada — ver e2e/README.md.
   e2e-flujos:
     runs-on: ubuntu-latest
+    # Un solo run a la vez contra staging (plan free): con varios PRs en paralelo los flujos
+    # se pisaban en tiempos de respuesta y fallaban por timeout. Los demás esperan su turno
+    # (GitHub deja uno solo en espera: si se encola un tercero, el que esperaba se cancela y
+    # hay que volver a correrlo).
+    concurrency:
+      group: e2e-staging
+      cancel-in-progress: false
     env:
       E2E_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
       E2E_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
@@ -134,6 +141,30 @@ jobs:
         run: npx playwright test e2e/flujos
         env:
           E2E_BASE_URL: http://localhost:3100
+
+      # #356: los que antes se corrían solo a mano. Accesibilidad (axe en cada pantalla),
+      # formularios que no se salgan en 320–414 px, y todos los formularios enviados de verdad.
+      # Usan la misma app y el mismo staging; los informes quedan como artefacto.
+      - name: e2e accesibilidad y formularios (staging)
+        if: env.E2E_SUPABASE_URL != ''
+        run: npx playwright test e2e/local/accesibilidad.spec.ts e2e/local/formularios-ancho.spec.ts e2e/local/todos-los-formularios.spec.ts
+        env:
+          E2E_BASE_URL: http://localhost:3100
+          E2E_A11Y: "1"
+          E2E_FORMULARIOS: "1"
+          E2E_FORMULARIOS_TODOS: "1"
+          E2E_RECORRIDO_DIR: informes-e2e
+
+      - name: subir informes
+        if: always() && env.E2E_SUPABASE_URL != ''
+        uses: actions/upload-artifact@v4
+        with:
+          name: informes-e2e
+          path: |
+            informes-e2e/
+            test-results/
+          if-no-files-found: ignore
+          retention-days: 7
 
       - name: Sin secrets de staging — se saltea
         if: env.E2E_SUPABASE_URL == ''
