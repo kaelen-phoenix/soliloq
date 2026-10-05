@@ -88,7 +88,9 @@
         "palabraBorrar": "DELETE",
         "confirmarBorrado": "This deletes {nombre}'s account and everything in it —profile, projects, rooms, messages—. It can't be undone; to remove someone reversibly, use Suspend. Type {palabra} to confirm.",
         "borrarDefinitivamente": "Delete permanently",
-        "borrando": "Deleting…"
+        "borrando": "Deleting…",
+        "noATiMismo": "You can't suspend yourself.",
+        "noAOtroAdmin": "You can't suspend another admin."
       },
       "acceso": {
         "noSeInvito": "Couldn't send the invitation.",
@@ -110,7 +112,8 @@
         "invitacionesVacioDetalle": "You haven't invited anyone yet.",
         "enviadaEl": "Sent on {fecha}",
         "usada": "used",
-        "pendiente": "pending"
+        "pendiente": "pending",
+        "emailInvalido": "That email doesn't look valid."
       },
       "publicaciones": {
         "placeholder": "Title, owner or email",

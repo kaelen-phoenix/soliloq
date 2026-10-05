@@ -88,7 +88,9 @@
         "palabraBorrar": "BORRAR",
         "confirmarBorrado": "Se elimina la cuenta de {nombre} con todo su contenido —perfil, proyectos, salas, mensajes—. Es irreversible; para una baja reversible usá Suspender. Escribí {palabra} para confirmar.",
         "borrarDefinitivamente": "Borrar definitivamente",
-        "borrando": "Borrando…"
+        "borrando": "Borrando…",
+        "noATiMismo": "No podés suspenderte a vos mismo.",
+        "noAOtroAdmin": "No podés suspender a otro admin."
       },
       "acceso": {
         "noSeInvito": "No se pudo enviar la invitación.",
@@ -110,7 +112,8 @@
         "invitacionesVacioDetalle": "Todavía no invitaste a nadie.",
         "enviadaEl": "Enviada el {fecha}",
         "usada": "usada",
-        "pendiente": "pendiente"
+        "pendiente": "pendiente",
+        "emailInvalido": "Ese email no parece válido."
       },
       "publicaciones": {
         "placeholder": "Título, dueño o email",

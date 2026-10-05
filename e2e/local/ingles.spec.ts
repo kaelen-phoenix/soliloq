@@ -1,4 +1,4 @@
-import { test, type Browser, type Page } from "@playwright/test";
+import { expect, test, type Browser, type Page } from "@playwright/test";
 import { createClient } from "@supabase/supabase-js";
 import { borrarUsuarios } from "../flujos/limpieza";
 
@@ -17,6 +17,15 @@ const PASS = "test-1234-abcd";
 // lugar («Córdoba») son datos, no texto de la interfaz.
 const CASTELLANO =
   /\b(el|los|las|del|para|con|una|que|tu|tus|sin|por|más|está|querés|tenés|podés|acá|todavía|también|ningún|ninguna|guardar|buscar|cerrar|volver|probá|elegí|escribí|tocá)\b|[¿¡]/i;
+
+// Si falta una clave, next-intl muestra su ruta («perfil.formulario.nombre»), también cuando
+// la página se arma en el server, donde no hay consola del navegador que lo avise.
+const CLAVE_SIN_TRADUCIR =
+  /\b(comun|nav|titulos|landing|ajustes|instalar|auth|suspendido|solicitudPendiente|aceptarNormas|normas|apoyar|notificacionesPush|tour|legal|perfil|proyectos|chats|cuenta|admin|correos)\.[a-zA-Z]+\b/;
+
+// Un lugar sin nadie cerca (isla Bouvet), con radio chico: el feed y el buscador solo muestran
+// lo de esta cuenta, y no títulos en castellano que hayan cargado otras pruebas en staging.
+const LUGAR = { ubicacion_texto: "Bouvet Island", ubicacion_lat: -54.43, ubicacion_lng: 3.4, ubicacion_pais: "BV" };
 
 test.describe("la app en inglés", () => {
   test.skip(process.env.E2E_INGLES !== "1" || !URL || !KEY, "solo con E2E_INGLES=1 + staging");
@@ -40,13 +49,11 @@ test.describe("la app en inglés", () => {
       .update({ aprobado_en: ahora, normas_aceptadas_en: ahora, tour_talento_visto_en: ahora, tour_creador_visto_en: ahora, idioma: "en" })
       .eq("id", id);
     await admin!.from("perfiles_talento").insert({
-      id, nombre: "English Tester", fecha_nacimiento: "1990-01-01", ubicacion_texto: "Buenos Aires, Argentina",
-      ubicacion_publica: "Palermo", ubicacion_lat: -34.6, ubicacion_lng: -58.4, ubicacion_pais: "AR",
-      genero: "sin_especificar", onboarding_visto_en: ahora, experiencia: "Independent theater.",
+      id, nombre: "English Tester", fecha_nacimiento: "1990-01-01", ...LUGAR, ubicacion_publica: "Bouvet Island",
+      radio_busqueda_metros: 5000, genero: "sin_especificar", onboarding_visto_en: ahora, experiencia: "Independent theater.",
     });
     const { data: obra } = await admin!.from("obras").insert({
-      creador_id: id, titulo: "English play", estado: "borrador",
-      ubicacion_texto: "Buenos Aires, Argentina", ubicacion_lat: -34.6, ubicacion_lng: -58.4, ubicacion_pais: "AR",
+      creador_id: id, titulo: "English play", estado: "borrador", ...LUGAR,
     }).select("id").single();
     const { data: equipo } = await admin!.from("equipos").insert({ creador_id: id, titulo: "English team", cupo: null }).select("id").single();
     return { email, obraId: obra!.id as string, equipoId: equipo!.id as string };
@@ -67,6 +74,11 @@ test.describe("la app en inglés", () => {
 
   test("ninguna pantalla muestra castellano", async ({ browser }) => {
     const hallazgos: string[] = [];
+    /** Abre la ruta y verifica que no haya redirigido a otra pantalla (si no, se revisaría otra). */
+    async function ir(page: Page, ruta: string) {
+      await page.goto(ruta);
+      expect(new globalThis.URL(page.url()).pathname, ruta).toBe(ruta.split("?")[0]);
+    }
     async function revisar(page: Page, nombre: string) {
       await page.waitForLoadState("networkidle").catch(() => {});
       const texto = await page.evaluate(() => {
@@ -79,13 +91,13 @@ test.describe("la app en inglés", () => {
         }
         return partes.join("\n");
       });
-      const lineas = texto.split("\n").filter((l) => CASTELLANO.test(l));
+      const lineas = texto.split("\n").filter((l) => CASTELLANO.test(l) || CLAVE_SIN_TRADUCIR.test(l));
       if (lineas.length) hallazgos.push(`${nombre}:\n    ${[...new Set(lineas)].slice(0, 6).join("\n    ")}`);
     }
 
     const anon = await nueva(browser);
     for (const ruta of ["/bienvenida", "/ingresar", "/recuperar", "/normas", "/apoyar", "/privacidad", "/terminos"]) {
-      await anon.goto(ruta);
+      await ir(anon, ruta);
       await revisar(anon, ruta);
     }
 
@@ -109,7 +121,7 @@ test.describe("la app en inglés", () => {
       "/notificaciones",
       "/ajustes",
     ]) {
-      await p.goto(ruta);
+      await ir(p, ruta);
       await revisar(p, ruta);
     }
 

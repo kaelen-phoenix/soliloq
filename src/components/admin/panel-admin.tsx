@@ -129,7 +129,7 @@ function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { data, error: e } = await supabase.rpc("admin_mensajes", { p_limite: 200, p_offset: 0 });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_mensajes" });
-      setError(e.message ?? t("comun.noSeLeyo"));
+      setError(t("comun.noSeLeyo"));
     } else setFilas(data ?? []);
   }, [supabase]);
 
@@ -144,7 +144,7 @@ function Mensajes({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_marcar_mensaje_leido", mensajeId: m.id });
-      setError(e.message ?? t("comun.noSeAplico"));
+      setError(t("comun.noSeAplico"));
     } else setFilas((prev) => (prev ?? []).map((f) => (f.id === m.id ? { ...f, leido: !m.leido } : f)));
   }
 
@@ -220,7 +220,7 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { data, error: e } = await supabase.rpc("admin_sponsors");
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_sponsors" });
-      setError(e.message ?? t("comun.noSeLeyo"));
+      setError(t("comun.noSeLeyo"));
     } else setFilas(data ?? []);
   }, [supabase]);
 
@@ -241,7 +241,7 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     });
     if (err) {
       reportarErrorSupabase(err, { rpc: "admin_guardar_sponsor", sponsorId: form.id });
-      setError(err.message ?? t("comun.noSeGuardo"));
+      setError(t("comun.noSeGuardo"));
       return;
     }
     setError(null);
@@ -254,7 +254,7 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { error: e } = await supabase.rpc("admin_borrar_sponsor", { p_id: s.id });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_borrar_sponsor", sponsorId: s.id });
-      setError(e.message ?? t("comun.noSeBorro"));
+      setError(t("comun.noSeBorro"));
     } else setFilas((prev) => (prev ?? []).filter((f) => f.id !== s.id));
   }
 
@@ -446,7 +446,14 @@ function Usuarios({
     });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_suspender_usuario", usuarioId: u.id });
-      setError(e.message ?? t("comun.noSeAplico"));
+      // Los dos rechazos que pone la base a propósito (0040) se muestran con su motivo.
+      setError(
+        e.message.includes("a vos mismo")
+          ? t("usuarios.noATiMismo")
+          : e.message.includes("otro admin")
+            ? t("usuarios.noAOtroAdmin")
+            : t("comun.noSeAplico"),
+      );
       return;
     }
     setError(null);
@@ -605,7 +612,7 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     if (eSol || eInv) {
       if (eSol) reportarErrorSupabase(eSol, { rpc: "admin_solicitudes_pendientes" });
       if (eInv) reportarErrorSupabase(eInv, { rpc: "admin_invitaciones" });
-      setError(eSol?.message ?? eInv?.message ?? t("comun.noSeLeyo"));
+      setError(t("comun.noSeLeyo"));
       return;
     }
     setPendientes(sol ?? []);
@@ -625,7 +632,7 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     setInvitando(false);
     if (err) {
       reportarErrorSupabase(err, { rpc: "admin_crear_invitacion" });
-      setError(err.message ?? t("acceso.noSeInvito"));
+      setError(err.message.includes("email inválido") ? t("acceso.emailInvalido") : t("acceso.noSeInvito"));
       return;
     }
     const invitado = email.trim();
@@ -649,7 +656,7 @@ function Acceso({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     setAprobandoId(null);
     if (err) {
       reportarErrorSupabase(err, { rpc: "admin_aprobar_usuario", solicitudId: s.id });
-      setError(err.message ?? t("acceso.noSeAprobo"));
+      setError(t("acceso.noSeAprobo"));
       return;
     }
     setError(null);
@@ -783,7 +790,7 @@ function Publicaciones({ supabase }: { supabase: ReturnType<typeof createClient>
       setCargando(false);
       if (e) {
         reportarErrorSupabase(e, { rpc: "admin_publicaciones", texto: q });
-        setError(e.message ?? t("comun.noSeLeyo"));
+        setError(t("comun.noSeLeyo"));
         return;
       }
       setError(null);
@@ -889,7 +896,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
     const { data, error: e } = await supabase.rpc("admin_denuncias", { p_limite: 100, p_offset: 0 });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_denuncias" });
-      setError(e.message ?? t("comun.noSeLeyo"));
+      setError(t("comun.noSeLeyo"));
       return;
     }
     setFilas(data ?? []);
@@ -911,7 +918,7 @@ function Denuncias({ supabase }: { supabase: ReturnType<typeof createClient> }) 
     });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_resolver_denuncia", denunciaId: d.id, estado });
-      setError(e.message ?? t("comun.noSeAplico"));
+      setError(t("comun.noSeAplico"));
       return;
     }
     setError(null);
@@ -974,7 +981,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     const { data, error: e } = await supabase.rpc("admin_bloqueos", { p_limite: 100, p_offset: 0 });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_bloqueos" });
-      setError(e.message ?? t("comun.noSeLeyo"));
+      setError(t("comun.noSeLeyo"));
       return;
     }
     setFilas(data ?? []);
@@ -992,7 +999,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     });
     if (e) {
       reportarErrorSupabase(e, { rpc: "admin_levantar_bloqueo" });
-      setError(e.message ?? t("bloqueos.noSeLevanto"));
+      setError(t("bloqueos.noSeLevanto"));
       return;
     }
     setError(null);
@@ -1008,7 +1015,7 @@ function Bloqueos({ supabase }: { supabase: ReturnType<typeof createClient> }) {
     });
     if (err) {
       reportarErrorSupabase(err, { rpc: "admin_crear_bloqueo" });
-      setError(err.message ?? t("bloqueos.noSeCreo"));
+      setError(t("bloqueos.noSeCreo"));
       return;
     }
     setError(null);
