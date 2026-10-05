@@ -91,6 +91,8 @@ test.describe("todos los formularios", () => {
     const page = await ctx.newPage();
 
     // ── 1. Registrarse ──────────────────────────────────────────────────────
+    // (Un alta exitosa por el formulario no se puede probar acá: staging rechaza los dominios de
+    // prueba y no manda el correo de confirmación a direcciones de afuera del equipo.)
     // Supabase rechaza los dominios de prueba (`@test.local`): el formulario tiene que mostrar
     // el error en castellano (#349: antes salía el texto de Supabase en inglés). La cuenta para
     // el resto del recorrido se crea por el admin, como si hubiera confirmado el email.
@@ -200,6 +202,7 @@ test.describe("todos los formularios", () => {
     await page.getByLabel("Descripción (opcional)").fill("Un grupo para crear juntos.");
     await page.getByRole("button", { name: "Guardar", exact: true }).click();
     await expect(page.getByText("Un grupo para crear juntos.")).toBeVisible({ timeout: 15_000 });
+    await expect.poll(async () => (await admin!.from("equipos").select("descripcion").eq("creador_id", nuevo.id).single()).data?.descripcion, { timeout: 15_000 }).toBe("Un grupo para crear juntos.");
 
     // ── 12. Buscar talento (texto) ──────────────────────────────────────────
     await page.goto(`/talentos?obra=${obraId}`);
@@ -219,6 +222,7 @@ test.describe("todos los formularios", () => {
     await page.getByPlaceholder("Contanos qué pasó").fill("Prueba de formularios.");
     await page.getByRole("button", { name: /Enviar/ }).click();
     await expect(page.getByText("Recibimos tu denuncia")).toBeVisible({ timeout: 15_000 });
+    await expect.poll(async () => (await admin!.from("denuncias").select("id").eq("perfil_denunciado_id", otro.data.user!.id)).data?.length ?? 0, { timeout: 15_000 }).toBe(1);
 
     // ── 14. Escribir en un chat ─────────────────────────────────────────────
     const { data: sala } = await admin!.from("salas").insert({ titulo: "Sala formularios", obra_id: obraId }).select("id").single();
@@ -230,6 +234,7 @@ test.describe("todos los formularios", () => {
     await page.getByPlaceholder("Escribí un mensaje…").fill("Hola, prueba de formularios");
     await page.getByRole("button", { name: "Enviar" }).click();
     await expect(page.getByText("Hola, prueba de formularios")).toBeVisible({ timeout: 15_000 });
+    await expect.poll(async () => (await admin!.from("mensajes").select("contenido").eq("sala_id", sala!.id).eq("autor_id", nuevo.id)).data?.map((m) => m.contenido), { timeout: 15_000 }).toEqual(["Hola, prueba de formularios"]);
 
     // ── 15. Ajustes: tema e idioma ──────────────────────────────────────────
     await page.goto("/ajustes");
