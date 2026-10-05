@@ -1,20 +1,9 @@
+import { useTranslations } from "next-intl";
 import { FondoTelon } from "@/components/ui/fondo-telon";
 import { Logotipo } from "@/components/ui/logotipo";
 
-const ARGUMENTOS = [
-  {
-    titulo: "Postulate a convocatorias",
-    detalle: "Roles reales de obras que se están armando cerca tuyo.",
-  },
-  {
-    titulo: "Armá equipo sin proyecto",
-    detalle: "Conocé gente con ganas de crear, incluso antes de tener la idea.",
-  },
-  {
-    titulo: "Coordiná en un solo lugar",
-    detalle: "Cuando hay equipo se abre una sala con todo el elenco.",
-  },
-];
+/** Los tres argumentos del panel: `argumentoNTitulo` / `argumentoNDetalle` en `cuenta.marcoAcceso`. */
+const ARGUMENTOS = [1, 2, 3] as const;
 
 /**
  * Marco de las pantallas públicas: ingreso, recuperación y cambio de clave.
@@ -28,6 +17,7 @@ const ARGUMENTOS = [
  * la marca se sostiene sola sin inventar un segundo lenguaje visual para escritorio.
  */
 export function MarcoAcceso({ children }: { children: React.ReactNode }) {
+  const t = useTranslations("cuenta.marcoAcceso");
   return (
     <div className="min-h-screen lg:grid lg:grid-cols-[1fr_minmax(28rem,34rem)]">
       {/* Panel de marca. En móvil desaparece por completo: ahí el logotipo lo pone la
@@ -41,29 +31,29 @@ export function MarcoAcceso({ children }: { children: React.ReactNode }) {
 
         <div className="relative max-w-md">
           <h2 className="font-display text-2xl font-semibold leading-tight tracking-[-0.02em]">
-            El teatro se hace de a muchos.
+            {t("titulo")}
           </h2>
           <p className="mt-3 text-base leading-relaxed text-white/60">
-            Yalope conecta a quien tiene una idea con quien quiere hacerla.
+            {t("texto")}
           </p>
 
           <ul className="mt-9 flex flex-col gap-5">
-            {ARGUMENTOS.map((a) => (
-              <li key={a.titulo} className="flex gap-3.5">
+            {ARGUMENTOS.map((n) => (
+              <li key={n} className="flex gap-3.5">
                 <span
                   className="mt-[0.4rem] h-[3px] w-5 shrink-0 rounded-full bg-brand-500"
                   aria-hidden="true"
                 />
                 <div>
-                  <p className="text-base font-medium">{a.titulo}</p>
-                  <p className="mt-0.5 text-sm leading-relaxed text-white/50">{a.detalle}</p>
+                  <p className="text-base font-medium">{t(`argumento${n}Titulo`)}</p>
+                  <p className="mt-0.5 text-sm leading-relaxed text-white/50">{t(`argumento${n}Detalle`)}</p>
                 </div>
               </li>
             ))}
           </ul>
         </div>
 
-        <p className="relative text-2xs text-white/40">Match de actores y actrices · Argentina</p>
+        <p className="relative text-2xs text-white/40">{t("pie")}</p>
       </aside>
 
       {/* Columna del formulario. En móvil ocupa todo y trae el telón claro de fondo; en

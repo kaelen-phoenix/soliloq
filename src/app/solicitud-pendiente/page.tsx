@@ -6,10 +6,10 @@ import { Logotipo } from "@/components/ui/logotipo";
 import { BotonNotificaciones } from "@/components/pwa/boton-notificaciones";
 import { DespacharAvisosAcceso } from "@/components/pwa/despachar-avisos-acceso";
 
-export const metadata: Metadata = {
-  title: "Solicitud pendiente — Yalope",
-  robots: { index: false, follow: false },
-};
+export async function generateMetadata(): Promise<Metadata> {
+  const t = await getTranslations("cuenta.metadatos");
+  return { title: t("solicitudPendiente"), robots: { index: false, follow: false } };
+}
 
 /**
  * A donde cae una cuenta sin invitación ni aprobación mientras Yalope está en prueba (el

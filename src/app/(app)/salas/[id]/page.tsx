@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { SalaChat, type Integrante } from "@/components/salas/sala-chat";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
@@ -9,6 +10,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
   const user = await usuarioDeLaRequest();
   if (!user) return null;
+  const t = await getTranslations("chats.paginas");
 
   const { data: sala } = await supabase
     .from("salas")
@@ -57,10 +59,10 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
     const esDirector = obra?.creador_id === id || equipo?.creador_id === id;
     return {
       perfil_id: id,
-      nombre: talento?.nombre ?? (esDeIniciativa ? "Integrante" : "Perfil sin completar"),
+      nombre: talento?.nombre ?? (esDeIniciativa ? t("integrante") : t("perfilSinCompletar")),
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
       // La sala nace de un interés mutuo + convocatoria, no de un casting con roles.
-      rol_en_obra: esDirector ? "Director/a" : esDeIniciativa ? "Elenco" : "Contacto",
+      rol_en_obra: esDirector ? t("director") : esDeIniciativa ? t("elenco") : t("contacto"),
       // #149: sólo los mensajes de quien tiene perfil de Talento abren la placa de perfil.
       esTalento: !!talento,
     };
@@ -82,7 +84,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       <div className="flex items-center gap-3 border-b border-borde px-4 py-2">
         <div className="min-w-0 flex-1">
           <p className="text-xs font-medium uppercase tracking-wide text-texto-tenue">
-            {sala.obra_id ? "Sala de proyecto" : sala.equipo_id ? "Sala de equipo" : "Chat directo"}
+            {sala.obra_id ? t("salaDeProyecto") : sala.equipo_id ? t("salaDeEquipo") : t("chatDirecto")}
           </p>
           {/* Título de la obra o el equipo; si no, el de una sala sin iniciativa, o el
               genérico cuando esa fila está escondida por bloqueo (0022). */}
@@ -90,9 +92,9 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
             {obra?.titulo ??
               equipo?.titulo ??
               (!esDeIniciativa
-                ? integrantes.filter((i) => i.perfil_id !== user.id).map((i) => i.nombre).join(" y ") || sala.titulo
+                ? integrantes.filter((i) => i.perfil_id !== user.id).map((i) => i.nombre).join(t("separadorNombres")) || sala.titulo
                 : sala.titulo) ??
-              "Proyecto"}
+              t("proyecto")}
           </h1>
         </div>
         {/* Espacio privado en Discord (#269), solo en Proyectos y Equipos. */}

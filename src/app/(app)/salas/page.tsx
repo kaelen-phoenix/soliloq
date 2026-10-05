@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ListaSalas } from "@/components/salas/lista-salas";
 import { InvitacionComunidad } from "@/components/comunidad/invitacion-comunidad";
@@ -9,6 +10,7 @@ async function nombresDeLosOtros(
   supabase: ReturnType<typeof createClient>,
   salaIds: string[],
   yo: string,
+  textos: { sinCompletar: string; separador: string },
 ): Promise<Map<string, string>> {
   const nombres = new Map<string, string>();
   if (salaIds.length === 0) return nombres;
@@ -23,8 +25,8 @@ async function nombresDeLosOtros(
     : { data: [] as { id: string; nombre: string }[] };
   const nombre = new Map((talentos ?? []).map((t) => [t.id, t.nombre]));
   for (const salaId of salaIds) {
-    const otros = (integrantes ?? []).filter((i) => i.sala_id === salaId).map((i) => nombre.get(i.perfil_id) ?? "Perfil sin completar");
-    if (otros.length) nombres.set(salaId, otros.join(" y "));
+    const otros = (integrantes ?? []).filter((i) => i.sala_id === salaId).map((i) => nombre.get(i.perfil_id) ?? textos.sinCompletar);
+    if (otros.length) nombres.set(salaId, otros.join(textos.separador));
   }
   return nombres;
 }
@@ -33,6 +35,7 @@ export default async function SalasPage() {
   const supabase = createClient();
   const user = await usuarioDeLaRequest();
   if (!user) return null;
+  const t = await getTranslations("chats.paginas");
 
   const [{ data: integraciones }, { data: destacados }] = await Promise.all([
     supabase
@@ -52,7 +55,10 @@ export default async function SalasPage() {
   const directas = (integraciones ?? [])
     .filter((i: any) => !i.salas?.obra_id && !i.salas?.equipo_id)
     .map((i: any) => i.sala_id as string);
-  const nombresDirectos = await nombresDeLosOtros(supabase, directas, user.id);
+  const nombresDirectos = await nombresDeLosOtros(supabase, directas, user.id, {
+    sinCompletar: t("perfilSinCompletar"),
+    separador: t("separadorNombres"),
+  });
 
   const salas = await Promise.all(
     (integraciones ?? []).map(async (i: any) => {
@@ -71,7 +77,7 @@ export default async function SalasPage() {
 
       return {
         salaId: i.sala_id as string,
-        titulo: obra?.titulo ?? equipo?.titulo ?? nombresDirectos.get(i.sala_id) ?? i.salas?.titulo ?? "Proyecto",
+        titulo: obra?.titulo ?? equipo?.titulo ?? nombresDirectos.get(i.sala_id) ?? i.salas?.titulo ?? t("proyecto"),
         esEquipo: !!equipo,
         // ¿La sala cuelga de un Proyecto/Equipo (tiene dueño) o es una sala 1:1 de armar
         // equipo entre personas (sin obra ni equipo)?
@@ -92,8 +98,8 @@ export default async function SalasPage() {
       {salas.length === 0 ? (
         <EstadoVacio
           icono="salas"
-          titulo="Todavía no tenés chats"
-          detalle="Se abren cuando convocás a alguien a tu proyecto, o cuando te convocan a uno."
+          titulo={t("vacioTitulo")}
+          detalle={t("vacioDetalle")}
         />
       ) : (
         <ListaSalas salas={salas} />
