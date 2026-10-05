@@ -23,6 +23,9 @@ jobs:
 
       - run: npm run typecheck
 
+      # Tests unitarios de la lógica pura (#355).
+      - run: npm test
+
       - name: build
         run: npm run build
         env:
