@@ -1,35 +1,42 @@
+import type { Idioma } from "@/i18n/request";
 import { armarMail, SITIO } from "./plantilla";
+import { textosCorreo } from "./textos";
 
 /**
  * Mail de bienvenida (#272): el mismo para todos, con el link de la app y el de la landing.
  * Sale al aceptar las Normas (cuando alguien ya puede entrar) y desde el panel de admin.
+ * En el idioma de quien lo recibe (`perfiles.idioma`; por defecto, castellano).
  */
-export function mailBienvenida(opciones: { discord?: string | null } = {}) {
+export function mailBienvenida(opciones: { discord?: string | null; idioma?: Idioma } = {}) {
   const discord = opciones.discord || null;
+  const idioma = opciones.idioma ?? "es";
+  const t = textosCorreo(idioma);
   return armarMail({
-    asunto: "🎭 Te damos la bienvenida a Yalope",
-    previa: "Ya sos parte de la comunidad de actores, actrices y creadores de Yalope.",
-    titulo: "¡Te damos la bienvenida a Yalope!",
-    parrafos: [
-      "Ya sos parte de la comunidad donde actores, actrices y creadores se encuentran para armar proyectos: deslizás perfiles y propuestas, y cuando el interés es de los dos lados, se abre el chat.",
-      "Ya podés entrar y completar tu perfil para empezar.",
-    ],
+    idioma,
+    asunto: t("bienvenida.asunto"),
+    previa: t("bienvenida.previa"),
+    titulo: t("bienvenida.titulo"),
+    parrafos: [t("bienvenida.parrafo1"), t("bienvenida.parrafo2")],
     botones: [
-      { href: `${SITIO}/ingresar`, texto: "Entrar a Yalope", primario: true },
+      { href: `${SITIO}/ingresar`, texto: t("bienvenida.entrar"), primario: true },
       // Abre el recorrido guiado; sin sesión, la portada que explica cómo funciona.
-      { href: `${SITIO}/?tour=1`, texto: "Conocé cómo funciona" },
+      { href: `${SITIO}/?tour=1`, texto: t("bienvenida.comoFunciona") },
     ],
     lista: {
-      titulo: "Para arrancar con todo",
+      titulo: t("bienvenida.lista.titulo"),
       items: [
-        "🎬 &nbsp;Sumá 3 fotos o más y tu videoreel: es lo primero que miran.",
-        "🔔 &nbsp;Activá las notificaciones para enterarte de cada match y cada mensaje.",
-        "📱 &nbsp;Instalá la app desde el navegador del celular: «Agregar a la pantalla de inicio».",
+        t("bienvenida.lista.fotos"),
+        t("bienvenida.lista.notificaciones"),
+        t("bienvenida.lista.instalar"),
         ...(discord
-          ? [`💬 &nbsp;Sumate a la comunidad en <a href="${discord}" style="color:#f2571e;text-decoration:underline;">Discord</a>.`]
+          ? [
+              t("bienvenida.lista.discord", {
+                discord: `<a href="${discord}" style="color:#f2571e;text-decoration:underline;">Discord</a>`,
+              }),
+            ]
           : []),
       ],
     },
-    motivo: "Te llega este mail porque tenés una cuenta en Yalope.",
+    motivo: t("bienvenida.motivo"),
   });
 }

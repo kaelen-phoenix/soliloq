@@ -42,6 +42,6 @@ export async function enviarCorreo(mail: {
     if (!res.ok) return { ok: false, error: `Resend ${res.status}: ${(await res.text()).slice(0, 200)}` };
     return { ok: true };
   } catch (e) {
-    return { ok: false, error: e instanceof Error ? e.message : "No se pudo enviar." };
+    return { ok: false, error: e instanceof Error ? e.message : String(e) };
   }
 }
