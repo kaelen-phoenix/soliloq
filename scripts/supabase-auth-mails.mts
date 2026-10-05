@@ -2,12 +2,12 @@
 // castellano y con el mismo diseño que los mails de la app (src/lib/correos/plantilla.ts).
 // Antes salían del servidor de Supabase: en inglés y con un tope de 2 mails por hora.
 //
-//   node scripts/supabase-auth-mails.mts            → muestra qué se aplicaría (sin secretos)
-//   node scripts/supabase-auth-mails.mts --aplicar  → lo aplica a prod
+//   npx tsx scripts/supabase-auth-mails.mts            → muestra qué se aplicaría (sin secretos)
+//   npx tsx scripts/supabase-auth-mails.mts --aplicar  → lo aplica a prod
 //
-// Necesita SUPABASE_ACCESS_TOKEN y RESEND_API_KEY (o los archivos de ~/.soliloq-deploy/), y
-// Node 22.18 o más: corre TypeScript directo, sin compilar (el CI usa Node 20, pero este
-// script se corre a mano).
+// Necesita SUPABASE_ACCESS_TOKEN y RESEND_API_KEY (o los archivos de ~/.soliloq-deploy/). Va con
+// `tsx` porque la plantilla importa con el alias `@/` y JSON (#354).
+// Supabase manda un solo juego de plantillas: van en castellano, el idioma de la comunidad.
 // Staging queda con el SMTP de Supabase a propósito: los E2E usan dominios de prueba.
 import fs from "node:fs";
 import os from "node:os";
@@ -24,6 +24,7 @@ function secreto(variable: string, archivo: string): string {
 
 const mails = {
   confirmation: armarMail({
+    idioma: "es",
     asunto: "Confirmá tu email para entrar a Yalope",
     previa: "Un paso más para terminar de crear tu cuenta.",
     titulo: "Confirmá tu email",
@@ -32,6 +33,7 @@ const mails = {
     motivo: `Te llega este mail porque se creó una cuenta en Yalope con esta dirección. ${NO_FUISTE}`,
   }),
   recovery: armarMail({
+    idioma: "es",
     asunto: "Cambiá tu contraseña de Yalope",
     previa: "El enlace vence en una hora.",
     titulo: "Cambiá tu contraseña",
@@ -43,6 +45,7 @@ const mails = {
     motivo: "Si no lo pediste vos, ignorá este mail: tu contraseña no cambia.",
   }),
   magic_link: armarMail({
+    idioma: "es",
     asunto: "Tu enlace para entrar a Yalope",
     previa: "El enlace vence en una hora.",
     titulo: "Entrá a Yalope",
@@ -51,6 +54,7 @@ const mails = {
     motivo: `Te llega este mail porque se pidió un enlace para entrar con esta dirección. ${NO_FUISTE}`,
   }),
   email_change: armarMail({
+    idioma: "es",
     asunto: "Confirmá tu nuevo email en Yalope",
     previa: "Confirmá el cambio de email de tu cuenta.",
     titulo: "Confirmá tu nuevo email",
@@ -59,6 +63,7 @@ const mails = {
     motivo: `Te llega este mail porque se pidió cambiar el email de una cuenta de Yalope. ${NO_FUISTE}`,
   }),
   invite: armarMail({
+    idioma: "es",
     asunto: "Te invitaron a Yalope",
     previa: "Creá tu cuenta con el enlace.",
     titulo: "Te invitaron a Yalope",
@@ -67,6 +72,7 @@ const mails = {
     motivo: "Te llega este mail porque alguien te invitó a Yalope.",
   }),
   reauthentication: armarMail({
+    idioma: "es",
     asunto: "Tu código de verificación de Yalope: {{ .Token }}",
     previa: "Usalo para confirmar que sos vos.",
     titulo: "Tu código: {{ .Token }}",
