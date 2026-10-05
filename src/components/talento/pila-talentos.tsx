@@ -130,12 +130,20 @@ export function PilaTalentos({
    * entrar a Convocatorias, y se enciende el corazón de la navegación (#366).
    */
   async function aceptarMatch() {
-    if (!placa) return;
+    if (!placa || ocupado) return;
     const { talento, matchId } = placa;
+    setOcupado(true);
+    setError(null);
+    const res = await marcarMatchMostrado(matchId);
+    setOcupado(false);
+    // Si no se pudo marcar, la ventana queda abierta con el error para volver a intentar.
+    if (!res.ok) {
+      setError(res.error);
+      return;
+    }
     setPlaca(null);
     setDescartados((prev) => new Set(prev).add(talento.id));
     if (pila.length <= 3) onCasiVacia();
-    await marcarMatchMostrado(matchId);
     avisarConvocatoriasNuevas();
   }
 
@@ -262,12 +270,14 @@ export function PilaTalentos({
                 </span>
               )}
             </div>
+            {error && <p className="mt-3 text-xs text-error-600">{error}</p>}
             <button
               type="button"
+              disabled={ocupado}
               onClick={aceptarMatch}
-              className="mt-5 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto"
+              className="mt-5 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
             >
-              {t("aceptar")}
+              {ocupado ? "…" : t("aceptar")}
             </button>
           </div>
         </Superposicion>

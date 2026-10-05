@@ -1,7 +1,7 @@
 "use client";
 
 import { usePathname } from "next/navigation";
-import { createContext, useContext, useEffect, useState } from "react";
+import { createContext, useContext, useEffect, useRef, useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 
@@ -29,6 +29,9 @@ export function ProveedorConvocatoriasNuevas({
 }) {
   const [hay, setHay] = useState(inicial);
   const [revision, setRevision] = useState(0);
+  // La marca de «visto» en vuelo: la lectura siguiente la espera, así entrar y salir rápido
+  // de Convocatorias no vuelve a encender el corazón con lo que se acaba de ver.
+  const marcando = useRef<Promise<unknown>>(Promise.resolve());
   const pathname = usePathname();
   const enConvocatorias = pathname === "/matches" || pathname.startsWith("/matches/");
 
@@ -51,14 +54,16 @@ export function ProveedorConvocatoriasNuevas({
     if (enConvocatorias) {
       // Entrar a Convocatorias es «verlo»: se apaga ya y queda marcado en la base.
       setHay(false);
-      supabase.rpc("marcar_convocatorias_vistas").then(({ error }) => {
+      marcando.current = Promise.resolve(supabase.rpc("marcar_convocatorias_vistas")).then(({ error }) => {
         if (error) reportarErrorSupabase(error, { rpc: "marcar_convocatorias_vistas" });
       });
     } else {
-      supabase.rpc("hay_convocatorias_nuevas").then(({ data, error }) => {
-        if (error) reportarErrorSupabase(error, { rpc: "hay_convocatorias_nuevas" });
-        else if (vigente) setHay(data === true);
-      });
+      marcando.current
+        .then(() => supabase.rpc("hay_convocatorias_nuevas"))
+        .then(({ data, error }) => {
+          if (error) reportarErrorSupabase(error, { rpc: "hay_convocatorias_nuevas" });
+          else if (vigente) setHay(data === true);
+        });
     }
     return () => {
       vigente = false;
