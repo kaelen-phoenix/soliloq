@@ -31,9 +31,13 @@ if (!r.ok) {
 const { types } = await r.json();
 const generado = ENCABEZADO + types.replace(/\r\n/g, "\n").trimEnd() + "\n";
 
+// La versión de PostgREST la agrega el generador, no sale del esquema: una actualización de
+// Supabase no tiene que hacer fallar el CI.
+const sinVersion = (t) => t.replace(/PostgrestVersion:\s*"[^"]*"/, 'PostgrestVersion: "*"');
+
 if (process.argv.includes("--verificar")) {
   const actual = fs.existsSync(ARCHIVO) ? fs.readFileSync(ARCHIVO, "utf8").replace(/\r\n/g, "\n") : "";
-  if (actual !== generado) {
+  if (sinVersion(actual) !== sinVersion(generado)) {
     console.error(
       `${ARCHIVO} no coincide con el esquema de la base. Corré \`npm run tipos-db\` y commiteá el resultado.`,
     );
