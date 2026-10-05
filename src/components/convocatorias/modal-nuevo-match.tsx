@@ -18,10 +18,11 @@ export interface MatchNuevo {
 }
 
 /**
- * Aviso de "¡Tenés un Match!" (issue #194): aparece solo, una vez por match, al entrar a
- * Matches. Cerrarlo (con "Listo" o con Esc/click afuera) no mueve nada de estado — el
- * match ya está en Matches por el solo hecho de existir — solo marca el aviso como visto
- * para que no vuelva a aparecer. Con varios matches nuevos, se muestran de a uno.
+ * Ventana «Hay interés» (#194, #365) para el match que se formó del lado del Talento: aparece
+ * sola, una vez por match, al entrar a Convocatorias. Es la misma que abre Buscar talento
+ * cuando el match se forma ahí: las dos fotos, «Hay interés» y «Aceptar», sin convocar ni
+ * descartar. Aceptar (o Esc/click afuera) no mueve nada de estado —el match ya está en
+ * Convocatorias por existir—, solo marca la ventana como vista. Con varios, de a uno.
  */
 export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
   const t = useTranslations("proyectos.nuevoMatch");
@@ -44,9 +45,9 @@ export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
   }
 
   return (
-    <Superposicion onCerrar={cerrar} etiqueta={t("etiqueta")}>
+    <Superposicion onCerrar={cerrar} etiqueta={t("titulo")}>
       <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
-        <p className="text-2xs font-semibold uppercase tracking-wide text-coral-700">
+        <p className="text-sm font-semibold uppercase tracking-wide text-coral-700">
           {t("titulo")}
         </p>
         <div className="mt-4 flex items-center justify-center gap-3">
@@ -66,18 +67,13 @@ export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
             </span>
           )}
         </div>
-        <p className="mt-4 text-sm text-texto">
-          {actual.esEquipo
-            ? t("conTuEquipo", { nombre: actual.nombre })
-            : t("conTuProyecto", { nombre: actual.nombre })}
-        </p>
         <button
           type="button"
           disabled={ocupado}
           onClick={cerrar}
-          className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
+          className="mt-5 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
         >
-          {ocupado ? "…" : t("listo")}
+          {ocupado ? "…" : t("aceptar")}
         </button>
       </div>
     </Superposicion>

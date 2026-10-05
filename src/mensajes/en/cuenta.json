@@ -65,7 +65,8 @@
     "cerrarSesion": "Sign out",
     "layout": {
       "sinLeer": "{etiqueta}, {n} unread",
-      "notificaciones": "Notifications"
+      "notificaciones": "Notifications",
+      "convocatoriasNuevas": "{etiqueta}, new talent"
     },
     "marcoAcceso": {
       "titulo": "Theater takes a crowd.",

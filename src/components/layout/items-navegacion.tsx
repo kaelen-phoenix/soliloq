@@ -55,3 +55,8 @@ export function esActivo(pathname: string, href: string) {
   if (href === "/proyectos") return /^\/(proyectos|talentos|equipos)(\/|$)/.test(pathname);
   return pathname === href || pathname.startsWith(`${href}/`);
 }
+
+/** Punto de «hay algo nuevo» (#366), sin número: el corazón de Convocatorias no cuenta, avisa. */
+export function PuntoNuevo({ className = "" }: { className?: string }) {
+  return <span aria-hidden className={`block h-2.5 w-2.5 rounded-full bg-brand-500 ring-2 ring-superficie ${className}`} />;
+}

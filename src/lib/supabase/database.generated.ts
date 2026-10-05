@@ -944,6 +944,7 @@ export type Database = {
           aprobado_en: string | null
           bienvenida_enviada_en: string | null
           busca_equipo: boolean
+          convocatorias_vistas_en: string
           creado_en: string
           discord_user_id: string | null
           discord_usuario: string | null
@@ -966,6 +967,7 @@ export type Database = {
           aprobado_en?: string | null
           bienvenida_enviada_en?: string | null
           busca_equipo?: boolean
+          convocatorias_vistas_en?: string
           creado_en?: string
           discord_user_id?: string | null
           discord_usuario?: string | null
@@ -988,6 +990,7 @@ export type Database = {
           aprobado_en?: string | null
           bienvenida_enviada_en?: string | null
           busca_equipo?: boolean
+          convocatorias_vistas_en?: string
           creado_en?: string
           discord_user_id?: string | null
           discord_usuario?: string | null
@@ -1760,10 +1763,12 @@ export type Database = {
         }
       }
       hay_bloqueo: { Args: { p_otro_perfil: string }; Returns: boolean }
+      hay_convocatorias_nuevas: { Args: never; Returns: boolean }
       iniciativa_en_cierre: {
         Args: { p_equipo_id: string; p_obra_id: string }
         Returns: boolean
       }
+      marcar_convocatorias_vistas: { Args: never; Returns: undefined }
       marcar_interes: {
         Args: {
           p_a_perfil: string

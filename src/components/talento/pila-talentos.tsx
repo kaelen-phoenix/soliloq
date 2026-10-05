@@ -11,7 +11,8 @@ import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { Superposicion } from "@/components/ui/superposicion";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import { marcarInteresEnTalento } from "@/app/(app)/matches/acciones";
+import { marcarInteresEnTalento, marcarMatchMostrado } from "@/app/(app)/matches/acciones";
+import { avisarConvocatoriasNuevas } from "@/components/convocatorias/convocatorias-nuevas";
 import type { ResultadoTalento } from "./tarjeta-talento";
 
 export interface IniciativaPlaca {
@@ -122,18 +123,20 @@ export function PilaTalentos({
     siguiente();
   }
 
-  /** Hay match: se convoca desde Matches, donde está el selector de rol (#287). */
-  function irAConvocar() {
-    router.push("/matches");
-  }
-
-  /** Cerrar sin aceptar: el match queda igual en `/matches`, no se pierde. */
-  function cerrarPlaca() {
+  /**
+   * #365: la primera ventana del match no convoca ni descarta, solo avisa. «Aceptar» (o
+   * cerrarla) deja al Talento en Convocatorias —el match ya está ahí desde que existe—, donde
+   * se lo gestiona. Se marca como mostrado para que la misma ventana no vuelva a salir al
+   * entrar a Convocatorias, y se enciende el corazón de la navegación (#366).
+   */
+  async function aceptarMatch() {
     if (!placa) return;
-    const id = placa.talento.id;
+    const { talento, matchId } = placa;
     setPlaca(null);
-    setDescartados((prev) => new Set(prev).add(id));
+    setDescartados((prev) => new Set(prev).add(talento.id));
     if (pila.length <= 3) onCasiVacia();
+    await marcarMatchMostrado(matchId);
+    avisarConvocatoriasNuevas();
   }
 
   const btnRedondo =
@@ -225,7 +228,7 @@ export function PilaTalentos({
       {error && <p className="text-xs text-error-600">{error}</p>}
 
       {placa && (
-        <Superposicion onCerrar={cerrarPlaca} etiqueta={t("hayInteres")}>
+        <Superposicion onCerrar={aceptarMatch} etiqueta={t("hayInteres")}>
           <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
             <p className="text-sm font-semibold uppercase tracking-wide text-coral-700">
               {t("hayInteres")}
@@ -259,25 +262,12 @@ export function PilaTalentos({
                 </span>
               )}
             </div>
-            <p className="mt-3 text-sm text-texto">
-              {t("nombreYTitulo", { nombre: placa.talento.nombre, titulo: iniciativa.titulo })}
-            </p>
-            {error && <p className="mt-2 text-xs text-error-600">{error}</p>}
             <button
               type="button"
-              disabled={ocupado}
-              onClick={irAConvocar}
-              className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
+              onClick={aceptarMatch}
+              className="mt-5 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto"
             >
-              {ocupado ? "…" : t("convocar")}
-            </button>
-            <button
-              type="button"
-              disabled={ocupado}
-              onClick={cerrarPlaca}
-              className="mt-2 w-full py-1.5 text-xs font-medium text-texto-tenue hover:text-texto disabled:opacity-50"
-            >
-              {t("ahoraNo")}
+              {t("aceptar")}
             </button>
           </div>
         </Superposicion>

@@ -233,11 +233,8 @@
       "retirarme": "Withdraw"
     },
     "nuevoMatch": {
-      "etiqueta": "New match",
-      "titulo": "It's a Match!",
-      "conTuEquipo": "{nombre} matched with your team.",
-      "conTuProyecto": "{nombre} matched with your project.",
-      "listo": "Done"
+      "titulo": "There's interest",
+      "aceptar": "Accept"
     },
     "tablero": {
       "estado": {
@@ -317,9 +314,7 @@
       "noMeInteresa": "Not interested",
       "meInteresa": "I'm interested",
       "hayInteres": "There's interest",
-      "nombreYTitulo": "{nombre} and “{titulo}”",
-      "convocar": "Call",
-      "ahoraNo": "Not now"
+      "aceptar": "Accept"
     }
   }
 }

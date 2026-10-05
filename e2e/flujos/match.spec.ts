@@ -217,19 +217,27 @@ test.describe("circuito de match (UI)", () => {
     // `exact` porque si no, "Me interesa" matchea por substring dentro de "No me interesa".
     await creadorPage.getByRole("button", { name: "Me interesa", exact: true }).click();
 
-    // La cerramos con "Ahora no" a propósito: el circuito completo se sigue desde Matches
-    // (si tocara "Convocar" acá, iría a Matches igual, pero queremos ver el aviso solo).
+    // #365: la ventana solo avisa. Sin «Convocar» ni «Ahora no»: un único «Aceptar».
     const placaInteres = creadorPage.getByRole("dialog", { name: "Hay interés" });
     await expect(placaInteres).toBeVisible({ timeout: 10_000 });
-    await placaInteres.getByRole("button", { name: "Ahora no" }).click();
+    await expect(placaInteres.getByRole("button")).toHaveCount(1);
+    await placaInteres.getByRole("button", { name: "Aceptar" }).click();
     await expect(placaInteres).toBeHidden();
 
-    // 3. El aviso "¡Tenés un Match!" (#194) aparece solo, la primera vez que entra a Matches.
+    // 3. #366: el corazón de Convocatorias se resalta (cerrar la ventana no lo apaga)…
+    const corazonNuevo = creadorPage.getByRole("link", { name: "Convocatorias, hay talento nuevo" });
+    await expect(corazonNuevo.first()).toBeVisible({ timeout: 10_000 });
+    // …y al entrar a Convocatorias el Talento está ahí, sin que la ventana vuelva a salir.
     await creadorPage.goto("/matches");
-    const avisoMatch = creadorPage.getByRole("dialog", { name: "Nuevo match" });
-    await expect(avisoMatch).toBeVisible({ timeout: 10_000 });
-    await avisoMatch.getByRole("button", { name: "Listo" }).click();
-    await expect(avisoMatch).toBeHidden();
+    await expect(creadorPage.getByText(nombreTalento)).toBeVisible({ timeout: 10_000 });
+    await expect(creadorPage.getByRole("dialog", { name: "Hay interés" })).toHaveCount(0);
+    // De vuelta en otra pantalla, el corazón ya no está resaltado.
+    await creadorPage.goto("/perfil");
+    await expect(creadorPage.getByRole("link", { name: "Convocatorias", exact: true }).first()).toBeVisible({
+      timeout: 10_000,
+    });
+    await expect(corazonNuevo).toHaveCount(0);
+    await creadorPage.goto("/matches");
 
     // 4-5. Convoca directo desde el match, sin aceptarlo antes (#287). Con un solo Rol no hay
     // selector de por medio (#152).
