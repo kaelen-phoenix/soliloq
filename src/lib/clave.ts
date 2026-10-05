@@ -30,8 +30,24 @@ export function mensajeErrorAuth(codigo: string | undefined, mensaje: string): s
       return "Demasiados intentos. Esperá unos minutos y probá de nuevo.";
     case "same_password":
       return "La contraseña nueva tiene que ser distinta de la actual.";
+    case "email_address_invalid":
+    case "validation_failed":
+      return "Ese email no parece válido. Revisalo y probá de nuevo.";
+    case "email_address_not_authorized":
+      return "No pudimos mandarle un correo a ese email. Probá con otro.";
+    case "signup_disabled":
+      return "Por ahora no se pueden crear cuentas nuevas.";
+    case "user_banned":
+      return "Esta cuenta está suspendida.";
+    case "session_expired":
+    case "session_not_found":
+    case "refresh_token_not_found":
+      return "Tu sesión venció. Volvé a ingresar.";
+    case "otp_expired":
+      return "El enlace venció. Pedí uno nuevo.";
     default:
-      return mensaje || "Algo salió mal. Probá de nuevo en unos minutos.";
+      // #349: el texto de Supabase viene en inglés; nunca se muestra tal cual.
+      return "Algo salió mal. Probá de nuevo en unos minutos.";
   }
 }
 
