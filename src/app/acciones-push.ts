@@ -6,6 +6,8 @@ import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { despacharMailsDeAcceso } from "@/lib/avisos-mail-servidor";
+import { idiomaDe, textosCorreo } from "@/lib/correos/textos";
+import type { Idioma } from "@/i18n/request";
 
 const VAPID_LISTO =
   !!process.env.VAPID_PRIVATE_KEY &&
@@ -90,7 +92,7 @@ export async function notificarMensajeNuevo(mensajeId: string) {
     .select("nombre")
     .eq("id", user.id)
     .maybeSingle();
-  const remitente = talento?.nombre ?? "Alguien";
+  const remitente = talento?.nombre ?? null;
 
   const { data: integrantes } = await supabase
     .from("sala_integrantes")
@@ -117,12 +119,12 @@ export async function notificarMensajeNuevo(mensajeId: string) {
   }
   if (destinatarios.length === 0) return;
 
-  await enviarPush(destinatarios, {
-    title: `${remitente} — ${tituloSala}`,
+  await enviarPush(destinatarios, (idioma) => ({
+    title: `${remitente ?? textosCorreo(idioma)("push.mensaje.alguien")} — ${tituloSala}`,
     body: contenido.length > 140 ? `${contenido.slice(0, 140)}…` : contenido,
     url: `/salas/${salaId}`,
     tag: `sala-${salaId}`,
-  });
+  }));
 }
 
 interface AvisoPush {
@@ -137,29 +139,35 @@ interface AvisoPush {
 /**
  * Manda un push a todos los dispositivos de esas cuentas. Con la clave de servicio: quien
  * llama ya decidió que el aviso corresponde. Las suscripciones muertas (404/410) se borran.
+ * El aviso se arma por dispositivo, en el idioma de su cuenta (`perfiles.idioma`, #354).
  *
  * Devuelve `false` si hubo un error que vale reintentar (no se pudieron leer las
  * suscripciones, o un envío falló por otra cosa que una suscripción muerta); `true` si no
  * queda nada por hacer (entregado, o la cuenta no tiene notificaciones activadas). Cada envío
  * tiene un tope de 5 s: un servicio de push colgado no puede trabar a quien llama.
  */
-async function enviarPush(perfilIds: string[], aviso: AvisoPush): Promise<boolean> {
+async function enviarPush(perfilIds: string[], aviso: (idioma: Idioma) => AvisoPush): Promise<boolean> {
   const admin = createAdminClient();
   const { data: suscripciones, error } = await admin
     .from("push_suscripciones")
-    .select("id, endpoint, p256dh, auth")
+    .select("id, endpoint, p256dh, auth, perfiles(idioma)")
     .in("perfil_id", perfilIds);
   if (error) return false;
   if (!suscripciones || suscripciones.length === 0) return true;
 
-  const payload = JSON.stringify(aviso);
+  const payloads = new Map<Idioma, string>();
+  const payloadEn = (idioma: Idioma) => {
+    if (!payloads.has(idioma)) payloads.set(idioma, JSON.stringify(aviso(idioma)));
+    return payloads.get(idioma)!;
+  };
 
   const resultados = await Promise.all(
     suscripciones.map(async (s) => {
+      const perfil = (Array.isArray(s.perfiles) ? s.perfiles[0] : s.perfiles) as { idioma: string | null } | null;
       try {
         await webpush.sendNotification(
           { endpoint: s.endpoint, keys: { p256dh: s.p256dh, auth: s.auth } },
-          payload,
+          payloadEn(idiomaDe(perfil?.idioma)),
           { timeout: 5_000 }
         );
         return true;
@@ -229,11 +237,14 @@ async function despacharPushDeAcceso() {
     avisos.map(async (a) => {
       let enviado: boolean;
       if (a.tipo === "acceso_habilitado") {
-        enviado = await enviarPush([a.destinatario_id], {
-          title: "¡Ya tenés acceso a Yalope!",
-          body: "Tu solicitud fue aprobada. Entrá y completá tu perfil.",
-          url: "/",
-          tag: "acceso-habilitado",
+        enviado = await enviarPush([a.destinatario_id], (idioma) => {
+          const t = textosCorreo(idioma);
+          return {
+            title: t("push.accesoHabilitado.titulo"),
+            body: t("push.accesoHabilitado.cuerpo"),
+            url: "/",
+            tag: "acceso-habilitado",
+          };
         });
       } else {
         // Solicitud: a los admins les sirve saber quién es, y lo único que hay es el email.
@@ -241,11 +252,14 @@ async function despacharPushDeAcceso() {
           ? await admin.auth.admin.getUserById(a.de_perfil)
           : { data: null };
         const email = solicitante?.user?.email;
-        enviado = await enviarPush([a.destinatario_id], {
-          title: "Nueva solicitud de acceso",
-          body: email ? `${email} pidió entrar a Yalope.` : "Alguien pidió entrar a Yalope.",
-          url: "/admin",
-          tag: `solicitud-${a.de_perfil ?? "acceso"}`,
+        enviado = await enviarPush([a.destinatario_id], (idioma) => {
+          const t = textosCorreo(idioma);
+          return {
+            title: t("push.solicitudAcceso.titulo"),
+            body: email ? t("push.solicitudAcceso.cuerpo", { email }) : t("push.solicitudAcceso.cuerpoSinEmail"),
+            url: "/admin",
+            tag: `solicitud-${a.de_perfil ?? "acceso"}`,
+          };
         });
       }
       // Falla temporal: se libera para que lo reintente la próxima llamada.
