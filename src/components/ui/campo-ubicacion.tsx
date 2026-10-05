@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useMemo, useRef, useState } from "react";
+import { useTranslations } from "next-intl";
 import {
   ErrorUbicacion,
   SesionUbicacion,
@@ -24,6 +25,8 @@ interface Props {
  * filtro por distancia, que es la razón de ser de este campo.
  */
 export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placeholder }: Props) {
+  const t = useTranslations("perfil.ubicacion");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
   const sesion = useMemo(() => new SesionUbicacion(), []);
   const [texto, setTexto] = useState(valor?.texto ?? "");
   const [sugerencias, setSugerencias] = useState<SugerenciaUbicacion[]>([]);
@@ -73,7 +76,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
         // Un fallo del servicio no borra la ubicación guardada: solo deja de sugerir.
         setSugerencias([]);
         setErrorBusqueda(
-          e instanceof ErrorUbicacion ? e.message : "No se pudo buscar lugares. Probá de nuevo.",
+          e instanceof ErrorUbicacion ? tEtiquetas(`ubicacion.${e.clave}`) : t("errorBuscar"),
         );
       } finally {
         // Se apaga siempre, incluso si la petición quedó superada. Antes estaba guardado
@@ -101,7 +104,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
       setErrorBusqueda(null);
     } catch (e) {
       setErrorBusqueda(
-        e instanceof ErrorUbicacion ? e.message : "No se pudo resolver ese lugar. Probá con otro.",
+        e instanceof ErrorUbicacion ? tEtiquetas(`ubicacion.${e.clave}`) : t("errorResolver"),
       );
     } finally {
       setBuscando(false);
@@ -115,7 +118,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
    */
   async function usarMiUbicacion() {
     if (!("geolocation" in navigator)) {
-      setErrorBusqueda("Tu navegador no puede darnos tu ubicación. Escribila a mano.");
+      setErrorBusqueda(t("sinGeolocalizacion"));
       return;
     }
 
@@ -135,7 +138,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
           setSugerencias([]);
         } catch (e) {
           setErrorBusqueda(
-            e instanceof ErrorUbicacion ? e.message : "No pudimos identificar tu ubicación.",
+            e instanceof ErrorUbicacion ? tEtiquetas(`ubicacion.${e.clave}`) : t("noIdentificada"),
           );
         } finally {
           setUbicando(false);
@@ -145,8 +148,8 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
         setUbicando(false);
         setErrorBusqueda(
           error.code === error.PERMISSION_DENIED
-            ? "No nos diste permiso para usar tu ubicación. Podés escribirla igual."
-            : "No pudimos obtener tu ubicación. Probá escribiéndola.",
+            ? t("sinPermiso")
+            : t("noSeObtuvo"),
         );
       },
       // Diez segundos y sin cachear: una ubicación vieja acá es peor que ninguna, porque se
@@ -167,7 +170,7 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
           id={id}
           value={texto}
           autoComplete="off"
-          placeholder={placeholder ?? "Dirección, barrio o ciudad"}
+          placeholder={placeholder ?? t("placeholder")}
           onChange={(e) => {
             setTexto(e.target.value);
             // Editar el texto invalida la ubicación resuelta: no puede quedar un lugar
@@ -202,13 +205,13 @@ export function CampoUbicacion({ etiqueta, id, valor, onCambio, error, placehold
         disabled={ubicando}
         className="inline-flex w-fit items-center gap-1.5 text-xs font-medium text-texto-tenue underline underline-offset-4 hover:text-texto disabled:text-texto-tenue disabled:no-underline"
       >
-        {ubicando ? "Buscando tu ubicación…" : "Usar mi ubicación actual"}
+        {ubicando ? t("buscandoTuUbicacion") : t("usarMiUbicacion")}
       </button>
 
-      {buscando && <p className="text-xs text-texto-tenue">Buscando lugares…</p>}
+      {buscando && <p className="text-xs text-texto-tenue">{t("buscandoLugares")}</p>}
       {errorBusqueda && <p className="text-xs text-error-600">{errorBusqueda}</p>}
       {!buscando && !errorBusqueda && sinResolver && (
-        <p className="text-xs text-texto-tenue">Elegí un lugar de la lista para confirmarlo.</p>
+        <p className="text-xs text-texto-tenue">{t("elegiDeLaLista")}</p>
       )}
       {error && <p className="text-xs text-error-600">{error}</p>}
     </div>

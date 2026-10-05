@@ -1,1 +1,298 @@
-{ "perfil": {} }
+{
+  "perfil": {
+    "etiquetas": {
+      "genero": {
+        "mujer": "Woman",
+        "varon": "Man",
+        "no_binarie": "Non-binary",
+        "otro": "Other",
+        "sin_especificar": "Prefer not to say"
+      },
+      "disciplina": {
+        "actuacion": "Acting",
+        "direccion": "Directing",
+        "guion": "Screenwriting",
+        "produccion": "Production",
+        "dramaturgia": "Playwriting",
+        "vestuario": "Costume design",
+        "escenografia": "Set design",
+        "iluminacion": "Lighting",
+        "sonido": "Sound",
+        "coreografia": "Choreography",
+        "danza": "Dance",
+        "musica": "Music",
+        "fotografia": "Photography",
+        "edicion": "Editing",
+        "maquillaje": "Makeup",
+        "asistencia_direccion": "Assistant directing",
+        "otro": "Other"
+      },
+      "habilidad": {
+        "canto": "Singing",
+        "danza": "Dance",
+        "acrobacia": "Acrobatics",
+        "instrumentos": "Musical instruments",
+        "idiomas": "Languages",
+        "doblaje": "Dubbing / voice-over",
+        "esgrima": "Stage combat",
+        "improvisacion": "Improv"
+      },
+      "red": {
+        "instagram": "Instagram",
+        "youtube": "YouTube",
+        "tiktok": "TikTok",
+        "x": "X",
+        "linkedin": "LinkedIn",
+        "vimeo": "Vimeo",
+        "sitio": "Website"
+      },
+      "redes": {
+        "errorSitio": "Enter a valid web address starting with https://",
+        "errorRed": "That link doesn't look like {red}. Check the username or URL."
+      },
+      "unidad": {
+        "km": "km",
+        "mi": "miles"
+      },
+      "radio": {
+        "todoElMundo": "Anywhere"
+      },
+      "ubicacion": {
+        "faltaClave": "NEXT_PUBLIC_GOOGLE_MAPS_API_KEY is not set.",
+        "noCargoBuscador": "Couldn't load the place search.",
+        "elegiDeLaLista": "Pick a place from the list.",
+        "sinCoordenadas": "That place has no coordinates; try another one.",
+        "sinPais": "That place has no country; try another one.",
+        "noIdentificada": "We couldn't identify your location.",
+        "noIdentificadaEscribila": "We couldn't identify your location. Type it in instead.",
+        "paisNoIdentificado": "We couldn't identify your country. Type in your location."
+      },
+      "imagen": {
+        "demasiadoGrande": "The image is {mb} MB. Pick one up to {max} MB.",
+        "noSeLee": "We couldn't read the image.",
+        "noSeProcesa": "We couldn't process the image."
+      },
+      "ejemplos": {
+        "creador": "Sample project",
+        "casaDeMunecas": {
+          "rol": "Nora Helmer",
+          "descripcion": "Lead. Travels the whole play from domestic comfort to the final break. Calls for command of silence as much as of the text.",
+          "titulo": "A Doll's House",
+          "sinopsis": "Henrik Ibsen, 1879. Nora keeps up a seemingly happy marriage built on a secret she signed herself. When it comes out, she discovers how much of her life was a part written by others."
+        },
+        "bodasDeSangre": {
+          "rol": "The Bride",
+          "descripcion": "Central role. She marries one man while still bound to another. Needs a body ready to work: the play calls for physical work and chorus.",
+          "titulo": "Blood Wedding",
+          "sinopsis": "Federico García Lorca, 1933. A wedding in the Andalusian countryside falls apart when the bride runs off with Leonardo, the only character in the play with a name of his own. A tragedy in verse and prose."
+        },
+        "romeoYJulieta": {
+          "rol": "Lighting design",
+          "descripcion": "Small-venue staging, with few fixtures and many shifts in mood. Looking for someone who has lit text-based theater.",
+          "titulo": "Romeo and Juliet",
+          "sinopsis": "William Shakespeare, c. 1595. Two young people from feuding families fall in love and rush a plan that ends badly. The most retold story of impossible love."
+        }
+      }
+    },
+    "formulario": {
+      "errores": {
+        "nombre": "Enter your name.",
+        "fechaFalta": "Enter your date of birth.",
+        "fechaFormato": "Write it as day/month/year, for example 07/05/1995.",
+        "fechaEdad": "The platform is for people 16 and older.",
+        "ubicacion": "Pick your location from the suggestions.",
+        "genero": "Pick an option.",
+        "maximoCaracteres": "{max} characters max.",
+        "fotos": "Upload at least one photo.",
+        "videoreel": "We don't recognize that link. Paste a YouTube or Vimeo video link.",
+        "revisar": "Check the fields marked in red.",
+        "guardar": "We couldn't save your profile. Check the details and try again.",
+        "guardarCreador": "We saved your profile, but not your artistic profile as a Creator. Try again."
+      },
+      "recuperado": "We restored what you'd filled in. Pick up from here.",
+      "fichaBasica": "Basics",
+      "nombre": "Full name",
+      "fechaNacimiento": "Date of birth",
+      "fechaPlaceholder": "dd/mm/yyyy",
+      "edadVisible": "Your age is shown on your profile",
+      "edadOculta": "Your age is hidden on your profile",
+      "fechaAyuda": "We save the date either way and use it to rank searches by age, whether you show it or not.",
+      "ubicacion": "Location",
+      "ubicacionAyuda": "Your city or neighborhood is enough. Nobody sees your address: just the area, so we can show you what's nearby.",
+      "genero": "Gender",
+      "elegiUnaOpcion": "Pick an option",
+      "generoCual": "Which one? (optional)",
+      "portfolio": "Photo portfolio",
+      "trayendoFoto": "Getting your photo…",
+      "usarFotoGoogle": "Use my Google photo",
+      "fotosRecomendadas": "We recommend {n} photos or more: it helps people looking for talent get a better sense of you.",
+      "sumarMas": "+ Add more (optional)",
+      "sumarMasAyuda": "Reel, experience, skills and social links. You can also fill these in later from your Profile.",
+      "videoreel": "Reel (optional)",
+      "videoreelEtiqueta": "YouTube or Vimeo link",
+      "videoreelPlaceholder": "https://youtu.be/... or https://vimeo.com/...",
+      "videoreelAyuda": "A regular link, a share link, Shorts or one from the mobile app all work.",
+      "cvHabilidades": "Résumé and skills",
+      "experiencia": "Experience",
+      "experienciaPlaceholder": "Tell us about your training, shows you've been in, etc.",
+      "redes": "Social links (optional)",
+      "sitioPlaceholder": "https://yoursite.com",
+      "redPlaceholder": "@username or https://…",
+      "agregarRed": "+ Add another network (YouTube, TikTok, X, LinkedIn, Vimeo, website)",
+      "visibilidad": "Visibility",
+      "ocultarPerfil": "Hide my profile from new people",
+      "ocultarPerfilAyuda": "You won't show up in the Creators' search and your public link stops showing your profile. Your chats and your Projects and Teams stay the same.",
+      "completar": "Complete profile",
+      "guardarCambios": "Save changes"
+    },
+    "creador": {
+      "errorUna": "Pick at least one.",
+      "errorOtro": "Tell us what you do.",
+      "titulo": "Artistic profile as a Creator",
+      "elegiTodo": "Pick everything you do",
+      "queHaces": "What do you do?",
+      "queHacesPlaceholder": "For example: puppeteer, flying rig technician"
+    },
+    "disciplinas": {
+      "vacio": "Add your disciplines (acting, directing, tech…) from “Edit”."
+    },
+    "compartir": {
+      "errorActivar": "We couldn't turn on the link. Try again.",
+      "errorDesactivar": "We couldn't turn off the link. Try again.",
+      "errorRegenerar": "We couldn't regenerate the link. Try again.",
+      "textoCompartir": "{nombre} on Yalope",
+      "titulo": "Share my profile",
+      "activo": "Your link is on: anyone who has it can see your public profile —photos, reel, experience, skills, area, gender and your age if you left it visible— without an account. Only people with a Yalope account see your social links.",
+      "inactivo": "A link anyone can open without an account, like a calling card: your photos, your reel, your experience, your skills, your area, your gender and your age if you left it visible. Never your email, your phone or your date of birth, and only people with a Yalope account see your social links.",
+      "unMomento": "One moment…",
+      "compartir": "Share",
+      "ocultarQr": "Hide QR",
+      "codigoQr": "QR code",
+      "copiado": "Link copied",
+      "qrAyuda": "Show it so people can scan it and open your profile, no account needed. It's the same link:",
+      "whatsapp": "Share on WhatsApp",
+      "x": "Share on X",
+      "facebook": "Share on Facebook",
+      "instagram": "Share on Instagram",
+      "copiar": "Copy link",
+      "regenerar": "Regenerate link",
+      "desactivar": "Turn off link"
+    },
+    "mejorarRedaccion": {
+      "ayuda": {
+        "experiencia": "Paste your résumé however you have it (even if it's messy) and we'll polish it up.",
+        "sinopsis": "Write it however it comes out and we'll make it clear and appealing for readers.",
+        "equipo": "Write it however it comes out and we'll make it clear for readers.",
+        "rol": "Describe the character and what you're looking for, and we'll make it clear and concrete."
+      },
+      "error": "We couldn't improve it right now. Try again.",
+      "mejorando": "Improving…",
+      "boton": "✨ Improve writing",
+      "propuesta": "Suggestion",
+      "revisala": "Review it: AI can make mistakes.",
+      "usar": "Use this text",
+      "descartar": "Discard"
+    },
+    "sugerirHabilidades": {
+      "yaMarcadas": "You'd already checked the ones that show up in your experience.",
+      "ninguna": "We didn't find any skills from the list in your experience.",
+      "marcamos": "We checked: {lista}. Review them before saving.",
+      "error": "We couldn't suggest them right now. Try again.",
+      "leyendo": "Reading your experience…",
+      "boton": "✨ Suggest from my experience"
+    },
+    "detalle": {
+      "edad": "{edad} years old",
+      "edadOculta": "Your age is hidden: nobody else sees it.",
+      "experiencia": "Experience"
+    },
+    "placa": {
+      "etiqueta": "Talent profile",
+      "error": "We couldn't load this profile.",
+      "cerrar": "Close"
+    },
+    "fotos": {
+      "tiposAdmitidos": "Only JPEG, PNG or WebP images are allowed.",
+      "errorSubir": "We couldn't upload the photo. Try again.",
+      "errorGuardar": "We couldn't save the photo. Try again.",
+      "maximo": "The limit is {max} photos.",
+      "subimosAlgunas": "We uploaded {lugares} of {total}: the limit is {max} photos.",
+      "altFoto": "Portfolio photo",
+      "principal": "Main",
+      "eliminar": "Delete",
+      "subiendo": "Uploading…",
+      "agregar": "Add photos",
+      "contador": "{n}/{max} photos — one is enough to start. You can pick several at once."
+    },
+    "videoreel": {
+      "titulo": "Reel"
+    },
+    "vidriera": {
+      "edad": "{edad} years old",
+      "videoreel": "Reel",
+      "trayectoria": "Background",
+      "habilidades": "Skills",
+      "perfilArtistico": "Artistic profile"
+    },
+    "vistaPropia": {
+      "asiTeVen": "This is how others see you.",
+      "editar": "Edit"
+    },
+    "pagina": {
+      "ajustes": "Settings",
+      "cambiarClave": "Change password",
+      "apoyar": "Support Yalope",
+      "verMiPerfil": "View my profile",
+      "avisoVisible": "Your exact location is never shown: only the neighborhood or city.",
+      "avisoOculto": "Your profile is hidden from new people: only your open chats can see you."
+    },
+    "completar": {
+      "titulo": "Tell us about yourself",
+      "bajada": "This is your profile: your calling card on Yalope. Later on, when you put together a Project or a Team, you'll be able to invite Talent without creating anything else.",
+      "errores": {
+        "sinSesion": "Not signed in.",
+        "sinFoto": "Your Google account doesn't have a photo.",
+        "noSeTrajo": "We couldn't get your Google photo. Upload it from your phone.",
+        "noSeGuardo": "We couldn't save the photo. Try again."
+      }
+    },
+    "publico": {
+      "tituloMeta": "{nombre} · Yalope",
+      "descripcionMeta": "{nombre}'s profile on Yalope.",
+      "irAYalope": "Go to Yalope",
+      "booking": "Booking",
+      "teInteresa": "Interested in working with {nombre}?",
+      "sinCuenta": "Create your free Yalope account to see {nombre}'s full profile, including social links.",
+      "esperandoAprobacion": "Your account is waiting for approval. Once you're approved you'll see the full profile, including social links.",
+      "completaTuPerfil": "Complete your Yalope profile to see the full profile, including social links.",
+      "crearCuenta": "Create account",
+      "yaTengoCuenta": "I already have an account",
+      "completarMiPerfil": "Complete my profile",
+      "volverAMiPerfil": "Back to my profile",
+      "perfilEnYalope": "Profile on Yalope"
+    },
+    "og": {
+      "edad": "{edad} years old"
+    },
+    "ubicacion": {
+      "errorBuscar": "Couldn't search for places. Try again.",
+      "errorResolver": "Couldn't look up that place. Try another one.",
+      "sinGeolocalizacion": "Your browser can't give us your location. Type it in instead.",
+      "noIdentificada": "We couldn't identify your location.",
+      "sinPermiso": "You didn't give us permission to use your location. You can still type it in.",
+      "noSeObtuvo": "We couldn't get your location. Try typing it in.",
+      "placeholder": "Address, neighborhood or city",
+      "buscandoTuUbicacion": "Finding your location…",
+      "usarMiUbicacion": "Use my current location",
+      "buscandoLugares": "Searching places…",
+      "elegiDeLaLista": "Pick a place from the list to confirm it."
+    },
+    "galeria": {
+      "ampliar": "Enlarge photo {n} of {total}",
+      "ampliada": "Enlarged photo",
+      "cerrar": "Close",
+      "anterior": "Previous photo",
+      "siguiente": "Next photo"
+    }
+  }
+}

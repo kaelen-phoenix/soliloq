@@ -1,4 +1,6 @@
 import Link from "next/link";
+import { useTranslations } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import { CerrarSesionBoton } from "@/components/cerrar-sesion-boton";
 import { FormularioTalento } from "@/components/perfil/formulario-talento";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
@@ -15,25 +17,26 @@ import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servid
 import { redesDeJson } from "@/lib/redes";
 
 function AccionesCuenta() {
+  const t = useTranslations("perfil.pagina");
   return (
     <section className="mt-8 flex flex-col items-start gap-3">
       <Link
         href="/ajustes"
         className="text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
       >
-        Ajustes
+        {t("ajustes")}
       </Link>
       <Link
         href="/cambiar-clave?volver=/perfil"
         className="text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
       >
-        Cambiar contraseña
+        {t("cambiarClave")}
       </Link>
       <Link
         href="/apoyar"
         className="text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
       >
-        Apoyar Yalope
+        {t("apoyar")}
       </Link>
       <CerrarSesionBoton />
     </section>
@@ -48,6 +51,7 @@ export default async function PerfilPage({
   const supabase = createClient();
   const user = await usuarioDeLaRequest();
   if (!user) return null;
+  const t = await getTranslations("perfil.pagina");
 
   // El formulario está detrás de `?editar=1`: por defecto se ve el perfil como lo ve el
   // resto. Va por URL y no por estado local para que "volver" funcione y el link a editar
@@ -62,7 +66,7 @@ export default async function PerfilPage({
       className="mb-4 inline-flex items-center gap-1.5 text-sm font-medium text-texto-tenue hover:text-texto"
     >
       <Icono nombre="chevron" className="h-3.5 w-3.5 rotate-90" />
-      Ver mi perfil
+      {t("verMiPerfil")}
     </Link>
   );
 
@@ -114,9 +118,9 @@ export default async function PerfilPage({
           hrefEditar="/perfil?editar=1"
           aviso={
             perfilTalento.aparece_en_buscador
-              ? "Tu ubicación exacta nunca se muestra: solo el barrio o la ciudad."
+              ? t("avisoVisible")
               : // #265: la opción «Ocultar mi perfil a personas nuevas» está tildada.
-                "Tu perfil está oculto a personas nuevas: solo te ven tus chats abiertos."
+                t("avisoOculto")
           }
         >
           <PerfilTalentoDetalle

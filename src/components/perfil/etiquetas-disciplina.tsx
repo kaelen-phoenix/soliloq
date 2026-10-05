@@ -1,4 +1,5 @@
-import { clasesDisciplina, etiquetaDisciplina } from "@/lib/constantes";
+import { useTranslations } from "next-intl";
+import { claveDisciplina, clasesDisciplina } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 /**
@@ -18,11 +19,12 @@ export function EtiquetasDisciplina({
   otroDetalle?: string | null;
   className?: string;
 }) {
+  const t = useTranslations("perfil");
   if (disciplinas.length === 0) {
     // Solo se ve en el perfil propio (el enlace público esconde la sección vacía): que diga qué hacer.
     return (
       <p className={`text-sm text-texto-tenue ${className}`}>
-        Sumá tus disciplinas (actuación, dirección, técnica…) desde «Editar».
+        {t("disciplinas.vacio")}
       </p>
     );
   }
@@ -36,7 +38,7 @@ export function EtiquetasDisciplina({
         >
           {/* "Otro" no le dice nada a nadie en un perfil público: se muestra lo que la
               persona escribió, y recién si no escribió nada cae en la etiqueta genérica. */}
-          {d === "otro" && otroDetalle ? otroDetalle : etiquetaDisciplina(d)}
+          {d === "otro" && otroDetalle ? otroDetalle : t(`etiquetas.${claveDisciplina(d)}`)}
         </li>
       ))}
     </ul>

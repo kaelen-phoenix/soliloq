@@ -1,6 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
+import { useTranslations } from "next-intl";
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Icono } from "@/components/ui/icono";
@@ -37,6 +38,7 @@ export function GaleriaFotos({
    */
   destacarPrimera?: boolean;
 }) {
+  const t = useTranslations("perfil.galeria");
   const [abierta, setAbierta] = useState<number | null>(null);
   // Hacia dónde va la próxima foto: 1 = siguiente (entra por la derecha), -1 = anterior.
   const [direccion, setDireccion] = useState(0);
@@ -84,7 +86,7 @@ export function GaleriaFotos({
       key={i}
       type="button"
       onClick={() => setAbierta(i)}
-      aria-label={`Ampliar foto ${i + 1} de ${fotos.length}`}
+      aria-label={t("ampliar", { n: i + 1, total: fotos.length })}
       className="group block w-full"
     >
       <Imagen
@@ -131,7 +133,7 @@ export function GaleriaFotos({
           <motion.div
             role="dialog"
             aria-modal="true"
-            aria-label="Foto ampliada"
+            aria-label={t("ampliada")}
             className="fixed inset-0 z-50 flex items-center justify-center bg-ink-950/95 p-4"
             onClick={cerrar}
             initial={prefiereReduccion ? false : { opacity: 0 }}
@@ -143,7 +145,7 @@ export function GaleriaFotos({
               ref={cerrarRef}
               type="button"
               onClick={cerrar}
-              aria-label="Cerrar"
+              aria-label={t("cerrar")}
               className={`${btnRedondo} right-3 top-3`}
             >
               <Icono nombre="cruz" className="h-5 w-5" />
@@ -157,7 +159,7 @@ export function GaleriaFotos({
                     e.stopPropagation();
                     ir(-1);
                   }}
-                  aria-label="Foto anterior"
+                  aria-label={t("anterior")}
                   className={`${btnRedondo} left-3 top-1/2 -translate-y-1/2`}
                 >
                   <Icono nombre="flecha-derecha" className="h-5 w-5 rotate-180" />
@@ -168,7 +170,7 @@ export function GaleriaFotos({
                     e.stopPropagation();
                     ir(1);
                   }}
-                  aria-label="Foto siguiente"
+                  aria-label={t("siguiente")}
                   className={`${btnRedondo} right-3 top-1/2 -translate-y-1/2`}
                 >
                   <Icono nombre="flecha-derecha" className="h-5 w-5" />

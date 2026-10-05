@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { COLUMNAS_PUBLICAS_TALENTO } from "@/lib/constantes";
 import { Superposicion } from "@/components/ui/superposicion";
@@ -17,13 +18,15 @@ import { redesDeJson } from "@/lib/redes";
 export function PlacaPerfilTalento({
   talentoId,
   onCerrar,
-  textoBoton = "Cerrar",
+  textoBoton,
 }: {
   talentoId: string;
   onCerrar: () => void;
-  /** #149 pide "Aceptar" en la sala de chat; #151 pide "Cerrar" en Matches. */
+  /** #149 pide "Aceptar" en la sala de chat; #151 pide "Cerrar" en Matches (el de por defecto). */
   textoBoton?: string;
 }) {
+  const t = useTranslations("perfil.placa");
+  const tComun = useTranslations("comun");
   const [talento, setTalento] = useState<TalentoDetalle | null>(null);
   const [error, setError] = useState(false);
 
@@ -60,12 +63,12 @@ export function PlacaPerfilTalento({
   }, [talentoId]);
 
   return (
-    <Superposicion onCerrar={onCerrar} posicion="abajo" etiqueta="Perfil del Talento">
+    <Superposicion onCerrar={onCerrar} posicion="abajo" etiqueta={t("etiqueta")}>
       <div className="mx-auto flex max-h-[85vh] w-full max-w-sm flex-col overflow-y-auto rounded-t-2xl bg-superficie p-5 sm:rounded-2xl sm:shadow-tarjeta">
         {error ? (
-          <p className="py-6 text-center text-sm text-texto-tenue">No pudimos cargar este perfil.</p>
+          <p className="py-6 text-center text-sm text-texto-tenue">{t("error")}</p>
         ) : !talento ? (
-          <p className="py-6 text-center text-sm text-texto-tenue">Cargando…</p>
+          <p className="py-6 text-center text-sm text-texto-tenue">{tComun("cargando")}</p>
         ) : (
           <PerfilTalentoDetalle talento={talento} />
         )}
@@ -75,7 +78,7 @@ export function PlacaPerfilTalento({
           onClick={onCerrar}
           className="mt-4 w-full shrink-0 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto"
         >
-          {textoBoton}
+          {textoBoton ?? t("cerrar")}
         </button>
       </div>
     </Superposicion>

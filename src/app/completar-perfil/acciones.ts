@@ -1,6 +1,7 @@
 "use server";
 
 import { randomUUID } from "node:crypto";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import * as Sentry from "@sentry/nextjs";
 
@@ -30,14 +31,15 @@ export async function fotoDeGoogle(metadata: Record<string, unknown> | undefined
  * demás del alta: la fila en `fotos_talento` se crea al completar el perfil.
  */
 export async function importarFotoDeGoogle(): Promise<Resultado> {
+  const t = await getTranslations("perfil.completar.errores");
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: "Sin sesión." };
+  if (!user) return { ok: false, error: t("sinSesion") };
 
   const origen = await fotoDeGoogle(user.user_metadata);
-  if (!origen) return { ok: false, error: "Tu cuenta de Google no tiene foto." };
+  if (!origen) return { ok: false, error: t("sinFoto") };
 
   let imagen: Blob;
   try {
@@ -62,7 +64,7 @@ export async function importarFotoDeGoogle(): Promise<Resultado> {
     }
     imagen = new Blob(partes, { type: tipo });
   } catch {
-    return { ok: false, error: "No pudimos traer tu foto de Google. Subila desde el celular." };
+    return { ok: false, error: t("noSeTrajo") };
   }
 
   const extension = imagen.type.includes("png") ? "png" : imagen.type.includes("webp") ? "webp" : "jpg";
@@ -72,7 +74,7 @@ export async function importarFotoDeGoogle(): Promise<Resultado> {
     .upload(ruta, imagen, { contentType: imagen.type });
   if (error) {
     Sentry.captureException(error, { extra: { accion: "importar foto de Google" } });
-    return { ok: false, error: "No pudimos guardar la foto. Probá de nuevo." };
+    return { ok: false, error: t("noSeGuardo") };
   }
   return {
     ok: true,

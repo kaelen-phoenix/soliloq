@@ -1,3 +1,4 @@
+import { useTranslations } from "next-intl";
 import { EtiquetasDisciplina } from "./etiquetas-disciplina";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
@@ -13,10 +14,11 @@ export interface CreadorDetalle {
  * Creador está activa.
  */
 export function PerfilCreadorDetalle({ creador }: { creador: CreadorDetalle }) {
+  const t = useTranslations("perfil.creador");
   return (
     <section>
       <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-        Perfil artístico como Creador
+        {t("titulo")}
       </h3>
       <EtiquetasDisciplina
         disciplinas={creador.disciplinas}

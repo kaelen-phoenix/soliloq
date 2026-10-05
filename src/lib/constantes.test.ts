@@ -1,5 +1,15 @@
 import { afterEach, beforeEach, describe, expect, it, vi } from "vitest";
-import { calcularEdad } from "./constantes";
+import {
+  calcularEdad,
+  claveDisciplina,
+  claveGenero,
+  claveRed,
+  etiquetaDisciplina,
+  etiquetaGenero,
+  etiquetaHabilidad,
+  GENEROS,
+  traductorCastellano,
+} from "./constantes";
 import { tagPush } from "./notificaciones-cliente";
 
 describe("calcularEdad", () => {
@@ -27,5 +37,30 @@ describe("tagPush (#347)", () => {
     expect(tagPush({ tipo: "solicitud_acceso", de_perfil: "p1" })).toBe("solicitud-p1");
     expect(tagPush({ tipo: "solicitud_acceso" })).toBe("solicitud-acceso");
     expect(tagPush({ tipo: "match" })).toBeNull();
+  });
+});
+
+describe("etiquetas traducibles (#354)", () => {
+  // Un traductor de mentira: devuelve la clave, para ver qué se le pidió.
+  const t = (clave: string) => `[${clave}]`;
+
+  it("sin traductor, el castellano sale del JSON", () => {
+    expect(traductorCastellano("genero.varon")).toBe("Varón");
+    expect(traductorCastellano("imagen.demasiadoGrande", { mb: 50, max: 40 })).toBe(
+      "La imagen pesa 50 MB. Elegí uno de hasta 40 MB.",
+    );
+    expect(etiquetaGenero("sin_especificar")).toBe("Prefiero no decirlo");
+    expect(etiquetaDisciplina("asistencia_direccion")).toBe("Asistencia de dirección");
+    expect(GENEROS.map((g) => g.etiqueta)).toContain("No binarie");
+  });
+  it("las claves apuntan a perfil.etiquetas", () => {
+    expect(claveGenero("mujer")).toBe("genero.mujer");
+    expect(claveDisciplina("guion")).toBe("disciplina.guion");
+    expect(claveRed("sitio")).toBe("red.sitio");
+  });
+  it("una habilidad de la lista se traduce; una escrita a mano queda como se guardó", () => {
+    expect(etiquetaHabilidad("Doblaje / locución")).toBe("Doblaje / locución");
+    expect(etiquetaHabilidad("Doblaje / locución", t)).toBe("[habilidad.doblaje]");
+    expect(etiquetaHabilidad("Malabares", t)).toBe("Malabares");
   });
 });

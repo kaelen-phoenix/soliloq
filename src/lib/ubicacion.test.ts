@@ -34,6 +34,12 @@ describe("radio de búsqueda", () => {
     // 50 km ≈ 31 mi: el paso de millas más cercano es 25.
     expect(radioMasCercano(50_000, "mi").etiqueta).toBe("25 millas");
   });
+  it("con traductor, las etiquetas salen en su idioma (#354)", () => {
+    const ingles: Record<string, string> = { "unidad.mi": "miles", "radio.todoElMundo": "Anywhere" };
+    const t = (clave: string) => ingles[clave] ?? clave;
+    expect(radioMasCercano(50_000, "mi", t).etiqueta).toBe("25 miles");
+    expect(opcionesDeRadio("mi", t).at(-1)?.etiqueta).toBe("Anywhere");
+  });
 });
 
 describe("columnas de ubicación", () => {

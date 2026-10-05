@@ -11,6 +11,8 @@
  * decodificar, porque eso sí puede colgar la pestaña.
  */
 
+import { traductorCastellano } from "@/lib/constantes";
+
 const MB = 1024 * 1024;
 
 export interface OpcionesCompresion {
@@ -22,10 +24,23 @@ export interface OpcionesCompresion {
   techoBytes?: number;
 }
 
+/**
+ * Error con el mensaje como clave de `perfil.etiquetas.imagen`, para mostrarlo traducido con
+ * `t("imagen." + e.clave, e.valores)`. `message` queda en castellano para quien no traduce.
+ */
+export class ErrorImagen extends Error {
+  constructor(
+    readonly clave: "demasiadoGrande" | "noSeLee" | "noSeProcesa",
+    readonly valores?: Record<string, number>,
+  ) {
+    super(traductorCastellano(`imagen.${clave}`, valores));
+  }
+}
+
 /** El original supera el techo: no se intenta comprimir. */
-export class ImagenDemasiadoGrande extends Error {}
+export class ImagenDemasiadoGrande extends ErrorImagen {}
 /** No se pudo decodificar o reencodear la imagen. */
-export class ImagenInvalida extends Error {}
+export class ImagenInvalida extends ErrorImagen {}
 
 const EXTENSION: Record<string, string> = {
   "image/jpeg": "jpg",
@@ -38,11 +53,10 @@ export async function comprimirImagen(
   { maxBytes = 5 * MB, maxLado = 2200, techoBytes = 40 * MB }: OpcionesCompresion = {},
 ): Promise<File> {
   if (archivo.size > techoBytes) {
-    throw new ImagenDemasiadoGrande(
-      `La imagen pesa ${Math.round(archivo.size / MB)} MB. Elegí uno de hasta ${Math.round(
-        techoBytes / MB,
-      )} MB.`,
-    );
+    throw new ImagenDemasiadoGrande("demasiadoGrande", {
+      mb: Math.round(archivo.size / MB),
+      max: Math.round(techoBytes / MB),
+    });
   }
 
   const img = await cargarImagen(archivo);
@@ -109,7 +123,7 @@ async function cargarImagen(archivo: File): Promise<FuenteImagen> {
     const el = await new Promise<HTMLImageElement>((resolver, rechazar) => {
       const imagen = new window.Image();
       imagen.onload = () => resolver(imagen);
-      imagen.onerror = () => rechazar(new ImagenInvalida("No pudimos leer la imagen."));
+      imagen.onerror = () => rechazar(new ImagenInvalida("noSeLee"));
       imagen.src = url;
     });
     return {
@@ -138,7 +152,7 @@ async function encodear(
   canvas.width = w;
   canvas.height = h;
   const ctx = canvas.getContext("2d");
-  if (!ctx) throw new ImagenInvalida("No pudimos procesar la imagen.");
+  if (!ctx) throw new ImagenInvalida("noSeProcesa");
 
   if (tipo === "image/jpeg") {
     // JPEG no tiene canal alfa: sin esto, lo transparente sale negro.
@@ -150,7 +164,7 @@ async function encodear(
   const blob = await new Promise<Blob | null>((resolver) =>
     canvas.toBlob(resolver, tipo, calidad),
   );
-  if (!blob) throw new ImagenInvalida("No pudimos procesar la imagen.");
+  if (!blob) throw new ImagenInvalida("noSeProcesa");
   return blob;
 }
 

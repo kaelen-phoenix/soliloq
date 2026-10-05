@@ -1,8 +1,9 @@
+import { useTranslations } from "next-intl";
 import { EtiquetasDisciplina } from "./etiquetas-disciplina";
 import { VideoreelEmbed } from "./videoreel-embed";
 import { GaleriaFotos } from "@/components/ui/galeria-fotos";
 import { Icono } from "@/components/ui/icono";
-import { etiquetaGenero, REDES, type Genero } from "@/lib/constantes";
+import { claveGenero, claveRed, etiquetaHabilidad, REDES, type Genero } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
 export interface PerfilPublico {
@@ -44,14 +45,16 @@ function Seccion({ titulo, children }: { titulo: string; children: React.ReactNo
  * para eso está "Contactar".
  */
 export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
+  const t = useTranslations("perfil.vidriera");
+  const tEtiquetas = useTranslations("perfil.etiquetas");
   const generoTexto =
     perfil.genero_descripcion ||
     (perfil.genero && perfil.genero !== "sin_especificar"
-      ? etiquetaGenero(perfil.genero as Genero)
+      ? tEtiquetas(claveGenero(perfil.genero as Genero))
       : "");
 
   const datos = [
-    perfil.edad !== null ? `${perfil.edad} años` : null,
+    perfil.edad !== null ? t("edad", { edad: perfil.edad }) : null,
     perfil.ubicacion_publica,
     generoTexto || null,
   ].filter(Boolean);
@@ -81,7 +84,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
               href={perfil.redes[red.clave]}
               target="_blank"
               rel="noopener noreferrer nofollow"
-              aria-label={red.etiqueta}
+              aria-label={tEtiquetas(claveRed(red.clave))}
               className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-colors hover:border-ink-400 hover:text-ink-800"
             >
               <Icono nombre={red.icono} className="h-4 w-4" />
@@ -92,13 +95,13 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
 
       <div className="mt-6 flex flex-col divide-y divide-ink-100 border-t border-ink-100">
         {perfil.videoreel_url && (
-          <Seccion titulo="Videoreel">
+          <Seccion titulo={t("videoreel")}>
             <VideoreelEmbed url={perfil.videoreel_url} />
           </Seccion>
         )}
 
         {perfil.texto && (
-          <Seccion titulo="Trayectoria">
+          <Seccion titulo={t("trayectoria")}>
             <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-ink-800">
               {perfil.texto}
             </p>
@@ -106,14 +109,14 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
         )}
 
         {perfil.habilidades.length > 0 && (
-          <Seccion titulo="Habilidades">
+          <Seccion titulo={t("habilidades")}>
             <div className="flex flex-wrap gap-2">
               {perfil.habilidades.map((h) => (
                 <span
                   key={h}
                   className="rounded-full border border-ink-200 px-3 py-1 text-xs font-medium text-ink-700"
                 >
-                  {h}
+                  {etiquetaHabilidad(h, tEtiquetas)}
                 </span>
               ))}
             </div>
@@ -122,7 +125,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
 
         {/* Sólo aparece si además tiene la función de Creador activa. */}
         {perfil.disciplinas.length > 0 && (
-          <Seccion titulo="Perfil artístico">
+          <Seccion titulo={t("perfilArtistico")}>
             <EtiquetasDisciplina disciplinas={perfil.disciplinas} otroDetalle={perfil.otro_detalle} />
           </Seccion>
         )}

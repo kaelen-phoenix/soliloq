@@ -1,17 +1,11 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { mejorarRedaccion } from "@/app/acciones-ia";
 import type { TipoRedaccion } from "@/lib/ia-prompts";
 
 const MINIMO = 15;
-
-const AYUDA: Record<TipoRedaccion, string> = {
-  experiencia: "Pegá tu CV como lo tengas (aunque esté desordenado) y te lo dejamos bien redactado.",
-  sinopsis: "Escribilo como te salga y te lo dejamos claro y atractivo para quien lo lea.",
-  equipo: "Escribilo como te salga y te lo dejamos claro para quien lo lea.",
-  rol: "Escribí cómo es el personaje y qué buscás, y te lo dejamos claro y concreto.",
-};
 
 /**
  * «✨ Mejorar redacción» (#313, #319): bajo la Experiencia, la sinopsis del Proyecto, la
@@ -27,6 +21,7 @@ export function MejorarRedaccion({
   onUsar: (nuevo: string) => void;
   tipo?: TipoRedaccion;
 }) {
+  const t = useTranslations("perfil.mejorarRedaccion");
   const [estado, setEstado] = useState<"listo" | "pensando">("listo");
   // La propuesta va con el texto del que salió: si la persona lo sigue editando, ya no aplica.
   const [propuesta, setPropuesta] = useState<{ de: string; texto: string } | null>(null);
@@ -46,7 +41,7 @@ export function MejorarRedaccion({
       if (!r.ok) return setError(r.error);
       setPropuesta({ de, texto: r.texto });
     } catch {
-      setError("No pudimos mejorarlo ahora. Probá de nuevo.");
+      setError(t("error"));
     } finally {
       setEstado("listo");
     }
@@ -60,19 +55,19 @@ export function MejorarRedaccion({
         disabled={estado === "pensando" || texto.trim().length < MINIMO}
         className="self-start rounded-full border border-borde px-3.5 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil disabled:opacity-50"
       >
-        {estado === "pensando" ? "Mejorando…" : "✨ Mejorar redacción"}
+        {estado === "pensando" ? t("mejorando") : t("boton")}
       </button>
       {texto.trim().length < MINIMO && (
         <p className="text-xs text-texto-tenue">
-          {AYUDA[tipo]}
+          {t(`ayuda.${tipo}`)}
         </p>
       )}
       {error && <p className="text-xs text-error-600">{error}</p>}
       {propuesta && (
         <div className="flex flex-col gap-2 rounded-xl border border-borde bg-fondo-sutil p-3.5">
-          <p className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Propuesta</p>
+          <p className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("propuesta")}</p>
           <p className="whitespace-pre-line text-sm text-texto">{propuesta.texto}</p>
-          <p className="text-xs text-texto-tenue">Revisala: la IA puede equivocarse.</p>
+          <p className="text-xs text-texto-tenue">{t("revisala")}</p>
           <div className="flex flex-wrap gap-2">
             <button
               type="button"
@@ -82,14 +77,14 @@ export function MejorarRedaccion({
               }}
               className="rounded-full bg-accion px-3.5 py-1.5 text-sm font-semibold text-accion-texto"
             >
-              Usar este texto
+              {t("usar")}
             </button>
             <button
               type="button"
               onClick={() => setPropuesta(null)}
               className="rounded-full border border-borde px-3.5 py-1.5 text-sm font-medium text-texto hover:bg-fondo-sutil"
             >
-              Descartar
+              {t("descartar")}
             </button>
           </div>
         </div>

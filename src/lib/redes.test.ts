@@ -38,5 +38,13 @@ describe("validarRedes", () => {
     const { redes, errores } = validarRedes({ instagram: "@ana", tiktok: "", x: "https://instagram.com/ana" });
     expect(redes).toEqual({ instagram: "https://instagram.com/ana" });
     expect(Object.keys(errores)).toEqual(["x"]);
+    expect(errores.x).toBe("Ese enlace no parece de X. Revisá el usuario o la URL.");
+  });
+  it("los mensajes salen con el traductor que se le pase (#354)", () => {
+    const t = (clave: string, valores?: Record<string, string | number>) => `${clave}|${valores?.red ?? ""}`;
+    expect(validarRedes({ instagram: "ana actriz!!", sitio: "http://a.com" }, t).errores).toEqual({
+      instagram: "redes.errorRed|Instagram",
+      sitio: "redes.errorSitio|",
+    });
   });
 });
