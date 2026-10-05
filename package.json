@@ -9,7 +9,8 @@
     "lint": "next lint",
     "typecheck": "tsc --noEmit",
     "test": "vitest run",
-    "test:e2e": "playwright test"
+    "test:e2e": "playwright test",
+    "tipos-db": "node scripts/tipos-db.mjs"
   },
   "dependencies": {
     "@sentry/nextjs": "^10.75.1",

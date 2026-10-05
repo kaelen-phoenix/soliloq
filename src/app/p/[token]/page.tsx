@@ -8,6 +8,7 @@ import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 import { VidrieraPublica } from "@/components/perfil/vidriera-publica";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { destinoSegunEstado } from "@/lib/cuenta";
+import { redesDeJson } from "@/lib/redes";
 
 // `cache()` deduplica la RPC entre `generateMetadata` y la página: las dos la piden con el
 // mismo token dentro del mismo request.
@@ -82,7 +83,7 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
           </span>
         </header>
 
-        <VidrieraPublica perfil={{ ...perfil, fotos }} />
+        <VidrieraPublica perfil={{ ...perfil, redes: redesDeJson(perfil.redes), fotos }} />
 
         {/* Sin chat de dos personas (#283): quien tiene cuenta completa ya ve todo, con las
             redes, y contacta por donde quiera. Al resto se le dice qué le falta. */}

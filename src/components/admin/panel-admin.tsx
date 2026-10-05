@@ -276,7 +276,7 @@ function Sponsors({ supabase }: { supabase: ReturnType<typeof createClient> }) {
                     nombre: s.nombre,
                     logo_url: s.logo_url,
                     sitio_url: s.sitio_url ?? "",
-                    nivel: s.nivel,
+                    nivel: s.nivel as FormSponsor["nivel"],
                     activo: s.activo,
                     orden: s.orden,
                   })

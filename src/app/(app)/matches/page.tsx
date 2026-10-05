@@ -123,7 +123,7 @@ export default async function MatchesPage() {
     fotoUrl: url(m.iniciativa_foto),
     creadorNombre: m.creador_nombre,
     expiraEn: m.expira_en,
-    estado: m.estado,
+    estado: m.estado as FilaMatchTalento["estado"],
     salaId: m.sala_id,
   }));
   const filasCreador = [...filasMatches, ...filasConvocados];

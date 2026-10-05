@@ -15,7 +15,7 @@ export interface TalentoDetalle {
   /** #110: si es `false`, la edad no se muestra (tampoco en el perfil propio, #250). */
   edad_visible: boolean;
   /** La recortada a barrio/ciudad. Nunca `ubicacion_texto`: puede ser el domicilio. */
-  ubicacion_publica: string;
+  ubicacion_publica: string | null;
   genero: Genero;
   genero_descripcion: string | null;
   videoreel_url: string | null;
