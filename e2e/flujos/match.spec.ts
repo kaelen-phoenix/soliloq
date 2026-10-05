@@ -278,7 +278,7 @@ test.describe("circuito de match (UI)", () => {
     await login(page, talento.email);
     await page.getByRole("link", { name: "Convocatorias" }).first().click();
     await page.waitForURL(/\/matches$/);
-    await expect(page.getByRole("tab", { name: /Mis convocatorias/, selected: true })).toBeVisible({ timeout: 10_000 });
+    await expect(page.getByRole("tab", { name: /Mis postulaciones/, selected: true })).toBeVisible({ timeout: 10_000 });
     const fila = page.locator("li", { hasText: tituloObra });
     await expect(fila).toBeVisible();
     await fila.getByRole("button", { name: "Retirarme" }).click();
@@ -289,7 +289,7 @@ test.describe("circuito de match (UI)", () => {
     expect(m?.descartado_en).not.toBeNull();
   });
 
-  test("el Talento en el chat sale desde Mis convocatorias (#298)", async ({ page }) => {
+  test("el Talento en el chat sale desde Mis postulaciones (#298)", async ({ page }) => {
     const sufijo = Date.now();
     const tituloObra = `Obra Salida E2E ${sufijo}`;
     const talento = await nuevoUsuario();
