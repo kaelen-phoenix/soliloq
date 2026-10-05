@@ -1,1 +1,240 @@
-{ "admin": {} }
+{
+  "admin": {
+    "pagina": {
+      "metaTitulo": "Admin — Yalope",
+      "intro": "Métricas, usuarios, denuncias y bloqueos de la plataforma."
+    },
+    "panel": {
+      "ver": "Ver ↗",
+      "pestanas": {
+        "resumen": "resumen",
+        "usuarios": "usuarios",
+        "acceso": "acceso",
+        "publicaciones": "publicaciones",
+        "denuncias": "denuncias",
+        "revision": "revisión",
+        "bloqueos": "bloqueos",
+        "mensajes": "mensajes",
+        "sponsors": "sponsors"
+      },
+      "comun": {
+        "noSeLeyo": "No se pudo leer.",
+        "noSeAplico": "No se pudo aplicar.",
+        "noSeGuardo": "No se pudo guardar.",
+        "noSeBorro": "No se pudo borrar.",
+        "cargando": "Cargando…",
+        "cargarMas": "Cargar más",
+        "buscar": "Buscar",
+        "editar": "Editar",
+        "borrar": "Borrar",
+        "cancelar": "Cancelar",
+        "sinNombre": "(sin nombre)"
+      },
+      "mensajes": {
+        "cargando": "Cargando mensajes…",
+        "vacioTitulo": "Sin mensajes",
+        "vacioDetalle": "No hay mensajes de contacto.",
+        "noLeido": "No leído",
+        "leido": "Leído"
+      },
+      "sponsors": {
+        "confirmarBorrar": "¿Borrar a {nombre}?",
+        "inactivo": "(inactivo)",
+        "nivelOrden": "{nivel} · orden {orden}",
+        "editarTitulo": "Editar sponsor",
+        "nuevoTitulo": "Nuevo sponsor",
+        "nombre": "Nombre",
+        "logo": "URL del logo (PNG/SVG transparente)",
+        "sitio": "URL del sitio (opcional)",
+        "nivel": "Nivel",
+        "orden": "Orden",
+        "activo": "Activo",
+        "guardar": "Guardar",
+        "agregar": "Agregar"
+      },
+      "resumen": {
+        "vacioTitulo": "Sin datos",
+        "vacioDetalle": "No se pudieron leer las métricas.",
+        "total": "Usuarios",
+        "con_talento": "Con perfil de talento",
+        "con_creador": "Con perfil de creador",
+        "con_ambos": "Con ambos perfiles",
+        "registros_7d": "Altas últimos 7 días",
+        "con_enlace_publico": "Enlace público activo",
+        "suspendidos": "Suspendidos",
+        "bloqueos": "Bloqueos",
+        "denuncias_abiertas": "Denuncias abiertas",
+        "obras_publicadas": "Obras publicadas",
+        "equipos_activos": "Equipos activos",
+        "matches_activos": "Matches vigentes",
+        "convocatorias_aceptadas": "Convocatorias aceptadas",
+        "salas": "Salas",
+        "interes_7d": "«Me interesa» últimos 7 días"
+      },
+      "usuarios": {
+        "noSeBusco": "No se pudo buscar.",
+        "confirmarSuspender": "¿Suspender a {nombre}? No podrá entrar hasta reactivarla.",
+        "confirmarReactivar": "¿Reactivar a {nombre}?",
+        "noSeBorroReintentar": "No se pudo borrar. Probá de nuevo.",
+        "placeholder": "Nombre o email",
+        "vacioTitulo": "Sin usuarios",
+        "vacioDetalle": "No hay resultados para esa búsqueda.",
+        "admin": "admin",
+        "suspendido": "suspendido",
+        "sinPerfil": "sin perfil",
+        "detalle": "{email} · {roles} · alta {fecha}",
+        "reactivar": "Reactivar",
+        "suspender": "Suspender",
+        "palabraBorrar": "BORRAR",
+        "confirmarBorrado": "Se elimina la cuenta de {nombre} con todo su contenido —perfil, proyectos, salas, mensajes—. Es irreversible; para una baja reversible usá Suspender. Escribí {palabra} para confirmar.",
+        "borrarDefinitivamente": "Borrar definitivamente",
+        "borrando": "Borrando…"
+      },
+      "acceso": {
+        "noSeInvito": "No se pudo enviar la invitación.",
+        "invitacionEnviada": "Invitación registrada y enviada por mail a {email}.",
+        "invitacionRegistrada": "Invitación registrada para {email}.",
+        "invitacionSinMail": "Invitación registrada para {email}, pero no se pudo mandar el mail ({error}).",
+        "noSeAprobo": "No se pudo aprobar.",
+        "invitarTitulo": "Invitar por email",
+        "email": "Email",
+        "invitar": "Invitar",
+        "invitarAyuda": "Quien se registre con ese email entra directo, sin esperar aprobación.",
+        "pendientesTitulo": "Solicitudes pendientes",
+        "pendientesVacioTitulo": "Sin solicitudes",
+        "pendientesVacioDetalle": "No hay registros esperando aprobación.",
+        "seRegistro": "Se registró el {fecha}",
+        "habilitar": "Habilitar",
+        "invitacionesTitulo": "Invitaciones enviadas",
+        "invitacionesVacioTitulo": "Sin invitaciones",
+        "invitacionesVacioDetalle": "Todavía no invitaste a nadie.",
+        "enviadaEl": "Enviada el {fecha}",
+        "usada": "usada",
+        "pendiente": "pendiente"
+      },
+      "publicaciones": {
+        "placeholder": "Título, dueño o email",
+        "cargando": "Cargando publicaciones…",
+        "vacioTitulo": "Sin publicaciones",
+        "vacioDetalle": "No hay resultados.",
+        "fotos": "{n, plural, one {# foto} other {# fotos}}"
+      },
+      "denuncias": {
+        "notaResolucion": "Nota de resolución (opcional):",
+        "cargando": "Cargando denuncias…",
+        "vacioTitulo": "Sin denuncias",
+        "vacioDetalle": "No hay denuncias registradas.",
+        "resolucion": "Resolución: {texto}",
+        "estados": {
+          "abierta": "abierta",
+          "en_revision": "en revision",
+          "resuelta": "resuelta",
+          "descartada": "descartada"
+        }
+      },
+      "bloqueos": {
+        "confirmarLevantar": "¿Levantar el bloqueo entre {a} y {b}?",
+        "noSeLevanto": "No se pudo levantar.",
+        "noSeCreo": "No se pudo crear.",
+        "cargando": "Cargando bloqueos…",
+        "vacioTitulo": "Sin bloqueos",
+        "vacioDetalle": "No hay bloqueos entre usuarios.",
+        "puso": "puso {autor}",
+        "levantar": "Levantar",
+        "imponerTitulo": "Imponer un bloqueo (por id de perfil)",
+        "perfilA": "Perfil A",
+        "perfilB": "Perfil B",
+        "motivo": "Motivo (opcional)",
+        "bloquear": "Bloquear"
+      },
+      "bienvenida": {
+        "pruebaOk": "Te mandamos la prueba a {email}. Revisá la bandeja (y spam, por las dudas).",
+        "confirmarEnvio": "¿Mandar el mail de bienvenida a {n, plural, one {# persona} other {# personas}}?",
+        "sinCorreo": "Todavía no está configurado el envío de mails (falta RESEND_API_KEY en Vercel).",
+        "enviados": "Enviados: {enviados}.",
+        "enviadosConFallidos": "Enviados: {enviados}. No se pudieron enviar: {fallidos} (quedan para reintentar).",
+        "titulo": "Mail de bienvenida",
+        "explicacion": "A cada persona nueva le llega solo, al entrar por primera vez. Cada cuenta lo recibe una sola vez.",
+        "recibieron": "Lo recibieron {n} de {total}.",
+        "ocultarDetalle": "Ocultar detalle",
+        "verDetalle": "Ver detalle",
+        "pendiente": "Pendiente",
+        "enviando": "Enviando…",
+        "enviarmePrueba": "Enviarme una prueba",
+        "todosRecibieron": "Todos lo recibieron",
+        "enviarFaltan": "Enviar a quienes faltan ({n})"
+      }
+    },
+    "revision": {
+      "tipo": {
+        "perfil": "Perfil",
+        "proyecto": "Proyecto",
+        "equipo": "Equipo",
+        "rol": "Rol"
+      },
+      "errorRevisar": "No se pudo revisar. Probá de nuevo.",
+      "explicacion": "La IA lee los perfiles, proyectos, equipos y roles más recientes y marca lo que parece un problema: pedidos de plata para participar, contenido sexual, insultos, spam o datos de contacto para sacar a la gente de la app. Es una ayuda: revisá cada caso antes de actuar.",
+      "revisando": "Revisando…",
+      "revisar": "✨ Revisar lo reciente con IA",
+      "revisamos": "Revisamos {n} publicaciones.",
+      "nadaParaMirar": "No encontramos nada para mirar.",
+      "paraMirar": "{n} para mirar:"
+    },
+    "acciones": {
+      "sinSesion": "Sin sesión.",
+      "noAutorizado": "No autorizado.",
+      "noBorrarteAVos": "No podés borrarte a vos mismo.",
+      "noExiste": "Ese usuario no existe.",
+      "noBorrarOtroAdmin": "No podés borrar a otro admin.",
+      "noSeBorro": "No se pudo borrar.",
+      "noSeEnvio": "No se pudo enviar.",
+      "faltaResend": "Falta RESEND_API_KEY en Vercel.",
+      "envioNoConfigurado": "No está configurado el envío.",
+      "sinEmail": "(sin email)",
+      "noSeLeyo": "No se pudo leer.",
+      "noSeLeyoPublicado": "No se pudo leer lo publicado: {error}",
+      "noSeLeyeronPerfiles": "No se pudieron leer los perfiles: {error}",
+      "respuestaInvalida": "La IA no devolvió una respuesta válida. Probá de nuevo.",
+      "noSeReviso": "No se pudo revisar."
+    },
+    "ia": {
+      "limite": "Llegaste al máximo de usos de IA de las últimas 24 horas. Probá más tarde.",
+      "errorGenerico": "No pudimos hacerlo ahora. Probá de nuevo.",
+      "sinSesion": "Sin sesión.",
+      "noSePuedeMejorar": "No se puede mejorar este texto.",
+      "masTexto": "Escribí o pegá un poco más de texto primero.",
+      "muyLargoMaximo": "El texto es muy largo (máximo {max} caracteres).",
+      "noSinCambiar": "No pudimos mejorarlo sin cambiarle el contenido. Probá con un texto más completo.",
+      "mejorarFallo": "No pudimos mejorarlo ahora. Probá de nuevo en un rato.",
+      "sinDatos": {
+        "experiencia": "No encontramos formación ni experiencia para ordenar. Pegá tu CV o contá dónde estudiaste y en qué trabajaste.",
+        "sinopsis": "Contá un poco más del proyecto (de qué se trata, qué buscás) y probá de nuevo.",
+        "equipo": "Contá un poco más del equipo (qué quieren hacer, a quién buscan) y probá de nuevo.",
+        "rol": "Contá un poco más del rol (quién es el personaje, qué se pide) y probá de nuevo."
+      },
+      "primeroExperiencia": "Primero escribí tu experiencia.",
+      "muyLargo": "El texto es muy largo.",
+      "sugerirFallo": "No pudimos sugerirlas ahora. Probá de nuevo en un rato.",
+      "escribiQueBuscas": "Escribí qué estás buscando.",
+      "masCorto": "Escribilo más corto (hasta {max} caracteres).",
+      "interpretarFallo": "No pudimos interpretarlo ahora. Usá los filtros de abajo.",
+      "soloQuienArmo": "Solo quien armó el proyecto puede usar esto.",
+      "nadieSeSumo": "Todavía no se sumó nadie al chat.",
+      "saludoFallo": "No pudimos escribirlo ahora. Probá de nuevo en un rato."
+    },
+    "portada": {
+      "metaTitulo": "Yalope — El match de actores y actrices empieza acá",
+      "metaDescripcion": "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat. Armá tu equipo y compartí tu perfil como booking.",
+      "palabrasClave": [
+        "match de actores",
+        "actores y actrices",
+        "casting online",
+        "booking de actores",
+        "convocatorias artísticas",
+        "buscar talento actoral",
+        "armar equipo artístico",
+        "comunidad artística Argentina"
+      ]
+    }
+  }
+}

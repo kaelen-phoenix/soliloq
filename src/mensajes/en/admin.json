@@ -1,1 +1,240 @@
-{ "admin": {} }
+{
+  "admin": {
+    "pagina": {
+      "metaTitulo": "Admin — Yalope",
+      "intro": "Platform metrics, users, reports and blocks."
+    },
+    "panel": {
+      "ver": "View ↗",
+      "pestanas": {
+        "resumen": "summary",
+        "usuarios": "users",
+        "acceso": "access",
+        "publicaciones": "posts",
+        "denuncias": "reports",
+        "revision": "review",
+        "bloqueos": "blocks",
+        "mensajes": "messages",
+        "sponsors": "sponsors"
+      },
+      "comun": {
+        "noSeLeyo": "Couldn't load.",
+        "noSeAplico": "Couldn't apply it.",
+        "noSeGuardo": "Couldn't save.",
+        "noSeBorro": "Couldn't delete.",
+        "cargando": "Loading…",
+        "cargarMas": "Load more",
+        "buscar": "Search",
+        "editar": "Edit",
+        "borrar": "Delete",
+        "cancelar": "Cancel",
+        "sinNombre": "(no name)"
+      },
+      "mensajes": {
+        "cargando": "Loading messages…",
+        "vacioTitulo": "No messages",
+        "vacioDetalle": "There are no contact messages.",
+        "noLeido": "Unread",
+        "leido": "Read"
+      },
+      "sponsors": {
+        "confirmarBorrar": "Delete {nombre}?",
+        "inactivo": "(inactive)",
+        "nivelOrden": "{nivel} · order {orden}",
+        "editarTitulo": "Edit sponsor",
+        "nuevoTitulo": "New sponsor",
+        "nombre": "Name",
+        "logo": "Logo URL (transparent PNG/SVG)",
+        "sitio": "Website URL (optional)",
+        "nivel": "Tier",
+        "orden": "Order",
+        "activo": "Active",
+        "guardar": "Save",
+        "agregar": "Add"
+      },
+      "resumen": {
+        "vacioTitulo": "No data",
+        "vacioDetalle": "Couldn't load the metrics.",
+        "total": "Users",
+        "con_talento": "With a Talent profile",
+        "con_creador": "With a Creator profile",
+        "con_ambos": "With both profiles",
+        "registros_7d": "Sign-ups, last 7 days",
+        "con_enlace_publico": "Public link on",
+        "suspendidos": "Suspended",
+        "bloqueos": "Blocks",
+        "denuncias_abiertas": "Open reports",
+        "obras_publicadas": "Published projects",
+        "equipos_activos": "Active teams",
+        "matches_activos": "Active matches",
+        "convocatorias_aceptadas": "Accepted casting calls",
+        "salas": "Rooms",
+        "interes_7d": "“I'm interested”, last 7 days"
+      },
+      "usuarios": {
+        "noSeBusco": "Couldn't search.",
+        "confirmarSuspender": "Suspend {nombre}? They won't be able to sign in until reactivated.",
+        "confirmarReactivar": "Reactivate {nombre}?",
+        "noSeBorroReintentar": "Couldn't delete. Try again.",
+        "placeholder": "Name or email",
+        "vacioTitulo": "No users",
+        "vacioDetalle": "No results for that search.",
+        "admin": "admin",
+        "suspendido": "suspended",
+        "sinPerfil": "no profile",
+        "detalle": "{email} · {roles} · joined {fecha}",
+        "reactivar": "Reactivate",
+        "suspender": "Suspend",
+        "palabraBorrar": "DELETE",
+        "confirmarBorrado": "This deletes {nombre}'s account and everything in it —profile, projects, rooms, messages—. It can't be undone; to remove someone reversibly, use Suspend. Type {palabra} to confirm.",
+        "borrarDefinitivamente": "Delete permanently",
+        "borrando": "Deleting…"
+      },
+      "acceso": {
+        "noSeInvito": "Couldn't send the invitation.",
+        "invitacionEnviada": "Invitation saved and emailed to {email}.",
+        "invitacionRegistrada": "Invitation saved for {email}.",
+        "invitacionSinMail": "Invitation saved for {email}, but the email couldn't be sent ({error}).",
+        "noSeAprobo": "Couldn't approve.",
+        "invitarTitulo": "Invite by email",
+        "email": "Email",
+        "invitar": "Invite",
+        "invitarAyuda": "Whoever signs up with that email gets in right away, without waiting for approval.",
+        "pendientesTitulo": "Pending requests",
+        "pendientesVacioTitulo": "No requests",
+        "pendientesVacioDetalle": "No sign-ups waiting for approval.",
+        "seRegistro": "Signed up on {fecha}",
+        "habilitar": "Approve",
+        "invitacionesTitulo": "Sent invitations",
+        "invitacionesVacioTitulo": "No invitations",
+        "invitacionesVacioDetalle": "You haven't invited anyone yet.",
+        "enviadaEl": "Sent on {fecha}",
+        "usada": "used",
+        "pendiente": "pending"
+      },
+      "publicaciones": {
+        "placeholder": "Title, owner or email",
+        "cargando": "Loading posts…",
+        "vacioTitulo": "No posts",
+        "vacioDetalle": "No results.",
+        "fotos": "{n, plural, one {# photo} other {# photos}}"
+      },
+      "denuncias": {
+        "notaResolucion": "Resolution note (optional):",
+        "cargando": "Loading reports…",
+        "vacioTitulo": "No reports",
+        "vacioDetalle": "There are no reports.",
+        "resolucion": "Resolution: {texto}",
+        "estados": {
+          "abierta": "open",
+          "en_revision": "in review",
+          "resuelta": "resolved",
+          "descartada": "dismissed"
+        }
+      },
+      "bloqueos": {
+        "confirmarLevantar": "Lift the block between {a} and {b}?",
+        "noSeLevanto": "Couldn't lift it.",
+        "noSeCreo": "Couldn't create it.",
+        "cargando": "Loading blocks…",
+        "vacioTitulo": "No blocks",
+        "vacioDetalle": "There are no blocks between users.",
+        "puso": "set by {autor}",
+        "levantar": "Lift",
+        "imponerTitulo": "Impose a block (by profile id)",
+        "perfilA": "Profile A",
+        "perfilB": "Profile B",
+        "motivo": "Reason (optional)",
+        "bloquear": "Block"
+      },
+      "bienvenida": {
+        "pruebaOk": "We sent the test to {email}. Check your inbox (and spam, just in case).",
+        "confirmarEnvio": "Send the welcome email to {n, plural, one {# person} other {# people}}?",
+        "sinCorreo": "Email sending isn't set up yet (RESEND_API_KEY is missing in Vercel).",
+        "enviados": "Sent: {enviados}.",
+        "enviadosConFallidos": "Sent: {enviados}. Couldn't send: {fallidos} (they'll be retried).",
+        "titulo": "Welcome email",
+        "explicacion": "Every new person gets it automatically the first time they sign in. Each account receives it only once.",
+        "recibieron": "{n} of {total} received it.",
+        "ocultarDetalle": "Hide details",
+        "verDetalle": "Show details",
+        "pendiente": "Pending",
+        "enviando": "Sending…",
+        "enviarmePrueba": "Send me a test",
+        "todosRecibieron": "Everyone received it",
+        "enviarFaltan": "Send to those missing it ({n})"
+      }
+    },
+    "revision": {
+      "tipo": {
+        "perfil": "Profile",
+        "proyecto": "Project",
+        "equipo": "Team",
+        "rol": "Role"
+      },
+      "errorRevisar": "Couldn't review. Try again.",
+      "explicacion": "The AI reads the most recent profiles, projects, teams and roles and flags anything that looks like a problem: asking for money to take part, sexual content, insults, spam or contact details meant to take people off the app. It's a helper: check each case before acting.",
+      "revisando": "Reviewing…",
+      "revisar": "✨ Review recent posts with AI",
+      "revisamos": "We reviewed {n, plural, one {# post} other {# posts}}.",
+      "nadaParaMirar": "We didn't find anything to look at.",
+      "paraMirar": "{n} to look at:"
+    },
+    "acciones": {
+      "sinSesion": "Not signed in.",
+      "noAutorizado": "Not authorized.",
+      "noBorrarteAVos": "You can't delete yourself.",
+      "noExiste": "That user doesn't exist.",
+      "noBorrarOtroAdmin": "You can't delete another admin.",
+      "noSeBorro": "Couldn't delete.",
+      "noSeEnvio": "Couldn't send.",
+      "faltaResend": "RESEND_API_KEY is missing in Vercel.",
+      "envioNoConfigurado": "Email sending isn't set up.",
+      "sinEmail": "(no email)",
+      "noSeLeyo": "Couldn't load.",
+      "noSeLeyoPublicado": "Couldn't load the posts: {error}",
+      "noSeLeyeronPerfiles": "Couldn't load the profiles: {error}",
+      "respuestaInvalida": "The AI didn't return a valid response. Try again.",
+      "noSeReviso": "Couldn't review."
+    },
+    "ia": {
+      "limite": "You've reached the maximum AI uses for the last 24 hours. Try again later.",
+      "errorGenerico": "We couldn't do it right now. Try again.",
+      "sinSesion": "Not signed in.",
+      "noSePuedeMejorar": "This text can't be improved.",
+      "masTexto": "Write or paste a bit more text first.",
+      "muyLargoMaximo": "The text is too long (max {max} characters).",
+      "noSinCambiar": "We couldn't improve it without changing its content. Try a more complete text.",
+      "mejorarFallo": "We couldn't improve it right now. Try again in a bit.",
+      "sinDatos": {
+        "experiencia": "We didn't find any training or experience to organize. Paste your résumé or tell us where you studied and what you've worked on.",
+        "sinopsis": "Tell us a bit more about the project (what it's about, what you're looking for) and try again.",
+        "equipo": "Tell us a bit more about the team (what you want to do, who you're looking for) and try again.",
+        "rol": "Tell us a bit more about the role (who the character is, what's needed) and try again."
+      },
+      "primeroExperiencia": "Write your experience first.",
+      "muyLargo": "The text is too long.",
+      "sugerirFallo": "We couldn't suggest them right now. Try again in a bit.",
+      "escribiQueBuscas": "Type what you're looking for.",
+      "masCorto": "Make it shorter (up to {max} characters).",
+      "interpretarFallo": "We couldn't interpret it right now. Use the filters below.",
+      "soloQuienArmo": "Only the person who created the project can use this.",
+      "nadieSeSumo": "Nobody has joined the chat yet.",
+      "saludoFallo": "We couldn't write it right now. Try again in a bit."
+    },
+    "portada": {
+      "metaTitulo": "Yalope — Where actors and actresses find their match",
+      "metaDescripcion": "Yalope connects actors, actresses and creators with a quick, visual match: when the interest is mutual, the chat opens. Build your team and share your profile as a booking page.",
+      "palabrasClave": [
+        "actor matching",
+        "actors and actresses",
+        "online casting",
+        "actor booking",
+        "casting calls",
+        "find acting talent",
+        "build a creative team",
+        "Argentina arts community"
+      ]
+    }
+  }
+}
