@@ -74,6 +74,13 @@ jobs:
   # correr nada — ver e2e/README.md.
   e2e-flujos:
     runs-on: ubuntu-latest
+    # Un solo run a la vez contra staging (plan free): con varios PRs en paralelo los flujos
+    # se pisaban en tiempos de respuesta y fallaban por timeout. Los demás esperan su turno
+    # (GitHub deja uno solo en espera: si se encola un tercero, el que esperaba se cancela y
+    # hay que volver a correrlo).
+    concurrency:
+      group: e2e-staging
+      cancel-in-progress: false
     env:
       E2E_SUPABASE_URL: ${{ secrets.E2E_SUPABASE_URL }}
       E2E_SUPABASE_ANON_KEY: ${{ secrets.E2E_SUPABASE_ANON_KEY }}
