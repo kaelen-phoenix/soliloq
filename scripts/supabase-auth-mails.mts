@@ -5,7 +5,9 @@
 //   node scripts/supabase-auth-mails.mts            → muestra qué se aplicaría (sin secretos)
 //   node scripts/supabase-auth-mails.mts --aplicar  → lo aplica a prod
 //
-// Necesita SUPABASE_ACCESS_TOKEN y RESEND_API_KEY (o los archivos de ~/.soliloq-deploy/).
+// Necesita SUPABASE_ACCESS_TOKEN y RESEND_API_KEY (o los archivos de ~/.soliloq-deploy/), y
+// Node 22.18 o más: corre TypeScript directo, sin compilar (el CI usa Node 20, pero este
+// script se corre a mano).
 // Staging queda con el SMTP de Supabase a propósito: los E2E usan dominios de prueba.
 import fs from "node:fs";
 import os from "node:os";
