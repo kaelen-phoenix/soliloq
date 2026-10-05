@@ -2,6 +2,7 @@
 
 import Link from "next/link";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
 import { EMAIL_REGEX, mensajeErrorAuth, urlCallback, validarClave } from "@/lib/clave";
@@ -14,6 +15,7 @@ type Modo = "ingresar" | "registrarme";
 export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: string; modoInicial?: Modo }) {
   const router = useRouter();
   const [modo, setModo] = useState<Modo>(modoInicial);
+  const tLegal = useTranslations("legal");
   const [email, setEmail] = useState("");
   const [clave, setClave] = useState("");
   const [error, setError] = useState<string | null>(null);
@@ -185,6 +187,22 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
       <Boton variante="secundario" onClick={ingresarConGoogle} type="button">
         Continuar con Google
       </Boton>
+
+      {/* #352: Google también crea la cuenta, así que el aviso va en los dos modos. */}
+      <p className="text-xs leading-relaxed text-texto-tenue">
+        {tLegal.rich("aceptacionAlta", {
+          terminos: (texto) => (
+            <Link href="/terminos" className="underline underline-offset-4 hover:text-texto">
+              {texto}
+            </Link>
+          ),
+          privacidad: (texto) => (
+            <Link href="/privacidad" className="underline underline-offset-4 hover:text-texto">
+              {texto}
+            </Link>
+          ),
+        })}
+      </p>
     </div>
   );
 }

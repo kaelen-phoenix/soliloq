@@ -1,5 +1,6 @@
 import { cookies } from "next/headers";
 import { getTranslations } from "next-intl/server";
+import Link from "next/link";
 import { FormularioAjustes } from "@/components/ajustes/formulario-ajustes";
 import { createClient } from "@/lib/supabase/server";
 import { resolverIdioma } from "@/i18n/request";
@@ -32,6 +33,7 @@ export default async function AjustesPage() {
     .maybeSingle();
 
   const t = await getTranslations("ajustes");
+  const tLegal = await getTranslations("legal");
 
   return (
     <main className="px-5 py-5">
@@ -40,6 +42,17 @@ export default async function AjustesPage() {
         idiomaInicial={(perfil?.idioma as "es" | "en") ?? resolverIdioma()}
         temaInicial={temaVigente()}
       />
+      <nav className="mt-8 flex flex-wrap gap-x-4 gap-y-2 text-xs text-texto-tenue">
+        <Link href="/terminos" className="underline underline-offset-4 hover:text-texto">
+          {tLegal("enlaceTerminos")}
+        </Link>
+        <Link href="/privacidad" className="underline underline-offset-4 hover:text-texto">
+          {tLegal("enlacePrivacidad")}
+        </Link>
+        <Link href="/normas" className="underline underline-offset-4 hover:text-texto">
+          {tLegal("enlaceNormas")}
+        </Link>
+      </nav>
     </main>
   );
 }

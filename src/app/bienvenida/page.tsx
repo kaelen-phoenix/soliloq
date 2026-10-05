@@ -65,6 +65,7 @@ const JSON_LD = {
 
 export default async function BienvenidaPage() {
   const t = await getTranslations("landing");
+  const tLegal = await getTranslations("legal");
   return (
     // #217: la portada pasa al negro de escena, como la primera pantalla de la referencia
     // (`docs/marca/referencias/interfaz-yalope-217.png`). Antes era una superficie de marca
@@ -295,9 +296,20 @@ export default async function BienvenidaPage() {
               </Link>
             </div>
           </div>
-          <p className="mt-6 text-xs text-texto-tenue">
-            © {new Date().getFullYear()} Yalope. {t("derechos")}
-          </p>
+          <div className="mt-6 flex flex-wrap items-center gap-x-4 gap-y-2 text-xs text-texto-tenue">
+            <p>
+              © {new Date().getFullYear()} Yalope. {t("derechos")}
+            </p>
+            <Link href="/terminos" className="hover:text-texto">
+              {tLegal("enlaceTerminos")}
+            </Link>
+            <Link href="/privacidad" className="hover:text-texto">
+              {tLegal("enlacePrivacidad")}
+            </Link>
+            <Link href="/normas" className="hover:text-texto">
+              {tLegal("enlaceNormas")}
+            </Link>
+          </div>
         </div>
       </footer>
     </div>
