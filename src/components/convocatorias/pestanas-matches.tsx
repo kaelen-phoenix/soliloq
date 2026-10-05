@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 
 type Pestana = "proyectos" | "talento";
 
@@ -21,6 +22,7 @@ export function PestanasMatches({
   panelProyectos: React.ReactNode;
   panelTalento: React.ReactNode;
 }) {
+  const t = useTranslations("proyectos.matches.pestanas");
   const [pestana, setPestana] = useState<Pestana>(inicial);
 
   const tab = (p: Pestana, etiqueta: string, cantidad: number) => (
@@ -44,11 +46,11 @@ export function PestanasMatches({
     <>
       <div
         role="tablist"
-        aria-label="Convocatorias"
+        aria-label={t("etiqueta")}
         className="mb-5 flex gap-1 rounded-full border border-borde bg-fondo-sutil p-1"
       >
-        {tab("proyectos", "Mis proyectos", cantidadProyectos)}
-        {tab("talento", "Mis convocatorias", cantidadTalento)}
+        {tab("proyectos", t("misProyectos"), cantidadProyectos)}
+        {tab("talento", t("misConvocatorias"), cantidadTalento)}
       </div>
       <div role="tabpanel" id="panel-matches" aria-labelledby={`pestana-matches-${pestana}`}>{pestana === "proyectos" ? panelProyectos : panelTalento}</div>
     </>

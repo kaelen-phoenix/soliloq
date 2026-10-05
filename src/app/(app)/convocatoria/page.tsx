@@ -1,13 +1,18 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ConvocatoriasLista } from "@/components/talento/convocatorias-lista";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
-export const metadata = { title: "Convocatoria — Yalope" };
+export async function generateMetadata() {
+  const t = await getTranslations("proyectos.convocatoria");
+  return { title: `${t("metaTitulo")} — Yalope` };
+}
 
 export default async function ConvocatoriaPage() {
   const supabase = createClient();
+  const t = await getTranslations("proyectos.convocatoria");
   const user = await usuarioDeLaRequest();
   if (!user) return null;
 
@@ -29,14 +34,14 @@ export default async function ConvocatoriaPage() {
   return (
     <main className="px-5 py-5">
       <p className="mb-5 text-sm text-texto-tenue">
-        Te convocaron a un proyecto o equipo. Aceptá para entrar a la sala.
+        {t("bajada")}
       </p>
 
       {filas.length === 0 ? (
         <EstadoVacio
           icono="corazon"
-          titulo="No tenés convocatorias pendientes"
-          detalle="Cuando un creador te convoque en firme, la vas a ver acá."
+          titulo={t("vacioTitulo")}
+          detalle={t("vacioDetalle")}
         />
       ) : (
         <ConvocatoriasLista filas={filas} />

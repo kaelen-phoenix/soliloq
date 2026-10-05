@@ -1,11 +1,15 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { GestionEquipo } from "@/components/convocatorias/gestion-equipo";
 import type { FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
-export const metadata = { title: "Equipo — Yalope" };
+export async function generateMetadata() {
+  const t = await getTranslations("titulos");
+  return { title: `${t("equipo")} — Yalope` };
+}
 
 /**
  * La pantalla de un Equipo (#341), como la del Proyecto: editarlo, sus fotos, buscar talento,

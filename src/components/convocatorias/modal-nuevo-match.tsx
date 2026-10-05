@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
@@ -23,6 +24,7 @@ export interface MatchNuevo {
  * para que no vuelva a aparecer. Con varios matches nuevos, se muestran de a uno.
  */
 export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
+  const t = useTranslations("proyectos.nuevoMatch");
   const [cola, setCola] = useState(nuevos);
   const [ocupado, setOcupado] = useState(false);
 
@@ -42,10 +44,10 @@ export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
   }
 
   return (
-    <Superposicion onCerrar={cerrar} etiqueta="Nuevo match">
+    <Superposicion onCerrar={cerrar} etiqueta={t("etiqueta")}>
       <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
         <p className="text-2xs font-semibold uppercase tracking-wide text-coral-700">
-          ¡Tenés un Match!
+          {t("titulo")}
         </p>
         <div className="mt-4 flex items-center justify-center gap-3">
           <Avatar url={actual.fotoUrl} nombre={actual.nombre} size={64} />
@@ -65,7 +67,9 @@ export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
           )}
         </div>
         <p className="mt-4 text-sm text-texto">
-          {actual.nombre} hizo match con {actual.esEquipo ? "tu equipo" : "tu proyecto"}.
+          {actual.esEquipo
+            ? t("conTuEquipo", { nombre: actual.nombre })
+            : t("conTuProyecto", { nombre: actual.nombre })}
         </p>
         <button
           type="button"
@@ -73,7 +77,7 @@ export function ModalNuevoMatch({ nuevos }: { nuevos: MatchNuevo[] }) {
           onClick={cerrar}
           className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
         >
-          {ocupado ? "…" : "Listo"}
+          {ocupado ? "…" : t("listo")}
         </button>
       </div>
     </Superposicion>

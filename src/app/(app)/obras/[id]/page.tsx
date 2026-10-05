@@ -8,11 +8,10 @@ import { EditarObra } from "@/components/convocatorias/editar-obra";
 import { FotosObra } from "@/components/convocatorias/fotos-obra";
 import { MetricasObra } from "@/components/convocatorias/metricas-obra";
 import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
+import { getTranslations } from "next-intl/server";
 import { Icono } from "@/components/ui/icono";
 import { etiquetaGenero } from "@/lib/constantes";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
-
-const ETIQUETA_TIPO: Record<string, string> = { actuacion: "Actuación", tecnica: "Técnica" };
 
 export default async function DetalleObraPage({
   params,
@@ -22,6 +21,7 @@ export default async function DetalleObraPage({
   searchParams: { editar?: string };
 }) {
   const supabase = createClient();
+  const t = await getTranslations("proyectos.obra");
 
   const { data: obra } = await supabase.from("obras").select("*").eq("id", params.id).single();
   if (!obra) notFound();
@@ -34,7 +34,7 @@ export default async function DetalleObraPage({
     return (
       <main className="px-5 py-5">
         <h2 className="mb-4 font-display text-xl font-semibold tracking-[-0.02em] text-texto">
-          Editar proyecto
+          {t("editarProyecto")}
         </h2>
         <EditarObra obra={obra} />
       </main>
@@ -92,7 +92,7 @@ export default async function DetalleObraPage({
             className="inline-flex shrink-0 items-center gap-1.5 rounded-lg border border-borde px-3 py-1.5 text-sm font-medium text-texto transition-colors hover:bg-fondo-sutil"
           >
             <Icono nombre="editar" className="h-3.5 w-3.5" />
-            Editar
+            {t("editar")}
           </Link>
         )}
       </div>
@@ -103,7 +103,7 @@ export default async function DetalleObraPage({
           className="brillo-accion mt-4 flex max-w-sm items-center justify-center gap-1.5 rounded-full bg-accion px-4 py-3 text-sm font-semibold text-accion-texto transition hover:brightness-110"
         >
           <Icono nombre="buscar" className="h-4 w-4" />
-          Buscar talento para este proyecto
+          {t("buscarTalento")}
         </Link>
       )}
       {obra.sinopsis && (
@@ -128,8 +128,8 @@ export default async function DetalleObraPage({
       <section className="mt-7 flex flex-col gap-2.5">
         {roles && roles.length === 0 && (
           <>
-            <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Roles</h3>
-            <p className="text-sm text-texto-tenue">Todavía no definiste roles para esta obra.</p>
+            <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("roles")}</h3>
+            <p className="text-sm text-texto-tenue">{t("sinRoles")}</p>
           </>
         )}
 
@@ -141,18 +141,20 @@ export default async function DetalleObraPage({
           roles &&
           roles.length > 0 && (
             <>
-              <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">Roles</h3>
+              <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("roles")}</h3>
               <ul className="grid gap-2 [grid-template-columns:repeat(auto-fill,minmax(18rem,1fr))]">
                 {roles.map((rol) => (
                   <li key={rol.id} className="rounded-xl border border-borde bg-superficie p-4">
                     <p className="truncate text-base font-medium text-texto">{rol.nombre}</p>
                     <p className="mt-0.5 text-xs text-texto-tenue">
-                      {ETIQUETA_TIPO[rol.tipo]}
-                      {rol.edad_minima && rol.edad_maxima ? ` · ${rol.edad_minima}–${rol.edad_maxima} años` : ""}
+                      {rol.tipo === "actuacion" || rol.tipo === "tecnica" ? t(`tipo.${rol.tipo}`) : rol.tipo}
+                      {rol.edad_minima && rol.edad_maxima
+                        ? ` · ${t("rangoEdad", { min: rol.edad_minima, max: rol.edad_maxima })}`
+                        : ""}
                     </p>
                     <p className="mt-0.5 text-xs text-texto-tenue">
                       {rol.generos_buscados.length === 0
-                        ? "Abierto a cualquier género"
+                        ? t("cualquierGenero")
                         : rol.generos_buscados.map(etiquetaGenero).join(", ")}
                     </p>
                   </li>
@@ -167,7 +169,7 @@ export default async function DetalleObraPage({
 
       <section className="mt-8 flex flex-col gap-2.5">
         <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">
-          Rendimiento
+          {t("rendimiento")}
         </h3>
         <MetricasObra obraId={obra.id} />
       </section>

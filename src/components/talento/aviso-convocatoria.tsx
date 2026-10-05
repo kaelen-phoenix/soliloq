@@ -2,6 +2,7 @@
 
 import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
@@ -32,6 +33,7 @@ interface AvisoFila {
  */
 export function AvisoConvocatoria({ userId }: { userId: string }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.convocatoria");
   const [cola, setCola] = useState<AvisoFila[]>([]);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -103,11 +105,11 @@ export function AvisoConvocatoria({ userId }: { userId: string }) {
   return (
     <Superposicion
       onCerrar={() => setCola((prev) => prev.slice(1))}
-      etiqueta={actual.esEquipo ? "Hay equipo" : "Hay proyecto"}
+      etiqueta={actual.esEquipo ? t("hayEquipo") : t("hayProyecto")}
     >
       <div className="mx-auto w-full max-w-xs rounded-2xl bg-superficie p-5 text-center shadow-tarjeta">
         <p className="text-2xs font-semibold uppercase tracking-wide text-coral-700">
-          {actual.esEquipo ? "Hay equipo" : "Hay proyecto"}
+          {actual.esEquipo ? t("hayEquipo") : t("hayProyecto")}
         </p>
         <div className="mt-4 flex items-center justify-center gap-3">
           {actual.talentoFotoUrl ? (
@@ -139,7 +141,10 @@ export function AvisoConvocatoria({ userId }: { userId: string }) {
           )}
         </div>
         <p className="mt-3 text-sm text-texto">
-          Te convocan a <span className="font-medium">{actual.iniciativaTitulo}</span>
+          {t.rich("teConvocanA", {
+            titulo: actual.iniciativaTitulo,
+            b: (chunks) => <span className="font-medium">{chunks}</span>,
+          })}
         </p>
         {error && <p className="mt-2 text-xs text-error-600">{error}</p>}
         <button
@@ -148,7 +153,7 @@ export function AvisoConvocatoria({ userId }: { userId: string }) {
           onClick={aceptar}
           className="mt-4 w-full rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto disabled:opacity-50"
         >
-          {ocupado ? "…" : "Aceptar"}
+          {ocupado ? "…" : t("aceptar")}
         </button>
       </div>
     </Superposicion>

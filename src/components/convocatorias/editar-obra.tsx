@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
@@ -28,6 +29,8 @@ interface ObraEditable {
  */
 export function EditarObra({ obra }: { obra: ObraEditable }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.formularioObra");
+  const tc = useTranslations("comun");
   const [titulo, setTitulo] = useState(obra.titulo);
   const [sinopsis, setSinopsis] = useState(obra.sinopsis ?? "");
   const [fechaEstreno, setFechaEstreno] = useState(obra.fecha_estreno_estimada ?? "");
@@ -40,8 +43,8 @@ export function EditarObra({ obra }: { obra: ObraEditable }) {
     e.preventDefault();
     setErrorGeneral(null);
     const nuevos: Record<string, string> = {};
-    if (!titulo.trim()) nuevos.titulo = "Ingresá el título de la obra.";
-    if (!ubicacion) nuevos.ubicacion = "Elegí la locación de ensayos de la lista.";
+    if (!titulo.trim()) nuevos.titulo = t("errorTituloObra");
+    if (!ubicacion) nuevos.ubicacion = t("errorUbicacionCorta");
     setErrores(nuevos);
     if (Object.keys(nuevos).length > 0) return;
 
@@ -59,7 +62,7 @@ export function EditarObra({ obra }: { obra: ObraEditable }) {
     setCargando(false);
 
     if (error) {
-      setErrorGeneral("No pudimos guardar los cambios. Probá de nuevo.");
+      setErrorGeneral(t("errorGuardar"));
       return;
     }
     router.push(`/obras/${obra.id}`);
@@ -70,14 +73,14 @@ export function EditarObra({ obra }: { obra: ObraEditable }) {
     <form onSubmit={guardar} className="flex max-w-2xl flex-col gap-4">
       <CampoTexto
         id="titulo"
-        etiqueta="Título"
+        etiqueta={t("titulo")}
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
         error={errores.titulo}
       />
       <div className="flex flex-col gap-1.5">
         <label htmlFor="sinopsis" className="text-sm font-medium text-texto">
-          Sinopsis (opcional)
+          {t("sinopsis")}
         </label>
         <textarea
           id="sinopsis"
@@ -91,14 +94,14 @@ export function EditarObra({ obra }: { obra: ObraEditable }) {
       </div>
       <CampoUbicacion
         id="ubicacion"
-        etiqueta="Locación de ensayos"
+        etiqueta={t("ubicacion")}
         valor={ubicacion}
         onCambio={setUbicacion}
         error={errores.ubicacion}
       />
       <CampoTexto
         id="fecha_estreno"
-        etiqueta="Fecha estimada de estreno (opcional)"
+        etiqueta={t("fechaEstreno")}
         type="date"
         value={fechaEstreno}
         onChange={(e) => setFechaEstreno(e.target.value)}
@@ -108,14 +111,14 @@ export function EditarObra({ obra }: { obra: ObraEditable }) {
 
       <div className="flex gap-2">
         <Boton type="submit" cargando={cargando}>
-          Guardar cambios
+          {t("guardarCambios")}
         </Boton>
         <button
           type="button"
           onClick={() => router.push(`/obras/${obra.id}`)}
           className="rounded-xl px-4 text-sm font-medium text-texto-tenue transition-colors hover:text-texto"
         >
-          Cancelar
+          {tc("cancelar")}
         </button>
       </div>
     </form>

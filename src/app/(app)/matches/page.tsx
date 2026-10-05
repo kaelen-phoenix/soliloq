@@ -1,3 +1,4 @@
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { iniciativaActivaDelCreador } from "@/lib/iniciativa-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
@@ -8,10 +9,14 @@ import { MisMatchesTalento, type FilaMatchTalento } from "@/components/convocato
 import { PestanasMatches } from "@/components/convocatorias/pestanas-matches";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
-export const metadata = { title: "Convocatorias — Yalope" };
+export async function generateMetadata() {
+  const t = await getTranslations("titulos");
+  return { title: `${t("matches")} — Yalope` };
+}
 
 export default async function MatchesPage() {
   const supabase = createClient();
+  const t = await getTranslations("proyectos.matches");
   const user = await usuarioDeLaRequest();
   if (!user) return null;
 
@@ -141,7 +146,7 @@ export default async function MatchesPage() {
   return (
     <main className="px-5 py-5">
       <p className="mb-5 text-sm text-texto-tenue">
-        Cuando el interés es mutuo, aparece acá: para convocar, o porque te pueden convocar.
+        {t("bajada")}
       </p>
 
       <PestanasMatches
@@ -154,11 +159,11 @@ export default async function MatchesPage() {
           ) : (
             <EstadoVacio
               icono="corazon"
-              titulo="Todavía nadie para convocar"
+              titulo={t("vacioProyectosTitulo")}
               detalle={
                 tienePerfilCreador
-                  ? "Buscá talento desde tu proyecto o equipo. Cuando alguien que te interesa también lo marca, aparece acá para convocarlo."
-                  : "Cuando armes un proyecto o equipo y busques talento, acá vas a ver a quién convocar."
+                  ? t("vacioProyectosConIniciativa")
+                  : t("vacioProyectosSinIniciativa")
               }
             />
           )
@@ -169,8 +174,8 @@ export default async function MatchesPage() {
           ) : (
             <EstadoVacio
               icono="corazon"
-              titulo="Todavía no tenés convocatorias"
-              detalle="Marcá «Me interesa» en Explorar. Si del otro lado también les interesa tu perfil, aparece acá."
+              titulo={t("vacioTalentoTitulo")}
+              detalle={t("vacioTalentoDetalle")}
             />
           )
         }

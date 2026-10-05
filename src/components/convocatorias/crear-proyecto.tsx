@@ -1,6 +1,7 @@
 "use client";
 
 import { useState } from "react";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { FormularioObra } from "@/components/convocatorias/formulario-obra";
 import { GestionEquipo } from "@/components/convocatorias/gestion-equipo";
@@ -11,6 +12,8 @@ import { GestionEquipo } from "@/components/convocatorias/gestion-equipo";
  * formulario de cada uno. Antes eran dos pestañas al mismo nivel y confundían.
  */
 export function CrearProyecto({ creadorId }: { creadorId: string }) {
+  const t = useTranslations("proyectos.crearProyecto");
+  const tc = useTranslations("comun");
   const [paso, setPaso] = useState<"cerrado" | "elegir" | "proyecto" | "equipo">("cerrado");
 
   if (paso === "proyecto") {
@@ -44,17 +47,17 @@ export function CrearProyecto({ creadorId }: { creadorId: string }) {
     );
     return (
       <section className="flex flex-col gap-3 rounded-2xl border border-borde bg-fondo-sutil/50 p-4">
-        <h2 className="text-base font-semibold text-texto">¿Qué querés armar?</h2>
+        <h2 className="text-base font-semibold text-texto">{t("pregunta")}</h2>
         {opcion(
           "proyecto",
-          "Un proyecto con roles",
-          "Una obra, un corto, una película… con los roles que buscás.",
+          t("proyectoTitulo"),
+          t("proyectoTexto"),
           "tablero",
         )}
         {opcion(
           "equipo",
-          "Armar equipo",
-          "Juntar gente con ganas de crear como vos; la idea puede surgir en el camino.",
+          t("equipoTitulo"),
+          t("equipoTexto"),
           "corazon",
         )}
         <button
@@ -62,7 +65,7 @@ export function CrearProyecto({ creadorId }: { creadorId: string }) {
           onClick={() => setPaso("cerrado")}
           className="self-start text-sm font-medium text-texto-tenue hover:text-texto"
         >
-          Cancelar
+          {tc("cancelar")}
         </button>
       </section>
     );
@@ -74,7 +77,7 @@ export function CrearProyecto({ creadorId }: { creadorId: string }) {
       className="brillo-accion flex w-full items-center justify-center gap-1.5 rounded-full bg-accion px-4 py-3 text-sm font-semibold text-accion-texto transition hover:brightness-110"
     >
       <Icono nombre="mas" className="h-4 w-4" />
-      Crear proyecto
+      {t("crear")}
     </button>
   );
 }

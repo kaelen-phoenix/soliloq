@@ -1,6 +1,7 @@
 "use server";
 
 import { revalidatePath } from "next/cache";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { sincronizarEspaciosDe } from "@/lib/discord-servidor";
@@ -18,11 +19,12 @@ export async function responderConvocatoria(
     p_aceptar: aceptar,
   });
   if (error) {
+    const t = await getTranslations("proyectos.convocatoria.errores");
     if (error.message?.includes("no encontrada")) {
-      return { ok: false, error: "Esa convocatoria ya no está disponible." };
+      return { ok: false, error: t("noDisponible") };
     }
     reportarErrorSupabase(error, { rpc: "responder_convocatoria", convocatoriaId, aceptar });
-    return { ok: false, error: "No se pudo aplicar. Probá de nuevo." };
+    return { ok: false, error: t("noSePudo") };
   }
   // Si aceptó, ya está en la sala: entra también al espacio de Discord, si hay (#269).
   if (aceptar) {

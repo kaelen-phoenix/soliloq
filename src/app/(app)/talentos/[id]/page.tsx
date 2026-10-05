@@ -1,4 +1,5 @@
 import { notFound } from "next/navigation";
+import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { BotonDenuncia } from "@/components/ui/boton-denuncia";
 import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle";
@@ -7,6 +8,7 @@ import { redesDeJson } from "@/lib/redes";
 
 export default async function PerfilTalentoPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
+  const t = await getTranslations("proyectos.talentos");
 
   // Solo lo público: la fecha y la ubicación exacta no salen de la base (#255).
   const [{ data: talento }, { data: fotos }, { data: edad }] = await Promise.all([
@@ -29,7 +31,7 @@ export default async function PerfilTalentoPage({ params }: { params: { id: stri
       <PerfilTalentoDetalle talento={{ ...talento, redes: redesDeJson(talento.redes), edad: edad ?? null, fotos: fotosConUrl }} />
 
       <div className="mt-8">
-        <BotonDenuncia perfilDenunciadoId={talento.id} queSeDenuncia={`a ${talento.nombre}`} />
+        <BotonDenuncia perfilDenunciadoId={talento.id} queSeDenuncia={t("denunciarA", { nombre: talento.nombre })} />
       </div>
     </main>
   );

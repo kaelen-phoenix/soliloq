@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
@@ -40,6 +41,8 @@ export function FormularioObra({
   onCancelar?: () => void;
 }) {
   const router = useRouter();
+  const t = useTranslations("proyectos.formularioObra");
+  const tc = useTranslations("comun");
   const [abierto, setAbierto] = useState(abiertoInicial);
   const [titulo, setTitulo] = useState("");
   const [sinopsis, setSinopsis] = useState("");
@@ -54,7 +57,7 @@ export function FormularioObra({
 
   function agregarRol() {
     if (!rolNombre.trim()) {
-      setErrores((p) => ({ ...p, rol: "Ingresá el rol que buscás." }));
+      setErrores((p) => ({ ...p, rol: t("errorRol") }));
       return;
     }
     setRoles((prev) => [
@@ -75,8 +78,8 @@ export function FormularioObra({
     setErrorGeneral(null);
 
     const nuevos: Record<string, string> = {};
-    if (!titulo.trim()) nuevos.titulo = "Ingresá el título del proyecto.";
-    if (!ubicacion) nuevos.ubicacion = "Elegí la locación de ensayos de la lista de sugerencias.";
+    if (!titulo.trim()) nuevos.titulo = t("errorTitulo");
+    if (!ubicacion) nuevos.ubicacion = t("errorUbicacion");
     // Reemplaza los avisos de título y locación: uno ya corregido no tiene que quedar en rojo.
     setErrores((p) => ({ rol: p.rol ?? "", ...nuevos }));
     if (Object.keys(nuevos).length > 0) return;
@@ -98,7 +101,7 @@ export function FormularioObra({
 
     if (errorObra || !obra) {
       setCargando(false);
-      setErrorGeneral("No pudimos crear el proyecto. Probá de nuevo.");
+      setErrorGeneral(t("errorCrear"));
       return;
     }
 
@@ -128,7 +131,7 @@ export function FormularioObra({
         className="flex w-full items-center justify-center gap-1.5 rounded-xl border border-dashed border-borde px-4 py-3 text-sm font-medium text-texto-tenue transition-colors hover:border-texto hover:text-texto"
       >
         <Icono nombre="mas" className="h-4 w-4" />
-        Crear un proyecto
+        {t("crearUnProyecto")}
       </button>
     );
   }
@@ -140,7 +143,7 @@ export function FormularioObra({
     >
       <CampoTexto
         id="obra_titulo"
-        etiqueta="Título del proyecto"
+        etiqueta={t("tituloProyecto")}
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
         error={errores.titulo}
@@ -148,7 +151,7 @@ export function FormularioObra({
 
       <div className="flex flex-col gap-1.5">
         <label htmlFor="obra_sinopsis" className="text-sm font-medium text-texto">
-          Descripción (opcional)
+          {t("descripcion")}
         </label>
         <textarea
           id="obra_sinopsis"
@@ -163,14 +166,14 @@ export function FormularioObra({
 
       <CampoUbicacion
         id="obra_ubicacion"
-        etiqueta="Locación de ensayos"
+        etiqueta={t("ubicacion")}
         valor={ubicacion}
         onCambio={setUbicacion}
         error={errores.ubicacion}
       />
       <CampoTexto
         id="obra_fecha_estreno"
-        etiqueta="Fecha estimada de estreno (opcional)"
+        etiqueta={t("fechaEstreno")}
         type="date"
         value={fechaEstreno}
         onChange={(e) => setFechaEstreno(e.target.value)}
@@ -178,7 +181,9 @@ export function FormularioObra({
 
       <div className="flex flex-col gap-2">
         <p className="text-sm font-medium text-texto">
-          Roles que busca <span className="font-normal text-texto-tenue">(opcional)</span>
+          {t.rich("rolesQueBusca", {
+            tenue: (chunks) => <span className="font-normal text-texto-tenue">{chunks}</span>,
+          })}
         </p>
 
         {roles.length > 0 && (
@@ -199,7 +204,7 @@ export function FormularioObra({
                   onClick={() => quitarRol(r.id)}
                   className="shrink-0 text-xs font-medium text-error-600"
                 >
-                  Quitar
+                  {t("quitar")}
                 </button>
               </li>
             ))}
@@ -211,21 +216,21 @@ export function FormularioObra({
             <div className="grid gap-2 sm:grid-cols-2 sm:items-end">
               <CampoTexto
                 id="rol_nombre"
-                etiqueta="Rol buscado"
-                placeholder="Director"
+                etiqueta={t("rolBuscado")}
+                placeholder={t("rolPlaceholder")}
                 value={rolNombre}
                 onChange={(e) => setRolNombre(e.target.value)}
                 error={errores.rol}
               />
               <CampoTexto
                 id="rol_descripcion"
-                etiqueta="Breve descripción (opcional)"
+                etiqueta={t("rolDescripcion")}
                 value={rolDescripcion}
                 onChange={(e) => setRolDescripcion(e.target.value)}
               />
             </div>
             <Boton type="button" variante="secundario" onClick={agregarRol}>
-              + Agregar rol
+              {t("agregarRol")}
             </Boton>
           </div>
       </div>
@@ -234,10 +239,10 @@ export function FormularioObra({
 
       <div className="flex gap-2">
         <Boton type="submit" cargando={cargando}>
-          Crear proyecto
+          {t("crearProyecto")}
         </Boton>
         <Boton type="button" variante="fantasma" onClick={() => (onCancelar ? onCancelar() : setAbierto(false))} disabled={cargando}>
-          Cancelar
+          {tc("cancelar")}
         </Boton>
       </div>
     </form>

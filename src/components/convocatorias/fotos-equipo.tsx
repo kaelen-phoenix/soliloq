@@ -2,6 +2,7 @@
 
 import { useState } from "react";
 import { useRouter } from "next/navigation";
+import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { comprimirImagen } from "@/lib/comprimir-imagen";
@@ -40,6 +41,7 @@ export function FotosEquipo({
   // #329: el resto de la pantalla (p. ej. «Publicar convocatoria») cuenta las fotos del
   // servidor; sin refrescar, seguía viendo cero aunque ya hubiera una.
   const router = useRouter();
+  const t = useTranslations("proyectos.fotos");
   const [error, setError] = useState<string | null>(null);
   const [subiendo, setSubiendo] = useState(false);
 
@@ -53,11 +55,11 @@ export function FotosEquipo({
     setError(null);
 
     if (fotos.length >= MAX) {
-      setError(`El máximo es ${MAX} fotos.`);
+      setError(t("maximo", { max: MAX }));
       return;
     }
     if (!TIPOS.includes(archivo.type)) {
-      setError("Solo se admiten imágenes JPEG, PNG o WebP.");
+      setError(t("tipos"));
       return;
     }
 
@@ -68,7 +70,7 @@ export function FotosEquipo({
       foto = await comprimirImagen(archivo, { maxBytes: MAX_BYTES });
     } catch (err) {
       setSubiendo(false);
-      setError(err instanceof Error ? err.message : "No pudimos procesar la imagen.");
+      setError(err instanceof Error ? err.message : t("procesar"));
       return;
     }
 
@@ -82,7 +84,7 @@ export function FotosEquipo({
 
     if (errorSubida) {
       setSubiendo(false);
-      setError("No pudimos subir la foto. Probá de nuevo.");
+      setError(t("subir"));
       return;
     }
 
@@ -97,7 +99,7 @@ export function FotosEquipo({
 
     if (errorInsert || !data) {
       await supabase.storage.from("fotos-perfil").remove([ruta]);
-      setError("No pudimos guardar la foto. Probá de nuevo.");
+      setError(t("guardar"));
       return;
     }
 
@@ -116,7 +118,7 @@ export function FotosEquipo({
 
   return (
     <div className="mt-4 flex flex-col gap-3">
-      <p className="text-sm font-medium text-texto">Fotos del equipo</p>
+      <p className="text-sm font-medium text-texto">{t("tituloEquipo")}</p>
       <div className="grid grid-cols-3 gap-2">
         {ordenadas.map((foto, i) => (
           <div
@@ -125,14 +127,14 @@ export function FotosEquipo({
           >
             <Imagen
               src={foto.url}
-              alt="Foto del equipo"
+              alt={t("altEquipo")}
               fill
               absoluto
               sizes="(max-width: 640px) 33vw, 200px"
             />
             {i === 0 && (
               <span className="absolute left-1.5 top-1.5 rounded bg-ink-950/75 px-1.5 py-0.5 text-2xs font-medium uppercase tracking-wide text-white backdrop-blur-sm">
-                Principal
+                {t("principal")}
               </span>
             )}
             <button
@@ -140,7 +142,7 @@ export function FotosEquipo({
               onClick={() => eliminar(foto)}
               className="absolute inset-x-0 bottom-0 bg-gradient-to-t from-ink-950/80 to-transparent px-1.5 pb-1.5 pt-4 text-right text-2xs font-medium text-white/90 hover:text-white"
             >
-              Eliminar
+              {t("eliminar")}
             </button>
           </div>
         ))}
@@ -148,7 +150,7 @@ export function FotosEquipo({
         {fotos.length < MAX && (
           <label className="flex aspect-[3/4] cursor-pointer flex-col items-center justify-center gap-1.5 rounded-lg border border-dashed border-ink-300 text-texto-tenue transition-colors hover:border-texto hover:text-texto">
             <Icono nombre="mas" className="h-5 w-5" />
-            <span className="text-2xs font-medium">{subiendo ? "Subiendo…" : "Agregar"}</span>
+            <span className="text-2xs font-medium">{subiendo ? t("subiendo") : t("agregar")}</span>
             <input
               type="file"
               accept={TIPOS.join(",")}
@@ -162,10 +164,9 @@ export function FotosEquipo({
 
       {error && <p className="text-xs text-error-600">{error}</p>}
       <p className="text-xs text-texto-tenue">
-        {fotos.length}/{MAX} fotos
         {faltan > 0
-          ? ` — agregá ${faltan} más (mínimo ${MIN_FOTOS_EQUIPO}).`
-          : " — se recomienda que sean de quien arma el equipo."}
+          ? t("pieEquipoFaltan", { n: fotos.length, max: MAX, faltan, minimo: MIN_FOTOS_EQUIPO })
+          : t("pieEquipo", { n: fotos.length, max: MAX })}
       </p>
     </div>
   );
