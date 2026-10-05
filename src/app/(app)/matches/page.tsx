@@ -20,7 +20,14 @@ export default async function MatchesPage() {
   const user = await usuarioDeLaRequest();
   if (!user) return null;
 
-  const iniciativa = await iniciativaActivaDelCreador(supabase, user.id);
+  // #368: el texto inicial de «Mis convocatorias» depende de si existe algún Proyecto o
+  // Equipo propio, en cualquier estado (borrarlos todos lo vuelve a mostrar).
+  const [iniciativa, { count: cantidadObras }, { count: cantidadEquipos }] = await Promise.all([
+    iniciativaActivaDelCreador(supabase, user.id),
+    supabase.from("obras").select("id", { count: "exact", head: true }).eq("creador_id", user.id),
+    supabase.from("equipos").select("id", { count: "exact", head: true }).eq("creador_id", user.id),
+  ]);
+  const tieneIniciativas = (cantidadObras ?? 0) + (cantidadEquipos ?? 0) > 0;
 
   const [
     { data: matches, error: errorMatches },
@@ -161,7 +168,7 @@ export default async function MatchesPage() {
               icono="corazon"
               titulo={t("vacioProyectosTitulo")}
               detalle={
-                tienePerfilCreador
+                tieneIniciativas
                   ? t("vacioProyectosConIniciativa")
                   : t("vacioProyectosSinIniciativa")
               }
