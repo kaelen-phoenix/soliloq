@@ -83,6 +83,25 @@ do $$ begin
     'T7: al dejar la sala de B, debería volver a aparecer buscando para B';
 end $$;
 
+-- ── Otro Creador no puede usar una iniciativa ajena (0109): no recibe filas ─────
+-- Si no, comparando resultados podría deducir quién está en la sala privada de B.
+insert into auth.users (id, email, aud, role)
+  values ('92222222-2222-2222-2222-22222222bbbb', 'bpi-otro@test.local', 'authenticated', 'authenticated');
+insert into perfiles_creador (id) values ('92222222-2222-2222-2222-22222222bbbb');
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"92222222-2222-2222-2222-22222222bbbb"}';
+create temp table r_ajena as select id from public.buscar_talento(p_limite => 1000, p_obra_id => 'b1111111-0000-0000-0000-00000000bbbb');
+create temp table r_otro_sin as select id from public.buscar_talento(p_limite => 1000);
+reset role;
+
+do $$ begin
+  assert (select count(*) from r_ajena) = 0,
+    'T8: con el Proyecto de otro Creador, buscar_talento no debería devolver nada';
+  assert exists (select 1 from r_otro_sin where id = (select v from ctx where k='t')),
+    'T8: sin iniciativa, el otro Creador sí ve al Talento (no hay decisiones suyas)';
+end $$;
+
 select 'TODOS LOS TESTS OK' as resultado;
 
 rollback;
