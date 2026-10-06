@@ -116,4 +116,44 @@ test.describe("varios proyectos (UI)", () => {
       return (data?.[0] as { roles?: { nombre?: string } } | undefined)?.roles?.nombre ?? null;
     }, { timeout: 15_000 }).toBe("Rol B2");
   });
+
+  test("#372: descartado para un Proyecto, vuelve a aparecer buscando para otro", async ({ page }) => {
+    const s = Date.now();
+    const creadora = await cuenta(`Creadora Busca ${s}`);
+    const talento = await cuenta(`Talento Reaparece ${s}`);
+    // `buscar_talento` exige al menos una foto.
+    const { error: eFoto } = await admin!
+      .from("fotos_talento")
+      .insert({ talento_id: talento.id, storage_path: `e2e/${talento.id}-f.png`, orden: 0 });
+    if (eFoto) throw eFoto;
+    const obraA = await obra(creadora.id, `Proyecto A ${s}`, ["Rol A"]);
+    const obraB = await obra(creadora.id, `Proyecto B ${s}`, ["Rol B"]);
+
+    await page.goto("/ingresar");
+    await page.getByLabel("Tu email").fill(creadora.email);
+    await page.getByLabel("Contraseña").fill(PASS);
+    await page.locator("form").getByRole("button", { name: "Ingresar" }).click();
+    await page.waitForURL((u) => !u.pathname.startsWith("/ingresar"), { timeout: 30_000 });
+
+    const buscarPara = async (obraId: string) => {
+      await page.goto(`/talentos?obra=${obraId}`);
+      await page.getByRole("textbox", { name: "Buscar" }).fill(`Reaparece ${s}`);
+    };
+
+    // Para el Proyecto A lo descarta…
+    await buscarPara(obraA);
+    await expect(page.getByText(`Talento Reaparece ${s}`)).toBeVisible({ timeout: 15_000 });
+    await page.getByRole("button", { name: "No me interesa" }).click();
+    await expect(page.getByText(`Talento Reaparece ${s}`)).toHaveCount(0, { timeout: 10_000 });
+    // …y buscando de nuevo para A sigue afuera.
+    await buscarPara(obraA);
+    await expect(page.getByText("No hay talento que coincida con esos filtros", { exact: false })).toBeVisible({
+      timeout: 15_000,
+    });
+    await expect(page.getByText(`Talento Reaparece ${s}`)).toHaveCount(0);
+
+    // Para el Proyecto B vuelve a aparecer.
+    await buscarPara(obraB);
+    await expect(page.getByText(`Talento Reaparece ${s}`)).toBeVisible({ timeout: 15_000 });
+  });
 });

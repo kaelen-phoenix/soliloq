@@ -1626,11 +1626,13 @@ export type Database = {
         Args: {
           p_edad_max?: number
           p_edad_min?: number
+          p_equipo_id?: string
           p_generos?: Database["public"]["Enums"]["genero_persona"][]
           p_habilidades?: string[]
           p_lat?: number
           p_limite?: number
           p_lng?: number
+          p_obra_id?: string
           p_offset?: number
           p_radio_metros?: number
           p_texto?: string

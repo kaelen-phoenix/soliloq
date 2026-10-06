@@ -77,7 +77,10 @@ export default async function BuscarTalentoPage({
           b: (chunks) => <span className="font-medium text-texto">{chunks}</span>,
         })}
       </p>
+      {/* #372: la `key` hace que buscar para otro Proyecto o Equipo arranque de cero (filtros,
+          resultados y descartes de la pila), no con lo que quedó de la búsqueda anterior. */}
       <BuscadorTalento
+        key={`${iniciativa.tipo}-${iniciativa.id}`}
         iniciativa={{
           tipo: iniciativa.tipo,
           id: iniciativa.id,

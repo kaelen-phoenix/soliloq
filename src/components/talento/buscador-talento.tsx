@@ -115,6 +115,10 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
         p_radio_metros: conGeo ? radioMetros : null,
         p_limite: PAGINA,
         p_offset: nuevoOffset,
+        // #372: se excluye solo a quien ya se decidió para ESTA iniciativa; quien se descartó
+        // o no se eligió para otro Proyecto o Equipo vuelve a aparecer.
+        p_obra_id: iniciativa?.tipo === "obra" ? iniciativa.id : null,
+        p_equipo_id: iniciativa?.tipo === "equipo" ? iniciativa.id : null,
       });
 
       if (corrida !== corridaRef.current) return;
@@ -135,7 +139,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
       setHayMas(filas.length === PAGINA);
       setCargando(false);
     },
-    [supabase, url, texto, edadMin, edadMax, generos, habilidades, ubicacion, radioMetros],
+    [supabase, url, texto, edadMin, edadMax, generos, habilidades, ubicacion, radioMetros, iniciativa?.tipo, iniciativa?.id],
   );
 
   // Debounce: cambiar cualquier filtro reinicia la búsqueda desde el offset 0.
