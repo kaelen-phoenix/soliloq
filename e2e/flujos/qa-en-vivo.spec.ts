@@ -288,14 +288,14 @@ test.describe("QA en vivo (#122, teléfono)", () => {
     await expect(page.getByText("No tenés convocatorias pendientes")).toBeVisible({ timeout: 15_000 });
   });
 
-  test("Mis convocatorias sin Proyecto ni Equipo: texto inicial que se va al crear uno (#368)", async ({ page }) => {
+  test("Mis convocados sin Proyecto ni Equipo: texto inicial que se va al crear uno (#368)", async ({ page }) => {
     const s = sufijo();
     const persona = await nuevoUsuario(`Sin Iniciativa ${s}`, "talento");
     const inicial =
       "En esta sección aparecerán los talentos cuando el interés haya sido mutuo. Permanecerán durante 7 días para que puedas conocerlos y decidir finalmente a quién convocar.";
     const abrirMisConvocatorias = async () => {
       await page.goto("/matches");
-      await page.getByRole("tab", { name: /Mis convocatorias/ }).click();
+      await page.getByRole("tab", { name: /Mis convocados/ }).click();
     };
 
     await login(page, persona.email);
