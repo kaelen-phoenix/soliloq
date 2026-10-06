@@ -102,6 +102,27 @@ do $$ begin
     'T8: sin iniciativa, el otro Creador sí ve al Talento (no hay decisiones suyas)';
 end $$;
 
+-- ── Tampoco mezclando una iniciativa ajena con una propia (0110) ──────────────────
+insert into equipos (id, creador_id, titulo)
+  values ('e2222222-0000-0000-0000-00000000eeee', '92222222-2222-2222-2222-22222222bbbb', 'Equipo del otro');
+
+set local role authenticated;
+set local request.jwt.claims = '{"sub":"92222222-2222-2222-2222-22222222bbbb"}';
+create temp table r_mezcla as select id from public.buscar_talento(
+  p_limite => 1000,
+  p_obra_id => 'b1111111-0000-0000-0000-00000000bbbb',
+  p_equipo_id => 'e2222222-0000-0000-0000-00000000eeee'
+);
+create temp table r_propio as select id from public.buscar_talento(p_limite => 1000, p_equipo_id => 'e2222222-0000-0000-0000-00000000eeee');
+reset role;
+
+do $$ begin
+  assert (select count(*) from r_mezcla) = 0,
+    'T9: con un Proyecto ajeno y un Equipo propio a la vez no debería devolver nada';
+  assert exists (select 1 from r_propio where id = (select v from ctx where k='t')),
+    'T9: con solo su Equipo, el otro Creador sí ve al Talento';
+end $$;
+
 select 'TODOS LOS TESTS OK' as resultado;
 
 rollback;
