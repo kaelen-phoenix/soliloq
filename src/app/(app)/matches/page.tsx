@@ -22,12 +22,17 @@ export default async function MatchesPage() {
 
   // #368: el texto inicial de «Mis convocatorias» depende de si existe algún Proyecto o
   // Equipo propio, en cualquier estado (borrarlos todos lo vuelve a mostrar).
-  const [iniciativa, { count: cantidadObras }, { count: cantidadEquipos }] = await Promise.all([
+  const [iniciativa, obras, equipos] = await Promise.all([
     iniciativaActivaDelCreador(supabase, user.id),
     supabase.from("obras").select("id", { count: "exact", head: true }).eq("creador_id", user.id),
     supabase.from("equipos").select("id", { count: "exact", head: true }).eq("creador_id", user.id),
   ]);
-  const tieneIniciativas = (cantidadObras ?? 0) + (cantidadEquipos ?? 0) > 0;
+  if (obras.error) reportarErrorSupabase(obras.error, { consulta: "contar obras propias" });
+  if (equipos.error) reportarErrorSupabase(equipos.error, { consulta: "contar equipos propios" });
+  // Si un conteo falla no se afirma «no tenés ninguno»: se cae a lo que ya se sabe (la
+  // iniciativa activa), para no mostrarle el texto inicial a quien sí tiene uno.
+  const tieneIniciativas =
+    (obras.count ?? 0) + (equipos.count ?? 0) > 0 || ((!!obras.error || !!equipos.error) && iniciativa != null);
 
   const [
     { data: matches, error: errorMatches },
