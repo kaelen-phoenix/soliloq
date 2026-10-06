@@ -29,10 +29,10 @@ export default async function MatchesPage() {
   ]);
   if (obras.error) reportarErrorSupabase(obras.error, { consulta: "contar obras propias" });
   if (equipos.error) reportarErrorSupabase(equipos.error, { consulta: "contar equipos propios" });
-  // Si un conteo falla no se afirma «no tenés ninguno»: se cae a lo que ya se sabe (la
-  // iniciativa activa), para no mostrarle el texto inicial a quien sí tiene uno.
-  const tieneIniciativas =
-    (obras.count ?? 0) + (equipos.count ?? 0) > 0 || ((!!obras.error || !!equipos.error) && iniciativa != null);
+  // El texto inicial afirma «no tenés ninguno»: solo se muestra si los dos conteos lo
+  // confirman. Si alguno falla, no se sabe, y se muestra el estado vacío común.
+  const conteoFallido = !!obras.error || !!equipos.error;
+  const tieneIniciativas = conteoFallido || (obras.count ?? 0) + (equipos.count ?? 0) > 0;
 
   const [
     { data: matches, error: errorMatches },
