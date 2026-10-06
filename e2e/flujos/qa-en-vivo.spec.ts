@@ -288,6 +288,32 @@ test.describe("QA en vivo (#122, teléfono)", () => {
     await expect(page.getByText("No tenés convocatorias pendientes")).toBeVisible({ timeout: 15_000 });
   });
 
+  test("Mis convocatorias sin Proyecto ni Equipo: texto inicial que se va al crear uno (#368)", async ({ page }) => {
+    const s = sufijo();
+    const persona = await nuevoUsuario(`Sin Iniciativa ${s}`, "talento");
+    const inicial =
+      "En esta sección aparecerán los talentos cuando el interés haya sido mutuo. Permanecerán durante 7 días para que puedas conocerlos y decidir finalmente a quién convocar.";
+    const abrirMisConvocatorias = async () => {
+      await page.goto("/matches");
+      await page.getByRole("tab", { name: /Mis convocatorias/ }).click();
+    };
+
+    await login(page, persona.email);
+    await abrirMisConvocatorias();
+    await expect(page.getByText(inicial)).toBeVisible({ timeout: 15_000 });
+
+    // Con un Proyecto, el texto se va.
+    const { obraId } = await nuevaObra(persona.id, `Obra ${s}`);
+    await abrirMisConvocatorias();
+    await expect(page.getByText("Todavía nadie para convocar")).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(inicial)).toHaveCount(0);
+
+    // Sin Proyectos de nuevo, vuelve.
+    await hecho(admin!.from("obras").delete().eq("id", obraId));
+    await abrirMisConvocatorias();
+    await expect(page.getByText(inicial)).toBeVisible({ timeout: 15_000 });
+  });
+
   test("Chats: destacar una sala y después desvincularse", async ({ page }) => {
     const s = sufijo();
     const creador = await nuevoUsuario(`Creadora Sala ${s}`, "creador");
