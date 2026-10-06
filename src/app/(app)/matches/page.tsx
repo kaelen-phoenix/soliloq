@@ -20,7 +20,7 @@ export default async function MatchesPage() {
   const user = await usuarioDeLaRequest();
   if (!user) return null;
 
-  // #368: el texto inicial de «Mis convocatorias» depende de si existe algún Proyecto o
+  // #368: el texto inicial de «Mis convocados» depende de si existe algún Proyecto o
   // Equipo propio, en cualquier estado (borrarlos todos lo vuelve a mostrar).
   const [iniciativa, obras, equipos] = await Promise.all([
     iniciativaActivaDelCreador(supabase, user.id),

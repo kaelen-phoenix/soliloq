@@ -49,7 +49,7 @@ export function PestanasMatches({
         aria-label={t("etiqueta")}
         className="mb-5 flex gap-1 rounded-full border border-borde bg-fondo-sutil p-1"
       >
-        {tab("proyectos", t("convocatorias"), cantidadProyectos)}
+        {tab("proyectos", t("convocados"), cantidadProyectos)}
         {tab("talento", t("postulaciones"), cantidadTalento)}
       </div>
       <div role="tabpanel" id="panel-matches" aria-labelledby={`pestana-matches-${pestana}`}>{pestana === "proyectos" ? panelProyectos : panelTalento}</div>
