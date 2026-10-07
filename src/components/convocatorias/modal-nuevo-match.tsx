@@ -6,7 +6,7 @@ import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
 import { Avatar } from "@/components/convocatorias/avatar";
-import { marcarMatchMostrado } from "@/app/(app)/matches/acciones";
+import { marcarMatchMostrado } from "@/app/(sitio)/(app)/matches/acciones";
 
 export interface MatchNuevo {
   matchId: string;

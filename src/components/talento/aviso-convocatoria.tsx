@@ -9,7 +9,7 @@ import { Superposicion } from "@/components/ui/superposicion";
 import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import { responderConvocatoria } from "@/app/(app)/convocatoria/acciones";
+import { responderConvocatoria } from "@/app/(sitio)/(app)/convocatoria/acciones";
 
 interface AvisoFila {
   convocatoriaId: string;

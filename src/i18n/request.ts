@@ -1,15 +1,8 @@
 import { getRequestConfig } from "next-intl/server";
 import { cookies, headers } from "next/headers";
+import { detectarIdioma, esIdioma, type Idioma } from "./idiomas";
 
-export const IDIOMAS = ["es", "en"] as const;
-export type Idioma = (typeof IDIOMAS)[number];
-export const IDIOMA_POR_DEFECTO: Idioma = "es";
-
-/** Resuelve `es`/`en` desde el header `Accept-Language`. Cualquier cosa que no sea inglés → español. */
-export function detectarIdioma(acceptLanguage: string | null | undefined): Idioma {
-  const primero = acceptLanguage?.split(",")[0]?.trim().slice(0, 2).toLowerCase();
-  return primero === "en" ? "en" : "es";
-}
+export { IDIOMAS, IDIOMA_POR_DEFECTO, detectarIdioma, type Idioma } from "./idiomas";
 
 /** El idioma efectivo del request: la cookie `NEXT_LOCALE` si es válida, si no la detección por header. */
 export function resolverIdioma(): Idioma {
@@ -32,7 +25,11 @@ export async function mensajesDe(idioma: Idioma) {
   return Object.assign({}, general.default, ...areas.map((m) => m.default));
 }
 
-export default getRequestConfig(async () => {
-  const locale = resolverIdioma();
+export default getRequestConfig(async ({ requestLocale }) => {
+  // Las páginas públicas fijan su idioma con `setRequestLocale` (viene de la URL, #237): así
+  // no se leen cookies ni headers y pueden armarse una sola vez. El resto de la app no lo fija
+  // y sigue con la cookie de Ajustes.
+  const fijado = await requestLocale;
+  const locale = esIdioma(fijado) ? fijado : resolverIdioma();
   return { locale, messages: await mensajesDe(locale) };
 });

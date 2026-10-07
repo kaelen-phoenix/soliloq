@@ -5,22 +5,30 @@ import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
 import { FormularioContacto } from "@/components/apoyar/formulario-contacto";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
+import { SelectorIdioma, alternativasIdioma, fijarIdioma } from "@/components/publico/idioma";
+import { esIdioma } from "@/i18n/idiomas";
 
 // Plataforma de donación: el Cafecito de Yalope.
 const DONACION_URL = "https://cafecito.app/yalope";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("apoyar");
+// Se arma una vez por idioma (#237); se rehace cada 10 minutos por los sponsors.
+export const revalidate = 600;
+
+type Props = { params: { idioma: string } };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale: esIdioma(params.idioma) ? params.idioma : "es", namespace: "apoyar" });
   return {
     title: `${t("titulo")} — Yalope`,
     description: t("intro"),
-    alternates: { canonical: "/apoyar" },
+    alternates: alternativasIdioma(esIdioma(params.idioma) ? params.idioma : "es", "/apoyar"),
   };
 }
 
 const NIVELES = ["reparto", "coproduccion", "produccion"] as const;
 
-export default async function ApoyarPage() {
+export default async function ApoyarPage({ params }: Props) {
+  const idioma = fijarIdioma(params.idioma);
   const t = await getTranslations("apoyar");
 
   const destinos = [t("destino1"), t("destino2"), t("destino3")];
@@ -130,10 +138,11 @@ export default async function ApoyarPage() {
       </main>
 
       <footer className="border-t border-borde bg-superficie">
-        <div className="mx-auto w-full max-w-3xl px-5 py-6 text-sm">
+        <div className="mx-auto flex w-full max-w-3xl items-center justify-between px-5 py-6 text-sm">
           <Link href="/" className="font-medium text-texto hover:text-brand-400">
             {t("volverInicio")}
           </Link>
+          <SelectorIdioma idioma={idioma} ruta="/apoyar" className="font-medium text-texto hover:text-brand-400" />
         </div>
       </footer>
     </div>

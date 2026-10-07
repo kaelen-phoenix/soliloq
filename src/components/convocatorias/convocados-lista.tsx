@@ -11,7 +11,7 @@ import {
   convocarMatch,
   descartarConvocado,
   darDeBajaConvocado,
-} from "@/app/(app)/matches/acciones";
+} from "@/app/(sitio)/(app)/matches/acciones";
 
 type Estado = "en_convocados" | "esperando_confirmacion" | "en_sala";
 

@@ -33,7 +33,7 @@ import { formatearMientrasSeEscribe, isoATexto, textoAIso } from "@/lib/fecha-es
 import { MejorarRedaccion } from "./mejorar-redaccion";
 import { SugerirHabilidades } from "./sugerir-habilidades";
 import { FOTOS_RECOMENDADAS, MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
-import { importarFotoDeGoogle } from "@/app/completar-perfil/acciones";
+import { importarFotoDeGoogle } from "@/app/(sitio)/completar-perfil/acciones";
 
 /** Lo cargado en el alta, guardado en el teléfono (#300): en celulares con poca memoria, salir
  *  a otra app (a copiar un link, a la cámara) puede cerrar la página, y se perdía todo. */

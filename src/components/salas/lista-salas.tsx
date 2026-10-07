@@ -10,7 +10,7 @@ import {
   destacarChat,
   quitarDestacadoChat,
   desvincularmeDeSala,
-} from "@/app/(app)/salas/acciones";
+} from "@/app/(sitio)/(app)/salas/acciones";
 import { BadgeNoLeidos, useNoLeidos } from "./no-leidos";
 
 export interface SalaItem {

@@ -1,11 +1,13 @@
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Logotipo } from "@/components/ui/logotipo";
+import { SelectorIdioma } from "@/components/publico/idioma";
+import { rutaPublica, type Idioma } from "@/i18n/idiomas";
 
 type Seccion = { titulo: string; parrafos: string[] };
 
 /** Política de Privacidad y Términos (#352): mismo formato que /normas, textos en `legal.<doc>`. */
-export async function PaginaLegal({ doc }: { doc: "privacidad" | "terminos" }) {
+export async function PaginaLegal({ doc, idioma }: { doc: "privacidad" | "terminos"; idioma: Idioma }) {
   const t = await getTranslations("legal");
   const secciones = t.raw(`${doc}.secciones`) as Seccion[];
 
@@ -45,9 +47,10 @@ export async function PaginaLegal({ doc }: { doc: "privacidad" | "terminos" }) {
 
       <footer className="border-t border-ink-100 bg-white">
         <nav className="mx-auto flex w-full max-w-3xl flex-wrap gap-x-5 gap-y-2 px-5 py-5 text-sm text-ink-700">
-          <Link href="/terminos" className="hover:text-brand-600">{t("enlaceTerminos")}</Link>
-          <Link href="/privacidad" className="hover:text-brand-600">{t("enlacePrivacidad")}</Link>
-          <Link href="/normas" className="hover:text-brand-600">{t("enlaceNormas")}</Link>
+          <Link href={rutaPublica(idioma, "/terminos")} className="hover:text-brand-600">{t("enlaceTerminos")}</Link>
+          <Link href={rutaPublica(idioma, "/privacidad")} className="hover:text-brand-600">{t("enlacePrivacidad")}</Link>
+          <Link href={rutaPublica(idioma, "/normas")} className="hover:text-brand-600">{t("enlaceNormas")}</Link>
+          <SelectorIdioma idioma={idioma} ruta={`/${doc}`} className="hover:text-brand-600" />
         </nav>
       </footer>
     </div>

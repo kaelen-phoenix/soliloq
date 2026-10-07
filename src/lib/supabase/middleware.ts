@@ -1,6 +1,7 @@
 import { createServerClient, type CookieOptions } from "@supabase/ssr";
 import { NextResponse, type NextRequest } from "next/server";
 import { destinoSegunEstado } from "../cuenta";
+import { separarIdioma } from "@/i18n/idiomas";
 import { leerEstadoCuenta } from "../cuenta-servidor";
 import type { Database } from "./types";
 
@@ -24,7 +25,9 @@ function conNext(destino: string, next: string): string {
   return `${destino}?next=${encodeURIComponent(next)}`;
 }
 
-export async function actualizarSesion(request: NextRequest) {
+export async function actualizarSesion(
+  request: NextRequest,
+): Promise<{ respuesta: NextResponse; userId: string | null }> {
   let response = NextResponse.next({ request });
 
   const supabase = createServerClient<Database>(
@@ -56,8 +59,11 @@ export async function actualizarSesion(request: NextRequest) {
   const userId = sesion?.claims?.sub ?? null;
 
   const path = request.nextUrl.pathname;
-  const esRutaPublica = RUTAS_PUBLICAS.some((r) => path.startsWith(r));
-  const esRutaAbierta = RUTAS_ABIERTAS.some((r) => path.startsWith(r));
+  // `/en/normas` es la misma página que `/normas`, en inglés (#237): las reglas de acceso
+  // miran la ruta sin el prefijo de idioma.
+  const ruta = separarIdioma(path).resto;
+  const esRutaPublica = RUTAS_PUBLICAS.some((r) => ruta.startsWith(r));
+  const esRutaAbierta = RUTAS_ABIERTAS.some((r) => ruta.startsWith(r));
 
   // `destino` puede traer query (`conNext`): separarla es necesario porque `url.pathname`
   // no acepta un `?` adentro.
@@ -66,24 +72,23 @@ export async function actualizarSesion(request: NextRequest) {
     const url = request.nextUrl.clone();
     url.pathname = pathname;
     url.search = search ? `?${search}` : "";
-    return NextResponse.redirect(url);
+    return { respuesta: NextResponse.redirect(url), userId };
   };
+  const seguir = () => ({ respuesta: response, userId });
 
-  if (esRutaAbierta) return response;
+  if (esRutaAbierta) return seguir();
 
   if (!userId) {
-    // La raíz para un anónimo la resuelve el rewrite de `next.config.mjs` (sirve el
-    // contenido de `/bienvenida` ahí mismo, con 200 — no un redirect): si acá
-    // redirigiéramos primero, ese rewrite queda muerto porque el middleware corre antes
-    // en la cadena. Dejarla pasar es lo que permite que `/` sea indexable de verdad.
-    if (path === "/") return response;
-    if (esRutaPublica) return response;
+    // La raíz para un anónimo sirve la portada ahí mismo, con 200 y no un redirect, para
+    // que `/` sea indexable: el rewrite a la portada en su idioma lo hace `src/middleware.ts`.
+    if (path === "/") return seguir();
+    if (esRutaPublica) return seguir();
     return redirigir("/ingresar");
   }
 
   if (esRutaPublica) return redirigir("/");
 
-  if (RUTAS_SIEMPRE_DISPONIBLES.some((r) => path.startsWith(r))) return response;
+  if (RUTAS_SIEMPRE_DISPONIBLES.some((r) => path.startsWith(r))) return seguir();
 
   const estado = await leerEstadoCuenta(supabase, userId);
   const destino = destinoSegunEstado(estado);
@@ -93,19 +98,19 @@ export async function actualizarSesion(request: NextRequest) {
   const enAceptarNormas = path.startsWith("/aceptar-normas");
 
   if (destino === "solicitud-pendiente") {
-    return enSolicitudPendiente ? response : redirigir(conNext("/solicitud-pendiente", path));
+    return enSolicitudPendiente ? seguir() : redirigir(conNext("/solicitud-pendiente", path));
   }
 
   if (destino === "aceptar-normas") {
-    return enAceptarNormas ? response : redirigir(conNext("/aceptar-normas", path));
+    return enAceptarNormas ? seguir() : redirigir(conNext("/aceptar-normas", path));
   }
 
   if (destino === "completar-perfil") {
-    return enAltaPerfil ? response : redirigir(conNext("/completar-perfil", path));
+    return enAltaPerfil ? seguir() : redirigir(conNext("/completar-perfil", path));
   }
 
   // Onboarding terminado: esas pantallas ya no aplican.
   if (enAltaPerfil || enSolicitudPendiente || enAceptarNormas) return redirigir("/");
 
-  return response;
+  return seguir();
 }

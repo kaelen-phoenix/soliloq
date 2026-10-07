@@ -58,13 +58,57 @@ test.describe("landing", () => {
   });
 
   // `page.goto` sigue redirects y devuelve el status de la respuesta final, así que un 307
-  // a `/bienvenida` seguido de un 200 pasa el test de arriba igual — no distingue el rewrite
-  // de `next.config.mjs` (200 directo, indexable) de un redirect. Ya pasó una vez: el
-  // middleware empezó a redirigir "/" antes de que el rewrite pudiera correr. Este test pega
-  // directo a la API sin seguir redirects para que una regresión así no vuelva a colarse.
-  test("/ raíz NO redirige (el rewrite, no el middleware, sirve el contenido)", async ({ request }) => {
+  // a `/bienvenida` seguido de un 200 pasa el test de arriba igual — no distingue un rewrite
+  // (200 directo, indexable) de un redirect. Ya pasó una vez: el middleware empezó a
+  // redirigir "/" antes de que el rewrite pudiera correr. Este test pega directo a la API sin
+  // seguir redirects para que una regresión así no vuelva a colarse. Desde #237 el rewrite a
+  // la portada en el idioma de cada quien lo hace el middleware.
+  test("/ raíz NO redirige (se sirve la portada ahí mismo)", async ({ request }) => {
     const res = await request.fetch("/", { maxRedirects: 0 });
     expect(res.status()).toBe(200);
+  });
+});
+
+// #237: las páginas públicas llevan el idioma en la URL para poder cachearse.
+test.describe("idioma en la URL", () => {
+  test("/en/bienvenida está en inglés y declara sus alternativas", async ({ page }) => {
+    const res = await page.goto("/en/bienvenida");
+    expect(res?.status()).toBe(200);
+    await expect(page.locator("html")).toHaveAttribute("lang", "en");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("match for");
+    await expect(page.locator('link[rel="alternate"][hreflang="es"]')).toHaveAttribute("href", /yalope\.com\/?$/);
+  });
+
+  test("un navegador en inglés que entra sin prefijo va a /en/…", async ({ request }) => {
+    const res = await request.fetch("/privacidad", {
+      maxRedirects: 0,
+      headers: { "Accept-Language": "en-US,en;q=0.9" },
+    });
+    expect(res.status()).toBe(307);
+    expect(res.headers()["location"]).toMatch(/\/en\/privacidad$/);
+  });
+
+  test("en castellano la URL no lleva prefijo y no redirige", async ({ request }) => {
+    const res = await request.fetch("/terminos", { maxRedirects: 0, headers: { "Accept-Language": "es-AR" } });
+    expect(res.status()).toBe(200);
+  });
+
+  test("«Español» desde una página en inglés vuelve a la URL sin prefijo y lo recuerda", async ({ page }) => {
+    await page.goto("/en/terminos");
+    await page.getByRole("link", { name: "Español" }).click();
+    // Exacta: `/\/terminos$/` también acepta `/en/terminos`, y el test leería la cookie antes
+    // de que termine la navegación.
+    await expect(page).toHaveURL(/^https?:\/\/[^/]+\/terminos$/);
+    await expect(page.getByRole("heading", { level: 1 })).toHaveText("Términos y Condiciones");
+    await expect
+      .poll(async () => (await page.context().cookies()).find((c) => c.name === "NEXT_LOCALE")?.value)
+      .toBe("es");
+  });
+
+  test("el sitemap lista las dos versiones", async ({ request }) => {
+    const xml = await (await request.get("/sitemap.xml")).text();
+    expect(xml).toContain("https://yalope.com/en/privacidad");
+    expect(xml).toContain("https://yalope.com/privacidad");
   });
 });
 

@@ -96,7 +96,8 @@ test.describe("la app en inglés", () => {
     }
 
     const anon = await nueva(browser);
-    for (const ruta of ["/bienvenida", "/ingresar", "/recuperar", "/normas", "/apoyar", "/privacidad", "/terminos"]) {
+    // Las públicas en inglés viven en `/en/…` (#237); el login y la recuperación siguen la cookie.
+    for (const ruta of ["/en/bienvenida", "/ingresar", "/recuperar", "/en/normas", "/en/apoyar", "/en/privacidad", "/en/terminos"]) {
       await ir(anon, ruta);
       await revisar(anon, ruta);
     }
@@ -122,6 +123,12 @@ test.describe("la app en inglés", () => {
       "/ajustes",
     ]) {
       await ir(p, ruta);
+      // El buscador lista a todo el talento de staging (sin filtro de distancia): con un texto
+      // que no coincide con nadie queda la interfaz sola, sin nombres cargados por otras pruebas.
+      if (ruta.startsWith("/talentos")) {
+        await p.getByRole("textbox", { name: "Search" }).fill(`zz-nadie-${Date.now()}`);
+        await p.waitForTimeout(800);
+      }
       await revisar(p, ruta);
     }
 

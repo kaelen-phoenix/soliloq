@@ -5,7 +5,7 @@ import { useState } from "react";
 import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
-import { responderConvocatoria } from "@/app/(app)/convocatoria/acciones";
+import { responderConvocatoria } from "@/app/(sitio)/(app)/convocatoria/acciones";
 
 export interface FilaConvocatoria {
   convocatoriaId: string;

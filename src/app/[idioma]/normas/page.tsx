@@ -2,19 +2,24 @@ import type { Metadata } from "next";
 import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { Logotipo } from "@/components/ui/logotipo";
+import { SelectorIdioma, alternativasIdioma, fijarIdioma } from "@/components/publico/idioma";
+import { esIdioma, rutaPublica } from "@/i18n/idiomas";
 
-export async function generateMetadata(): Promise<Metadata> {
-  const t = await getTranslations("normas");
+type Props = { params: { idioma: string } };
+
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const t = await getTranslations({ locale: esIdioma(params.idioma) ? params.idioma : "es", namespace: "normas" });
   return {
     title: `${t("titulo")} — Yalope`,
     description: t("intro"),
-    alternates: { canonical: "/normas" },
+    alternates: alternativasIdioma(esIdioma(params.idioma) ? params.idioma : "es", "/normas"),
   };
 }
 
 const NUMEROS = ["1", "2", "3", "4", "5", "6", "7", "8", "9", "10"] as const;
 
-export default async function NormasPage() {
+export default async function NormasPage({ params }: Props) {
+  const idioma = fijarIdioma(params.idioma);
   const t = await getTranslations("normas");
   const tLegal = await getTranslations("legal");
 
@@ -50,8 +55,9 @@ export default async function NormasPage() {
         </div>
 
         <nav className="mt-10 flex flex-wrap gap-x-5 gap-y-2 text-sm text-ink-700">
-          <Link href="/terminos" className="hover:text-brand-600">{tLegal("enlaceTerminos")}</Link>
-          <Link href="/privacidad" className="hover:text-brand-600">{tLegal("enlacePrivacidad")}</Link>
+          <Link href={rutaPublica(idioma, "/terminos")} className="hover:text-brand-600">{tLegal("enlaceTerminos")}</Link>
+          <Link href={rutaPublica(idioma, "/privacidad")} className="hover:text-brand-600">{tLegal("enlacePrivacidad")}</Link>
+          <SelectorIdioma idioma={idioma} ruta="/normas" className="hover:text-brand-600" />
         </nav>
       </main>
     </div>

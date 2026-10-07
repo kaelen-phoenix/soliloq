@@ -113,7 +113,7 @@ test.describe("accesibilidad", () => {
 
   test("todas las pantallas", async ({ browser }) => {
     const anon = await (await browser.newContext({ viewport: { width: 390, height: 844 } })).newPage();
-    for (const ruta of ["/bienvenida", "/ingresar", "/recuperar", "/normas", "/apoyar", "/privacidad", "/terminos"]) {
+    for (const ruta of ["/bienvenida", "/ingresar", "/recuperar", "/normas", "/apoyar", "/privacidad", "/terminos", "/en/bienvenida"]) {
       await visitar(anon, ruta, () => anon.goto(ruta));
     }
 
