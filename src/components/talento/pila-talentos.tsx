@@ -11,7 +11,7 @@ import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { Superposicion } from "@/components/ui/superposicion";
 import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
-import { marcarInteresEnTalento, marcarMatchMostrado } from "@/app/(app)/matches/acciones";
+import { marcarInteresEnTalento, marcarMatchMostrado } from "@/app/(sitio)/(app)/matches/acciones";
 import { avisarConvocatoriasNuevas } from "@/components/convocatorias/convocatorias-nuevas";
 import type { ResultadoTalento } from "./tarjeta-talento";
 

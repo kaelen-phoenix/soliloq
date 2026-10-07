@@ -16,13 +16,16 @@ export function BorrarCuenta() {
   async function confirmar() {
     setError(null);
     setEnviando(true);
-    // Si sale bien, la acción redirige a /bienvenida y esto no vuelve. Si falla —porque la
-    // acción devolvió el error o porque tiró—, se muestra y se puede reintentar (#229).
-    const res = await borrarCuenta().catch(() => ({ ok: false as const }));
-    if (res && !res.ok) {
-      setError(t("borrarCuentaError"));
-      setEnviando(false);
+    // Si sale bien, a la portada con una navegación completa (la resuelve el middleware en el
+    // idioma de cada quien, #237). Si falla —porque la acción devolvió el error o porque
+    // tiró—, se muestra y se puede reintentar (#229).
+    const res = await borrarCuenta().catch(() => ({ ok: false }));
+    if (res.ok) {
+      window.location.assign("/bienvenida");
+      return;
     }
+    setError(t("borrarCuentaError"));
+    setEnviando(false);
   }
 
   return (

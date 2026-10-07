@@ -1,15 +1,21 @@
 import type { Metadata } from "next";
-import { getLocale, getTranslations } from "next-intl/server";
+import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
 import { BotonInstalar } from "@/components/pwa/boton-instalar";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
+import { SelectorIdioma, alternativasIdioma, fijarIdioma } from "@/components/publico/idioma";
+import { esIdioma, rutaPublica, type Idioma } from "@/i18n/idiomas";
 
-/** Lo que el buscador y las redes ven de la portada, en el idioma del request. */
-async function textosPortada() {
-  const t = await getTranslations("admin.portada");
-  const idioma = await getLocale();
+// Se arma una vez por idioma (#237); se rehace cada 10 minutos por los sponsors del pie.
+export const revalidate = 600;
+
+type Props = { params: { idioma: string } };
+
+/** Lo que el buscador y las redes ven de la portada, en el idioma de la URL. */
+async function textosPortada(idioma: Idioma) {
+  const t = await getTranslations({ locale: idioma, namespace: "admin.portada" });
   return {
     titulo: t("metaTitulo"),
     descripcion: t("metaDescripcion"),
@@ -19,17 +25,17 @@ async function textosPortada() {
   };
 }
 
-export async function generateMetadata(): Promise<Metadata> {
-  const { titulo, descripcion, palabrasClave, ogLocale } = await textosPortada();
+export async function generateMetadata({ params }: Props): Promise<Metadata> {
+  const { titulo, descripcion, palabrasClave, ogLocale } = await textosPortada(esIdioma(params.idioma) ? params.idioma : "es");
   return {
     title: titulo,
     description: descripcion,
-    // La landing se sirve en `/` (rewrite para anónimos), así que esa es la URL canónica.
-    alternates: { canonical: "/" },
+    // En castellano la landing se sirve en `/` (rewrite para anónimos): esa es su URL canónica.
+    alternates: alternativasIdioma(esIdioma(params.idioma) ? params.idioma : "es", "/bienvenida", "/"),
     keywords: palabrasClave,
     openGraph: {
       type: "website",
-      url: "https://yalope.com/",
+      url: params.idioma === "en" ? "https://yalope.com/en/bienvenida" : "https://yalope.com/",
       siteName: "Yalope",
       locale: ogLocale,
       title: titulo,
@@ -68,10 +74,11 @@ function jsonLd(descripcion: string, inLanguage: string) {
   };
 }
 
-export default async function BienvenidaPage() {
+export default async function BienvenidaPage({ params }: Props) {
+  const idioma = fijarIdioma(params.idioma);
   const t = await getTranslations("landing");
   const tLegal = await getTranslations("legal");
-  const { descripcion, inLanguage } = await textosPortada();
+  const { descripcion, inLanguage } = await textosPortada(idioma);
   return (
     // #217: la portada pasa al negro de escena, como la primera pantalla de la referencia
     // (`docs/marca/referencias/interfaz-yalope-217.png`). Antes era una superficie de marca
@@ -294,7 +301,7 @@ export default async function BienvenidaPage() {
             <Logotipo tamano="sm" tono="claro" />
             <p>{t("pieLema")}</p>
             <div className="flex gap-4">
-              <Link href="/apoyar" className="font-medium text-texto hover:text-brand-400">
+              <Link href={rutaPublica(idioma, "/apoyar")} className="font-medium text-texto hover:text-brand-400">
                 {t("apoyarEnlace")}
               </Link>
               <Link href="/ingresar" className="font-medium text-texto hover:text-brand-400">
@@ -306,15 +313,16 @@ export default async function BienvenidaPage() {
             <p>
               © {new Date().getFullYear()} Yalope. {t("derechos")}
             </p>
-            <Link href="/terminos" className="hover:text-texto">
+            <Link href={rutaPublica(idioma, "/terminos")} className="hover:text-texto">
               {tLegal("enlaceTerminos")}
             </Link>
-            <Link href="/privacidad" className="hover:text-texto">
+            <Link href={rutaPublica(idioma, "/privacidad")} className="hover:text-texto">
               {tLegal("enlacePrivacidad")}
             </Link>
-            <Link href="/normas" className="hover:text-texto">
+            <Link href={rutaPublica(idioma, "/normas")} className="hover:text-texto">
               {tLegal("enlaceNormas")}
             </Link>
+            <SelectorIdioma idioma={idioma} ruta="/bienvenida" className="font-medium text-texto hover:text-brand-400" />
           </div>
         </div>
       </footer>

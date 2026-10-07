@@ -3,7 +3,7 @@
 import Link from "next/link";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
-import { adminRevisarConIa, type MarcaModeracion } from "@/app/(app)/admin/acciones";
+import { adminRevisarConIa, type MarcaModeracion } from "@/app/(sitio)/(app)/admin/acciones";
 
 /** Adónde ir a mirar cada cosa marcada. Un Equipo no tiene página propia: se busca en Publicaciones. */
 function enlace(m: MarcaModeracion): string | null {

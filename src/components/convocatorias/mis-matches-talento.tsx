@@ -5,8 +5,8 @@ import { useRouter } from "next/navigation";
 import { useEffect, useState } from "react";
 import { useTranslations } from "next-intl";
 import { Avatar } from "@/components/convocatorias/avatar";
-import { retirarmeDeMatch } from "@/app/(app)/matches/acciones";
-import { desvincularmeDeSala } from "@/app/(app)/salas/acciones";
+import { retirarmeDeMatch } from "@/app/(sitio)/(app)/matches/acciones";
+import { desvincularmeDeSala } from "@/app/(sitio)/(app)/salas/acciones";
 
 export interface FilaMatchTalento {
   matchId: string;

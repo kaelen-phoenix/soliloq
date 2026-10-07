@@ -6,7 +6,7 @@ import { useTranslations } from "next-intl";
 import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
-import { darDeBajaConvocado } from "@/app/(app)/matches/acciones";
+import { darDeBajaConvocado } from "@/app/(sitio)/(app)/matches/acciones";
 
 export interface FilaCobertura {
   rolId: string | null;

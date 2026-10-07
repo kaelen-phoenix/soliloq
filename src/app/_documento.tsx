@@ -1,9 +1,16 @@
 import type { Metadata, Viewport } from "next";
 import { Baloo_2, Inter } from "next/font/google";
-import { NextIntlClientProvider } from "next-intl";
-import { getLocale, getMessages, getTranslations } from "next-intl/server";
+import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
+import { getTranslations } from "next-intl/server";
 import "./globals.css";
 import { SplashMarca } from "@/components/ui/splash-marca";
+import type { Idioma } from "@/i18n/idiomas";
+
+/**
+ * El documento (`<html>`) común a los dos layouts raíz (#237): `app/(sitio)/layout.tsx`, con
+ * el idioma de Ajustes, y `app/[idioma]/layout.tsx`, con el idioma de la URL para las páginas
+ * públicas que se arman una sola vez. Mismas fuentes, scripts, metadatos y viewport.
+ */
 
 // Se auto-hospeda en el build: sin request a un dominio externo en runtime.
 const inter = Inter({
@@ -23,8 +30,8 @@ const baloo = Baloo_2({
   weight: ["800"],
 });
 
-export async function generateMetadata(): Promise<Metadata> {
-  const [t, locale] = await Promise.all([getTranslations("cuenta.metadatos"), getLocale()]);
+export async function metadatosBase(idioma: Idioma): Promise<Metadata> {
+  const t = await getTranslations({ locale: idioma, namespace: "cuenta.metadatos" });
   const titulo = t("titulo");
   const descripcion = t("descripcion");
   return {
@@ -38,7 +45,7 @@ export async function generateMetadata(): Promise<Metadata> {
     // para Twitter), así que no se declara acá.
     openGraph: {
       type: "website",
-      locale: locale === "en" ? "en_US" : "es_AR",
+      locale: idioma === "en" ? "en_US" : "es_AR",
       siteName: "Yalope",
       title: titulo,
       description: descripcion,
@@ -87,13 +94,18 @@ const SCRIPT_TEMA = `(function(){var d=document.documentElement,mq=window.matchM
 // con uno en cada navegación). "Reducir movimiento" lo resuelve el CSS.
 const SCRIPT_SPLASH = `(function(){var d=document.documentElement;try{if(navigator.webdriver||sessionStorage.getItem('splash')){d.dataset.splash='omitir';}else{sessionStorage.setItem('splash','1');}}catch(e){d.dataset.splash='omitir';}})();`;
 
-export default async function RootLayout({ children }: { children: React.ReactNode }) {
-  const locale = await getLocale();
-  const messages = await getMessages();
-
+export function Documento({
+  idioma,
+  mensajes,
+  children,
+}: {
+  idioma: Idioma;
+  mensajes: AbstractIntlMessages;
+  children: React.ReactNode;
+}) {
   return (
     <html
-      lang={locale}
+      lang={idioma}
       data-tema="dark"
       suppressHydrationWarning
       className={`${inter.variable} ${baloo.variable}`}
@@ -104,7 +116,9 @@ export default async function RootLayout({ children }: { children: React.ReactNo
       </head>
       <body className="min-h-screen">
         <SplashMarca />
-        <NextIntlClientProvider messages={messages}>{children}</NextIntlClientProvider>
+        <NextIntlClientProvider locale={idioma} messages={mensajes}>
+          {children}
+        </NextIntlClientProvider>
       </body>
     </html>
   );

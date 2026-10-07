@@ -15,7 +15,7 @@ import {
   adminEnviarmePruebaBienvenida,
   adminEstadoBienvenidas,
   type EstadoBienvenida,
-} from "@/app/(app)/admin/acciones";
+} from "@/app/(sitio)/(app)/admin/acciones";
 import { despacharAvisosDeAcceso } from "@/app/acciones-push";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { Database } from "@/lib/supabase/types";

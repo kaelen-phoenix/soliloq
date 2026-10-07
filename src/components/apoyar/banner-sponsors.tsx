@@ -1,5 +1,5 @@
 import { getTranslations } from "next-intl/server";
-import { createClient } from "@/lib/supabase/server";
+import { createClientPublico } from "@/lib/supabase/publico";
 
 type Nivel = "reparto" | "coproduccion" | "produccion";
 
@@ -25,7 +25,8 @@ export async function BannerSponsors({
 }) {
   let sponsors: { id: string; nombre: string; logo_url: string; sitio_url: string | null; nivel: Nivel }[] = [];
   try {
-    const supabase = createClient();
+    // Sin cookies (#237): la portada y «Apoyar» se arman una vez por idioma y se cachean.
+    const supabase = createClientPublico();
     const { data } = await supabase
       .from("sponsors")
       .select("id, nombre, logo_url, sitio_url, nivel")

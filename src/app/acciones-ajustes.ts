@@ -57,7 +57,7 @@ export async function volverAVerTour() {
  * Borra la cuenta propia y todo lo que cuelga de ella. Irreversible.
  * La cascada y la limpieza de Storage viven en `borrarUsuarioYArchivos`.
  */
-export async function borrarCuenta(): Promise<{ ok: false } | void> {
+export async function borrarCuenta(): Promise<{ ok: boolean }> {
   const { supabase, user } = await usuario();
 
   // Si falla, se devuelve el error en vez de tirar: una excepción en la server action dejaba
@@ -72,5 +72,8 @@ export async function borrarCuenta(): Promise<{ ok: false } | void> {
 
   // La sesión ya quedó huérfana; alcanza con limpiar las cookies de este dispositivo.
   await supabase.auth.signOut({ scope: "local" });
-  redirect("/bienvenida");
+  // A la portada va el cliente, con una navegación completa: un `redirect()` desde una server
+  // action arma la página destino sin pasar por el middleware, y la portada en el idioma de
+  // cada quien la resuelve el middleware (#237).
+  return { ok: true };
 }
