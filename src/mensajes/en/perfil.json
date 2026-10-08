@@ -135,6 +135,8 @@
       "cvHabilidades": "Résumé and skills",
       "experiencia": "Experience",
       "experienciaPlaceholder": "Tell us about your training, shows you've been in, etc.",
+      "formacion": "Artistic training",
+      "formacionPlaceholder": "Studies, schools, degrees, courses, workshops, seminars…",
       "redes": "Social links (optional)",
       "sitioPlaceholder": "https://yoursite.com",
       "redPlaceholder": "@username or https://…",
@@ -143,7 +145,8 @@
       "ocultarPerfil": "Hide my profile from new people",
       "ocultarPerfilAyuda": "You won't show up in the Creators' search and your public link stops showing your profile. Your chats and your Projects and Teams stay the same.",
       "completar": "Complete profile",
-      "guardarCambios": "Save changes"
+      "guardarCambios": "Save changes",
+      "opcional": "(optional)"
     },
     "creador": {
       "errorUna": "Pick at least one.",
@@ -204,7 +207,8 @@
     "detalle": {
       "edad": "{edad} years old",
       "edadOculta": "Your age is hidden: nobody else sees it.",
-      "experiencia": "Experience"
+      "experiencia": "Experience",
+      "formacion": "Artistic training"
     },
     "placa": {
       "etiqueta": "Talent profile",
@@ -231,6 +235,7 @@
       "edad": "{edad} years old",
       "videoreel": "Reel",
       "trayectoria": "Background",
+      "formacion": "Artistic training",
       "habilidades": "Skills",
       "perfilArtistico": "Artistic profile"
     },

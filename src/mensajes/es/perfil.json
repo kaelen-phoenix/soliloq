@@ -135,6 +135,8 @@
       "cvHabilidades": "CV y habilidades",
       "experiencia": "Experiencia",
       "experienciaPlaceholder": "Contá tu formación, obras en las que participaste, etc.",
+      "formacion": "Formación artística",
+      "formacionPlaceholder": "Estudios, escuelas, carreras, cursos, talleres, seminarios…",
       "redes": "Redes sociales (opcional)",
       "sitioPlaceholder": "https://tusitio.com",
       "redPlaceholder": "@usuario o https://…",
@@ -143,7 +145,8 @@
       "ocultarPerfil": "Ocultar mi perfil a personas nuevas",
       "ocultarPerfilAyuda": "No salís en el buscador de Creadores y tu enlace público deja de mostrar tu perfil. Tus chats y tus Proyectos y Equipos siguen igual.",
       "completar": "Completar perfil",
-      "guardarCambios": "Guardar cambios"
+      "guardarCambios": "Guardar cambios",
+      "opcional": "(opcional)"
     },
     "creador": {
       "errorUna": "Elegí al menos una.",
@@ -204,7 +207,8 @@
     "detalle": {
       "edad": "{edad} años",
       "edadOculta": "Tu edad está oculta: nadie más la ve.",
-      "experiencia": "Experiencia"
+      "experiencia": "Experiencia",
+      "formacion": "Formación artística"
     },
     "placa": {
       "etiqueta": "Perfil del Talento",
@@ -231,6 +235,7 @@
       "edad": "{edad} años",
       "videoreel": "Videoreel",
       "trayectoria": "Trayectoria",
+      "formacion": "Formación artística",
       "habilidades": "Habilidades",
       "perfilArtistico": "Perfil artístico"
     },

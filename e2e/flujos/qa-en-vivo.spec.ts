@@ -425,6 +425,41 @@ test.describe("QA en vivo (#122, teléfono)", () => {
       .toEqual({ edadVisible: false, disciplinas: ["actuacion", "direccion"] });
   });
 
+  test("Perfil: «Formación artística» es opcional y se ve solo si se cargó (#379)", async ({ page }) => {
+    const cuenta = await nuevoUsuario(`Formada ${sufijo()}`, "talento", { fotos: 3 });
+    const formacion = "Escuela Municipal de Arte Dramático (2015-2018). Taller de clown.";
+
+    await login(page, cuenta.email);
+    // Sin cargarla, el perfil no muestra un apartado vacío.
+    await page.goto("/perfil");
+    await expect(page.getByRole("heading", { name: "Formación artística" })).toHaveCount(0);
+
+    await page.goto("/perfil?editar=1");
+    await page.getByLabel("Formación artística").fill(formacion);
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect
+      .poll(
+        async () => (await admin!.from("perfiles_talento").select("formacion").eq("id", cuenta.id).single()).data?.formacion,
+        { timeout: 15_000 },
+      )
+      .toBe(formacion);
+
+    await page.goto("/perfil");
+    await expect(page.getByRole("heading", { name: "Formación artística" })).toBeVisible({ timeout: 15_000 });
+    await expect(page.getByText(formacion)).toBeVisible();
+
+    // Vaciarla vuelve a dejarla sin cargar (null), y el perfil se guarda igual.
+    await page.goto("/perfil?editar=1");
+    await page.getByLabel("Formación artística").fill("");
+    await page.getByRole("button", { name: "Guardar cambios" }).click();
+    await expect
+      .poll(
+        async () => (await admin!.from("perfiles_talento").select("formacion").eq("id", cuenta.id).single()).data?.formacion,
+        { timeout: 15_000 },
+      )
+      .toBeNull();
+  });
+
   test("Editar perfil con menos de 3 fotos: guarda igual y avisa", async ({ page }) => {
     // #243: la regla de 3 fotos es para el alta; al editar, trabar el guardado dejaba a
     // cuentas viejas (1 foto) sin poder cambiar nada y sin ver por qué.

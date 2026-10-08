@@ -80,6 +80,7 @@ interface DatosIniciales {
   genero_descripcion: string | null;
   videoreel_url: string | null;
   experiencia: string | null;
+  formacion: string | null;
   habilidades: string[];
   redes: Record<string, string>;
   aparece_en_buscador: boolean;
@@ -127,6 +128,8 @@ export function FormularioTalento({
   );
   const [videoreelUrl, setVideoreelUrl] = useState(datosIniciales?.videoreel_url ?? "");
   const [experiencia, setExperiencia] = useState(datosIniciales?.experiencia ?? "");
+  // #379: opcional y aparte de la Experiencia (estudios, escuelas, cursos, talleres…).
+  const [formacion, setFormacion] = useState(datosIniciales?.formacion ?? "");
   const [habilidades, setHabilidades] = useState<string[]>(datosIniciales?.habilidades ?? []);
   // Lo que la persona tipeó, tal cual. Se normaliza recién en `validar()` / `guardar()`.
   const [redes, setRedes] = useState<Record<string, string>>(datosIniciales?.redes ?? {});
@@ -170,6 +173,7 @@ export function FormularioTalento({
         if (typeof b.generoDescripcion === "string") setGeneroDescripcion(b.generoDescripcion);
         if (typeof b.videoreelUrl === "string") setVideoreelUrl(b.videoreelUrl);
         if (typeof b.experiencia === "string") setExperiencia(b.experiencia);
+        if (typeof b.formacion === "string") setFormacion(b.formacion);
         if (Array.isArray(b.habilidades)) setHabilidades(b.habilidades);
         if (b.redes && typeof b.redes === "object") setRedes(b.redes);
         if (typeof b.apareceEnBuscador === "boolean") setApareceEnBuscador(b.apareceEnBuscador);
@@ -203,6 +207,7 @@ export function FormularioTalento({
           generoDescripcion,
           videoreelUrl,
           experiencia,
+          formacion,
           habilidades,
           redes,
           apareceEnBuscador,
@@ -224,6 +229,7 @@ export function FormularioTalento({
     generoDescripcion,
     videoreelUrl,
     experiencia,
+    formacion,
     habilidades,
     redes,
     apareceEnBuscador,
@@ -281,6 +287,7 @@ export function FormularioTalento({
       nuevos.videoreel_url = tError("videoreel");
     }
     if (experiencia.length > 2000) nuevos.experiencia = tError("maximoCaracteres", { max: 2000 });
+    if (formacion.length > 2000) nuevos.formacion = tError("maximoCaracteres", { max: 2000 });
 
     const { errores: erroresRedes } = validarRedes(redes, tEtiquetas);
     for (const [clave, mensaje] of Object.entries(erroresRedes)) {
@@ -299,7 +306,7 @@ export function FormularioTalento({
 
     setErrores(nuevos);
     // Si el error está en algo opcional que estaba plegado, se despliega para que se vea.
-    const opcionales = ["genero_descripcion", "videoreel_url", "experiencia"];
+    const opcionales = ["genero_descripcion", "videoreel_url", "experiencia", "formacion"];
     if (Object.keys(nuevos).some((k) => opcionales.includes(k) || k.startsWith("redes_"))) {
       setVerOpcionales(true);
     }
@@ -334,6 +341,7 @@ export function FormularioTalento({
       genero_descripcion: genero === "otro" ? generoDescripcion.trim() || null : null,
       videoreel_url: videoreelUrl || null,
       experiencia: experiencia || null,
+      formacion: formacion.trim() ? formacion : null,
       habilidades,
       redes: validarRedes(redes).redes,
       aparece_en_buscador: apareceEnBuscador,
@@ -555,6 +563,23 @@ export function FormularioTalento({
               />
               <p className="text-right text-xs text-texto-tenue">{experiencia.length}/2000</p>
               <MejorarRedaccion texto={experiencia} onUsar={setExperiencia} />
+            </div>
+
+            <div className="flex flex-col gap-1.5">
+              <label htmlFor="formacion" className="text-sm font-medium text-texto">
+                {t("formacion")} <span className="font-normal text-texto-tenue">{t("opcional")}</span>
+              </label>
+              <textarea
+                id="formacion"
+                rows={4}
+                maxLength={2000}
+                value={formacion}
+                onChange={(e) => setFormacion(e.target.value)}
+                className="rounded-xl border border-borde bg-superficie px-3.5 py-2.5 text-base text-texto outline-none focus:border-accion"
+                placeholder={t("formacionPlaceholder")}
+              />
+              <p className="text-right text-xs text-texto-tenue">{formacion.length}/2000</p>
+              {errores.formacion && <p className="text-xs text-error-600">{errores.formacion}</p>}
             </div>
 
             <div className="flex flex-wrap gap-2">
