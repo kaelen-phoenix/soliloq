@@ -239,7 +239,13 @@ export async function adminRevisarConIa(): Promise<
           tipo: "perfil" as const,
           id: p.id,
           titulo: p.nombre,
-          texto: [p.experiencia, p.formacion].filter(Boolean).join("\n\n"),
+          // El listado recorta cada ítem a 2000 caracteres: con los dos campos, mitad para cada
+          // uno, para que una Experiencia larga no deje la Formación sin revisar.
+          texto: (() => {
+            const campos = [p.experiencia, p.formacion].filter((c): c is string => !!c);
+            const tope = Math.floor(1990 / campos.length);
+            return campos.map((c) => c.replace(/\s+/g, " ").slice(0, tope)).join(" / ");
+          })(),
         })),
       ...(obras ?? []).map((o) => ({ tipo: "proyecto" as const, id: o.id, titulo: o.titulo, texto: `${o.titulo}. ${o.sinopsis ?? ""}` })),
       ...(equipos ?? []).map((e) => ({ tipo: "equipo" as const, id: e.id, titulo: e.titulo, texto: `${e.titulo}. ${e.descripcion ?? ""}` })),
