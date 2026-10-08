@@ -9,6 +9,7 @@ import type { DisciplinaArtistica } from "@/lib/supabase/types";
 export interface PerfilPublico {
   nombre: string;
   texto: string | null;
+  formacion: string | null;
   habilidades: string[];
   /** Sólo si además tiene la función de Creador activa (issue #175); si no, `[]`. */
   disciplinas: DisciplinaArtistica[];
@@ -104,6 +105,14 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
           <Seccion titulo={t("trayectoria")}>
             <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-ink-800">
               {perfil.texto}
+            </p>
+          </Seccion>
+        )}
+
+        {perfil.formacion && (
+          <Seccion titulo={t("formacion")}>
+            <p className="max-w-prose whitespace-pre-line text-sm leading-relaxed text-ink-800">
+              {perfil.formacion}
             </p>
           </Seccion>
         )}

@@ -1047,6 +1047,7 @@ export type Database = {
           edad_visible: boolean
           experiencia: string | null
           fecha_nacimiento: string | null
+          formacion: string | null
           genero: Database["public"]["Enums"]["genero_persona"]
           genero_descripcion: string | null
           habilidades: string[]
@@ -1070,6 +1071,7 @@ export type Database = {
           edad_visible?: boolean
           experiencia?: string | null
           fecha_nacimiento?: string | null
+          formacion?: string | null
           genero: Database["public"]["Enums"]["genero_persona"]
           genero_descripcion?: string | null
           habilidades?: string[]
@@ -1093,6 +1095,7 @@ export type Database = {
           edad_visible?: boolean
           experiencia?: string | null
           fecha_nacimiento?: string | null
+          formacion?: string | null
           genero?: Database["public"]["Enums"]["genero_persona"]
           genero_descripcion?: string | null
           habilidades?: string[]
@@ -1804,6 +1807,7 @@ export type Database = {
           edad_visible: boolean
           experiencia: string | null
           fecha_nacimiento: string | null
+          formacion: string | null
           genero: Database["public"]["Enums"]["genero_persona"]
           genero_descripcion: string | null
           habilidades: string[]
@@ -1907,6 +1911,7 @@ export type Database = {
         Returns: {
           disciplinas: Database["public"]["Enums"]["disciplina_artistica"][]
           edad: number
+          formacion: string
           fotos: string[]
           genero: string
           genero_descripcion: string

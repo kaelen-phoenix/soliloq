@@ -21,6 +21,7 @@ export interface TalentoDetalle {
   genero_descripcion: string | null;
   videoreel_url: string | null;
   experiencia: string | null;
+  formacion?: string | null;
   habilidades: string[];
   /** `{ [claveRed]: urlCanonica }`. Se renderiza en orden de catálogo; `{}` no ocupa lugar. */
   redes: Record<string, string>;
@@ -86,6 +87,14 @@ export function PerfilTalentoDetalle({
         <div>
           <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("experiencia")}</h3>
           <p className="mt-1 max-w-prose whitespace-pre-line text-sm text-texto">{talento.experiencia}</p>
+        </div>
+      )}
+
+      {/* #379: si no la cargó, no aparece el apartado vacío. */}
+      {talento.formacion && (
+        <div>
+          <h3 className="text-2xs font-medium uppercase tracking-wide text-texto-tenue">{t("formacion")}</h3>
+          <p className="mt-1 max-w-prose whitespace-pre-line text-sm text-texto">{talento.formacion}</p>
         </div>
       )}
 

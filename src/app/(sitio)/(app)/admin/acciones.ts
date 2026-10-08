@@ -219,14 +219,14 @@ export async function adminRevisarConIa(): Promise<
     const fallida = consultas.find((c) => c.error);
     if (fallida?.error) return { ok: false, error: t("noSeLeyoPublicado", { error: fallida.error.message }) };
     const [{ data: cuentas }, { data: obras }, { data: equipos }, { data: roles }] = consultas;
-    // De las cuentas más nuevas, las primeras 40 que tienen Experiencia escrita (sin texto no
-    // hay nada que revisar, y no tienen que ocupar el cupo).
+    // De las cuentas más nuevas, las primeras 40 que tienen Experiencia o Formación escritas
+    // (sin texto no hay nada que revisar, y no tienen que ocupar el cupo).
     const orden = (cuentas ?? []).map((c) => c.id);
     const { data: conTexto, error: errorPerfiles } = await admin
       .from("perfiles_talento")
-      .select("id, nombre, experiencia")
+      .select("id, nombre, experiencia, formacion")
       .in("id", orden)
-      .not("experiencia", "is", null);
+      .or("experiencia.not.is.null,formacion.not.is.null");
     if (errorPerfiles) return { ok: false, error: t("noSeLeyeronPerfiles", { error: errorPerfiles.message }) };
     const perfiles = (conTexto ?? [])
       .sort((a, b) => orden.indexOf(a.id) - orden.indexOf(b.id))
@@ -234,8 +234,13 @@ export async function adminRevisarConIa(): Promise<
 
     const items: (Omit<MarcaModeracion, "motivo"> & { texto: string })[] = [
       ...perfiles
-        .filter((p) => p.experiencia)
-        .map((p) => ({ tipo: "perfil" as const, id: p.id, titulo: p.nombre, texto: p.experiencia! })),
+        .filter((p) => p.experiencia || p.formacion)
+        .map((p) => ({
+          tipo: "perfil" as const,
+          id: p.id,
+          titulo: p.nombre,
+          texto: [p.experiencia, p.formacion].filter(Boolean).join("\n\n"),
+        })),
       ...(obras ?? []).map((o) => ({ tipo: "proyecto" as const, id: o.id, titulo: o.titulo, texto: `${o.titulo}. ${o.sinopsis ?? ""}` })),
       ...(equipos ?? []).map((e) => ({ tipo: "equipo" as const, id: e.id, titulo: e.titulo, texto: `${e.titulo}. ${e.descripcion ?? ""}` })),
       ...(roles ?? []).map((r) => ({ tipo: "rol" as const, id: r.obra_id, titulo: r.nombre, texto: `${r.nombre}. ${r.descripcion}` })),

@@ -271,7 +271,7 @@ export function claveRed(clave: ClaveRed): string {
  * la edad ajena con `edad_publica()`.
  */
 export const COLUMNAS_PUBLICAS_TALENTO =
-  "id, nombre, edad_visible, ubicacion_publica, ubicacion_pais, genero, genero_descripcion, videoreel_url, experiencia, habilidades, redes, aparece_en_buscador";
+  "id, nombre, edad_visible, ubicacion_publica, ubicacion_pais, genero, genero_descripcion, videoreel_url, experiencia, formacion, habilidades, redes, aparece_en_buscador";
 
 export function calcularEdad(fechaNacimiento: string): number {
   // Se lee «aaaa-mm-dd» por partes: `new Date("1990-10-06")` es medianoche UTC, que al oeste
