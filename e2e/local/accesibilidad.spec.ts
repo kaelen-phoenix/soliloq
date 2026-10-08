@@ -135,7 +135,7 @@ test.describe("accesibilidad", () => {
     }
     await visitar(p, "/proyectos (¿Qué querés armar?)", async () => {
       await p.goto("/proyectos");
-      await p.getByRole("button", { name: "Crear proyecto" }).click();
+      await p.getByRole("button", { name: "Crear", exact: true }).click();
     });
 
     console.log(informe.join("\n"));

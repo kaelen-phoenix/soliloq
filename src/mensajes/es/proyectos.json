@@ -17,7 +17,7 @@
     "talentos": {
       "sinIniciativaTitulo": "Primero armá tu proyecto o equipo",
       "sinIniciativaDetalle": "Buscás talento para algo concreto: creá un Proyecto o un Equipo y buscá desde ahí.",
-      "irAMisProyectos": "Ir a Mis proyectos",
+      "irAIniciativas": "Ir a Iniciativas",
       "bajada": "Para <b>«{titulo}»</b>. Encontrá artistas por nombre, habilidad o experiencia, y filtrá por edad, género o zona.",
       "denunciarA": "a {nombre}"
     },
@@ -117,7 +117,7 @@
       "proyectoTexto": "Una obra, un corto, una película… con los roles que buscás.",
       "equipoTitulo": "Armar equipo",
       "equipoTexto": "Juntar gente con ganas de crear como vos; la idea puede surgir en el camino.",
-      "crear": "Crear proyecto"
+      "crear": "Crear"
     },
     "formularioObra": {
       "errorTituloObra": "Ingresá el título de la obra.",
@@ -307,7 +307,7 @@
       "vacioDetalle": "No hay talento que coincida con esos filtros. Probá aflojando alguno."
     },
     "pilaTalentos": {
-      "sinIniciativa": "Para buscar talento primero armá un proyecto o equipo en <enlace>Mis proyectos</enlace>.",
+      "sinIniciativa": "Para buscar talento primero armá un proyecto o equipo en <enlace>Iniciativas</enlace>.",
       "sinMas": "Por ahora no hay más perfiles. Probá aflojando los filtros o volvé más tarde.",
       "selloNo": "No",
       "selloSi": "Sí",

@@ -88,8 +88,8 @@ test.describe("varios proyectos (UI)", () => {
     // #341: una sola lista, con la etiqueta de cada uno.
     await expect(page.getByText(`Equipo ${s}`)).toBeVisible();
 
-    // «Crear proyecto» pregunta qué se quiere armar; cancelar vuelve a la pregunta.
-    await page.getByRole("button", { name: "Crear proyecto" }).click();
+    // «Crear» (#380) pregunta qué se quiere armar; cancelar vuelve a la pregunta.
+    await page.getByRole("button", { name: "Crear", exact: true }).click();
     await expect(page.getByRole("heading", { name: "¿Qué querés armar?" })).toBeVisible();
     await page.getByRole("button", { name: /Un proyecto con roles/ }).click();
     await expect(page.getByLabel("Título del proyecto")).toBeVisible();

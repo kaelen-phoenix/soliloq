@@ -4,7 +4,7 @@ import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 
 export async function generateMetadata() {
   const t = await getTranslations("titulos");
-  return { title: `${t("misProyectos")} — Yalope` };
+  return { title: `${t("misProyectosYEquipos")} — Yalope` };
 }
 
 /** Los Proyectos y Equipos propios. Sin modo Creador (#288): cualquiera arma el suyo desde acá. */

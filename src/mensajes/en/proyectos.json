@@ -17,7 +17,7 @@
     "talentos": {
       "sinIniciativaTitulo": "First, set up your project or team",
       "sinIniciativaDetalle": "You search for talent for something specific: create a Project or a Team and search from there.",
-      "irAMisProyectos": "Go to My projects",
+      "irAIniciativas": "Go to Initiatives",
       "bajada": "For <b>“{titulo}”</b>. Find artists by name, skill or experience, and filter by age, gender or area.",
       "denunciarA": "{nombre}"
     },
@@ -117,7 +117,7 @@
       "proyectoTexto": "A play, a short, a film… with the roles you're looking for.",
       "equipoTitulo": "Build a team",
       "equipoTexto": "Bring together people who want to create, like you; the idea can come along the way.",
-      "crear": "Create project"
+      "crear": "Create"
     },
     "formularioObra": {
       "errorTituloObra": "Enter the project's title.",
@@ -307,7 +307,7 @@
       "vacioDetalle": "No talent matches those filters. Try loosening some of them."
     },
     "pilaTalentos": {
-      "sinIniciativa": "To find talent, first set up a project or team in <enlace>My projects</enlace>.",
+      "sinIniciativa": "To find talent, first set up a project or team in <enlace>Initiatives</enlace>.",
       "sinMas": "No more profiles for now. Try loosening the filters or check back later.",
       "selloNo": "No",
       "selloSi": "Yes",

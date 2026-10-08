@@ -127,8 +127,8 @@ test.describe("equipo, admin y notificaciones (UI)", () => {
     // que usa `match.spec.ts` para la Obra — acá interesa probar el formulario en sí.
     await login(page, creador.email);
     await page.goto("/proyectos");
-    // #341: «Crear proyecto» → «¿Qué querés armar?» → «Armar equipo».
-    await page.getByRole("button", { name: "Crear proyecto" }).click();
+    // #341, #380: «Crear» → «¿Qué querés armar?» → «Armar equipo».
+    await page.getByRole("button", { name: "Crear", exact: true }).click();
     await page.getByRole("button", { name: /Armar equipo/ }).click();
     await page.getByLabel("Título — por qué querés armar el equipo").fill(tituloEquipo);
     await page.getByRole("button", { name: "Armar equipo", exact: true }).click();
