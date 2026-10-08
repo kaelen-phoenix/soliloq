@@ -36,7 +36,7 @@ export default async function BuscarTalentoPage({
               href="/proyectos"
               className="inline-flex items-center rounded-full bg-accion px-4 py-2 text-sm font-semibold text-accion-texto"
             >
-              {t("irAMisProyectos")}
+              {t("irAIniciativas")}
             </Link>
           }
         />

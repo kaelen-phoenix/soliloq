@@ -5,7 +5,7 @@ import { usePathname } from "next/navigation";
 
 /** El valor es la clave en el namespace `titulos` de los mensajes. */
 const TITULOS: { patron: RegExp; clave: string }[] = [
-  { patron: /^\/proyectos/, clave: "misProyectos" },
+  { patron: /^\/proyectos/, clave: "misProyectosYEquipos" },
   { patron: /^\/matches/, clave: "matches" },
   { patron: /^\/convocatoria/, clave: "convocatoria" },
   { patron: /^\/equipos\/.+/, clave: "equipo" },

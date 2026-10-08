@@ -26,7 +26,7 @@ export interface ItemNavegacion {
  * la ruta sigue siendo `/salas`.
  */
 const EXPLORAR: ItemNavegacion = { href: "/", clave: "convocatorias", claveCorto: "convocatoriasCorto", icono: "feed" };
-const PROYECTOS: ItemNavegacion = { href: "/proyectos", clave: "misProyectos", claveCorto: "misProyectosCorto", icono: "tablero" };
+const PROYECTOS: ItemNavegacion = { href: "/proyectos", clave: "iniciativas", claveCorto: "iniciativasCorto", icono: "tablero" };
 const MATCHES: ItemNavegacion = { href: "/matches", clave: "matches", icono: "corazon" };
 const CHATS: ItemNavegacion = { href: "/salas", clave: "salas", icono: "salas" };
 const PERFIL: ItemNavegacion = { href: "/perfil", clave: "perfil", icono: "perfil" };

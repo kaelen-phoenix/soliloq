@@ -15,8 +15,8 @@
     "convocatoriasCorto": "Explorar",
     "salas": "Chats",
     "perfil": "Perfil",
-    "misProyectos": "Mis proyectos",
-    "misProyectosCorto": "Proyectos",
+    "iniciativas": "Iniciativas",
+    "iniciativasCorto": "Iniciativas",
     "buscarTalento": "Buscar talento",
     "buscarTalentoCorto": "Buscar",
     "admin": "Admin",
@@ -36,7 +36,7 @@
     "ajustes": "Ajustes",
     "admin": "Administración",
     "convocatorias": "Explorar",
-    "misProyectos": "Mis proyectos",
+    "misProyectosYEquipos": "Mis proyectos y equipos",
     "matches": "Convocatorias",
     "convocatoria": "Te convocaron",
     "equipo": "Equipo"
@@ -229,7 +229,7 @@
         "texto": "Cuando el interés es mutuo, lo ves en Convocatorias: desde ahí te convocan, y si cambiás de idea, te retirás."
       },
       "proyectos": {
-        "titulo": "Tus proyectos",
+        "titulo": "Tus iniciativas",
         "texto": "¿Querés armar algo propio? Creá tu Proyecto o Equipo acá, buscá talento y convocá desde Convocatorias."
       },
       "chats": {

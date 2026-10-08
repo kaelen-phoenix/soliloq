@@ -160,7 +160,7 @@ test.describe("todos los formularios", () => {
 
     // ── 7. Crear un proyecto con roles ──────────────────────────────────────
     await page.goto("/proyectos");
-    await page.getByRole("button", { name: "Crear proyecto" }).click();
+    await page.getByRole("button", { name: "Crear", exact: true }).click();
     await page.getByRole("button", { name: /Un proyecto con roles/ }).click();
     await page.getByLabel("Título del proyecto").fill(`Proyecto formularios ${s}`);
     await elegirUbicacion(page, "Locación de ensayos");
@@ -193,7 +193,7 @@ test.describe("todos los formularios", () => {
 
     // ── 11. Armar y editar un equipo ────────────────────────────────────────
     await page.goto("/proyectos");
-    await page.getByRole("button", { name: "Crear proyecto" }).click();
+    await page.getByRole("button", { name: "Crear", exact: true }).click();
     await page.getByRole("button", { name: /Armar equipo/ }).click();
     await page.getByLabel("Título — por qué querés armar el equipo").fill(`Equipo formularios ${s}`);
     await page.getByRole("button", { name: "Armar equipo", exact: true }).click();
