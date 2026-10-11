@@ -151,13 +151,16 @@ test.describe("accesibilidad", () => {
     {
       for (const paso of [1, 6]) {
         await visitar(pAlta, `/completar-perfil (paso ${paso})`, async () => {
+          // Ídem `formularios-ancho`: salir antes, para que el guardado pendiente de la página
+          // no pise el borrador que se escribe acá.
+          await pAlta.evaluate(() => localStorage.clear());
+          await pAlta.goto("about:blank");
           await admin!.from("borradores_perfil").upsert({
             perfil_id: alta.user.id,
             paso,
             datos: { nombre: "Accesible Alta", fechaNacimiento: "05/05/1995", genero: "sin_especificar" },
             actualizado_en: new Date().toISOString(),
           });
-          await pAlta.evaluate(() => localStorage.clear());
           await pAlta.goto("/completar-perfil");
           await pAlta.getByText(`Paso ${paso} de 6`, { exact: true }).waitFor({ timeout: 15_000 });
         });

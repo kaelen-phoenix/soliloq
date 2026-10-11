@@ -153,9 +153,12 @@ test.describe("formularios en pantallas angostas", () => {
       await page.locator("form").getByRole("button", { name: "Ingresar" }).click();
       await page.waitForURL(/\/completar-perfil/, { timeout: 30_000 });
       for (let paso = 1; paso <= 6; paso++) {
-        await admin!.from("borradores_perfil").upsert({ perfil_id: id, paso, datos, actualizado_en: new Date().toISOString() });
-        // Sin el borrador del teléfono, que sería más nuevo y ganaría.
+        // Primero se sale de la página: su guardado del borrador (sale un segundo después de
+        // cargar) podría pisar el que se escribe acá. Y sin el borrador del teléfono, que
+        // sería más nuevo y ganaría.
         await page.evaluate(() => localStorage.clear());
+        await page.goto("about:blank");
+        await admin!.from("borradores_perfil").upsert({ perfil_id: id, paso, datos, actualizado_en: new Date().toISOString() });
         await page.goto("/completar-perfil");
         await page.getByText(`Paso ${paso} de 6`, { exact: true }).waitFor({ timeout: 15_000 });
         await revisar(page, `alta-paso-${paso}`, ancho, informe, fallas);
