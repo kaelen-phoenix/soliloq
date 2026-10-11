@@ -61,6 +61,35 @@ export type Database = {
           },
         ]
       }
+      borradores_perfil: {
+        Row: {
+          actualizado_en: string
+          datos: Json
+          paso: number
+          perfil_id: string
+        }
+        Insert: {
+          actualizado_en?: string
+          datos?: Json
+          paso?: number
+          perfil_id: string
+        }
+        Update: {
+          actualizado_en?: string
+          datos?: Json
+          paso?: number
+          perfil_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "borradores_perfil_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: true
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
       chats_destacados: {
         Row: {
           creado_en: string
