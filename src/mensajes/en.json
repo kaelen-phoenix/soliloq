@@ -250,7 +250,7 @@
   },
   "legal": {
     "volverApp": "Go to the app",
-    "actualizado": "Last updated: October 5, 2026",
+    "actualizado": "Last updated: October 11, 2026",
     "contacto": "For any questions about these topics, write to us at info@yalope.com.",
     "privacidad": {
       "titulo": "Privacy Policy",
@@ -264,7 +264,7 @@
             "Profile: name, date of birth, location, gender (and its description if you choose “Other”), photos, video reel, experience, skills, social links and your visibility preferences.",
             "Projects and teams you create: titles, descriptions, roles, photos and rehearsal location.",
             "Activity in the app: the “I'm interested” marks you make, your matches and casting calls, chat messages, notifications, reports and blocks.",
-            "Technical data: if you turn on notifications, your browser's subscription; if you link Discord, your Discord ID and username; your theme and language preferences; how many times you use the AI features (we don't store the texts you send); and error logs with technical data (browser, operating system and the screen where the error happened).",
+            "Technical data: if you turn on notifications, your browser's subscription; if you link Discord, your Discord ID and username; your theme and language preferences; how many times you use the AI features (we don't store the texts you send); if you share your public link, the name you choose for it and how many times a day it's opened (we don't store who opens it); and error logs with technical data (browser, operating system and the screen where the error happened).",
             "If you write to us through the “Support” form: your name, your email and your message."
           ]
         },
@@ -282,7 +282,7 @@
           "titulo": "3. Who sees your information",
           "parrafos": [
             "Your profile is visible to people with an approved Yalope account. Your location is shown only as a neighborhood or city: the exact address is never published. You can hide your age, and you can hide your profile from new people.",
-            "If you turn on your profile's public link, anyone with that link sees your profile without your social links.",
+            "If you turn on your profile's public link, anyone with that link sees your full profile, including your social links and website, even without an account. You can turn it off or change it at any time.",
             "Chat messages are visible only to the members of that chat.",
             "Yalope's admin team can access information when needed to approve accounts, handle reports or solve technical problems."
           ]

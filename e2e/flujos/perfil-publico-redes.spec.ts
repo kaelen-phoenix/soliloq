@@ -3,16 +3,17 @@ import { createClient } from "@supabase/supabase-js";
 import { barrerRestos, borrarUsuarios } from "./limpieza";
 
 /**
- * Enlace público sin chat de dos personas (#283, 0095/0097): sin cuenta se ve la vidriera
- * sin redes y «Crear cuenta»; con cuenta completa se ve el perfil con sus redes, y no hay
- * «Contactar» en ningún caso.
+ * Compartir el perfil completo (#384, 0113): sin cuenta se ve la vidriera con las redes y la
+ * invitación «Creá tu perfil en Yalope»; el enlace anda con el código o con el nombre elegido
+ * (`/p/ana-perez`), y cada apertura de otra persona suma al contador del dueño. Sigue sin
+ * haber «Contactar» (#283).
  */
 const URL = process.env.E2E_SUPABASE_URL;
 const KEY = process.env.E2E_SERVICE_KEY;
 const PASS = "test-1234-abcd";
 const INSTAGRAM = "https://instagram.com/redes.e2e";
 
-test.describe("redes en el enlace público", () => {
+test.describe("perfil compartido", () => {
   test.skip(
     !URL || !KEY || !process.env.E2E_BASE_URL,
     "faltan E2E_SUPABASE_URL/E2E_SERVICE_KEY/E2E_BASE_URL (staging)",
@@ -67,6 +68,11 @@ test.describe("redes en el enlace público", () => {
     await page.waitForURL((u) => !u.pathname.startsWith("/ingresar"), { timeout: 30_000 });
   }
 
+  async function visitas(id: string) {
+    const { data } = await admin!.from("visitas_enlace").select("cantidad").eq("perfil_id", id);
+    return (data ?? []).reduce((suma, v) => suma + (v.cantidad as number), 0);
+  }
+
   test.beforeAll(async () => {
     await barrerRestos(admin!);
   });
@@ -75,23 +81,66 @@ test.describe("redes en el enlace público", () => {
     await borrarUsuarios(admin!, usuariosCreados);
   });
 
-  test("sin cuenta, sin redes y «Crear cuenta»; con cuenta completa, con redes", async ({ page, browser }) => {
+  test("sin cuenta se ve con redes y la invitación, y la visita se cuenta", async ({ page, browser }) => {
     const ana = await cuenta("Ana Redes E2E", { redes: { instagram: INSTAGRAM }, enlace: true });
     const beto = await cuenta("Beto Mirón E2E");
 
     const anonimo = await browser.newPage();
     await anonimo.goto(`/p/${ana.token}`);
     await expect(anonimo.getByRole("heading", { name: "Ana Redes E2E" })).toBeVisible({ timeout: 15_000 });
-    await expect(anonimo.locator(`a[href="${INSTAGRAM}"]`)).toHaveCount(0);
-    await expect(anonimo.getByRole("link", { name: "Crear cuenta" })).toBeVisible();
+    await expect(anonimo.locator(`a[href="${INSTAGRAM}"]`)).toBeVisible();
+    await expect(anonimo.getByRole("link", { name: "Creá tu perfil en Yalope" })).toBeVisible();
     await expect(anonimo.getByRole("button", { name: /Contactar/ })).toHaveCount(0);
+    await expect.poll(() => visitas(ana.id), { timeout: 15_000 }).toBe(1);
+    // Recargar la misma pestaña no suma otra.
+    await anonimo.reload();
+    await expect(anonimo.getByRole("heading", { name: "Ana Redes E2E" })).toBeVisible({ timeout: 15_000 });
     await anonimo.close();
 
     await login(page, beto.email);
     await page.goto(`/p/${ana.token}`);
     await expect(page.getByRole("heading", { name: "Ana Redes E2E" })).toBeVisible({ timeout: 15_000 });
     await expect(page.locator(`a[href="${INSTAGRAM}"]`)).toBeVisible();
-    await expect(page.getByRole("link", { name: "Crear cuenta" })).toHaveCount(0);
+    await expect(page.getByRole("link", { name: "Creá tu perfil en Yalope" })).toHaveCount(0);
     await expect(page.getByRole("button", { name: /Contactar/ })).toHaveCount(0);
+    await expect.poll(() => visitas(ana.id), { timeout: 15_000 }).toBe(2);
+  });
+
+  test("el dueño elige el nombre del enlace y ve cuántas veces se abrió", async ({ page, browser }) => {
+    const ana = await cuenta("Ana Alias E2E", { enlace: true });
+    const alias = `ana-e2e-${Math.random().toString(36).slice(2, 8)}`;
+
+    await login(page, ana.email);
+    await page.goto("/perfil");
+    const campo = page.locator("#enlace-alias");
+    await expect(campo).toBeVisible({ timeout: 15_000 });
+    // Sugiere uno a partir del nombre.
+    await expect(campo).toHaveValue("ana-alias-e2e");
+
+    await campo.fill("Con Espacios");
+    await page.getByRole("button", { name: "Guardar", exact: true }).click();
+    await expect(page.getByText(/Usá de 3 a 40 letras minúsculas/)).toBeVisible();
+
+    await campo.fill(alias);
+    await page.getByRole("button", { name: "Guardar", exact: true }).click();
+    await expect(page.getByText("Listo: ya podés compartir tu enlace con este nombre.")).toBeVisible();
+
+    // Las visitas del propio dueño no cuentan.
+    await page.goto(`/p/${alias}`);
+    await expect(page.getByRole("heading", { name: "Ana Alias E2E" })).toBeVisible({ timeout: 15_000 });
+
+    const anonimo = await browser.newPage();
+    await anonimo.goto(`/p/${alias.toUpperCase()}`);
+    await expect(anonimo.getByRole("heading", { name: "Ana Alias E2E" })).toBeVisible({ timeout: 15_000 });
+    await expect.poll(() => visitas(ana.id), { timeout: 15_000 }).toBe(1);
+    // El enlace con código sigue andando.
+    await anonimo.goto(`/p/${ana.token}`);
+    await expect(anonimo.getByRole("heading", { name: "Ana Alias E2E" })).toBeVisible({ timeout: 15_000 });
+    await anonimo.close();
+
+    await page.goto("/perfil");
+    await expect(page.getByText(/Tu enlace se abrió (una vez|\d+ veces) en los últimos 30 días/)).toBeVisible({
+      timeout: 15_000,
+    });
   });
 });

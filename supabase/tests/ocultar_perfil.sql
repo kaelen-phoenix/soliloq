@@ -51,11 +51,11 @@ set local role authenticated;
 set local request.jwt.claims = '{"sub":"a3333333-3333-3333-3333-33333333aaaa"}';
 create temp table t1_equipo as select perfil_id from public.feed_equipo(null);
 create temp table t1_buscar as select id from public.buscar_talento(p_limite => 1000);
-create temp table t1_enlace as select * from public.perfil_publico((select v from ctx where k='token_h'));
+create temp table t1_enlace as select * from public.perfil_publico((select v::text from ctx where k='token_h'));
 reset role;
 set local role anon;
 set local request.jwt.claims = '{}';
-create temp table t1_enlace_anon as select * from public.perfil_publico((select v from ctx where k='token_h'));
+create temp table t1_enlace_anon as select * from public.perfil_publico((select v::text from ctx where k='token_h'));
 reset role;
 do $$
 declare
@@ -106,7 +106,7 @@ create temp table t3_equipo as select perfil_id from public.feed_equipo(null);
 reset role;
 set local role authenticated;
 set local request.jwt.claims = '{"sub":"a1111111-1111-1111-1111-11111111aaaa"}';
-create temp table t3_propio as select * from public.perfil_publico((select v from ctx where k='token_h'));
+create temp table t3_propio as select * from public.perfil_publico((select v::text from ctx where k='token_h'));
 reset role;
 do $$ begin
   if not exists (select 1 from t3_equipo where perfil_id = (select v from ctx where k='h')) then

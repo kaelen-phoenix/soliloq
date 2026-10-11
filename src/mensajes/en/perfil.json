@@ -163,8 +163,8 @@
       "errorRegenerar": "We couldn't regenerate the link. Try again.",
       "textoCompartir": "{nombre} on Yalope",
       "titulo": "Share my profile",
-      "activo": "Your link is on: anyone who has it can see your public profile —photos, reel, experience, skills, area, gender and your age if you left it visible— without an account. Only people with a Yalope account see your social links.",
-      "inactivo": "A link anyone can open without an account, like a calling card: your photos, your reel, your experience, your skills, your area, your gender and your age if you left it visible. Never your email, your phone or your date of birth, and only people with a Yalope account see your social links.",
+      "activo": "Your link is active: anyone who has it sees your full profile —photos, video reel, experience, training, skills, area, gender, your social links and website, and your age if you left it visible—, even without an account.",
+      "inactivo": "A link anyone can see without an account, like a calling card: your photos, video reel, experience, training, skills, area, gender, social links and website, and your age if you left it visible. Never your email, phone or date of birth.",
       "unMomento": "One moment…",
       "compartir": "Share",
       "ocultarQr": "Hide QR",
@@ -177,7 +177,15 @@
       "instagram": "Share on Instagram",
       "copiar": "Copy link",
       "regenerar": "Regenerate link",
-      "desactivar": "Turn off link"
+      "desactivar": "Turn off link",
+      "visitas": "Your link was opened {n, plural, =0 {no times} =1 {once} other {# times}} in the last 30 days ({total} in total).",
+      "aliasEtiqueta": "Your link",
+      "aliasAyuda": "Choose how it looks: lowercase letters, numbers and hyphens (for example, ana-perez). The link with the code still works.",
+      "aliasGuardar": "Save",
+      "aliasListo": "Done: you can now share your link with this name.",
+      "aliasFormato": "Use 3 to 40 lowercase letters, numbers or hyphens, with no spaces or accents.",
+      "aliasOcupado": "Someone else is already using that name. Try another one.",
+      "aliasError": "We couldn't save the name. Try again."
     },
     "mejorarRedaccion": {
       "ayuda": {
@@ -264,15 +272,16 @@
       "descripcionMeta": "{nombre}'s profile on Yalope.",
       "irAYalope": "Go to Yalope",
       "booking": "Booking",
-      "teInteresa": "Interested in working with {nombre}?",
-      "sinCuenta": "Create your free Yalope account to see {nombre}'s full profile, including social links.",
-      "esperandoAprobacion": "Your account is waiting for approval. Once you're approved you'll see the full profile, including social links.",
-      "completaTuPerfil": "Complete your Yalope profile to see the full profile, including social links.",
-      "crearCuenta": "Create account",
+      "esperandoAprobacion": "Your account is waiting for approval. Once you're approved you'll be able to set up your profile and connect with other talent.",
+      "completaTuPerfil": "Complete your profile on Yalope to show your journey and connect with other talent.",
       "yaTengoCuenta": "I already have an account",
       "completarMiPerfil": "Complete my profile",
       "volverAMiPerfil": "Back to my profile",
-      "perfilEnYalope": "Profile on Yalope"
+      "perfilEnYalope": "Profile on Yalope",
+      "noEstasTitulo": "Not on Yalope yet?",
+      "terminaTitulo": "Finish joining Yalope",
+      "invitacion": "Show your artistic journey, connect with other talent and discover projects and teams to create with.",
+      "crearPerfil": "Create your profile on Yalope"
     },
     "og": {
       "edad": "{edad} years old"

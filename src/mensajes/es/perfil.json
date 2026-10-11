@@ -163,8 +163,8 @@
       "errorRegenerar": "No pudimos regenerar el enlace. Probá de nuevo.",
       "textoCompartir": "{nombre} en Yalope",
       "titulo": "Compartir mi perfil",
-      "activo": "Tu enlace está activo: cualquiera que lo tenga ve tu perfil público —fotos, videoreel, experiencia, habilidades, zona, género y tu edad si la dejaste visible—, sin cuenta. Tus redes las ve solo quien tiene cuenta en Yalope.",
-      "inactivo": "Un enlace que se ve sin cuenta, como una carta de presentación: tus fotos, tu videoreel, tu experiencia, tus habilidades, tu zona, tu género y tu edad si la dejaste visible. Nunca tu correo, tu teléfono ni tu fecha de nacimiento, y tus redes las ve solo quien tiene cuenta en Yalope.",
+      "activo": "Tu enlace está activo: cualquiera que lo tenga ve tu perfil completo —fotos, videoreel, experiencia, formación, habilidades, zona, género, tus redes y tu sitio, y tu edad si la dejaste visible—, aunque no tenga cuenta.",
+      "inactivo": "Un enlace que se ve sin cuenta, como una carta de presentación: tus fotos, tu videoreel, tu experiencia, tu formación, tus habilidades, tu zona, tu género, tus redes y tu sitio, y tu edad si la dejaste visible. Nunca tu correo, tu teléfono ni tu fecha de nacimiento.",
       "unMomento": "Un momento…",
       "compartir": "Compartir",
       "ocultarQr": "Ocultar QR",
@@ -177,7 +177,15 @@
       "instagram": "Compartir en Instagram",
       "copiar": "Copiar enlace",
       "regenerar": "Regenerar enlace",
-      "desactivar": "Desactivar enlace"
+      "desactivar": "Desactivar enlace",
+      "visitas": "Tu enlace se abrió {n, plural, =0 {ninguna vez} =1 {una vez} other {# veces}} en los últimos 30 días ({total, plural, =1 {una} other {#}} en total).",
+      "aliasEtiqueta": "Tu enlace",
+      "aliasAyuda": "Elegí cómo se ve: minúsculas, números y guiones (por ejemplo, ana-perez). El enlace con código sigue andando.",
+      "aliasGuardar": "Guardar",
+      "aliasListo": "Listo: ya podés compartir tu enlace con este nombre.",
+      "aliasFormato": "Usá de 3 a 40 letras minúsculas, números o guiones, sin espacios ni tildes.",
+      "aliasOcupado": "Ese nombre ya lo usa otra persona. Probá con otro.",
+      "aliasError": "No pudimos guardar el nombre. Probá de nuevo."
     },
     "mejorarRedaccion": {
       "ayuda": {
@@ -264,15 +272,16 @@
       "descripcionMeta": "El perfil de {nombre} en Yalope.",
       "irAYalope": "Ir a Yalope",
       "booking": "Booking",
-      "teInteresa": "¿Te interesa trabajar con {nombre}?",
-      "sinCuenta": "Creá tu cuenta gratis en Yalope para ver el perfil completo de {nombre}, con sus redes.",
-      "esperandoAprobacion": "Tu cuenta está esperando aprobación. Cuando te habiliten vas a ver el perfil completo, con sus redes.",
-      "completaTuPerfil": "Completá tu perfil en Yalope para ver el perfil completo, con sus redes.",
-      "crearCuenta": "Crear cuenta",
+      "esperandoAprobacion": "Tu cuenta está esperando aprobación. Cuando te habiliten vas a poder armar tu perfil y conectar con otros talentos.",
+      "completaTuPerfil": "Completá tu perfil en Yalope para presentar tu recorrido y conectar con otros talentos.",
       "yaTengoCuenta": "Ya tengo cuenta",
       "completarMiPerfil": "Completar mi perfil",
       "volverAMiPerfil": "Volver a mi perfil",
-      "perfilEnYalope": "Perfil en Yalope"
+      "perfilEnYalope": "Perfil en Yalope",
+      "noEstasTitulo": "¿Todavía no estás en Yalope?",
+      "terminaTitulo": "Terminá de sumarte a Yalope",
+      "invitacion": "Presentá tu recorrido artístico, conectá con otros talentos y descubrí proyectos y equipos para crear.",
+      "crearPerfil": "Creá tu perfil en Yalope"
     },
     "og": {
       "edad": "{edad} años"
