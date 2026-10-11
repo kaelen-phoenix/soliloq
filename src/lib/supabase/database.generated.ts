@@ -977,6 +977,7 @@ export type Database = {
           creado_en: string
           discord_user_id: string | null
           discord_usuario: string | null
+          enlace_alias: string | null
           enlace_publico_activo: boolean
           enlace_token: string
           es_admin: boolean
@@ -1000,6 +1001,7 @@ export type Database = {
           creado_en?: string
           discord_user_id?: string | null
           discord_usuario?: string | null
+          enlace_alias?: string | null
           enlace_publico_activo?: boolean
           enlace_token?: string
           es_admin?: boolean
@@ -1023,6 +1025,7 @@ export type Database = {
           creado_en?: string
           discord_user_id?: string | null
           discord_usuario?: string | null
+          enlace_alias?: string | null
           enlace_publico_activo?: boolean
           enlace_token?: string
           es_admin?: boolean
@@ -1440,6 +1443,32 @@ export type Database = {
         Relationships: [
           {
             foreignKeyName: "usos_ia_perfil_id_fkey"
+            columns: ["perfil_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      visitas_enlace: {
+        Row: {
+          cantidad: number
+          dia: string
+          perfil_id: string
+        }
+        Insert: {
+          cantidad?: number
+          dia: string
+          perfil_id: string
+        }
+        Update: {
+          cantidad?: number
+          dia?: string
+          perfil_id?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "visitas_enlace_perfil_id_fkey"
             columns: ["perfil_id"]
             isOneToOne: false
             referencedRelation: "perfiles"
@@ -1936,7 +1965,7 @@ export type Database = {
         }[]
       }
       perfil_publico: {
-        Args: { p_token: string }
+        Args: { p_clave: string }
         Returns: {
           disciplinas: Database["public"]["Enums"]["disciplina_artistica"][]
           edad: number
@@ -1954,6 +1983,7 @@ export type Database = {
         }[]
       }
       puede_buscar_talento: { Args: never; Returns: boolean }
+      registrar_visita_enlace: { Args: { p_clave: string }; Returns: undefined }
       responder_convocatoria: {
         Args: { p_aceptar: boolean; p_convocatoria_id: string }
         Returns: undefined

@@ -7,15 +7,16 @@ import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 import { VidrieraPublica } from "@/components/perfil/vidriera-publica";
+import { ContarVisita } from "@/components/perfil/contar-visita";
 import { leerEstadoCuenta } from "@/lib/cuenta-servidor";
 import { destinoSegunEstado } from "@/lib/cuenta";
 import { redesDeJson } from "@/lib/redes";
 
 // `cache()` deduplica la RPC entre `generateMetadata` y la página: las dos la piden con el
-// mismo token dentro del mismo request.
+// mismo token dentro del mismo request. #384: el «token» es el código o el nombre elegido.
 const obtenerPerfil = cache(async (token: string) => {
   const supabase = createClient();
-  const { data, error } = await supabase.rpc("perfil_publico", { p_token: token });
+  const { data, error } = await supabase.rpc("perfil_publico", { p_clave: token });
   if (error) reportarErrorSupabase(error, { rpc: "perfil_publico", token });
   return data?.[0] ?? null;
 });
@@ -51,21 +52,22 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
     data: { user },
   } = await supabase.auth.getUser();
 
-  // Se compara el token propio, no un id: `perfil_publico` no devuelve identidad, a
-  // propósito, así que esta es la única forma de saber si quien mira es el dueño.
+  // Se compara el enlace propio (código o nombre), no un id: `perfil_publico` no devuelve
+  // identidad, a propósito, así que esta es la única forma de saber si quien mira es el dueño.
   let esDueño = false;
   if (user) {
     const { data: miPerfil } = await supabase
       .from("perfiles")
-      .select("enlace_token")
+      .select("enlace_token, enlace_alias")
       .eq("id", user.id)
       .maybeSingle();
-    esDueño = miPerfil?.enlace_token === params.token;
+    const clave = params.token.toLowerCase();
+    esDueño = miPerfil?.enlace_token === clave || (!!miPerfil?.enlace_alias && miPerfil.enlace_alias === clave);
   }
 
   // Con sesión pero la cuenta todavía sin terminar (pendiente, sin Normas o sin perfil):
-  // `/p` está fuera de la app y no pasa por esa guarda, así que se mira acá. Solo una cuenta
-  // completa ve las redes (las filtra `perfil_publico`, 0097).
+  // `/p` está fuera de la app y no pasa por esa guarda, así que se mira acá. El perfil se ve
+  // completo igual, con las redes (#384); lo que cambia es la invitación de abajo.
   const pendiente = user && !esDueño ? destinoSegunEstado(await leerEstadoCuenta(supabase, user.id)) : "app";
   const volverAca = encodeURIComponent(`/p/${params.token}`);
 
@@ -88,17 +90,18 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
         </header>
 
         <VidrieraPublica perfil={{ ...perfil, redes: redesDeJson(perfil.redes), fotos }} />
+        {!esDueño && <ContarVisita clave={params.token} />}
 
-        {/* Sin chat de dos personas (#283): quien tiene cuenta completa ya ve todo, con las
-            redes, y contacta por donde quiera. Al resto se le dice qué le falta. */}
+        {/* Sin chat de dos personas (#283): el perfil se ve completo, con las redes, y se
+            contacta por ahí. A quien todavía no está en Yalope se lo invita a sumarse (#384). */}
         {!esDueño && (!user || pendiente !== "app") ? (
           <section className="mt-10 rounded-2xl border border-ink-200 bg-white p-6 shadow-[0_2px_20px_-8px_rgba(0,0,0,0.12)]">
             <h2 className="font-display text-lg font-semibold tracking-[-0.02em] text-ink-900">
-              {t("teInteresa", { nombre: primerNombre })}
+              {!user ? t("noEstasTitulo") : t("terminaTitulo")}
             </h2>
             <p className="mt-1 text-sm leading-relaxed text-ink-600">
               {!user
-                ? t("sinCuenta", { nombre: primerNombre })
+                ? t("invitacion")
                 : pendiente === "solicitud-pendiente"
                   ? t("esperandoAprobacion")
                   : t("completaTuPerfil")}
@@ -109,7 +112,7 @@ export default async function PerfilPublicoPage({ params }: { params: { token: s
                   href={`/ingresar?modo=registrarme&next=${volverAca}`}
                   className="inline-flex items-center justify-center gap-2 rounded-full bg-accion px-4 py-2.5 text-sm font-semibold text-accion-texto transition-colors hover:opacity-90"
                 >
-                  {t("crearCuenta")}
+                  {t("crearPerfil")}
                 </Link>
                 <Link href={`/ingresar?next=${volverAca}`} className="text-sm font-medium text-ink-700 hover:text-brand-600">
                   {t("yaTengoCuenta")}

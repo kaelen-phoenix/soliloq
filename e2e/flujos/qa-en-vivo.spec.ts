@@ -339,6 +339,12 @@ test.describe("QA en vivo (#122, teléfono)", () => {
         return data?.length;
       }, { timeout: 10_000 })
       .toBe(1);
+    // La base ya lo tiene antes de que la acción vuelva y cierre el menú: si se toca «Opciones»
+    // con el menú todavía abierto, lo cierra en vez de abrirlo.
+    await expect(tarjeta.getByRole("button", { name: "Opciones del chat" })).toHaveAttribute(
+      "aria-expanded",
+      "false",
+    );
 
     await tarjeta.getByRole("button", { name: "Opciones del chat" }).click();
     await page.getByRole("button", { name: "Desvincularme" }).click();

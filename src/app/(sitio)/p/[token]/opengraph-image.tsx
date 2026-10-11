@@ -46,7 +46,7 @@ export default async function OgImagePerfil({ params }: { params: { token: strin
       getTranslations("perfil.og"),
       getTranslations("perfil.etiquetas"),
     ]);
-    const { data, error } = await supabase.rpc("perfil_publico", { p_token: params.token });
+    const { data, error } = await supabase.rpc("perfil_publico", { p_clave: params.token });
     if (error) reportarErrorSupabase(error, { rpc: "perfil_publico", token: params.token });
     const perfil = data?.[0];
 

@@ -91,7 +91,7 @@ do $$ begin assert (select perfil_id from push_suscripciones where endpoint = 'h
 do $$
 declare v_edad int;
 begin
-  select edad into v_edad from perfil_publico((select enlace_token from perfiles where id = (select v from ctx where k='ta')));
+  select edad into v_edad from perfil_publico((select enlace_token::text from perfiles where id = (select v from ctx where k='ta')));
   assert v_edad is not null, 'T4: con edad_visible=true la edad se muestra en el perfil público';
 end $$;
 
@@ -99,7 +99,7 @@ update perfiles_talento set edad_visible = false where id = (select v from ctx w
 do $$
 declare v_edad int;
 begin
-  select edad into v_edad from perfil_publico((select enlace_token from perfiles where id = (select v from ctx where k='ta')));
+  select edad into v_edad from perfil_publico((select enlace_token::text from perfiles where id = (select v from ctx where k='ta')));
   assert v_edad is null, 'T4: con edad_visible=false la edad NO se muestra en el perfil público';
 end $$;
 

@@ -75,11 +75,11 @@ export default async function PerfilPage({
   // activa (creó un Proyecto o Equipo), se suma su perfil artístico como sección aparte.
   const estado = await estadoCuentaDeLaRequest(user.id);
 
-  const [{ data: cuenta }, { data: perfilTalento }, { data: fotos }, { data: perfilCreador }] =
+  const [{ data: cuenta }, { data: perfilTalento }, { data: fotos }, { data: perfilCreador }, { data: visitas }] =
     await Promise.all([
       supabase
         .from("perfiles")
-        .select("enlace_token, enlace_publico_activo, discord_usuario")
+        .select("enlace_token, enlace_publico_activo, enlace_alias, discord_usuario")
         .eq("id", user.id)
         .single(),
       // La fila propia entera, con fecha y ubicación exacta: por `select` la base ya no las da (#255).
@@ -88,7 +88,14 @@ export default async function PerfilPage({
       estado.tienePerfilCreador
         ? supabase.from("perfiles_creador").select("disciplinas, otro_detalle").eq("id", user.id).single()
         : Promise.resolve({ data: null }),
+      // #384: cuántas veces se abrió el enlace público (RLS: solo las propias).
+      supabase.from("visitas_enlace").select("dia, cantidad").eq("perfil_id", user.id),
     ]);
+  const hace30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
+  const visitasEnlace = {
+    ultimos30: (visitas ?? []).filter((v) => v.dia >= hace30).reduce((n, v) => n + v.cantidad, 0),
+    total: (visitas ?? []).reduce((n, v) => n + v.cantidad, 0),
+  };
 
   const fotosConUrl = (fotos ?? []).map((f) => ({
     id: f.id,
@@ -147,6 +154,8 @@ export default async function PerfilPage({
           nombre={perfilTalento.nombre}
           tokenInicial={cuenta.enlace_token}
           activoInicial={cuenta.enlace_publico_activo}
+          aliasInicial={cuenta.enlace_alias}
+          visitas={visitasEnlace}
         />
       )}
       {!editando && (

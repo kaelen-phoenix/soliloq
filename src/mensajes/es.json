@@ -250,7 +250,7 @@
   },
   "legal": {
     "volverApp": "Ir a la app",
-    "actualizado": "Última actualización: 5 de octubre de 2026",
+    "actualizado": "Última actualización: 11 de octubre de 2026",
     "contacto": "Por cualquier consulta sobre estos temas escribinos a info@yalope.com.",
     "privacidad": {
       "titulo": "Política de Privacidad",
@@ -264,7 +264,7 @@
             "Perfil: nombre, fecha de nacimiento, ubicación, género (y su aclaración si elegís «Otro»), fotos, videoreel, experiencia, habilidades, redes sociales y tus preferencias de visibilidad.",
             "Proyectos y equipos que crees: títulos, descripciones, roles, fotos y locación de ensayos.",
             "Actividad en la app: los «Me interesa» que marcás, tus matches y convocatorias, los mensajes de los chats, las notificaciones, las denuncias y los bloqueos.",
-            "Datos técnicos: si activás las notificaciones, la suscripción de tu navegador; si vinculás Discord, tu identificador y nombre de usuario de Discord; tus preferencias de tema e idioma; la cantidad de veces que usás las funciones de IA (no guardamos los textos que mandás); y registros de errores con datos técnicos (navegador, sistema operativo y la pantalla donde ocurrió el error).",
+            "Datos técnicos: si activás las notificaciones, la suscripción de tu navegador; si vinculás Discord, tu identificador y nombre de usuario de Discord; tus preferencias de tema e idioma; la cantidad de veces que usás las funciones de IA (no guardamos los textos que mandás); si compartís tu enlace público, el nombre que elijas para él y cuántas veces se abre por día (no guardamos quién lo abre); y registros de errores con datos técnicos (navegador, sistema operativo y la pantalla donde ocurrió el error).",
             "Si escribís desde el formulario de «Apoyar»: tu nombre, tu email y tu mensaje."
           ]
         },
@@ -282,7 +282,7 @@
           "titulo": "3. Quién ve tu información",
           "parrafos": [
             "Tu perfil lo ven las personas con una cuenta aprobada en Yalope. Tu ubicación se muestra solo como barrio o ciudad: la dirección exacta nunca se publica. Tu edad se puede ocultar, y podés ocultar tu perfil a personas nuevas.",
-            "Si activás el enlace público de tu perfil, quien tenga ese enlace ve tu perfil sin tus redes sociales.",
+            "Si activás el enlace público de tu perfil, quien tenga ese enlace ve tu perfil completo, con tus redes sociales y tu sitio, aunque no tenga cuenta. Podés desactivarlo o cambiarlo cuando quieras.",
             "Los mensajes de un chat los ven solo quienes forman parte de ese chat.",
             "El equipo de administración de Yalope puede acceder a la información cuando hace falta para aprobar cuentas, atender denuncias o resolver problemas técnicos."
           ]

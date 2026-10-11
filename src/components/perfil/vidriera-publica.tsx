@@ -22,8 +22,7 @@ export interface PerfilPublico {
   genero: string | null;
   genero_descripcion: string | null;
   videoreel_url: string | null;
-  /** `{ [claveRed]: urlCanonica }`. */
-  /** Vacías sin cuenta o con la cuenta incompleta: las filtra `perfil_publico` (0095, 0097). */
+  /** `{ [claveRed]: urlCanonica }`. Desde #384 (0113) se ven también sin cuenta. */
   redes: Record<string, string>;
 }
 

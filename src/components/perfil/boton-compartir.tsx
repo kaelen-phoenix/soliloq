@@ -7,6 +7,20 @@ import { Boton } from "@/components/ui/boton";
 import { CodigoQr } from "@/components/ui/codigo-qr";
 import { Icono } from "@/components/ui/icono";
 
+/** Formato del nombre del enlace (0113): minúsculas, números y guiones, de 3 a 40. */
+const FORMATO_ALIAS = /^[a-z0-9]+(-[a-z0-9]+)*$/;
+
+/** «Ana Pérez» → «ana-perez»: una sugerencia para el nombre del enlace. */
+function aAlias(texto: string): string {
+  return texto
+    .toLowerCase()
+    .normalize("NFD")
+    .replace(/[\u0300-\u036f]/g, "")
+    .replace(/[^a-z0-9]+/g, "-")
+    .replace(/^-+|-+$/g, "")
+    .slice(0, 40);
+}
+
 /**
  * Compartir el perfil propio con un enlace que se ve sin cuenta. El primer uso activa el
  * enlace (estaba apagado por defecto) — por eso la línea de qué queda visible se muestra
@@ -17,11 +31,17 @@ export function BotonCompartir({
   nombre,
   tokenInicial,
   activoInicial,
+  aliasInicial,
+  visitas,
 }: {
   userId: string;
   nombre: string;
   tokenInicial: string;
   activoInicial: boolean;
+  /** #384: el nombre elegido para el enlace (`yalope.com/p/ana-perez`), si tiene. */
+  aliasInicial: string | null;
+  /** #384: cuántas veces se abrió el enlace (últimos 30 días y en total). */
+  visitas: { ultimos30: number; total: number };
 }) {
   const t = useTranslations("perfil.compartir");
   const [token, setToken] = useState(tokenInicial);
@@ -31,9 +51,38 @@ export function BotonCompartir({
   const [copiado, setCopiado] = useState(false);
   const [cargando, setCargando] = useState(false);
   const [error, setError] = useState<string | null>(null);
+  const [alias, setAlias] = useState(aliasInicial);
+  const [aliasEditado, setAliasEditado] = useState(aliasInicial ?? aAlias(nombre));
+  const [errorAlias, setErrorAlias] = useState<string | null>(null);
+  const [aliasGuardado, setAliasGuardado] = useState(false);
+  const [guardandoAlias, setGuardandoAlias] = useState(false);
 
-  function urlActual() {
-    return `${window.location.origin}/p/${token}`;
+  function urlActual(con: string | null = alias) {
+    return `${window.location.origin}/p/${con ?? token}`;
+  }
+
+  async function guardarAlias() {
+    setErrorAlias(null);
+    setAliasGuardado(false);
+    const valor = aliasEditado.trim().toLowerCase();
+    if (valor && (!FORMATO_ALIAS.test(valor) || valor.length < 3 || valor.length > 40)) {
+      setErrorAlias(t("aliasFormato"));
+      return;
+    }
+    setGuardandoAlias(true);
+    const { error: errorBd } = await createClient()
+      .from("perfiles")
+      .update({ enlace_alias: valor || null })
+      .eq("id", userId);
+    setGuardandoAlias(false);
+    if (errorBd) {
+      // 23505: lo usa otra persona; 23514: no cumple el formato (lo valida la base, 0113).
+      setErrorAlias(errorBd.code === "23505" ? t("aliasOcupado") : errorBd.code === "23514" ? t("aliasFormato") : t("aliasError"));
+      return;
+    }
+    setAlias(valor || null);
+    setAliasGuardado(true);
+    setUrlQr((prev) => (prev ? urlActual(valor || null) : null));
   }
 
   async function activarSiHaceFalta() {
@@ -119,8 +168,9 @@ export function BotonCompartir({
       return;
     }
     setToken(nuevoToken);
-    // El QR abierto apuntaba al token viejo: se refresca o se cierra.
-    setUrlQr((prev) => (prev ? `${window.location.origin}/p/${nuevoToken}` : null));
+    // El QR abierto apuntaba al token viejo: se refresca (si no hay nombre elegido, que es lo
+    // que se comparte cuando lo hay).
+    setUrlQr((prev) => (prev ? `${window.location.origin}/p/${alias ?? nuevoToken}` : null));
   }
 
   const url = mostrarMenu ? urlActual() : "";
@@ -134,8 +184,48 @@ export function BotonCompartir({
           <p className="mt-1 text-sm leading-relaxed text-texto-tenue">
             {activo ? t("activo") : t("inactivo")}
           </p>
+          {activo && (
+            <p className="mt-1 text-sm text-texto-tenue">
+              {t("visitas", { n: visitas.ultimos30, total: visitas.total })}
+            </p>
+          )}
         </div>
         <Icono nombre="compartir" className="h-5 w-5 shrink-0 text-texto-tenue" />
+      </div>
+
+      {/* #384: el enlace con nombre propio, en lugar del código. */}
+      <div className="mt-4 flex flex-col gap-1.5">
+        <label htmlFor="enlace-alias" className="text-sm font-medium text-texto">
+          {t("aliasEtiqueta")}
+        </label>
+        <div className="flex flex-wrap items-center gap-2">
+          <div className="flex min-w-0 flex-1 items-center rounded-xl border border-borde bg-superficie px-3 focus-within:border-accion">
+            <span className="shrink-0 text-sm text-texto-tenue">yalope.com/p/</span>
+            <input
+              id="enlace-alias"
+              value={aliasEditado}
+              onChange={(e) => {
+                setAliasEditado(e.target.value.toLowerCase());
+                setAliasGuardado(false);
+              }}
+              maxLength={40}
+              autoCapitalize="none"
+              autoCorrect="off"
+              spellCheck={false}
+              className="min-w-0 flex-1 bg-transparent py-2.5 text-base text-texto outline-none"
+            />
+          </div>
+          <Boton type="button" variante="secundario" onClick={guardarAlias} cargando={guardandoAlias}>
+            {t("aliasGuardar")}
+          </Boton>
+        </div>
+        <p className="text-xs text-texto-tenue">{t("aliasAyuda")}</p>
+        {aliasGuardado && (
+          <p role="status" className="text-xs font-medium text-exito-600">
+            {t("aliasListo")}
+          </p>
+        )}
+        {errorAlias && <p className="text-xs text-error-600">{errorAlias}</p>}
       </div>
 
       <div className="mt-4 flex flex-wrap items-center gap-3">
