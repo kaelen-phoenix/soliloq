@@ -126,8 +126,6 @@
       "trayendoFoto": "Trayendo tu foto…",
       "usarFotoGoogle": "Usar mi foto de Google",
       "fotosRecomendadas": "Te recomendamos {n} fotos o más: así quien busca talento te ve mejor.",
-      "sumarMas": "+ Sumar más (opcional)",
-      "sumarMasAyuda": "Videoreel, experiencia, habilidades y redes. También podés completarlo después desde tu Perfil.",
       "videoreel": "Videoreel (opcional)",
       "videoreelEtiqueta": "Enlace de YouTube o Vimeo",
       "videoreelPlaceholder": "https://youtu.be/... o https://vimeo.com/...",
@@ -298,6 +296,44 @@
       "cerrar": "Cerrar",
       "anterior": "Foto anterior",
       "siguiente": "Foto siguiente"
+    },
+    "wizard": {
+      "pasoDe": "Paso {n} de {total}",
+      "opcional": "Opcional",
+      "siguiente": "Siguiente",
+      "atras": "Atrás",
+      "editar": "Editar",
+      "sinCompletar": "Sin completar",
+      "noPorAhora": "No por ahora",
+      "habilidades": "Habilidades",
+      "fotos": "{n, plural, =1 {# foto} other {# fotos}}",
+      "seGuarda": "Lo que cargás se guarda solo: si salís, seguís desde acá, también desde otro dispositivo.",
+      "pasos": {
+        "1": {
+          "titulo": "Datos básicos",
+          "instruccion": "Tu nombre, tu fecha de nacimiento, dónde estás y tu género. Es lo primero que ven de vos."
+        },
+        "2": {
+          "titulo": "Fotos",
+          "instruccion": "Subí tus fotos: con una ya podés seguir, y con tres o más tu perfil se luce más. La primera es la que se ve en tu tarjeta."
+        },
+        "3": {
+          "titulo": "Experiencia y formación",
+          "instruccion": "Contá en qué trabajaste y dónde te formaste. Es opcional: podés completarlo ahora o después desde tu perfil."
+        },
+        "4": {
+          "titulo": "Habilidades, videoreel y redes",
+          "instruccion": "Sumá lo que te ayude a destacar. Es opcional: podés completarlo después."
+        },
+        "5": {
+          "titulo": "¿También armás proyectos?",
+          "instruccion": "Si dirigís, producís, escribís o armás obras, marcá lo que hacés. Si no, seguí: se activa solo cuando crees tu primer Proyecto o Equipo."
+        },
+        "6": {
+          "titulo": "Revisá y confirmá",
+          "instruccion": "Mirá que esté todo bien. Con «Editar» volvés a cualquier paso para corregir."
+        }
+      }
     }
   }
 }

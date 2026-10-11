@@ -24,8 +24,12 @@ export default async function CompletarPerfilPage({
   // #303: con Google ya sabemos el nombre (y quizá la foto): se precargan.
   const meta = user.user_metadata as Record<string, unknown> | undefined;
   const nombreGoogle = [meta?.full_name, meta?.name].find((v): v is string => typeof v === "string" && v.trim().length > 1);
-  const conFotoGoogle = (await fotoDeGoogle(meta)) != null;
-  const t = await getTranslations("perfil.completar");
+  // #383: si ya había empezado (en este u otro dispositivo), sigue donde quedó.
+  const [conFotoGoogle, { data: borrador }, t] = await Promise.all([
+    fotoDeGoogle(meta).then((f) => f != null),
+    supabase.from("borradores_perfil").select("paso, datos, actualizado_en").eq("perfil_id", user.id).maybeSingle(),
+    getTranslations("perfil.completar"),
+  ]);
 
   return (
     <main className="min-h-screen px-6 py-10 sm:bg-fondo-sutil sm:py-14">
@@ -41,6 +45,9 @@ export default async function CompletarPerfilPage({
           destinoAlTerminar={next}
           nombreSugerido={nombreGoogle?.trim()}
           conFotoGoogle={conFotoGoogle}
+          borrador={
+            borrador ? { paso: borrador.paso, datos: borrador.datos, actualizadoEn: borrador.actualizado_en } : null
+          }
         />
       </div>
     </main>

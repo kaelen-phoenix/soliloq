@@ -138,6 +138,35 @@ test.describe("accesibilidad", () => {
       await p.getByRole("button", { name: "Crear", exact: true }).click();
     });
 
+    // #383: el asistente del alta (primer y último paso), con una cuenta sin perfil.
+    const emailAlta = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@test.local`;
+    const { data: alta, error: eAlta } = await admin!.auth.admin.createUser({ email: emailAlta, password: PASS, email_confirm: true });
+    if (eAlta || !alta.user) throw eAlta ?? new Error("sin usuario");
+    usuarios.push(alta.user.id);
+    const ahoraAlta = new Date().toISOString();
+    await admin!.from("perfiles").update({
+      aprobado_en: ahoraAlta, normas_aceptadas_en: ahoraAlta, tour_talento_visto_en: ahoraAlta, tour_creador_visto_en: ahoraAlta,
+    }).eq("id", alta.user.id);
+    const pAlta = await entrar(browser, emailAlta);
+    {
+      for (const paso of [1, 6]) {
+        await visitar(pAlta, `/completar-perfil (paso ${paso})`, async () => {
+          // Ídem `formularios-ancho`: salir antes, para que el guardado pendiente de la página
+          // no pise el borrador que se escribe acá.
+          await pAlta.evaluate(() => localStorage.clear());
+          await pAlta.goto("about:blank");
+          await admin!.from("borradores_perfil").upsert({
+            perfil_id: alta.user.id,
+            paso,
+            datos: { nombre: "Accesible Alta", fechaNacimiento: "05/05/1995", genero: "sin_especificar" },
+            actualizado_en: new Date().toISOString(),
+          });
+          await pAlta.goto("/completar-perfil");
+          await pAlta.getByText(`Paso ${paso} de 6`, { exact: true }).waitFor({ timeout: 15_000 });
+        });
+      }
+    }
+
     console.log(informe.join("\n"));
     if (fallas.length) throw new Error(`No se pudieron revisar: ${fallas.join(" | ")}`);
     if (conViolaciones.length) {

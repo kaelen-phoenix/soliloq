@@ -138,8 +138,11 @@ test.describe("todos los formularios", () => {
     await page.getByLabel("Fecha de nacimiento").fill("05051990");
     await elegirUbicacion(page, "Ubicación");
     await page.getByLabel("Género").selectOption({ index: 1 });
+    // #383: el alta es un asistente por pasos; los opcionales (3 a 5) se pasan sin completar.
+    await page.getByRole("button", { name: "Siguiente" }).click();
     await page.locator('input[type="file"]').first().setInputFiles({ name: "foto.png", mimeType: "image/png", buffer: PNG });
     await expect(page.getByText(/1\/5 fotos/)).toBeVisible({ timeout: 20_000 });
+    for (let i = 0; i < 4; i++) await page.getByRole("button", { name: "Siguiente" }).click();
     await page.getByRole("button", { name: "Completar perfil" }).click();
     await expect(page.getByRole("heading", { name: "Explorar" })).toBeVisible({ timeout: 30_000 });
     const { data: talento } = await admin!.from("perfiles_talento").select("nombre, ubicacion_publica, fecha_nacimiento").eq("id", nuevo.id).single();

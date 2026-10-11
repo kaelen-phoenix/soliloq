@@ -126,8 +126,6 @@
       "trayendoFoto": "Getting your photo…",
       "usarFotoGoogle": "Use my Google photo",
       "fotosRecomendadas": "We recommend {n} photos or more: it helps people looking for talent get a better sense of you.",
-      "sumarMas": "+ Add more (optional)",
-      "sumarMasAyuda": "Reel, experience, skills and social links. You can also fill these in later from your Profile.",
       "videoreel": "Reel (optional)",
       "videoreelEtiqueta": "YouTube or Vimeo link",
       "videoreelPlaceholder": "https://youtu.be/... or https://vimeo.com/...",
@@ -298,6 +296,44 @@
       "cerrar": "Close",
       "anterior": "Previous photo",
       "siguiente": "Next photo"
+    },
+    "wizard": {
+      "pasoDe": "Step {n} of {total}",
+      "opcional": "Optional",
+      "siguiente": "Next",
+      "atras": "Back",
+      "editar": "Edit",
+      "sinCompletar": "Not filled in",
+      "noPorAhora": "Not for now",
+      "habilidades": "Skills",
+      "fotos": "{n, plural, =1 {# photo} other {# photos}}",
+      "seGuarda": "What you enter is saved automatically: if you leave, you pick up from here, even on another device.",
+      "pasos": {
+        "1": {
+          "titulo": "Basic info",
+          "instruccion": "Your name, date of birth, where you are and your gender. It's the first thing people see about you."
+        },
+        "2": {
+          "titulo": "Photos",
+          "instruccion": "Upload your photos: one is enough to continue, and three or more make your profile stand out. The first one shows on your card."
+        },
+        "3": {
+          "titulo": "Experience and training",
+          "instruccion": "Tell us what you've worked on and where you trained. It's optional: fill it in now or later from your profile."
+        },
+        "4": {
+          "titulo": "Skills, video reel and social links",
+          "instruccion": "Add whatever helps you stand out. It's optional: you can fill it in later."
+        },
+        "5": {
+          "titulo": "Do you also put projects together?",
+          "instruccion": "If you direct, produce, write or put shows together, check what you do. If not, keep going: it turns on by itself when you create your first Project or Team."
+        },
+        "6": {
+          "titulo": "Review and confirm",
+          "instruccion": "Check that everything looks right. Use «Edit» to go back to any step."
+        }
+      }
     }
   }
 }

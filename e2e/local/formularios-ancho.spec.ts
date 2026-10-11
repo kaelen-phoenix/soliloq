@@ -109,7 +109,6 @@ test.describe("formularios en pantallas angostas", () => {
       await revisar(page, "buscar-filtros", ancho, informe, fallas);
 
       await page.goto("/perfil?editar=1");
-      // Al editar, lo opcional ya está desplegado (el «Sumar más» es solo del alta).
       await revisar(page, "perfil-editar", ancho, informe, fallas);
 
       await page.goto("/ajustes");
@@ -117,6 +116,55 @@ test.describe("formularios en pantallas angostas", () => {
       await page.context().close();
     }
     fs.writeFileSync(path.join(DIR, "informe.txt"), informe.join("\n"));
+    console.log(informe.join("\n"));
+    if (fallas.length) throw new Error(`Se sale de la pantalla en: ${fallas.join(", ")}`);
+  });
+
+  test("asistente del alta, paso por paso (#383)", async ({ browser }) => {
+    // Una cuenta aprobada y con Normas, sin Perfil de Talento: cae en el asistente.
+    const email = `e2e-${Date.now()}-${Math.random().toString(36).slice(2, 7)}@test.local`;
+    const { data, error } = await admin!.auth.admin.createUser({ email, password: PASS, email_confirm: true });
+    if (error || !data.user) throw error ?? new Error("sin usuario");
+    const id = data.user.id;
+    usuarios.push(id);
+    const ahora = new Date().toISOString();
+    await admin!.from("perfiles").update({
+      aprobado_en: ahora, normas_aceptadas_en: ahora, tour_talento_visto_en: ahora, tour_creador_visto_en: ahora,
+    }).eq("id", id);
+    // Cada paso se abre escribiendo el borrador en la base (sin completar los anteriores).
+    const datos = {
+      nombre: "Ancho Asistente E2E con un nombre largo para ver cómo corta",
+      fechaNacimiento: "05/05/1995",
+      ubicacion: { texto: "Buenos Aires, Argentina", publica: "Palermo, CABA", placeId: null, lat: -34.6, lng: -58.4, pais: "AR" },
+      genero: "sin_especificar",
+      experiencia: "Teatro independiente. ".repeat(20),
+      formacion: "Escuela de teatro. ".repeat(10),
+      habilidades: ["Canto", "Danza"],
+      disciplinas: ["direccion"],
+    };
+    const informe: string[] = [];
+    const fallas: string[] = [];
+    for (const ancho of [320, 360]) {
+      const ctx = await browser.newContext({ viewport: { width: ancho, height: 760 } });
+      const page = await ctx.newPage();
+      await page.goto("/ingresar");
+      await page.getByLabel("Tu email").fill(email);
+      await page.getByLabel("Contraseña").fill(PASS);
+      await page.locator("form").getByRole("button", { name: "Ingresar" }).click();
+      await page.waitForURL(/\/completar-perfil/, { timeout: 30_000 });
+      for (let paso = 1; paso <= 6; paso++) {
+        // Primero se sale de la página: su guardado del borrador (sale un segundo después de
+        // cargar) podría pisar el que se escribe acá. Y sin el borrador del teléfono, que
+        // sería más nuevo y ganaría.
+        await page.evaluate(() => localStorage.clear());
+        await page.goto("about:blank");
+        await admin!.from("borradores_perfil").upsert({ perfil_id: id, paso, datos, actualizado_en: new Date().toISOString() });
+        await page.goto("/completar-perfil");
+        await page.getByText(`Paso ${paso} de 6`, { exact: true }).waitFor({ timeout: 15_000 });
+        await revisar(page, `alta-paso-${paso}`, ancho, informe, fallas);
+      }
+      await ctx.close();
+    }
     console.log(informe.join("\n"));
     if (fallas.length) throw new Error(`Se sale de la pantalla en: ${fallas.join(", ")}`);
   });
