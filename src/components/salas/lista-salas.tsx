@@ -12,28 +12,11 @@ import {
   desvincularmeDeSala,
 } from "@/app/(sitio)/(app)/salas/acciones";
 import { BadgeNoLeidos, useNoLeidos } from "./no-leidos";
+import { ordenarSalas, type SalaItem } from "@/lib/salas-reglas";
 
-export interface SalaItem {
-  salaId: string;
-  titulo: string;
-  esEquipo: boolean;
-  /** `false` en los chats directos (sin Proyecto ni Equipo): llevan la etiqueta «Directo». */
-  esDeIniciativa: boolean;
-  ultimoMensaje: string | null;
-  ultimaActividad: string | null;
-  destacadoEn: string | null;
-  esDueno: boolean;
-}
-
-// Destacados primero (último destacado arriba), después el resto por actividad reciente.
-function ordenar(salas: SalaItem[]) {
-  return [...salas].sort((a, b) => {
-    if (a.destacadoEn && b.destacadoEn) return b.destacadoEn.localeCompare(a.destacadoEn);
-    if (a.destacadoEn) return -1;
-    if (b.destacadoEn) return 1;
-    return (b.ultimaActividad ?? "").localeCompare(a.ultimaActividad ?? "");
-  });
-}
+export type { SalaItem } from "@/lib/salas-reglas";
+// Destacados primero, después por actividad (`ordenarSalas`, compartido con la app).
+const ordenar = ordenarSalas;
 
 export function ListaSalas({ salas: salasIniciales }: { salas: SalaItem[] }) {
   const [salas, setSalas] = useState(salasIniciales);

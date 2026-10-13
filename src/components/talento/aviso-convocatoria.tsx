@@ -10,14 +10,8 @@ import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { responderConvocatoria } from "@/app/(sitio)/(app)/convocatoria/acciones";
+import { aFilaConvocatoria, type FilaConvocatoria } from "@/lib/convocatoria-talento";
 
-interface AvisoFila {
-  convocatoriaId: string;
-  esEquipo: boolean;
-  iniciativaTitulo: string;
-  talentoFotoUrl: string | null;
-  iniciativaFotoUrl: string | null;
-}
 
 /**
  * Ventana emergente de convocatoria definitiva (issue #203): a diferencia de
@@ -34,25 +28,18 @@ interface AvisoFila {
 export function AvisoConvocatoria({ userId }: { userId: string }) {
   const router = useRouter();
   const t = useTranslations("proyectos.convocatoria");
-  const [cola, setCola] = useState<AvisoFila[]>([]);
+  const [cola, setCola] = useState<FilaConvocatoria[]>([]);
   const [ocupado, setOcupado] = useState(false);
   const [error, setError] = useState<string | null>(null);
 
   useEffect(() => {
     const supabase = createClient();
-    const url = (path: string | null) =>
-      path ? supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl : null;
+    const url = (path: string) => supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl;
 
     async function cargar() {
       const { data, error } = await supabase.rpc("mis_convocatorias");
       if (error) reportarErrorSupabase(error, { rpc: "mis_convocatorias", userId });
-      const filas: AvisoFila[] = (data ?? []).map((c) => ({
-        convocatoriaId: c.convocatoria_id,
-        esEquipo: c.es_equipo,
-        iniciativaTitulo: c.iniciativa_titulo,
-        talentoFotoUrl: url(c.talento_foto),
-        iniciativaFotoUrl: url(c.iniciativa_foto),
-      }));
+      const filas = (data ?? []).map((c) => aFilaConvocatoria(c, url));
       setCola((prev) => {
         const vistas = new Set(prev.map((f) => f.convocatoriaId));
         return [...prev, ...filas.filter((f) => !vistas.has(f.convocatoriaId))];

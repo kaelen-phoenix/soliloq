@@ -10,6 +10,7 @@ import {
   type PermisoBorrado,
 } from "@/lib/discord-acciones";
 import { sinSesion, usuarioDesdeApp } from "@/lib/supabase/desde-app";
+import { esquemaApp, firmarPaseApp, SITIO } from "../../discord/comun";
 
 const texto = (v: unknown) => (typeof v === "string" && v.length <= 64 ? v : undefined);
 
@@ -23,6 +24,7 @@ const texto = (v: unknown) => (typeof v === "string" && v.length <= 64 ? v : und
  *   { accion: "borrar-canales", permiso }
  *   { accion: "abrir-espacio", salaId }              → { ok, url }
  *   { accion: "desvincular" }
+ *   { accion: "enlace-vincular", esquema }           → { ok, url } (Vincular mi Discord, #395)
  */
 export async function POST(request: Request) {
   const sesion = await usuarioDesdeApp(request);
@@ -49,6 +51,12 @@ export async function POST(request: Request) {
       return NextResponse.json(texto(c.salaId) ? await abrirEspacioDe(sesion, texto(c.salaId)!) : { ok: false, error: "errorCrear" });
     case "desvincular":
       return NextResponse.json(await desvincularDiscordDe(sesion));
+    case "enlace-vincular": {
+      const esquema = esquemaApp(texto(c.esquema));
+      if (!esquema) return NextResponse.json({ ok: false, error: "pedido" }, { status: 400 });
+      const pase = firmarPaseApp(sesion.user.id, esquema);
+      return NextResponse.json({ ok: true, url: `${SITIO}/api/discord/vincular?pase=${encodeURIComponent(pase)}` });
+    }
   }
   return NextResponse.json({ ok: false, error: "pedido" }, { status: 400 });
 }

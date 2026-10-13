@@ -7,42 +7,10 @@ import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import { darDeBajaConvocado } from "@/app/(sitio)/(app)/matches/acciones";
+import { agruparCobertura, type FilaCobertura } from "@/lib/iniciativa-reglas";
 
-export interface FilaCobertura {
-  rolId: string | null;
-  rolNombre: string | null;
-  vacantes: number;
-  convocatoriaId: string | null;
-  talentoId: string | null;
-  talentoNombre: string | null;
-  talentoFotoUrl: string | null;
-}
-
-interface Grupo {
-  rolId: string | null;
-  rolNombre: string | null;
-  vacantes: number;
-  ocupantes: { convocatoriaId: string; talentoId: string; nombre: string; fotoUrl: string | null }[];
-}
-
-function agrupar(filas: FilaCobertura[], sinNombre: string): Grupo[] {
-  const grupos = new Map<string, Grupo>();
-  for (const f of filas) {
-    const clave = f.rolId ?? "__equipo__";
-    if (!grupos.has(clave)) {
-      grupos.set(clave, { rolId: f.rolId, rolNombre: f.rolNombre, vacantes: f.vacantes, ocupantes: [] });
-    }
-    if (f.talentoId && f.convocatoriaId) {
-      grupos.get(clave)!.ocupantes.push({
-        convocatoriaId: f.convocatoriaId,
-        talentoId: f.talentoId,
-        nombre: f.talentoNombre ?? sinNombre,
-        fotoUrl: f.talentoFotoUrl,
-      });
-    }
-  }
-  return [...grupos.values()];
-}
+// El tipo y el agrupado viven en `@/lib/iniciativa-reglas` (los usa también la app nativa).
+export type { FilaCobertura } from "@/lib/iniciativa-reglas";
 
 function Avatar({ url, nombre }: { url: string | null; nombre: string }) {
   return url ? (
@@ -64,7 +32,7 @@ export function CoberturaIniciativa({ filas, esEquipo }: { filas: FilaCobertura[
   const t = useTranslations("proyectos.cobertura");
   const tc = useTranslations("comun");
   const sinNombre = t("talento");
-  const grupos = useMemo(() => agrupar(filas, sinNombre), [filas, sinNombre]);
+  const grupos = useMemo(() => agruparCobertura(filas, sinNombre), [filas, sinNombre]);
   const [perfilAbierto, setPerfilAbierto] = useState<string | null>(null);
   const [confirmando, setConfirmando] = useState<string | null>(null);
   const [ocupado, setOcupado] = useState(false);

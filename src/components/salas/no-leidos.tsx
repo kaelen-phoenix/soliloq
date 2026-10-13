@@ -5,14 +5,9 @@ import { createContext, useCallback, useContext, useEffect, useMemo, useRef, use
 import { createClient } from "@/lib/supabase/client";
 import { suscribirConSesion } from "@/lib/supabase/realtime";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
+import { contarNoLeidos, textoBadge, type FilaNoLeidos } from "@/lib/salas-reglas";
 
-/** Una fila de `salas_no_leidas()` (0082): solo vienen las salas con algo sin leer. */
-export interface FilaNoLeidos {
-  sala_id: string;
-  no_leidos: number;
-  es_de_iniciativa: boolean;
-  es_dueno: boolean;
-}
+export type { FilaNoLeidos } from "@/lib/salas-reglas";
 
 interface ValorNoLeidos {
   /** Mensajes sin leer por sala. */
@@ -113,15 +108,8 @@ export function ProveedorNoLeidos({
   );
 
   const valor = useMemo(() => {
-    const porSala = new Map<string, number>();
-    for (const f of filas) {
-      // #288: sin modos, cuentan todas las salas (antes se filtraban por Talento/Creador).
-      if (f.sala_id !== salaAbierta && f.no_leidos > 0) {
-        porSala.set(f.sala_id, f.no_leidos);
-      }
-    }
-    let total = 0;
-    porSala.forEach((n) => (total += n));
+    // #288: sin modos, cuentan todas las salas (antes se filtraban por Talento/Creador).
+    const { porSala, total } = contarNoLeidos(filas, salaAbierta);
     return { porSala, total, revision, marcarLeida };
   }, [filas, salaAbierta, revision, marcarLeida]);
 
@@ -139,7 +127,7 @@ export function BadgeNoLeidos({ cantidad, className = "" }: { cantidad: number; 
     <span
       className={`flex h-[16px] min-w-[16px] items-center justify-center rounded-full bg-brand-500 px-1 text-2xs font-semibold leading-none text-white ring-2 ring-superficie ${className}`}
     >
-      {cantidad > 9 ? "9+" : cantidad}
+      {textoBadge(cantidad)}
     </span>
   );
 }

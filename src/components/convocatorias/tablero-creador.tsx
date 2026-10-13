@@ -4,6 +4,7 @@ import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { Icono } from "@/components/ui/icono";
 import { CrearProyecto } from "@/components/convocatorias/crear-proyecto";
 import { createClient } from "@/lib/supabase/server";
+import { itemsTablero } from "@/lib/iniciativa-reglas";
 
 // La etiqueta de cada estado sale de `proyectos.tablero.estado.<estado>`.
 const COLOR_ESTADO: Record<string, string> = {
@@ -13,14 +14,6 @@ const COLOR_ESTADO: Record<string, string> = {
   activo: "bg-accion text-accion-texto",
   cerrado: "bg-fondo-sutil text-texto-tenue",
 };
-
-interface Item {
-  id: string;
-  tipo: "proyecto" | "equipo";
-  titulo: string;
-  estado: string;
-  creadoEn: string;
-}
 
 /**
  * Mis proyectos (#341): un solo «Crear proyecto» —que pregunta si es un proyecto con roles o
@@ -37,22 +30,8 @@ export async function TableroCreador({ creadorId }: { creadorId: string }) {
     supabase.from("equipos").select("id, titulo, activo, creado_en").eq("creador_id", creadorId),
   ]);
 
-  const items: Item[] = [
-    ...(obras ?? []).map((o) => ({
-      id: o.id,
-      tipo: "proyecto" as const,
-      titulo: o.titulo,
-      estado: o.estado,
-      creadoEn: o.creado_en,
-    })),
-    ...(equipos ?? []).map((e) => ({
-      id: e.id,
-      tipo: "equipo" as const,
-      titulo: e.titulo,
-      estado: e.activo ? "activo" : "cerrado",
-      creadoEn: e.creado_en,
-    })),
-  ].sort((a, b) => b.creadoEn.localeCompare(a.creadoEn));
+  // Todo en una lista, lo más nuevo primero (`itemsTablero`, compartido con la app).
+  const items = itemsTablero(obras ?? [], equipos ?? []);
 
   return (
     <main className="flex flex-col gap-4 px-5 py-5">

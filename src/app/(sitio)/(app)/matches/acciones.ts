@@ -6,6 +6,7 @@ import { createClient } from "@/lib/supabase/server";
 import { sincronizarEspaciosDe } from "@/lib/discord-servidor";
 import { iniciativaParaBuscar } from "@/lib/iniciativa-servidor";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
+import { errorConocidoConvocar, errorConocidoDescartar, errorConocidoRetirarme } from "@/lib/matches";
 
 type Resultado = { ok: true } | { ok: false; error: string };
 
@@ -36,17 +37,9 @@ export async function convocarMatch(matchId: string, rolId?: string): Promise<Re
   const t = await getTranslations("proyectos.matches.errores");
   const { error } = await supabase.rpc("convocar", { p_match_id: matchId, p_rol_id: rolId ?? null });
   if (error) {
-    const m = error.message ?? "";
-    if (m.includes("rol_lleno")) return { ok: false, error: t("rolLleno") };
-    if (m.includes("rol inválido")) return { ok: false, error: t("rolInvalido") };
-    if (m.includes("cupo_lleno")) {
-      return {
-        ok: false,
-        error: t("cupoLleno"),
-      };
-    }
-    if (m.includes("primero aceptá")) return { ok: false, error: t("primeroAcepta") };
-    if (m.includes("ya está convocado")) return { ok: false, error: t("yaConvocada") };
+    // Los errores esperados los explica la base; la app nativa los lee igual (`@/lib/matches`).
+    const conocido = errorConocidoConvocar(error.message);
+    if (conocido) return { ok: false, error: t(conocido) };
     reportarErrorSupabase(error, { rpc: "convocar", matchId, rolId });
     return { ok: false, error: t("convocar") };
   }
@@ -60,10 +53,8 @@ export async function descartarConvocado(matchId: string): Promise<Resultado> {
   const t = await getTranslations("proyectos.matches.errores");
   const { error } = await supabase.rpc("descartar_convocado", { p_match_id: matchId });
   if (error) {
-    const m = error.message ?? "";
-    if (m.includes("ya aceptó")) {
-      return { ok: false, error: t("yaAcepto") };
-    }
+    const conocido = errorConocidoDescartar(error.message);
+    if (conocido) return { ok: false, error: t(conocido) };
     reportarErrorSupabase(error, { rpc: "descartar_convocado", matchId });
     return { ok: false, error: t("descartar") };
   }
@@ -139,9 +130,8 @@ export async function retirarmeDeMatch(matchId: string): Promise<Resultado> {
   const t = await getTranslations("proyectos.matches.errores");
   const { error } = await supabase.rpc("retirarme_de_match", { p_match_id: matchId });
   if (error) {
-    if (error.message?.includes("ya estás en el chat")) {
-      return { ok: false, error: t("yaEnChat") };
-    }
+    const conocido = errorConocidoRetirarme(error.message);
+    if (conocido) return { ok: false, error: t(conocido) };
     reportarErrorSupabase(error, { rpc: "retirarme_de_match", matchId });
     return { ok: false, error: t("aplicar") };
   }

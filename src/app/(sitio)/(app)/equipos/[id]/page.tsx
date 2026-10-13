@@ -1,7 +1,7 @@
 import { notFound } from "next/navigation";
 import { getTranslations } from "next-intl/server";
 import { GestionEquipo } from "@/components/convocatorias/gestion-equipo";
-import type { FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
+import { filasCobertura } from "@/lib/iniciativa-reglas";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
@@ -37,15 +37,7 @@ export default async function EquipoPage({ params }: { params: { id: string } })
     p_equipo_id: equipo.id,
   });
   if (error) reportarErrorSupabase(error, { rpc: "cobertura_iniciativa", equipoId: equipo.id });
-  const cobertura: FilaCobertura[] = (coberturaRaw ?? []).map((r) => ({
-    rolId: r.rol_id,
-    rolNombre: r.rol_nombre,
-    vacantes: r.vacantes,
-    convocatoriaId: r.convocatoria_id,
-    talentoId: r.talento_id,
-    talentoNombre: r.talento_nombre,
-    talentoFotoUrl: r.talento_foto ? url(r.talento_foto) : null,
-  }));
+  const cobertura = filasCobertura(coberturaRaw ?? [], url);
 
   return (
     <main className="px-5 py-5">

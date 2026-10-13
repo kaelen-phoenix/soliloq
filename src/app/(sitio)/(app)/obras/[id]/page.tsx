@@ -7,7 +7,8 @@ import { AccionesObra } from "@/components/convocatorias/acciones-obra";
 import { EditarObra } from "@/components/convocatorias/editar-obra";
 import { FotosObra } from "@/components/convocatorias/fotos-obra";
 import { MetricasObra } from "@/components/convocatorias/metricas-obra";
-import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
+import { CoberturaIniciativa } from "@/components/convocatorias/cobertura-iniciativa";
+import { filasCobertura } from "@/lib/iniciativa-reglas";
 import { getTranslations } from "next-intl/server";
 import { Icono } from "@/components/ui/icono";
 import { claveGenero } from "@/lib/constantes";
@@ -62,17 +63,10 @@ export default async function DetalleObraPage({
   if (errorCobertura)
     reportarErrorSupabase(errorCobertura, { rpc: "cobertura_iniciativa", obraId: params.id });
 
-  const cobertura: FilaCobertura[] = (coberturaRaw ?? []).map((r) => ({
-    rolId: r.rol_id,
-    rolNombre: r.rol_nombre,
-    vacantes: r.vacantes,
-    convocatoriaId: r.convocatoria_id,
-    talentoId: r.talento_id,
-    talentoNombre: r.talento_nombre,
-    talentoFotoUrl: r.talento_foto
-      ? supabase.storage.from("fotos-perfil").getPublicUrl(r.talento_foto).data.publicUrl
-      : null,
-  }));
+  const cobertura = filasCobertura(
+    coberturaRaw ?? [],
+    (ruta) => supabase.storage.from("fotos-perfil").getPublicUrl(ruta).data.publicUrl,
+  );
 
   const fotos = (fotosRaw ?? []).map((f) => ({
     id: f.id,

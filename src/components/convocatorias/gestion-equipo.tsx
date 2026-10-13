@@ -14,9 +14,11 @@ import {
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { Icono } from "@/components/ui/icono";
 import { FotosEquipo, type FotoEquipo } from "@/components/convocatorias/fotos-equipo";
-import { CoberturaIniciativa, type FilaCobertura } from "@/components/convocatorias/cobertura-iniciativa";
+import { CoberturaIniciativa } from "@/components/convocatorias/cobertura-iniciativa";
+import type { FilaCobertura } from "@/lib/iniciativa-reglas";
 import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/client";
+import { columnasEquipo, MAX_TITULO_EQUIPO, validarEquipo } from "@/lib/iniciativa-reglas";
 import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
 export interface EquipoActivo {
@@ -27,8 +29,6 @@ export interface EquipoActivo {
   descripcion: string | null;
   activo: boolean;
 }
-
-const MAX_TITULO = 80;
 
 function FormEquipo({
   titulo,
@@ -61,7 +61,7 @@ function FormEquipo({
         id={`${idBase}-titulo`}
         etiqueta={t("tituloEtiqueta")}
         placeholder={t("tituloPlaceholder")}
-        maxLength={MAX_TITULO}
+        maxLength={MAX_TITULO_EQUIPO}
         value={titulo}
         onChange={(e) => setTitulo(e.target.value)}
       />
@@ -135,8 +135,9 @@ export function GestionEquipo({
   async function guardar(e: React.FormEvent) {
     e.preventDefault();
     setError(null);
-    if (titulo.trim().length < 1) {
-      setError(t("errorTitulo"));
+    const problema = validarEquipo(titulo);
+    if (problema) {
+      setError(t(problema));
       return;
     }
 
@@ -147,15 +148,11 @@ export function GestionEquipo({
       editando && equipo
         ? await supabase
             .from("equipos")
-            .update({
-              titulo: titulo.trim(),
-              descripcion: descripcion || null,
-              actualizado_en: new Date().toISOString(),
-            })
+            .update({ ...columnasEquipo({ titulo, descripcion }), actualizado_en: new Date().toISOString() })
             .eq("id", equipo.id)
         : await supabase
             .from("equipos")
-            .insert({ creador_id: creadorId, titulo: titulo.trim(), descripcion: descripcion || null, cupo: null })
+            .insert({ creador_id: creadorId, ...columnasEquipo({ titulo, descripcion }), cupo: null })
             .select("id")
             .single();
 

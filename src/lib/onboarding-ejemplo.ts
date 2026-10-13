@@ -1,4 +1,4 @@
-import type { RolFeed } from "@/components/feed/tarjeta-rol";
+import type { RolFeed } from "@/lib/feed-tipos";
 import { traductorCastellano, type TraductorEtiquetas } from "@/lib/constantes";
 
 /**

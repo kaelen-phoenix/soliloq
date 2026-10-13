@@ -12,6 +12,7 @@ import { supabase } from "~/lib/supabase";
 import { FilaMenu, Rotulo } from "~/ui/basicos";
 import { Pantalla } from "~/ui/pantalla";
 import { CompartirEnlace } from "~/ui/perfil/compartir-enlace";
+import { VincularDiscord } from "~/ui/perfil/vincular-discord";
 import { DetalleTalento, EtiquetasDisciplina, type TalentoDetalle } from "~/ui/perfil/detalle-talento";
 import { Texto } from "~/ui/texto";
 import { fuente, radio, useColores } from "~/ui/tema";
@@ -20,13 +21,14 @@ interface Datos {
   talento: TalentoDetalle & { aparece_en_buscador: boolean };
   creador: { disciplinas: DisciplinaArtistica[]; otro_detalle: string | null } | null;
   enlace: { token: string; activo: boolean; alias: string | null };
+  discord: string | null;
   visitas: { ultimos30: number; total: number };
 }
 
 /** Lo mismo que lee `/perfil` en la web. */
 async function leerPerfil(userId: string, conCreador: boolean): Promise<Datos | null> {
   const [{ data: cuenta }, { data: talento }, { data: fotos }, { data: creador }, { data: visitas }] = await Promise.all([
-    supabase.from("perfiles").select("enlace_token, enlace_publico_activo, enlace_alias").eq("id", userId).single(),
+    supabase.from("perfiles").select("enlace_token, enlace_publico_activo, enlace_alias, discord_usuario").eq("id", userId).single(),
     // La fila propia entera: por `select` la base ya no da fecha ni ubicación exacta (#255).
     supabase.rpc("mi_perfil_talento").maybeSingle(),
     supabase.from("fotos_talento").select("id, storage_path, orden").eq("talento_id", userId).order("orden"),
@@ -58,6 +60,7 @@ async function leerPerfil(userId: string, conCreador: boolean): Promise<Datos | 
     },
     creador: creador as Datos["creador"],
     enlace: { token: cuenta.enlace_token, activo: cuenta.enlace_publico_activo, alias: cuenta.enlace_alias },
+    discord: cuenta.discord_usuario,
     visitas: resumirVisitas(visitas),
   };
 }
@@ -166,6 +169,9 @@ export default function Perfil() {
           )}
         </>
       )}
+
+      {/* Los espacios privados de Discord de cada Proyecto y Equipo (#269). */}
+      {datos && <VincularDiscord usuario={datos.discord} alCambiar={cargar} />}
 
       <View style={{ borderTopWidth: 1, borderTopColor: color.borde, marginTop: 8 }}>
         <FilaMenu icono="settings-outline" texto={t("perfil.pagina.ajustes")} onPress={() => router.push("/ajustes")} />

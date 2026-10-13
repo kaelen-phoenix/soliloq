@@ -7,6 +7,7 @@ import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { comprimirImagen, ErrorImagen } from "@/lib/comprimir-imagen";
 import { createClient } from "@/lib/supabase/client";
+import { MAX_FOTOS_INICIATIVA, MIN_FOTOS_INICIATIVA, rutaFotoIniciativa } from "@/lib/iniciativa-reglas";
 
 export interface FotoEquipo {
   id: string;
@@ -18,8 +19,8 @@ export interface FotoEquipo {
 const TIPOS = ["image/jpeg", "image/png", "image/webp"];
 const MAX_BYTES = 5 * 1024 * 1024;
 // #330: el tope de 2 se sacó; 10 queda como resguardo de almacenamiento (igual que la base, 0101).
-const MAX = 10;
-export const MIN_FOTOS_EQUIPO = 1;
+const MAX = MAX_FOTOS_INICIATIVA;
+export const MIN_FOTOS_EQUIPO = MIN_FOTOS_INICIATIVA;
 
 /**
  * Carga de fotos del "Armar equipo" del Creador (issue #57, tope ajustado en #162). Se
@@ -77,7 +78,7 @@ export function FotosEquipo({
 
     const supabase = createClient();
     const extension = (foto.type.split("/")[1] ?? "jpg").replace("jpeg", "jpg");
-    const ruta = `${creadorId}/equipos/${equipoId}/${crypto.randomUUID()}.${extension}`;
+    const ruta = rutaFotoIniciativa(creadorId, "equipo", equipoId, `${crypto.randomUUID()}.${extension}`);
 
     const { error: errorSubida } = await supabase.storage
       .from("fotos-perfil")

@@ -14,6 +14,7 @@ import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { marcarInteresEnTalento, marcarMatchMostrado } from "@/app/(sitio)/(app)/matches/acciones";
 import { avisarConvocatoriasNuevas } from "@/components/convocatorias/convocatorias-nuevas";
 import type { ResultadoTalento } from "./tarjeta-talento";
+import { matchDeLaIniciativa } from "@/lib/matches";
 
 export interface IniciativaPlaca {
   /** Para qué Proyecto o Equipo se busca (#294): ahí se marca el interés. */
@@ -106,14 +107,9 @@ export function PilaTalentos({
       const { data, error } = await supabase.rpc("mis_matches");
       if (error) reportarErrorSupabase(error, { rpc: "mis_matches", talentoId: t.id });
       // Del mismo talento puede haber un match anterior con otra iniciativa: se mira el de esta.
-      const m = (data ?? []).find(
-        (x) =>
-          x.talento_id === t.id &&
-          x.es_equipo === (iniciativa.tipo === "equipo") &&
-          x.iniciativa_titulo === iniciativa.titulo,
-      );
-      if (m) {
-        setPlaca({ talento: t, matchId: m.match_id });
+      const matchId = matchDeLaIniciativa(data, t.id, iniciativa);
+      if (matchId) {
+        setPlaca({ talento: t, matchId });
         setOcupado(false);
         return; // la placa maneja el avance
       }

@@ -12,38 +12,11 @@ import {
   descartarConvocado,
   darDeBajaConvocado,
 } from "@/app/(sitio)/(app)/matches/acciones";
+import { vencimiento, type EstadoConvocado, type FilaConvocado, type RolDisponible } from "@/lib/matches";
 
-type Estado = "en_convocados" | "esperando_confirmacion" | "en_sala";
-
-export interface FilaConvocado {
-  matchId: string;
-  convocatoriaId: string | null;
-  talentoId: string;
-  nombre: string;
-  fotoUrl: string | null;
-  esEquipo: boolean;
-  iniciativaTitulo: string;
-  estado: Estado;
-  /** Match nuevo (todavía sin convocar): cuándo vence. */
-  expiraEn?: string | null;
-  /** El Proyecto del match (null en un Equipo): de ahí salen los roles para elegir (#330). */
-  obraId?: string | null;
-  /** La iniciativa ya llenó su cupo: no se puede convocar a nadie más. */
-  cupoLleno?: boolean;
-}
-
-function diasRestantes(expiraEn: string, t: (clave: string, v?: { dias: number }) => string) {
-  const dias = Math.ceil((new Date(expiraEn).getTime() - Date.now()) / 86_400_000);
-  if (dias <= 0) return t("venceHoy");
-  if (dias === 1) return t("venceManana");
-  return t("venceEn", { dias });
-}
-
-export interface RolDisponible {
-  id: string;
-  nombre: string;
-  disponible: boolean;
-}
+// Los tipos y el vencimiento viven en `@/lib/matches` (los usa también la app nativa).
+export type { FilaConvocado, RolDisponible } from "@/lib/matches";
+type Estado = EstadoConvocado;
 
 // El texto de cada chip sale de `proyectos.convocados.estado.<estado>`.
 const CHIP: Record<Estado, { clase: string }> = {
@@ -171,7 +144,7 @@ export function ConvocadosLista({
                   {t(`estado.${f.estado}`)}
                 </span>
                 {f.estado === "en_convocados" && f.expiraEn && (
-                  <span className="ml-2 text-xs text-texto-tenue">{diasRestantes(f.expiraEn, t)}</span>
+                  <span className="ml-2 text-xs text-texto-tenue">{t(vencimiento(f.expiraEn).clave, { dias: vencimiento(f.expiraEn).dias })}</span>
                 )}
               </div>
 

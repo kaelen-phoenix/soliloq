@@ -7,18 +7,10 @@ import { useTranslations } from "next-intl";
 import { Avatar } from "@/components/convocatorias/avatar";
 import { retirarmeDeMatch } from "@/app/(sitio)/(app)/matches/acciones";
 import { desvincularmeDeSala } from "@/app/(sitio)/(app)/salas/acciones";
+import type { FilaMatchTalento } from "@/lib/matches";
 
-export interface FilaMatchTalento {
-  matchId: string;
-  esEquipo: boolean;
-  obraId: string | null;
-  titulo: string;
-  fotoUrl: string | null;
-  creadorNombre: string | null;
-  expiraEn: string;
-  estado: "match" | "convocado" | "en_sala";
-  salaId: string | null;
-}
+// El tipo vive en `@/lib/matches` (lo usa también la app nativa).
+export type { FilaMatchTalento } from "@/lib/matches";
 
 // El texto de cada chip sale de `proyectos.misMatches.estado.<estado>`.
 const CHIP: Record<FilaMatchTalento["estado"], { clase: string }> = {

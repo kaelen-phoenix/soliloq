@@ -1,13 +1,15 @@
-import type { RolFeed } from "@/components/feed/tarjeta-rol";
+import type { EquipoFeed, RolFeed } from "@/lib/feed-tipos";
 import type { Database } from "@/lib/supabase/types";
 
 type FilaFeed = Database["public"]["Functions"]["feed_para_talento"]["Returns"][number];
+type FilaEquipo = Database["public"]["Functions"]["feed_equipos_para_talento"]["Returns"][number];
 
 /**
  * Una fila de `feed_para_talento` → tarjeta del feed. La función devuelve la vista
  * `feed_talento`, y Postgres da toda columna de una vista como anulable aunque salga de un
  * join interno: id, nombre y tipo del rol, la obra y el creador nunca vienen en null (#353).
- * Las fotos llegan como rutas de Storage y se resuelven acá a URL pública.
+ * Las fotos llegan como rutas de Storage y se resuelven acá a URL pública. Lo usan la web y la
+ * app nativa (#393).
  */
 export function aRolFeed(r: FilaFeed, urlPublica: (path: string) => string): RolFeed {
   return {
@@ -26,5 +28,18 @@ export function aRolFeed(r: FilaFeed, urlPublica: (path: string) => string): Rol
     creador_nombre: r.creador_nombre!,
     creador_imagen_url: r.creador_foto_path ? urlPublica(r.creador_foto_path) : null,
     fotos: (r.obra_fotos ?? []).map(urlPublica),
+  };
+}
+
+/** Una fila de `feed_equipos_para_talento` → tarjeta de equipo. La foto del creador sale de su Perfil de Talento (0072). */
+export function aEquipoFeed(e: FilaEquipo, urlPublica: (path: string) => string): EquipoFeed {
+  return {
+    equipo_id: e.equipo_id,
+    titulo: e.titulo,
+    cupo: e.cupo,
+    creador_id: e.creador_id,
+    creador_nombre: e.creador_nombre,
+    creador_imagen_url: e.creador_foto_path ? urlPublica(e.creador_foto_path) : null,
+    fotos: (e.fotos ?? []).map(urlPublica),
   };
 }
