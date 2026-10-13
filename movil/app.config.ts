@@ -9,7 +9,9 @@ const id = "com.yalope.app";
 const NEGRO = "#060606";
 
 const config: ExpoConfig = {
-  name: "Yalope",
+  // #408: «Yalope App» mientras conviva en el mismo teléfono con la web instalada («Yalope»).
+  // Al publicarla en Google Play vuelve a ser «Yalope» y la web ofrece descargarla (#390).
+  name: "Yalope App",
   slug: "yalope",
   version: process.env.VERSION_NAME ?? "1.0.0",
   orientation: "portrait",
