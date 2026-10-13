@@ -5,7 +5,6 @@ import { useRouter } from "next/navigation";
 import { useTranslations } from "next-intl";
 import { useState } from "react";
 import { createClient } from "@/lib/supabase/client";
-import { CALLBACK_APP, esAppNativa } from "@/lib/app-nativa";
 import { EMAIL_REGEX, LARGO_MINIMO_CLAVE, mensajeErrorAuth, urlCallback, validarClave } from "@/lib/clave";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
@@ -96,25 +95,6 @@ export function IngresarFormulario({ next, modoInicial = "ingresar" }: { next?: 
   async function ingresarConGoogle() {
     setError(null);
     const supabase = createClient();
-    // #387: Google no deja ingresar dentro de un WebView. En la app se abre en el navegador del
-    // sistema y vuelve por el esquema propio; lo termina `PuenteApp`.
-    if (esAppNativa()) {
-      const { data, error: errorOAuth } = await supabase.auth.signInWithOAuth({
-        provider: "google",
-        options: {
-          redirectTo: next ? `${CALLBACK_APP}?next=${encodeURIComponent(next)}` : CALLBACK_APP,
-          skipBrowserRedirect: true,
-          queryParams: { prompt: "select_account" },
-        },
-      });
-      if (errorOAuth || !data.url) {
-        setError(tError(mensajeErrorAuth(errorOAuth?.code), { minimo: LARGO_MINIMO_CLAVE }));
-        return;
-      }
-      const { Browser } = await import("@capacitor/browser");
-      await Browser.open({ url: data.url });
-      return;
-    }
     await supabase.auth.signInWithOAuth({
       provider: "google",
       options: {

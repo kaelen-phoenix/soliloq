@@ -13,11 +13,6 @@
     "tipos-db": "node scripts/tipos-db.mjs"
   },
   "dependencies": {
-    "@capacitor/android": "^8.5.3",
-    "@capacitor/app": "^8.1.2",
-    "@capacitor/browser": "^8.0.5",
-    "@capacitor/core": "^8.5.3",
-    "@capacitor/ios": "^8.5.3",
     "@sentry/nextjs": "^10.75.1",
     "@supabase/ssr": "^0.12.3",
     "@supabase/supabase-js": "^2.45.4",
@@ -31,8 +26,6 @@
     "web-push": "^3.6.7"
   },
   "devDependencies": {
-    "@capacitor/assets": "^3.0.5",
-    "@capacitor/cli": "^8.5.3",
     "@playwright/test": "^1.63.0",
     "@types/node": "^22.7.5",
     "@types/react": "^18.3.11",

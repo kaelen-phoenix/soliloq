@@ -4,8 +4,6 @@ import { NextIntlClientProvider, type AbstractIntlMessages } from "next-intl";
 import { getTranslations } from "next-intl/server";
 import "./globals.css";
 import { SplashMarca } from "@/components/ui/splash-marca";
-import { PuenteApp } from "@/components/pwa/puente-app";
-import { MARCA_APP } from "@/lib/app-nativa";
 import type { Idioma } from "@/i18n/idiomas";
 
 /**
@@ -96,10 +94,6 @@ const SCRIPT_TEMA = `(function(){var d=document.documentElement,mq=window.matchM
 // con uno en cada navegación). "Reducir movimiento" lo resuelve el CSS.
 const SCRIPT_SPLASH = `(function(){var d=document.documentElement;try{if(navigator.webdriver||sessionStorage.getItem('splash')){d.dataset.splash='omitir';}else{sessionStorage.setItem('splash','1');}}catch(e){d.dataset.splash='omitir';}})();`;
 
-// #387: dentro de las apps de Android y iPhone marca el `<html>` con `data-app` antes del
-// primer paint, para que el CSS oculte lo que es solo de la web (`.solo-web`: «Apoyar»).
-const SCRIPT_APP = `(function(){try{if(navigator.userAgent.indexOf('${MARCA_APP}')>-1)document.documentElement.dataset.app='1';}catch(e){}})();`;
-
 export function Documento({
   idioma,
   mensajes,
@@ -119,11 +113,9 @@ export function Documento({
       <head>
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_TEMA }} />
         <script dangerouslySetInnerHTML={{ __html: SCRIPT_SPLASH }} />
-        <script dangerouslySetInnerHTML={{ __html: SCRIPT_APP }} />
       </head>
       <body className="min-h-screen">
         <SplashMarca />
-        <PuenteApp />
         <NextIntlClientProvider locale={idioma} messages={mensajes}>
           {children}
         </NextIntlClientProvider>

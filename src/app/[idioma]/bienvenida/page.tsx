@@ -301,7 +301,7 @@ export default async function BienvenidaPage({ params }: Props) {
             <Logotipo tamano="sm" tono="claro" />
             <p>{t("pieLema")}</p>
             <div className="flex gap-4">
-              <Link href={rutaPublica(idioma, "/apoyar")} className="solo-web font-medium text-texto hover:text-brand-400">
+              <Link href={rutaPublica(idioma, "/apoyar")} className="font-medium text-texto hover:text-brand-400">
                 {t("apoyarEnlace")}
               </Link>
               <Link href="/ingresar" className="font-medium text-texto hover:text-brand-400">

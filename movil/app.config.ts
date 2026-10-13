@@ -1,19 +1,15 @@
 import type { ExpoConfig } from "expo/config";
 
 /**
- * La app nativa de Yalope (#396): una sola base para Android y iPhone.
- *
- * Mientras dura la migración (#391–#395) sale como **vista previa** (`APP_VARIANT=previa`, el
- * valor por defecto): otro identificador, así se instala al lado de la app actual (Capacitor,
- * #387). Cuando esté a la par (#395) se compila con `APP_VARIANT=final`, como `com.yalope.app`, y
- * con la misma clave de firma se instala encima de la de Capacitor.
+ * La app de Yalope para Android y iPhone (#396): una sola base. Con la web son las tres
+ * versiones, siempre a la par (#402). Reemplazó a la de Capacitor (#395) con el mismo
+ * identificador y la misma clave de firma, así que se instala encima de aquella.
  */
-const final = process.env.APP_VARIANT === "final";
-const id = final ? "com.yalope.app" : "com.yalope.app.previa";
+const id = "com.yalope.app";
 const NEGRO = "#060606";
 
 const config: ExpoConfig = {
-  name: final ? "Yalope" : "Yalope (previa)",
+  name: "Yalope",
   slug: "yalope",
   version: process.env.VERSION_NAME ?? "1.0.0",
   orientation: "portrait",
