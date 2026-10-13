@@ -2,7 +2,8 @@
 
 Android y iPhone con Expo (React Native), una sola base. Plan y etapas: issue #396.
 
-- **Las tres versiones van juntas.** Todo cambio de la web se hace también acá, en el mismo PR.
+- **Las dos apps conviven** (#402): esta y la de Capacitor (`com.yalope.app`), más la web. Todo
+  cambio se hace en las tres, en el mismo PR. Ver `CLAUDE.md` en la raíz.
 - **Expo cambia en cada SDK.** Antes de usar una API de Expo o React Native, leé la documentación
   de la versión de `expo` de `package.json` (https://docs.expo.dev/versions/v<major>.0.0/ y
   https://docs.expo.dev/llms.txt). Paquetes nativos: `npx expo install <paquete>`.
