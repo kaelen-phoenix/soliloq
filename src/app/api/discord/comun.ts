@@ -23,7 +23,7 @@ export function destinoVuelta(valor: string | null | undefined): string | null {
 // dice quién es, válido por 10 minutos, y al terminar Discord vuelve a la app por su esquema.
 
 /** Los esquemas de la app a los que se puede volver: nada más. */
-const ESQUEMAS_APP = ["com.yalope.app", "com.yalope.app.previa"];
+const ESQUEMAS_APP = ["com.yalope.app"];
 
 export function esquemaApp(valor: string | null | undefined): string | null {
   return valor && ESQUEMAS_APP.includes(valor) ? valor : null;

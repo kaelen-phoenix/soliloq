@@ -4,7 +4,6 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Superposicion } from "@/components/ui/superposicion";
-import { esAppNativa } from "@/lib/app-nativa";
 
 // `beforeinstallprompt` no está en las tipas del DOM.
 interface EventoInstalacion extends Event {
@@ -14,8 +13,6 @@ interface EventoInstalacion extends Event {
 
 function yaInstalada() {
   return (
-    // #387: dentro de la app de Android o iPhone ya está instalada.
-    esAppNativa() ||
     window.matchMedia("(display-mode: standalone)").matches ||
     // iOS marca las apps agregadas al inicio con esta bandera propietaria.
     (window.navigator as Navigator & { standalone?: boolean }).standalone === true

@@ -1,6 +1,6 @@
-// Firma del APK de Android con la clave de Yalope (#387, #391): la misma que la app de
-// Capacitor, así la nativa podrá instalarse encima cuando la reemplace (#395). La clave la
-// pone el pipeline (secrets de GitHub); sin ella queda la firma de depuración de Expo.
+// Firma del APK de Android con la clave de Yalope (#387, #391): siempre la misma, para que cada
+// versión se instale encima de la anterior (también encima de la vieja app de Capacitor, #395).
+// La clave la pone el pipeline (secrets de GitHub); sin ella queda la firma de depuración de Expo.
 const { withAppBuildGradle } = require("expo/config-plugins");
 
 const FIRMA = `
