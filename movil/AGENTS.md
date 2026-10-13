@@ -17,3 +17,6 @@ Android y iPhone con Expo (React Native), una sola base. Plan y etapas: issue #3
 - **Antes de cerrar un cambio:** `npm run typecheck` y `npx expo export --platform android`, que
   arma el bundle y atrapa imports rotos.
 - **Paquetes:** los arma `.github/workflows/apps.yml` en cada push a main.
+- **Probar sin teléfono:** `npx expo start --web` (con las variables de staging) levanta la app en el
+  navegador y sirve para ver la lógica y los datos. Ojo: lo que solo pasa en el teléfono (Hermes,
+  módulos nativos, el `URL` de React Native) no se ve ahí.

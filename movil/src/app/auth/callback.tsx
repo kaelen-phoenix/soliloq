@@ -3,7 +3,6 @@ import { useEffect, useState } from "react";
 import { ActivityIndicator, View } from "react-native";
 import * as Linking from "expo-linking";
 import { canjearCallback } from "~/lib/google";
-import { supabase } from "~/lib/supabase";
 import { useColores } from "~/ui/tema";
 
 /**
@@ -17,8 +16,8 @@ export default function Callback() {
 
   useEffect(() => {
     (async () => {
-      const { data } = await supabase.auth.getSession();
-      if (!data.session && code) await canjearCallback(Linking.createURL("auth/callback", { queryParams: { code } }));
+      // Si `ingresarConGoogle` ya lo está canjeando, espera ese mismo canje (no hace otro).
+      if (code) await canjearCallback(Linking.createURL("auth/callback", { queryParams: { code } }));
       setListo(true);
     })();
   }, [code]);
