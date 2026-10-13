@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { FormularioTalento } from "@/components/perfil/formulario-talento";
 import { fotoDeGoogle } from "./acciones";
+import { nombreDeGoogle } from "@/lib/foto-google";
 
 export default async function CompletarPerfilPage({
   searchParams,
@@ -23,7 +24,7 @@ export default async function CompletarPerfilPage({
 
   // #303: con Google ya sabemos el nombre (y quizá la foto): se precargan.
   const meta = user.user_metadata as Record<string, unknown> | undefined;
-  const nombreGoogle = [meta?.full_name, meta?.name].find((v): v is string => typeof v === "string" && v.trim().length > 1);
+  const nombreGoogle = nombreDeGoogle(meta);
   // #383: si ya había empezado (en este u otro dispositivo), sigue donde quedó.
   const [conFotoGoogle, { data: borrador }, t] = await Promise.all([
     fotoDeGoogle(meta).then((f) => f != null),
@@ -43,7 +44,7 @@ export default async function CompletarPerfilPage({
           esAlta
           fotosIniciales={[]}
           destinoAlTerminar={next}
-          nombreSugerido={nombreGoogle?.trim()}
+          nombreSugerido={nombreGoogle}
           conFotoGoogle={conFotoGoogle}
           borrador={
             borrador ? { paso: borrador.paso, datos: borrador.datos, actualizadoEn: borrador.actualizado_en } : null

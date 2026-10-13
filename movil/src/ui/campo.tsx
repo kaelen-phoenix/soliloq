@@ -6,6 +6,7 @@ import { useColores, fuente, radio } from "./tema";
 export function Campo({
   etiqueta,
   error,
+  style,
   ...props
 }: TextInputProps & { etiqueta: string; error?: string | null }) {
   const color = useColores();
@@ -18,7 +19,8 @@ export function Campo({
         accessibilityLabel={etiqueta}
         placeholderTextColor={color.textoTenue}
         {...props}
-        style={{
+        style={[
+          {
           minHeight: 48,
           borderRadius: radio.campo,
           borderWidth: 1,
@@ -28,7 +30,9 @@ export function Campo({
           fontFamily: fuente.normal,
           fontSize: 16,
           color: color.texto,
-        }}
+          },
+          style,
+        ]}
       />
       {error ? <Texto variante="error">{error}</Texto> : null}
     </View>

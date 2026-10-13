@@ -9,7 +9,6 @@ import { redesDeJson } from "@/lib/redes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 import { useSesion } from "~/lib/sesion";
 import { supabase } from "~/lib/supabase";
-import { abrirWeb } from "~/lib/web";
 import { FilaMenu, Rotulo } from "~/ui/basicos";
 import { Pantalla } from "~/ui/pantalla";
 import { CompartirEnlace } from "~/ui/perfil/compartir-enlace";
@@ -127,8 +126,7 @@ export default function Perfil() {
             </View>
             <Pressable
               accessibilityRole="button"
-              // La edición llega a la app en la próxima parte de #392; mientras, en la web.
-              onPress={() => abrirWeb("/perfil?editar=1")}
+              onPress={() => router.push("/editar-perfil")}
               style={{
                 flexDirection: "row",
                 alignItems: "center",

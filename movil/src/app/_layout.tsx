@@ -59,6 +59,7 @@ function Navegacion() {
       <Stack.Protected guard={!!sesion && destino === "app"}>
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="ajustes" />
+        <Stack.Screen name="editar-perfil" />
       </Stack.Protected>
       {/* Como en la web, cambiar la contraseña está disponible con la cuenta a medio armar. */}
       <Stack.Protected guard={!!sesion}>

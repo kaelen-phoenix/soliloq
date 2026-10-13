@@ -6,42 +6,13 @@ import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { comprimirImagen, ErrorImagen } from "@/lib/comprimir-imagen";
 import { createClient } from "@/lib/supabase/client";
+import { MAX_BYTES_FOTO as MAX_BYTES, MAX_FOTOS, reordenarConPrincipal, type FotoTalento } from "@/lib/perfil-talento";
 
-export interface FotoTalento {
-  /** Id de la fila en `fotos_talento`, o un id temporal de cliente si todavía no se persistió. */
-  id: string;
-  storage_path: string;
-  orden: number;
-  url: string;
-  /** false mientras la foto vive solo en Storage, durante el alta del perfil. */
-  enBd: boolean;
-}
+// El tipo y los topes viven en `@/lib/perfil-talento` (los usa
+// también la app nativa).
+export { FOTOS_RECOMENDADAS, MIN_FOTOS, type FotoTalento } from "@/lib/perfil-talento";
 
 const TIPOS_ADMITIDOS = ["image/jpeg", "image/png", "image/webp"];
-const MAX_BYTES = 5 * 1024 * 1024;
-const MAX_FOTOS = 5;
-// #311: con una foto alcanza para empezar; se recomiendan tres.
-export const MIN_FOTOS = 1;
-export const FOTOS_RECOMENDADAS = 3;
-
-/**
- * Persiste en `fotos_talento` las fotos que todavía solo existen en Storage.
- * Se llama recién después de crear el perfil, porque la FK exige que la fila de
- * `perfiles_talento` ya exista.
- */
-export async function persistirFotosPendientes(talentoId: string, fotos: FotoTalento[]) {
-  const pendientes = fotos.filter((f) => !f.enBd);
-  if (pendientes.length === 0) return;
-
-  const supabase = createClient();
-  await supabase.from("fotos_talento").insert(
-    pendientes.map((f) => ({
-      talento_id: talentoId,
-      storage_path: f.storage_path,
-      orden: f.orden,
-    }))
-  );
-}
 
 export function SubirFotos({
   talentoId,
@@ -151,10 +122,7 @@ export function SubirFotos({
 
   async function hacerPrincipal(foto: FotoTalento) {
     // Reordena poniendo la elegida primera y renumerando de forma contigua.
-    const reordenadas = [foto, ...ordenadas.filter((f) => f.id !== foto.id)].map((f, i) => ({
-      ...f,
-      orden: i,
-    }));
+    const reordenadas = reordenarConPrincipal(fotos, foto);
     onCambio(reordenadas);
 
     const supabase = createClient();

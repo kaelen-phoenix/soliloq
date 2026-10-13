@@ -49,6 +49,17 @@ const config: ExpoConfig = {
     ],
     "expo-font",
     "expo-image",
+    [
+      "expo-image-picker",
+      { photosPermission: "Yalope usa tus fotos para armar el portfolio de tu perfil.", cameraPermission: false },
+    ],
+    [
+      "expo-location",
+      {
+        locationWhenInUsePermission:
+          "Yalope usa tu ubicación solo si la pedís, para completar tu barrio o ciudad en el perfil.",
+      },
+    ],
     "./plugins/firma-android",
   ],
   experiments: { typedRoutes: true },

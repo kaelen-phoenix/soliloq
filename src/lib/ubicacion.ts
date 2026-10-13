@@ -141,7 +141,7 @@ type PlaceSuggestion = {
   } | null;
 };
 
-type ComponenteDireccion = {
+export type ComponenteDireccion = {
   types: string[];
   shortText?: string | null;
   longText?: string | null;
@@ -285,7 +285,7 @@ export class SesionUbicacion {
  * repeticiones: en la Ciudad de Buenos Aires la ciudad y la provincia son la misma palabra,
  * y "Buenos Aires, Buenos Aires, Argentina" se lee como un error.
  */
-function etiquetaPublica(componentes: ComponenteDireccion[] | null | undefined): string | null {
+export function etiquetaPublica(componentes: ComponenteDireccion[] | null | undefined): string | null {
   const de = (tipo: string) => {
     const c = componentes?.find((x) => x.types.includes(tipo));
     return c?.longText ?? c?.shortText ?? null;

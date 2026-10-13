@@ -4,6 +4,7 @@ import { llamarApi } from "~/lib/api";
 import { useSesion } from "~/lib/sesion";
 import { abrirWeb } from "~/lib/web";
 import { Casilla } from "~/ui/basicos";
+import { AltaPerfil } from "~/ui/perfil/alta-perfil";
 import { Boton } from "~/ui/boton";
 import { Marca } from "~/ui/marca";
 import { Pantalla } from "~/ui/pantalla";
@@ -66,8 +67,7 @@ function AceptarNormas() {
  * La cuenta todavía no puede entrar a la app: solicitud pendiente, falta aceptar las Normas o
  * completar el perfil, o está suspendida (las mismas guardas que la web).
  *
- * El alta del perfil todavía se hace en la web (llega a la app en la segunda parte de #392): se
- * abre la página y, al volver, «Ya terminé» relee el estado.
+ * El alta del perfil va en `AltaPerfil`.
  */
 export default function Estado() {
   const { destino, recargar, cerrarSesion } = useSesion();
@@ -80,18 +80,12 @@ export default function Estado() {
     setReleyendo(false);
   }
 
+  // El alta del perfil tiene su propia pantalla, con el asistente por pasos.
+  if (destino === "completar-perfil") return <AltaPerfil />;
+
   const contenido =
     destino === "aceptar-normas" ? (
       <AceptarNormas />
-    ) : destino === "completar-perfil" ? (
-      <>
-        <Texto variante="titulo">{t("app.completarPerfilTitulo")}</Texto>
-        <Texto variante="tenue">{t("app.pasoEnWeb")}</Texto>
-        <Boton onPress={() => abrirWeb("/completar-perfil")}>{t("app.abrirWeb")}</Boton>
-        <Boton variante="secundario" onPress={releer} cargando={releyendo}>
-          {t("app.yaTermine")}
-        </Boton>
-      </>
     ) : destino === "solicitud-pendiente" ? (
       <>
         <Texto variante="titulo">{t("solicitudPendiente.titulo")}</Texto>
