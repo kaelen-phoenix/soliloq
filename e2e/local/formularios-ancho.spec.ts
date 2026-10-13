@@ -158,9 +158,12 @@ test.describe("formularios en pantallas angostas", () => {
         // sería más nuevo y ganaría.
         await page.evaluate(() => localStorage.clear());
         await page.goto("about:blank");
+        // Un guardado que ya había salido puede llegar a la base después: se lo deja llegar y
+        // recién ahí se escribe el borrador del paso (si no, a veces abría en el anterior).
+        await page.waitForTimeout(2_000);
         await admin!.from("borradores_perfil").upsert({ perfil_id: id, paso, datos, actualizado_en: new Date().toISOString() });
         await page.goto("/completar-perfil");
-        await page.getByText(`Paso ${paso} de 6`, { exact: true }).waitFor({ timeout: 15_000 });
+        await page.getByText(`Paso ${paso} de 6`, { exact: true }).waitFor({ timeout: 30_000 });
         await revisar(page, `alta-paso-${paso}`, ancho, informe, fallas);
       }
       await ctx.close();
