@@ -1,7 +1,7 @@
 import { ActivityIndicator, Pressable, Text, View, type PressableProps } from "react-native";
-import { color, fuente, radio } from "./tema";
+import { useColores, fuente, radio } from "./tema";
 
-type Variante = "primario" | "secundario" | "fantasma";
+type Variante = "primario" | "secundario" | "fantasma" | "peligro";
 
 /** Botón píldora, como en la web (#225): el primario con el color de acción. */
 export function Boton({
@@ -11,7 +11,9 @@ export function Boton({
   disabled,
   ...props
 }: PressableProps & { children: string; variante?: Variante; cargando?: boolean }) {
+  const color = useColores();
   const inactivo = disabled || cargando;
+  const relleno = variante === "primario" || variante === "peligro";
   return (
     <Pressable
       accessibilityRole="button"
@@ -25,18 +27,18 @@ export function Boton({
         alignItems: "center",
         justifyContent: "center",
         opacity: inactivo ? 0.6 : pressed ? 0.85 : 1,
-        backgroundColor: variante === "primario" ? color.accion : "transparent",
+        backgroundColor: variante === "primario" ? color.accion : variante === "peligro" ? color.error : "transparent",
         borderWidth: variante === "secundario" ? 1 : 0,
         borderColor: color.borde,
       })}
     >
       <View style={{ flexDirection: "row", alignItems: "center", gap: 8 }}>
-        {cargando && <ActivityIndicator color={variante === "primario" ? color.accionTexto : color.texto} />}
+        {cargando && <ActivityIndicator color={relleno ? color.accionTexto : color.texto} />}
         <Text
           style={{
             fontFamily: fuente.semi,
             fontSize: 16,
-            color: variante === "primario" ? color.accionTexto : color.texto,
+            color: relleno ? color.accionTexto : color.texto,
           }}
         >
           {children}

@@ -4,13 +4,14 @@ import { ActivityIndicator, View } from "react-native";
 import * as Linking from "expo-linking";
 import { canjearCallback } from "~/lib/google";
 import { supabase } from "~/lib/supabase";
-import { color } from "~/ui/tema";
+import { useColores } from "~/ui/tema";
 
 /**
  * Cuando el navegador vuelve de Google, Android a veces abre la app por este enlace en lugar de
  * devolvérselo a `openAuthSessionAsync`: se canjea acá (si ya se canjeó, no pasa nada).
  */
 export default function Callback() {
+  const color = useColores();
   const { code } = useGlobalSearchParams<{ code?: string }>();
   const [listo, setListo] = useState(false);
 

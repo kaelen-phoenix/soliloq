@@ -4,6 +4,7 @@ import { destinoSegunEstado, resolverEstadoCuenta, type Destino, type EstadoCuen
 import { esIdioma } from "@/i18n/idiomas";
 import { supabase } from "./supabase";
 import { useIdioma } from "./intl";
+import { useTema } from "~/ui/tema";
 
 /** Como `destinoSegunEstado` de la web, más la cuenta suspendida (que allá resuelve el middleware). */
 export type DestinoApp = Destino | "suspendido";
@@ -31,7 +32,7 @@ async function leerEstado(userId: string) {
   const [{ data: perfil }, { count: talento }, { count: creador }] = await Promise.all([
     supabase
       .from("perfiles")
-      .select("es_admin, suspendido_en, aprobado_en, normas_aceptadas_en, tour_talento_visto_en, idioma")
+      .select("es_admin, suspendido_en, aprobado_en, normas_aceptadas_en, tour_talento_visto_en, idioma, tema")
       .eq("id", userId)
       .maybeSingle(),
     supabase.from("perfiles_talento").select("id", { count: "exact", head: true }).eq("id", userId),
@@ -40,6 +41,7 @@ async function leerEstado(userId: string) {
   return {
     estado: resolverEstadoCuenta(perfil, (talento ?? 0) > 0, (creador ?? 0) > 0),
     idioma: perfil?.idioma,
+    tema: perfil?.tema,
   };
 }
 
@@ -47,6 +49,7 @@ export function ProveedorSesion({ children }: { children: React.ReactNode }) {
   const [sesion, setSesion] = useState<Session | null | undefined>(undefined);
   const [estado, setEstado] = useState<EstadoCuenta | null>(null);
   const { setIdioma } = useIdioma();
+  const { setTema } = useTema();
 
   useEffect(() => {
     supabase.auth.getSession().then(({ data }) => setSesion(data.session));
@@ -63,7 +66,8 @@ export function ProveedorSesion({ children }: { children: React.ReactNode }) {
     const leido = await leerEstado(userId);
     setEstado(leido.estado);
     if (esIdioma(leido.idioma)) setIdioma(leido.idioma);
-  }, [userId, setIdioma]);
+    if (leido.tema === "sistema" || leido.tema === "claro" || leido.tema === "oscuro") setTema(leido.tema);
+  }, [userId, setIdioma, setTema]);
 
   useEffect(() => {
     setEstado(null);

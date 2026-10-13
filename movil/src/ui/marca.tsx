@@ -1,7 +1,7 @@
 import { Text, View } from "react-native";
 import Svg, { G, Path } from "react-native-svg";
 import { ISOTIPO_TRAZOS, ISOTIPO_VIEWBOX } from "@/lib/marca-isotipo";
-import { color } from "./tema";
+import { useColores } from "./tema";
 
 const [, , ANCHO, ALTO] = ISOTIPO_VIEWBOX.split(" ").map(Number);
 
@@ -20,6 +20,7 @@ export function Isotipo({ alto = 40 }: { alto?: number }) {
 
 /** Isotipo + «yalope» en la redonda pesada del logotipo (Baloo 2, 800), como `MarcaYalope`. */
 export function Marca() {
+  const color = useColores();
   return (
     <View
       accessible

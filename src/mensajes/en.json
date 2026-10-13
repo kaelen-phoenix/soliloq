@@ -407,12 +407,7 @@
     "enlaceNormas": "Community Guidelines"
   },
   "app": {
-    "previa": "Native app preview",
     "proximamente": "This section isn't in the native app yet. In the meantime, you can use it on the web.",
-    "abrirWeb": "Open on yalope.com",
-    "pasoEnWeb": "This step is still done on the web, with the same account. When you finish, come back and tap “I’m done”.",
-    "yaTermine": "I’m done",
-    "completarPerfilTitulo": "Complete your profile",
-    "sesionComo": "Signed in as {email}"
+    "abrirWeb": "Open on yalope.com"
   }
 }

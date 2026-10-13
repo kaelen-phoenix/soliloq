@@ -7,7 +7,6 @@ import {
   clasesDisciplina,
   DISCIPLINAS,
   MAX_OTRO_DETALLE,
-  type TraductorEtiquetas,
 } from "@/lib/constantes";
 import type { DisciplinaArtistica } from "@/lib/supabase/types";
 
@@ -25,18 +24,8 @@ export interface DatosCreador {
  *
  * `t`: el traductor de `perfil.creador`, que tiene los mensajes.
  */
-export function validarCreador(
-  disciplinas: DisciplinaArtistica[],
-  otroDetalle: string,
-  { exigirUna, t }: { exigirUna: boolean; t: TraductorEtiquetas },
-): Record<string, string> {
-  const errores: Record<string, string> = {};
-  if (exigirUna && disciplinas.length === 0) errores.creador_disciplinas = t("errorUna");
-  if (disciplinas.includes("otro") && otroDetalle.trim().length < 2) {
-    errores.creador_otro_detalle = t("errorOtro");
-  }
-  return errores;
-}
+// Las reglas viven en `@/lib/perfil-talento` (las usa también la app nativa).
+export { validarCreador } from "@/lib/perfil-talento";
 
 /**
  * El perfil artístico (`disciplinas`/`otro_detalle`) de la función de Creador — issue #175:

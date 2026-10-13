@@ -1,38 +1,15 @@
 "use client";
 
 import { useTranslations } from "next-intl";
+import { PASOS_OPCIONALES, TOTAL_PASOS } from "@/lib/perfil-talento";
 
 /**
  * El alta del perfil como asistente por pasos (#383). Lo obligatorio va primero (datos
  * básicos y fotos); lo demás es opcional y no frena el avance; el último paso es revisar y
  * confirmar. Los campos y sus reglas son los mismos del perfil: acá solo se reparten.
  */
-export const TOTAL_PASOS = 6;
-
-/** Qué errores de `validar()` corresponden a cada paso (la clave del campo). */
-const CAMPOS_POR_PASO: Record<number, (clave: string) => boolean> = {
-  1: (c) => ["nombre", "fecha_nacimiento", "ubicacion", "genero", "genero_descripcion"].includes(c),
-  2: (c) => c === "fotos",
-  3: (c) => c === "experiencia" || c === "formacion",
-  4: (c) => c === "videoreel_url" || c.startsWith("redes_"),
-  5: (c) => c.startsWith("creador_"),
-};
-
-export const PASOS_OPCIONALES = new Set([3, 4, 5]);
-
-export function erroresDelPaso(errores: Record<string, string>, paso: number): Record<string, string> {
-  const pertenece = CAMPOS_POR_PASO[paso];
-  if (!pertenece) return errores;
-  return Object.fromEntries(Object.entries(errores).filter(([clave]) => pertenece(clave)));
-}
-
-/** El primer paso con algún error, para volver ahí si algo falla al confirmar. */
-export function primerPasoConError(errores: Record<string, string>): number | null {
-  for (let paso = 1; paso < TOTAL_PASOS; paso++) {
-    if (Object.keys(erroresDelPaso(errores, paso)).length > 0) return paso;
-  }
-  return null;
-}
+// Las reglas de los pasos viven en `@/lib/perfil-talento` (las usa también la app nativa).
+export { TOTAL_PASOS, PASOS_OPCIONALES, erroresDelPaso, primerPasoConError } from "@/lib/perfil-talento";
 
 export function IndicadorPasos({ paso }: { paso: number }) {
   const t = useTranslations("perfil.wizard");

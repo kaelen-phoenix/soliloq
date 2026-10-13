@@ -2,7 +2,7 @@ import Ionicons from "@expo/vector-icons/Ionicons";
 import { Tabs } from "expo-router";
 import type { ColorValue } from "react-native";
 import { useTranslations } from "use-intl";
-import { color, fuente } from "~/ui/tema";
+import { useColores, fuente } from "~/ui/tema";
 
 type NombreIcono = React.ComponentProps<typeof Ionicons>["name"];
 
@@ -14,6 +14,7 @@ function icono(nombre: NombreIcono) {
 
 /** La barra de la web (#310, #380): Explorar · Chats · Iniciativas · Convocatorias · Perfil. */
 export default function Pestanas() {
+  const color = useColores();
   const t = useTranslations("nav");
   return (
     <Tabs

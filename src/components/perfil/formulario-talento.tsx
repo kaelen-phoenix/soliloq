@@ -10,17 +10,12 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { ToggleVisibilidad } from "@/components/ui/toggle-visibilidad";
-import {
-  CamposCreador,
-  validarCreador,
-  type DatosCreador,
-} from "@/components/perfil/formulario-creador";
+import { CamposCreador, type DatosCreador } from "@/components/perfil/formulario-creador";
 import {
   GENEROS,
   HABILIDADES,
   MAX_GENERO_DESCRIPCION,
   REDES,
-  calcularEdad,
   claveDisciplina,
   claveGenero,
   claveRed,
@@ -29,13 +24,20 @@ import {
   type Genero,
 } from "@/lib/constantes";
 import type { DisciplinaArtistica, Json } from "@/lib/supabase/types";
+import {
+  claveBorrador,
+  columnasCreador,
+  columnasPerfil,
+  elegirBorrador,
+  filasFotosPendientes,
+  validarPerfil,
+} from "@/lib/perfil-talento";
 import { validarRedes } from "@/lib/redes";
-import { aColumnas, desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
-import { esVideoreelValido } from "@/lib/videoreel";
-import { formatearMientrasSeEscribe, isoATexto, textoAIso } from "@/lib/fecha-escrita";
+import { desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
+import { formatearMientrasSeEscribe, isoATexto } from "@/lib/fecha-escrita";
 import { MejorarRedaccion } from "./mejorar-redaccion";
 import { SugerirHabilidades } from "./sugerir-habilidades";
-import { FOTOS_RECOMENDADAS, MIN_FOTOS, persistirFotosPendientes, SubirFotos, type FotoTalento } from "./subir-fotos";
+import { FOTOS_RECOMENDADAS, SubirFotos, type FotoTalento } from "./subir-fotos";
 import {
   BloqueResumen,
   IndicadorPasos,
@@ -45,37 +47,10 @@ import {
 } from "./pasos-alta";
 import { importarFotoDeGoogle } from "@/app/(sitio)/completar-perfil/acciones";
 
-/** Lo cargado en el alta, guardado en el teléfono (#300): en celulares con poca memoria, salir
- *  a otra app (a copiar un link, a la cámara) puede cerrar la página, y se perdía todo. Desde
- *  #383 también se guarda en la base (`borradores_perfil`) para seguir desde otro dispositivo;
- *  al volver se usa el más nuevo de los dos. */
-const claveBorrador = (userId: string) => `yalope-alta-perfil-${userId}`;
-
-// El borrador sale del navegador o de la base: se valida la forma antes de usarlo.
-function esUbicacion(u: unknown): u is Ubicacion {
-  const x = u as Record<string, unknown> | null;
-  return (
-    !!x &&
-    typeof x.texto === "string" &&
-    typeof x.publica === "string" &&
-    typeof x.pais === "string" &&
-    Number.isFinite(x.lat) &&
-    Number.isFinite(x.lng)
-  );
-}
-
-function esFotoPendiente(f: unknown, userId: string): f is FotoTalento {
-  const x = f as Record<string, unknown> | null;
-  return (
-    !!x &&
-    typeof x.id === "string" &&
-    typeof x.storage_path === "string" &&
-    x.storage_path.startsWith(`${userId}/`) &&
-    Number.isInteger(x.orden) &&
-    typeof x.url === "string" &&
-    x.enBd === false
-  );
-}
+// Lo cargado en el alta se guarda en el teléfono (#300): en celulares con poca memoria, salir
+// a otra app (a copiar un link, a la cámara) puede cerrar la página, y se perdía todo. Desde
+// #383 también se guarda en la base (`borradores_perfil`) para seguir desde otro dispositivo;
+// al volver se usa el más nuevo de los dos (`elegirBorrador`, compartido con la app).
 
 interface DatosIniciales {
   nombre: string;
@@ -184,49 +159,36 @@ export function FormularioTalento({
   // o en la base; el más nuevo de los dos.
   useEffect(() => {
     if (!esAlta) return;
-    let local: Record<string, unknown> | null = null;
+    let local: unknown = null;
     try {
       const crudo = localStorage.getItem(claveBorrador(userId));
       local = crudo ? JSON.parse(crudo) : null;
     } catch {
       // Sin acceso al almacenamiento del navegador: queda el de la base, si hay.
     }
-    const enBase =
-      borrador && borrador.datos && typeof borrador.datos === "object"
-        ? { ...(borrador.datos as Record<string, unknown>), paso: borrador.paso, guardadoEn: Date.parse(borrador.actualizadoEn) }
-        : null;
-    const momento = (b: Record<string, unknown> | null) => (typeof b?.guardadoEn === "number" ? b.guardadoEn : 0);
-    const b = [local, enBase]
-      .filter((x): x is Record<string, unknown> => !!x && typeof x === "object")
-      .sort((x, y) => momento(y) - momento(x))[0];
-    if (b) {
-      if (typeof b.nombre === "string" && b.nombre) setNombre(b.nombre);
-      if (typeof b.fechaNacimiento === "string") {
+    const elegido = elegirBorrador(userId, local, borrador);
+    if (elegido) {
+      const b = elegido.valores;
+      if (b.nombre !== undefined) setNombre(b.nombre);
+      if (b.fechaNacimiento !== undefined) {
         // Borradores de antes de #307 la guardaban en ISO.
         setFechaNacimiento(/^\d{4}-/.test(b.fechaNacimiento) ? isoATexto(b.fechaNacimiento) : b.fechaNacimiento);
       }
-      if (typeof b.edadVisible === "boolean") setEdadVisible(b.edadVisible);
-      if (esUbicacion(b.ubicacion)) setUbicacion(b.ubicacion);
-      if (typeof b.genero === "string") setGenero(b.genero as Genero | "");
-      if (typeof b.generoDescripcion === "string") setGeneroDescripcion(b.generoDescripcion);
-      if (typeof b.videoreelUrl === "string") setVideoreelUrl(b.videoreelUrl);
-      if (typeof b.experiencia === "string") setExperiencia(b.experiencia);
-      if (typeof b.formacion === "string") setFormacion(b.formacion);
-      if (Array.isArray(b.habilidades)) setHabilidades(b.habilidades.filter((h): h is string => typeof h === "string"));
-      if (b.redes && typeof b.redes === "object") setRedes(b.redes as Record<string, string>);
-      if (typeof b.apareceEnBuscador === "boolean") setApareceEnBuscador(b.apareceEnBuscador);
-      if (Array.isArray(b.disciplinas)) setDisciplinas(b.disciplinas.filter((d): d is DisciplinaArtistica => typeof d === "string"));
-      if (typeof b.otroDetalle === "string") setOtroDetalle(b.otroDetalle);
-      // Las fotos del alta ya están en Storage: alcanza con recordar dónde.
-      if (Array.isArray(b.fotos)) {
-        const validas = b.fotos.filter((f: unknown) => esFotoPendiente(f, userId)).slice(0, 5);
-        if (validas.length > 0) setFotos(validas);
-      }
-      if (Number.isInteger(b.paso) && (b.paso as number) >= 1 && (b.paso as number) <= TOTAL_PASOS) {
-        setPaso(b.paso as number);
-      }
-      // Solo se avisa si había algo cargado de verdad, no solo el nombre precargado.
-      setRecuperado(!!(b.fechaNacimiento || b.ubicacion || b.genero || (Array.isArray(b.fotos) && b.fotos.length)));
+      if (b.edadVisible !== undefined) setEdadVisible(b.edadVisible);
+      if (b.ubicacion !== undefined) setUbicacion(b.ubicacion);
+      if (b.genero !== undefined) setGenero(b.genero);
+      if (b.generoDescripcion !== undefined) setGeneroDescripcion(b.generoDescripcion);
+      if (b.videoreelUrl !== undefined) setVideoreelUrl(b.videoreelUrl);
+      if (b.experiencia !== undefined) setExperiencia(b.experiencia);
+      if (b.formacion !== undefined) setFormacion(b.formacion);
+      if (b.habilidades !== undefined) setHabilidades(b.habilidades);
+      if (b.redes !== undefined) setRedes(b.redes);
+      if (b.apareceEnBuscador !== undefined) setApareceEnBuscador(b.apareceEnBuscador);
+      if (b.disciplinas !== undefined) setDisciplinas(b.disciplinas);
+      if (b.otroDetalle !== undefined) setOtroDetalle(b.otroDetalle);
+      if (b.fotos !== undefined) setFotos(b.fotos);
+      if (b.paso !== undefined) setPaso(b.paso);
+      setRecuperado(elegido.recuperado);
     }
     borradorLeido.current = true;
     // Solo al entrar: después, lo que manda es lo que la persona va cargando.
@@ -314,50 +276,37 @@ export function FormularioTalento({
     setRedes((prev) => ({ ...prev, [clave]: valor }));
   }
 
-  /** Todos los errores del formulario. Las reglas son las del perfil; el alta solo las reparte. */
+  function valores() {
+    return {
+      nombre,
+      fechaNacimiento,
+      edadVisible,
+      ubicacion,
+      genero,
+      generoDescripcion,
+      videoreelUrl,
+      experiencia,
+      formacion,
+      habilidades,
+      redes,
+      apareceEnBuscador,
+      disciplinas,
+      otroDetalle,
+    };
+  }
+
+  /** Todos los errores del formulario (`validarPerfil`: las mismas reglas que la app). */
   function calcularErrores(): Record<string, string> {
-    const nuevos: Record<string, string> = {};
-
-    if (nombre.trim().length < 2) nuevos.nombre = tError("nombre");
-    const fechaIso = textoAIso(fechaNacimiento);
-    if (!fechaNacimiento) {
-      nuevos.fecha_nacimiento = tError("fechaFalta");
-    } else if (!fechaIso) {
-      nuevos.fecha_nacimiento = tError("fechaFormato");
-    } else if (calcularEdad(fechaIso) < 16) {
-      nuevos.fecha_nacimiento = tError("fechaEdad");
-    }
-    if (!ubicacion) nuevos.ubicacion = tError("ubicacion");
-    if (!genero) nuevos.genero = tError("genero");
-    if (generoDescripcion.length > MAX_GENERO_DESCRIPCION) {
-      nuevos.genero_descripcion = tError("maximoCaracteres", { max: MAX_GENERO_DESCRIPCION });
-    }
-    // El mínimo de fotos es para **completar** el perfil (el alta). Al editar no bloquea: las
-    // fotos se guardan solas al subirlas o borrarlas, y trabar el resto del formulario por eso
-    // dejaba a cuentas viejas sin poder guardar nada (#243). Se avisa abajo de las fotos.
-    if (esAlta && fotos.length < MIN_FOTOS) nuevos.fotos = tError("fotos");
-    if (videoreelUrl && !esVideoreelValido(videoreelUrl)) {
-      nuevos.videoreel_url = tError("videoreel");
-    }
-    if (experiencia.length > 2000) nuevos.experiencia = tError("maximoCaracteres", { max: 2000 });
-    if (formacion.length > 2000) nuevos.formacion = tError("maximoCaracteres", { max: 2000 });
-
-    const { errores: erroresRedes } = validarRedes(redes, tEtiquetas);
-    for (const [clave, mensaje] of Object.entries(erroresRedes)) {
-      nuevos[`redes_${clave}`] = mensaje;
-    }
-
-    if (datosCreador || esAlta) {
-      Object.assign(
-        nuevos,
-        validarCreador(disciplinas, otroDetalle, {
-          // En el alta es opcional (#383): se puede seguir sin elegir ninguna.
-          exigirUna: !!datosCreador && datosCreador.disciplinas.length > 0,
-          t: tCreador,
-        }),
-      );
-    }
-    return nuevos;
+    return validarPerfil(valores(), {
+      esAlta,
+      cantidadFotos: fotos.length,
+      validarCreador: !!datosCreador || esAlta,
+      // En el alta es opcional (#383): se puede seguir sin elegir ninguna.
+      exigirDisciplina: !!datosCreador && datosCreador.disciplinas.length > 0,
+      tError,
+      tEtiquetas,
+      tCreador,
+    });
   }
 
   /** Lleva la pantalla hasta el primer campo marcado (#243). */
@@ -414,20 +363,7 @@ export function FormularioTalento({
     setCargando(true);
     const supabase = createClient();
 
-    const campos = {
-      nombre: nombre.trim(),
-      fecha_nacimiento: textoAIso(fechaNacimiento)!,
-      edad_visible: edadVisible,
-      ...aColumnas(ubicacion!),
-      genero: genero as Genero,
-      genero_descripcion: genero === "otro" ? generoDescripcion.trim() || null : null,
-      videoreel_url: videoreelUrl || null,
-      experiencia: experiencia || null,
-      formacion: formacion.trim() ? formacion : null,
-      habilidades,
-      redes: validarRedes(redes).redes,
-      aparece_en_buscador: apareceEnBuscador,
-    };
+    const campos = columnasPerfil(valores());
 
     // La unidad se deriva del país **solo al crear el perfil**. Al editar no se toca: quien
     // se mudó de Chicago a Berlín puede seguir pensando en millas.
@@ -449,15 +385,14 @@ export function FormularioTalento({
 
     if (esAlta) {
       // Recién ahora existe la fila de `perfiles_talento` que exige la FK de las fotos.
-      await persistirFotosPendientes(userId, fotos);
+      const pendientes = filasFotosPendientes(userId, fotos);
+      if (pendientes.length > 0) await supabase.from("fotos_talento").insert(pendientes);
       // #383: si en el paso «¿También armás proyectos?» eligió disciplinas, queda su perfil
       // de Creador. Si no, se activa solo al crear el primer Proyecto o Equipo (0075).
       if (disciplinas.length > 0) {
-        const { error: errorCreador } = await supabase.from("perfiles_creador").upsert({
-          id: userId,
-          disciplinas,
-          otro_detalle: disciplinas.includes("otro") ? otroDetalle.trim() : null,
-        });
+        const { error: errorCreador } = await supabase
+          .from("perfiles_creador")
+          .upsert({ id: userId, ...columnasCreador({ disciplinas, otroDetalle }) });
         if (errorCreador) reportarErrorSupabase(errorCreador, { tabla: "perfiles_creador", alta: true });
       }
       try {
@@ -482,12 +417,7 @@ export function FormularioTalento({
     if (datosCreador) {
       const { error: errorCreador } = await supabase
         .from("perfiles_creador")
-        .update({
-          disciplinas,
-          // El detalle solo se guarda si "Otro" sigue elegido: si la persona lo desmarca, el
-          // texto tiene que irse con él en vez de quedar colgado sin nada que lo explique.
-          otro_detalle: disciplinas.includes("otro") ? otroDetalle.trim() : null,
-        })
+        .update(columnasCreador({ disciplinas, otroDetalle }))
         .eq("id", userId);
       if (errorCreador) {
         setCargando(false);
