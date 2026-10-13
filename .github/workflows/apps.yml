@@ -148,7 +148,9 @@ jobs:
         env:
           ANDROID_KEYSTORE_CLAVE: ${{ secrets.ANDROID_KEYSTORE_CLAVE }}
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
-        run: ./gradlew assembleRelease --no-daemon
+        # Solo los procesadores de teléfonos (ARM de 64 y 32 bits): con los de emulador (x86) el
+        # APK pasaba los 120 MB.
+        run: ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
       - name: Ordenar el paquete
         run: |
           mkdir -p ../salida
