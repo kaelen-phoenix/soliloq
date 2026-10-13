@@ -202,6 +202,13 @@ html[data-splash="omitir"] .splash-marca {
   display: none;
 }
 
+/* #387: dentro de las apps (`SCRIPT_APP`) la pantalla de carga es la nativa, y lo que es solo
+   de la web (`.solo-web`: «Apoyar») no aparece. */
+html[data-app] .splash-marca,
+html[data-app] .solo-web {
+  display: none !important;
+}
+
 @media (prefers-reduced-motion: reduce) {
   .splash-marca {
     display: none;
