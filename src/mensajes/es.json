@@ -405,5 +405,14 @@
     "enlaceTerminos": "Términos",
     "enlacePrivacidad": "Política de Privacidad",
     "enlaceNormas": "Normas de la Comunidad"
+  },
+  "app": {
+    "previa": "Vista previa de la app nativa",
+    "proximamente": "Esta sección todavía no está en la app nativa. Mientras tanto, la podés usar en la web.",
+    "abrirWeb": "Abrir en yalope.com",
+    "pasoEnWeb": "Este paso todavía se hace en la web, con tu misma cuenta. Cuando termines, volvé y tocá «Ya terminé».",
+    "yaTermine": "Ya terminé",
+    "completarPerfilTitulo": "Completá tu perfil",
+    "sesionComo": "Ingresaste como {email}"
   }
 }
