@@ -7,7 +7,7 @@ import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { ProveedorIdioma } from "~/lib/intl";
 import { ProveedorSesion, useSesion } from "~/lib/sesion";
-import { color } from "~/ui/tema";
+import { ProveedorTema, useColores, useTema } from "~/ui/tema";
 
 SplashScreen.preventAutoHideAsync();
 
@@ -16,6 +16,8 @@ SplashScreen.preventAutoHideAsync();
  * ingresar; con la cuenta a medio armar, el paso que falta; con todo listo, la app.
  */
 function Navegacion() {
+  const color = useColores();
+  const { oscuro } = useTema();
   const { sesion, destino } = useSesion();
   const [fuentesListas] = useFonts({
     Inter_400Regular,
@@ -32,17 +34,21 @@ function Navegacion() {
   }, [listo]);
 
   if (!fuentesListas || sesion === undefined) return null;
+  const barra = <StatusBar style={oscuro ? "light" : "dark"} />;
   // Recién ingresó: un instante mientras se lee el estado de la cuenta.
   if (!listo) {
     return (
       <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: color.superficie }}>
+        {barra}
         <ActivityIndicator color={color.texto} />
       </View>
     );
   }
 
   return (
-    <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.superficie } }}>
+    <>
+      {barra}
+      <Stack screenOptions={{ headerShown: false, contentStyle: { backgroundColor: color.superficie } }}>
       <Stack.Protected guard={!sesion}>
         <Stack.Screen name="ingresar" />
         <Stack.Screen name="recuperar" />
@@ -52,19 +58,26 @@ function Navegacion() {
       </Stack.Protected>
       <Stack.Protected guard={!!sesion && destino === "app"}>
         <Stack.Screen name="(tabs)" />
+        <Stack.Screen name="ajustes" />
+      </Stack.Protected>
+      {/* Como en la web, cambiar la contraseña está disponible con la cuenta a medio armar. */}
+      <Stack.Protected guard={!!sesion}>
+        <Stack.Screen name="cambiar-clave" />
       </Stack.Protected>
       <Stack.Screen name="auth/callback" />
-    </Stack>
+      </Stack>
+    </>
   );
 }
 
 export default function Raiz() {
   return (
-    <ProveedorIdioma>
-      <ProveedorSesion>
-        <StatusBar style="light" />
-        <Navegacion />
-      </ProveedorSesion>
-    </ProveedorIdioma>
+    <ProveedorTema>
+      <ProveedorIdioma>
+        <ProveedorSesion>
+          <Navegacion />
+        </ProveedorSesion>
+      </ProveedorIdioma>
+    </ProveedorTema>
   );
 }

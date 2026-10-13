@@ -6,20 +6,7 @@ import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CodigoQr } from "@/components/ui/codigo-qr";
 import { Icono } from "@/components/ui/icono";
-
-/** Formato del nombre del enlace (0113): minúsculas, números y guiones, de 3 a 40. */
-const FORMATO_ALIAS = /^[a-z0-9]+(-[a-z0-9]+)*$/;
-
-/** «Ana Pérez» → «ana-perez»: una sugerencia para el nombre del enlace. */
-function aAlias(texto: string): string {
-  return texto
-    .toLowerCase()
-    .normalize("NFD")
-    .replace(/[\u0300-\u036f]/g, "")
-    .replace(/[^a-z0-9]+/g, "-")
-    .replace(/^-+|-+$/g, "")
-    .slice(0, 40);
-}
+import { aAlias, aliasValido, errorAlias as claveErrorAlias } from "@/lib/enlace-publico";
 
 /**
  * Compartir el perfil propio con un enlace que se ve sin cuenta. El primer uso activa el
@@ -65,7 +52,7 @@ export function BotonCompartir({
     setErrorAlias(null);
     setAliasGuardado(false);
     const valor = aliasEditado.trim().toLowerCase();
-    if (valor && (!FORMATO_ALIAS.test(valor) || valor.length < 3 || valor.length > 40)) {
+    if (valor && !aliasValido(valor)) {
       setErrorAlias(t("aliasFormato"));
       return;
     }
@@ -76,8 +63,7 @@ export function BotonCompartir({
       .eq("id", userId);
     setGuardandoAlias(false);
     if (errorBd) {
-      // 23505: lo usa otra persona; 23514: no cumple el formato (lo valida la base, 0113).
-      setErrorAlias(errorBd.code === "23505" ? t("aliasOcupado") : errorBd.code === "23514" ? t("aliasFormato") : t("aliasError"));
+      setErrorAlias(t(claveErrorAlias(errorBd.code)));
       return;
     }
     setAlias(valor || null);

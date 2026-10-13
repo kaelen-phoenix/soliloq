@@ -15,6 +15,7 @@ import { calcularEdad } from "@/lib/constantes";
 import { createClient } from "@/lib/supabase/server";
 import { usuarioDeLaRequest, estadoCuentaDeLaRequest } from "@/lib/sesion-servidor";
 import { redesDeJson } from "@/lib/redes";
+import { resumirVisitas } from "@/lib/enlace-publico";
 
 function AccionesCuenta() {
   const t = useTranslations("perfil.pagina");
@@ -91,11 +92,7 @@ export default async function PerfilPage({
       // #384: cuántas veces se abrió el enlace público (RLS: solo las propias).
       supabase.from("visitas_enlace").select("dia, cantidad").eq("perfil_id", user.id),
     ]);
-  const hace30 = new Date(Date.now() - 30 * 24 * 60 * 60 * 1000).toISOString().slice(0, 10);
-  const visitasEnlace = {
-    ultimos30: (visitas ?? []).filter((v) => v.dia >= hace30).reduce((n, v) => n + v.cantidad, 0),
-    total: (visitas ?? []).reduce((n, v) => n + v.cantidad, 0),
-  };
+  const visitasEnlace = resumirVisitas(visitas);
 
   const fotosConUrl = (fotos ?? []).map((f) => ({
     id: f.id,

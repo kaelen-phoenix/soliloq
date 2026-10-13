@@ -11,12 +11,13 @@ import { Campo } from "~/ui/campo";
 import { Marca } from "~/ui/marca";
 import { Pantalla } from "~/ui/pantalla";
 import { Texto } from "~/ui/texto";
-import { color, fuente, radio } from "~/ui/tema";
+import { useColores, fuente, radio } from "~/ui/tema";
 
 type Modo = "ingresar" | "registrarme";
 
 /** Lo mismo que `ingresar-formulario.tsx` de la web: mismas validaciones y mismos textos. */
 export default function Ingresar() {
+  const color = useColores();
   const t = useTranslations("cuenta.ingresar");
   const tError = useTranslations("cuenta.errores");
   const tComun = useTranslations("comun");

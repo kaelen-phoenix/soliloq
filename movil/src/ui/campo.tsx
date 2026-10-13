@@ -1,6 +1,6 @@
 import { TextInput, View, type TextInputProps } from "react-native";
 import { Texto } from "./texto";
-import { color, fuente, radio } from "./tema";
+import { useColores, fuente, radio } from "./tema";
 
 /** Campo con etiqueta y error debajo, como `CampoTexto` de la web. 16 px: legible (#345). */
 export function Campo({
@@ -8,6 +8,7 @@ export function Campo({
   error,
   ...props
 }: TextInputProps & { etiqueta: string; error?: string | null }) {
+  const color = useColores();
   return (
     <View style={{ gap: 6 }}>
       <Texto variante="cuerpo" style={{ fontFamily: fuente.media, fontSize: 15 }}>
