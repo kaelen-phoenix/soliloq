@@ -7,13 +7,26 @@ WebBrowser.maybeCompleteAuthSession();
 /** `<esquema>://auth/callback`: Supabase lo tiene en las URL permitidas. */
 export const CALLBACK = Linking.createURL("auth/callback");
 
+// En Android la vuelta de Google llega por dos lados a la vez: a `openAuthSessionAsync` y como
+// enlace a la ruta `auth/callback`. Cada código se canjea una sola vez: dos canjes simultáneos
+// del mismo código dejaban trabado el cliente de Supabase y la app no cargaba nada más.
+const canjes = new Map<string, Promise<string | null>>();
+
 /** Canjea el `?code=` con el que vuelve Google (PKCE). Devuelve el código de error, si hubo. */
-export async function canjearCallback(url: string): Promise<string | null> {
+export function canjearCallback(url: string): Promise<string | null> {
   const { queryParams } = Linking.parse(url);
   const code = typeof queryParams?.code === "string" ? queryParams.code : null;
-  if (!code) return typeof queryParams?.error_code === "string" ? queryParams.error_code : "generico";
-  const { error } = await supabase.auth.exchangeCodeForSession(code);
-  return error ? (error.code ?? "generico") : null;
+  if (!code) return Promise.resolve(typeof queryParams?.error_code === "string" ? queryParams.error_code : "generico");
+  if (!canjes.has(code)) {
+    canjes.set(
+      code,
+      supabase.auth
+        .exchangeCodeForSession(code)
+        .then(({ error }) => (error ? (error.code ?? "generico") : null))
+        .catch(() => "generico"),
+    );
+  }
+  return canjes.get(code)!;
 }
 
 /**

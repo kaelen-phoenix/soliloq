@@ -38,15 +38,6 @@ function Navegacion() {
 
   if (!fuentesListas || sesion === undefined) return null;
   const barra = <StatusBar style={oscuro ? "light" : "dark"} />;
-  // Recién ingresó: un instante mientras se lee el estado de la cuenta.
-  if (!listo) {
-    return (
-      <View style={{ flex: 1, alignItems: "center", justifyContent: "center", backgroundColor: color.superficie }}>
-        {barra}
-        <ActivityIndicator color={color.texto} />
-      </View>
-    );
-  }
 
   return (
     <>
@@ -82,6 +73,26 @@ function Navegacion() {
       </Stack.Protected>
       <Stack.Screen name="auth/callback" />
       </Stack>
+      {/* Recién ingresó: un instante mientras se lee el estado de la cuenta. Va encima y no en
+          lugar de la navegación: si la navegación se desmonta justo cuando Android entrega la
+          vuelta del login con Google (`auth/callback`), esa vuelta se pierde y la app se
+          quedaba cargando para siempre. */}
+      {!listo && (
+        <View
+          style={{
+            position: "absolute",
+            top: 0,
+            right: 0,
+            bottom: 0,
+            left: 0,
+            alignItems: "center",
+            justifyContent: "center",
+            backgroundColor: color.superficie,
+          }}
+        >
+          <ActivityIndicator color={color.texto} />
+        </View>
+      )}
     </>
   );
 }

@@ -54,7 +54,7 @@ function usePushNativa(activo: boolean) {
 
   // Tocar una notificación: con la app abierta o en segundo plano, y al abrirla desde cero.
   useEffect(() => {
-    if (!activo) return;
+    if (!activo || !DISPONIBLE) return;
     const abrir = (r: Notifications.NotificationResponse | null) => {
       const url = r?.notification.request.content.data?.url;
       if (typeof url === "string") abrirDestino(url);
