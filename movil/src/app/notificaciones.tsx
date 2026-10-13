@@ -1,6 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
 import { Image } from "expo-image";
-import { router, type Href } from "expo-router";
+import { router } from "expo-router";
 import { useCallback, useEffect, useState } from "react";
 import { ActivityIndicator, Pressable, RefreshControl, View } from "react-native";
 import { useLocale, useTranslations } from "use-intl";
@@ -8,11 +8,11 @@ import { destinoNotificacion, primeraFila } from "@/lib/notificaciones-reglas";
 import type { TipoNotificacion } from "@/lib/supabase/types";
 import { useSesion } from "~/lib/sesion";
 import { supabase } from "~/lib/supabase";
-import { abrirWeb } from "~/lib/web";
 import { useNotificaciones } from "~/ui/notificaciones/campanita";
 import { Pantalla } from "~/ui/pantalla";
 import { Texto } from "~/ui/texto";
 import { fuente, radio, useColores } from "~/ui/tema";
+import { abrirDestino } from "~/lib/destinos";
 
 interface Notificacion {
   id: string;
@@ -65,13 +65,6 @@ async function leer(userId: string): Promise<{ lista: Notificacion[]; fotoPropia
     })),
     fotoPropia: foto ? urlFoto(foto.storage_path) : null,
   };
-}
-
-/** Las rutas de la web que en la app son otra cosa (o siguen en la web). */
-function abrirDestino(destino: string) {
-  if (destino === "/matches") return router.push("/convocatorias" as Href);
-  if (destino === "/admin") return abrirWeb("/admin");
-  router.push(destino as Href);
 }
 
 /** Notificaciones (`/notificaciones` de la web). */

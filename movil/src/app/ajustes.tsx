@@ -1,10 +1,11 @@
 import { router } from "expo-router";
 import { useState } from "react";
-import { TextInput, View } from "react-native";
+import { Linking, TextInput, View } from "react-native";
 import { useTranslations } from "use-intl";
 import type { Idioma } from "@/i18n/idiomas";
 import { llamarApi } from "~/lib/api";
 import { useIdioma } from "~/lib/intl";
+import { usePush } from "~/lib/push";
 import { useSesion } from "~/lib/sesion";
 import { supabase } from "~/lib/supabase";
 import { Opciones, Tarjeta } from "~/ui/basicos";
@@ -18,6 +19,8 @@ export default function Ajustes() {
   const t = useTranslations("ajustes");
   const tUi = useTranslations("cuenta.ui");
   const tComun = useTranslations("comun");
+  const tPush = useTranslations("notificacionesPush");
+  const push = usePush();
   const color = useColores();
   const { idioma, setIdioma } = useIdioma();
   const { tema, setTema } = useTema();
@@ -86,6 +89,24 @@ export default function Ajustes() {
           ]}
         />
       </View>
+
+      {/* Notificaciones push en este teléfono (#389), como en Ajustes de la web. */}
+      {push.estado !== "no-disponible" && (
+        <View style={{ gap: 6 }}>
+          <Texto variante="subtitulo">{tPush("titulo")}</Texto>
+          <Texto variante="chico">{push.estado === "denegadas" ? tPush("denegadoAyudaApp") : tPush("ayuda")}</Texto>
+          {push.estado === "sin-decidir" && (
+            <Boton variante="secundario" onPress={push.activar}>
+              {tPush("activar")}
+            </Boton>
+          )}
+          {push.estado === "denegadas" && (
+            <Boton variante="secundario" onPress={() => Linking.openSettings()}>
+              {tPush("abrirConfiguracion")}
+            </Boton>
+          )}
+        </View>
+      )}
 
       <Tarjeta style={{ borderColor: color.error }}>
         <Texto variante="subtitulo">{t("zonaPeligro")}</Texto>

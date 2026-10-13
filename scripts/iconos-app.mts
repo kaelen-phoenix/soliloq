@@ -16,12 +16,12 @@ const [, , ISO_W, ISO_H] = ISOTIPO_VIEWBOX.split(" ").map(Number);
 const DIR = "movil/assets";
 
 /** Un cuadrado de `lado` con el isotipo centrado ocupando `escala` del alto. */
-function svg(lado: number, escala: number, fondo: string | null) {
+function svg(lado: number, escala: number, fondo: string | null, tinta?: string) {
   const h = lado * escala;
   const w = (h * ISO_W) / ISO_H;
   const trazos = ISOTIPO_TRAZOS.map(
     (t) =>
-      `<path d="${t.d}" transform="translate(${t.x},${t.y})" fill="${t.brazo === "izq" ? BRAZO_IZQ : BRAZO_DER}"/>`,
+      `<path d="${t.d}" transform="translate(${t.x},${t.y})" fill="${tinta ?? (t.brazo === "izq" ? BRAZO_IZQ : BRAZO_DER)}"/>`,
   ).join("");
   return Buffer.from(
     `<svg xmlns="http://www.w3.org/2000/svg" width="${lado}" height="${lado}" viewBox="0 0 ${lado} ${lado}">` +
@@ -33,8 +33,8 @@ function svg(lado: number, escala: number, fondo: string | null) {
   );
 }
 
-async function png(nombre: string, lado: number, escala: number, fondo: string | null) {
-  await sharp(svg(lado, escala, fondo)).png().toFile(`${DIR}/${nombre}`);
+async function png(nombre: string, lado: number, escala: number, fondo: string | null, tinta?: string) {
+  await sharp(svg(lado, escala, fondo, tinta)).png().toFile(`${DIR}/${nombre}`);
   console.log("listo", nombre);
 }
 
@@ -44,3 +44,6 @@ await png("android-icon-foreground.png", 1024, 0.5, null);
 await png("android-icon-background.png", 1024, 0, TINTA);
 // La pantalla de carga: el isotipo solo, sobre el fondo negro que pone `expo-splash-screen`.
 await png("splash-icon.png", 1024, 0.5, null);
+// El ícono chico de las notificaciones de Android (#389): blanco sobre transparente, 96×96; el
+// color lo pone el sistema (`expo-notifications`, color de la marca).
+await png("notification-icon.png", 96, 0.8, null, "#ffffff");

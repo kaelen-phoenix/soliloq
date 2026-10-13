@@ -39,3 +39,6 @@ yarn-error.*
 # generated native folders
 /ios
 /android
+
+# Configuración de Firebase (#389): la escribe el pipeline desde un secret.
+/google-services.json

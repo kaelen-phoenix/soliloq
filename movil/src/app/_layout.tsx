@@ -6,6 +6,7 @@ import { StatusBar } from "expo-status-bar";
 import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { ProveedorIdioma } from "~/lib/intl";
+import { ProveedorPush } from "~/lib/push";
 import { ProveedorSesion, useSesion } from "~/lib/sesion";
 import { ProveedorNotificaciones } from "~/ui/notificaciones/campanita";
 import { ProveedorNoLeidos } from "~/ui/salas/no-leidos";
@@ -93,7 +94,9 @@ export default function Raiz() {
           {/* No leídos de los chats y notificaciones: solo se activan con la cuenta en la app. */}
           <ProveedorNoLeidos>
             <ProveedorNotificaciones>
-              <Navegacion />
+              <ProveedorPush>
+                <Navegacion />
+              </ProveedorPush>
             </ProveedorNotificaciones>
           </ProveedorNoLeidos>
         </ProveedorSesion>
