@@ -203,7 +203,9 @@
     "activar": "Enable notifications",
     "desactivar": "Turn off notifications",
     "aplicando": "One moment…",
-    "error": "Couldn't do that. Try again."
+    "error": "Couldn't do that. Try again.",
+    "denegadoAyudaApp": "You blocked them on your phone. To turn them on, allow notifications for Yalope in your phone settings.",
+    "abrirConfiguracion": "Open settings"
   },
   "tour": {
     "siguiente": "Next",

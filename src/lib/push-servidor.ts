@@ -3,6 +3,7 @@ import type { SupabaseClient, User } from "@supabase/supabase-js";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { idiomaDe, textosCorreo } from "@/lib/correos/textos";
+import { enviarFcm, FCM_LISTO } from "@/lib/fcm-servidor";
 import type { Database } from "@/lib/supabase/types";
 import type { Idioma } from "@/i18n/request";
 
@@ -16,6 +17,9 @@ export const VAPID_LISTO =
   !!process.env.VAPID_PRIVATE_KEY &&
   !!process.env.NEXT_PUBLIC_VAPID_PUBLIC_KEY &&
   !!process.env.VAPID_SUBJECT;
+
+/** Hay algún canal de push configurado: el de los navegadores o el de la app nativa (#389). */
+export const PUSH_LISTO = VAPID_LISTO || FCM_LISTO;
 
 if (VAPID_LISTO) {
   webpush.setVapidDetails(
@@ -35,7 +39,7 @@ if (VAPID_LISTO) {
  * mensaje real detrás. No falla nunca de forma visible: el chat ya se mandó bien.
  */
 export async function notificarMensajeNuevoDe({ supabase, user }: Sesion, mensajeId: string) {
-  if (!VAPID_LISTO) return;
+  if (!PUSH_LISTO) return;
 
   const { data: mensaje } = await supabase
     .from("mensajes")
@@ -108,7 +112,7 @@ export interface AvisoPush {
 }
 
 /**
- * Manda un push a todos los dispositivos de esas cuentas. Con la clave de servicio: quien
+ * Manda un push a todos los dispositivos de esas cuentas: navegadores y teléfonos con la app. Con la clave de servicio: quien
  * llama ya decidió que el aviso corresponde. Las suscripciones muertas (404/410) se borran.
  * El aviso se arma por dispositivo, en el idioma de su cuenta (`perfiles.idioma`, #354).
  *
@@ -118,6 +122,35 @@ export interface AvisoPush {
  * tiene un tope de 5 s: un servicio de push colgado no puede trabar a quien llama.
  */
 export async function enviarPush(perfilIds: string[], aviso: (idioma: Idioma) => AvisoPush): Promise<boolean> {
+  // A la vez: los navegadores (Web Push) y los teléfonos con la app nativa (FCM, #389).
+  const [web, app] = await Promise.all([enviarPushWeb(perfilIds, aviso), enviarPushApp(perfilIds, aviso)]);
+  return web && app;
+}
+
+/** A los teléfonos con la app nativa (`dispositivos_push`, 0114), por Firebase Cloud Messaging. */
+async function enviarPushApp(perfilIds: string[], aviso: (idioma: Idioma) => AvisoPush): Promise<boolean> {
+  if (!FCM_LISTO) return true;
+  const admin = createAdminClient();
+  const { data: dispositivos, error } = await admin
+    .from("dispositivos_push")
+    .select("id, token, perfiles(idioma)")
+    .in("perfil_id", perfilIds);
+  if (error) return false;
+  const resultados = await Promise.all(
+    (dispositivos ?? []).map(async (d) => {
+      const perfil = (Array.isArray(d.perfiles) ? d.perfiles[0] : d.perfiles) as { idioma: string | null } | null;
+      const r = await enviarFcm(d.token, aviso(idiomaDe(perfil?.idioma)));
+      // La app se desinstaló o el token cambió: se limpia, como las suscripciones web muertas.
+      if (r === "muerto") await admin.from("dispositivos_push").delete().eq("id", d.id);
+      return r !== "error";
+    }),
+  );
+  return resultados.every(Boolean);
+}
+
+/** A los navegadores con las notificaciones activadas (`push_suscripciones`, 0050). */
+async function enviarPushWeb(perfilIds: string[], aviso: (idioma: Idioma) => AvisoPush): Promise<boolean> {
+  if (!VAPID_LISTO) return true;
   const admin = createAdminClient();
   const { data: suscripciones, error } = await admin
     .from("push_suscripciones")

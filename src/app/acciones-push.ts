@@ -6,7 +6,7 @@ import { createAdminClient } from "@/lib/supabase/admin";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { despacharMailsDeAcceso } from "@/lib/avisos-mail-servidor";
 import { textosCorreo } from "@/lib/correos/textos";
-import { enviarPush, notificarMensajeNuevoDe, VAPID_LISTO } from "@/lib/push-servidor";
+import { enviarPush, notificarMensajeNuevoDe, PUSH_LISTO } from "@/lib/push-servidor";
 
 interface SuscripcionPush {
   endpoint: string;
@@ -71,7 +71,7 @@ export async function despacharAvisosDeAcceso() {
 
   // Push y mail (0093) en paralelo; cada canal con su marca y sus reintentos.
   await Promise.all([
-    VAPID_LISTO ? despacharPushDeAcceso() : null,
+    PUSH_LISTO ? despacharPushDeAcceso() : null,
     despacharMailsDeAcceso().catch((e) =>
       Sentry.captureException(e, { tags: { origen: "mail" }, extra: { accion: "despacharMailsDeAcceso" } }),
     ),

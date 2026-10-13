@@ -33,6 +33,10 @@ const config: ExpoConfig = {
       backgroundImage: "./assets/android-icon-background.png",
     },
     predictiveBackGestureEnabled: false,
+    // Firebase Cloud Messaging, para las push (#389). El pipeline escribe el archivo desde un
+    // secret y avisa con `GOOGLE_SERVICES_FILE`; sin él (en una compilación local) la app anda
+    // igual, sin push.
+    ...(process.env.GOOGLE_SERVICES_FILE ? { googleServicesFile: process.env.GOOGLE_SERVICES_FILE } : {}),
   },
   plugins: [
     "expo-router",
@@ -45,6 +49,10 @@ const config: ExpoConfig = {
     ],
     "expo-font",
     "expo-image",
+    [
+      "expo-notifications",
+      { icon: "./assets/notification-icon.png", color: "#f2571e", defaultChannel: "default" },
+    ],
     [
       "expo-image-picker",
       { photosPermission: "Yalope usa tus fotos para armar el portfolio de tu perfil.", cameraPermission: false },

@@ -11,7 +11,7 @@ export type Database = {
   // Allows to automatically instantiate createClient with right options
   // instead of createClient<Database, { PostgrestVersion: 'XX' }>(URL, KEY)
   __InternalSupabase: {
-    PostgrestVersion: "14.5"
+    PostgrestVersion: "14.17"
   }
   public: {
     Tables: {
@@ -327,6 +327,41 @@ export type Database = {
           {
             foreignKeyName: "descartes_equipo_talento_id_fkey"
             columns: ["talento_id"]
+            isOneToOne: false
+            referencedRelation: "perfiles"
+            referencedColumns: ["id"]
+          },
+        ]
+      }
+      dispositivos_push: {
+        Row: {
+          actualizado_en: string
+          creado_en: string
+          id: string
+          perfil_id: string
+          plataforma: string
+          token: string
+        }
+        Insert: {
+          actualizado_en?: string
+          creado_en?: string
+          id?: string
+          perfil_id: string
+          plataforma: string
+          token: string
+        }
+        Update: {
+          actualizado_en?: string
+          creado_en?: string
+          id?: string
+          perfil_id?: string
+          plataforma?: string
+          token?: string
+        }
+        Relationships: [
+          {
+            foreignKeyName: "dispositivos_push_perfil_id_fkey"
+            columns: ["perfil_id"]
             isOneToOne: false
             referencedRelation: "perfiles"
             referencedColumns: ["id"]
@@ -1983,6 +2018,10 @@ export type Database = {
         }[]
       }
       puede_buscar_talento: { Args: never; Returns: boolean }
+      registrar_dispositivo_push: {
+        Args: { p_plataforma: string; p_token: string }
+        Returns: undefined
+      }
       registrar_visita_enlace: { Args: { p_clave: string }; Returns: undefined }
       responder_convocatoria: {
         Args: { p_aceptar: boolean; p_convocatoria_id: string }

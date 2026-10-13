@@ -203,7 +203,9 @@
     "activar": "Activar notificaciones",
     "desactivar": "Desactivar notificaciones",
     "aplicando": "Un momento…",
-    "error": "No se pudo aplicar. Probá de nuevo."
+    "error": "No se pudo aplicar. Probá de nuevo.",
+    "denegadoAyudaApp": "Las bloqueaste en el teléfono. Para activarlas, habilitá las notificaciones de Yalope en la configuración del teléfono.",
+    "abrirConfiguracion": "Abrir configuración"
   },
   "tour": {
     "siguiente": "Siguiente",

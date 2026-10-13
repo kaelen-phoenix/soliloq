@@ -2,6 +2,7 @@ import type { Session } from "@supabase/supabase-js";
 import { createContext, useCallback, useContext, useEffect, useState } from "react";
 import { destinoSegunEstado, resolverEstadoCuenta, type Destino, type EstadoCuenta } from "@/lib/cuenta";
 import { esIdioma } from "@/i18n/idiomas";
+import { olvidarDispositivo } from "./push-token";
 import { supabase } from "./supabase";
 import { useIdioma } from "./intl";
 import { useTema } from "~/ui/tema";
@@ -75,6 +76,8 @@ export function ProveedorSesion({ children }: { children: React.ReactNode }) {
   }, [recargar]);
 
   const cerrarSesion = useCallback(async () => {
+    // Este teléfono deja de recibir las push de la cuenta (#389).
+    await olvidarDispositivo().catch(() => {});
     await supabase.auth.signOut();
   }, []);
 
