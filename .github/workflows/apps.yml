@@ -1,0 +1,146 @@
+# Las apps de Android y iPhone (#387). Una sola base de código, tres versiones:
+#   - web: yalope.com, la deploya Vercel en cada push a main (como siempre);
+#   - Android: APK firmado (y el AAB para Google Play, cuando se publique);
+#   - iPhone: por ahora el paquete para el simulador (sin cuenta de Apple Developer no se firma).
+# Las apps abren yalope.com, así que cada deploy de la web ya les llega. Estos paquetes solo
+# cambian si cambia algo nativo, pero se arman en cada push a main para tenerlos siempre al día.
+# Los de main quedan en la release «apps-ultima»: un link fijo para bajar el APK al teléfono.
+name: Apps
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    paths:
+      - "android/**"
+      - "ios/**"
+      - "app-nativa/**"
+      - "capacitor.config.ts"
+      - "package.json"
+      - "package-lock.json"
+      - ".github/workflows/apps.yml"
+  workflow_dispatch:
+
+concurrency:
+  group: apps-${{ github.ref }}
+  cancel-in-progress: true
+
+env:
+  VERSION_CODE: ${{ github.run_number }}
+  VERSION_NAME: 1.0.${{ github.run_number }}
+
+jobs:
+  android:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx cap sync android
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Clave de firma
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::Sin ANDROID_KEYSTORE_BASE64: el APK sale sin firmar."; exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/yalope.p12"
+          echo "ANDROID_KEYSTORE=$RUNNER_TEMP/yalope.p12" >> "$GITHUB_ENV"
+      - name: Compilar
+        working-directory: android
+        env:
+          ANDROID_KEYSTORE_CLAVE: ${{ secrets.ANDROID_KEYSTORE_CLAVE }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: ./gradlew assembleRelease bundleRelease --no-daemon
+      - name: Ordenar los paquetes
+        run: |
+          mkdir -p salida
+          APK=$(ls android/app/build/outputs/apk/release/*.apk | head -1)
+          cp "$APK" salida/Yalope.apk
+          cp android/app/build/outputs/bundle/release/app-release.aab salida/Yalope.aab
+          ls -la salida
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-${{ env.VERSION_NAME }}
+          path: salida/
+          if-no-files-found: error
+
+  ios:
+    runs-on: macos-latest
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+      - run: npm ci
+      - run: npx cap sync ios
+      - name: Compilar para el simulador
+        run: |
+          xcodebuild \
+            -project ios/App/App.xcodeproj \
+            -scheme App \
+            -configuration Release \
+            -sdk iphonesimulator \
+            -destination "generic/platform=iOS Simulator" \
+            -derivedDataPath build-ios \
+            CODE_SIGNING_ALLOWED=NO \
+            CURRENT_PROJECT_VERSION="$VERSION_CODE" \
+            MARKETING_VERSION="$VERSION_NAME" \
+            build
+      - name: Ordenar el paquete
+        run: |
+          mkdir -p salida
+          ditto -c -k --keepParent build-ios/Build/Products/Release-iphonesimulator/App.app salida/Yalope-iphone-simulador.zip
+          ls -la salida
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-${{ env.VERSION_NAME }}
+          path: salida/
+          if-no-files-found: error
+
+  publicar:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [android, ios]
+    runs-on: ubuntu-latest
+    permissions:
+      contents: write
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          path: paquetes
+          merge-multiple: true
+      - name: Release «apps-ultima»
+        env:
+          GH_TOKEN: ${{ github.token }}
+          GH_REPO: ${{ github.repository }}
+        run: |
+          NOTAS="Versión $VERSION_NAME · commit ${GITHUB_SHA::7} · $(date -u +'%Y-%m-%d %H:%M') UTC
+
+          - **Yalope.apk**: Android. Se baja desde el teléfono y se instala (hay que permitir «instalar apps de origen desconocido»). Se instala encima de la versión anterior.
+          - **Yalope.aab**: Android para Google Play (todavía no se publica).
+          - **Yalope-iphone-simulador.zip**: iPhone, solo para el simulador de Xcode (sin firma de Apple todavía).
+
+          Las apps abren yalope.com: los cambios de la web les llegan solos, sin bajar un paquete nuevo."
+          if ! gh release view apps-ultima >/dev/null 2>&1; then
+            gh release create apps-ultima --prerelease --title "Apps · última versión" --notes "$NOTAS" --target "$GITHUB_SHA"
+          else
+            gh release edit apps-ultima --notes "$NOTAS"
+          fi
+          gh release upload apps-ultima paquetes/Yalope.apk paquetes/Yalope.aab paquetes/Yalope-iphone-simulador.zip --clobber
+      - name: Resumen
+        run: |
+          {
+            echo "### Las tres versiones"
+            echo "- **Web**: yalope.com (Vercel)"
+            echo "- **Android**: [Yalope.apk](https://github.com/${{ github.repository }}/releases/download/apps-ultima/Yalope.apk) · $VERSION_NAME"
+            echo "- **iPhone (simulador)**: [Yalope-iphone-simulador.zip](https://github.com/${{ github.repository }}/releases/download/apps-ultima/Yalope-iphone-simulador.zip)"
+          } >> "$GITHUB_STEP_SUMMARY"

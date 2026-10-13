@@ -1,6 +1,7 @@
 import { NextResponse, type NextRequest } from "next/server";
 import { actualizarSesion } from "@/lib/supabase/middleware";
 import { detectarIdioma, esIdioma, esRutaPorIdioma, separarIdioma, type Idioma } from "@/i18n/idiomas";
+import { esUserAgentDeApp } from "@/lib/app-nativa";
 
 const COOKIE_IDIOMA = "NEXT_LOCALE";
 const OPCIONES_COOKIE_IDIOMA = { maxAge: 60 * 60 * 24 * 365, sameSite: "lax" as const, path: "/" };
@@ -30,6 +31,14 @@ export async function middleware(request: NextRequest) {
     const r = NextResponse.redirect(url);
     r.cookies.set(COOKIE_IDIOMA, idiomaUrl, OPCIONES_COOKIE_IDIOMA);
     return r;
+  }
+
+  // #387: dentro de las apps no se piden aportes (reglas de Google Play y App Store). Los
+  // enlaces a «Apoyar» se ocultan (`.solo-web`); si se llega igual, vuelve al inicio.
+  if (resto === "/apoyar" && esUserAgentDeApp(request.headers.get("user-agent"))) {
+    const url = request.nextUrl.clone();
+    url.pathname = "/";
+    return NextResponse.redirect(url);
   }
 
   const { respuesta, userId } = await actualizarSesion(request);

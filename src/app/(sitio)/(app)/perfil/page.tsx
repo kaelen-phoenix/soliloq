@@ -34,7 +34,7 @@ function AccionesCuenta() {
       </Link>
       <Link
         href="/apoyar"
-        className="text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
+        className="solo-web text-sm text-texto-tenue underline underline-offset-4 hover:text-texto"
       >
         {t("apoyar")}
       </Link>
