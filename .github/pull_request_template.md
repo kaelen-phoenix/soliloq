@@ -4,8 +4,8 @@ Closes #
 
 ## Las tres versiones (#402)
 - [ ] **Web**:
-- [ ] **App de Capacitor**: le llega por la web. Revisé lo propio de la cáscara (`.solo-web`, login con Google, enlaces, permisos), o no aplica porque:
-- [ ] **App nativa** (`movil/`, Android e iPhone):
+- [ ] **App nativa Android** (`movil/`):
+- [ ] **App nativa iPhone** (`movil/`): misma base. Si algo es distinto en iPhone:
 - [ ] La lógica nueva que comparten está en `src/lib/` (pura, sin paquetes), sin duplicar.
 - [ ] Los textos nuevos están en `es` y en `en`.
 
