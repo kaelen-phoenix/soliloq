@@ -3,8 +3,8 @@
 import { revalidatePath } from "next/cache";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { sincronizarEspacio } from "@/lib/discord-servidor";
-import { reportarErrorSupabase } from "@/lib/observabilidad";
+import { desvincularmeDe } from "@/lib/salas-servidor";
+import { errorConocidoDesvincularSala } from "@/lib/matches";
 
 type Resultado = { ok: true } | { ok: false; error: string };
 
@@ -51,16 +51,9 @@ export async function desvincularmeDeSala(salaId: string): Promise<Resultado> {
   const { supabase, user } = await usuario();
   const t = await getTranslations("chats.acciones");
   if (!user) return { ok: false, error: t("sinSesion") };
-  const { error } = await supabase.rpc("desvincularme_de_sala", { p_sala_id: salaId });
-  if (error) {
-    if (error.message?.includes("dueño")) {
-      return { ok: false, error: t("errorDueno") };
-    }
-    reportarErrorSupabase(error, { rpc: "desvincularme_de_sala", salaId, userId: user.id });
-    return { ok: false, error: t("errorGenerico") };
-  }
-  // Ya no está en la sala: pierde el acceso a su espacio en Discord (#269).
-  await sincronizarEspacio(salaId).catch(() => {});
+  // La misma lógica que la app nativa (`/api/app/salas`).
+  const r = await desvincularmeDe({ supabase, user }, salaId);
+  if (!r.ok) return { ok: false, error: t(r.error) };
   revalidatePath("/salas");
   return { ok: true };
 }

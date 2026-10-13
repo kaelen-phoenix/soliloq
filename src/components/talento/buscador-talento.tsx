@@ -12,10 +12,11 @@ import { createClient } from "@/lib/supabase/client";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { opcionesDeRadio, RADIO_INICIAL_METROS, SesionUbicacion, type Ubicacion } from "@/lib/ubicacion";
 import { interpretarBusqueda } from "@/app/acciones-ia";
+import { filtrosAvanzadosActivos, hayFiltrosTalento, PAGINA_TALENTO, parametrosBuscarTalento } from "@/lib/matches";
 import { type ResultadoTalento } from "./tarjeta-talento";
 import { PilaTalentos, type IniciativaPlaca } from "./pila-talentos";
 
-const PAGINA = 24;
+const PAGINA = PAGINA_TALENTO;
 
 type Fila = Omit<ResultadoTalento, "fotoUrl"> & { foto_principal_path: string };
 
@@ -98,28 +99,22 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
     [supabase],
   );
 
+  const iniciativaTipo = iniciativa?.tipo;
+  const iniciativaId = iniciativa?.id;
   const buscar = useCallback(
     async (nuevoOffset: number) => {
       const corrida = ++corridaRef.current;
       setCargando(true);
 
-      const conGeo = ubicacion && radioMetros !== null;
-      const { data, error } = await supabase.rpc("buscar_talento", {
-        p_texto: texto.trim() || null,
-        p_edad_min: edadMin ? Number(edadMin) : null,
-        p_edad_max: edadMax ? Number(edadMax) : null,
-        p_generos: generos.length ? generos : undefined,
-        p_habilidades: habilidades.length ? habilidades : undefined,
-        p_lat: conGeo ? ubicacion!.lat : null,
-        p_lng: conGeo ? ubicacion!.lng : null,
-        p_radio_metros: conGeo ? radioMetros : null,
-        p_limite: PAGINA,
-        p_offset: nuevoOffset,
-        // #372: se excluye solo a quien ya se decidió para ESTA iniciativa; quien se descartó
-        // o no se eligió para otro Proyecto o Equipo vuelve a aparecer.
-        p_obra_id: iniciativa?.tipo === "obra" ? iniciativa.id : null,
-        p_equipo_id: iniciativa?.tipo === "equipo" ? iniciativa.id : null,
-      });
+      // Los mismos parámetros que la app nativa (`@/lib/matches`).
+      const { data, error } = await supabase.rpc(
+        "buscar_talento",
+        parametrosBuscarTalento(
+          { texto, edadMin, edadMax, generos, habilidades, ubicacion, radioMetros },
+          iniciativaTipo && iniciativaId ? { tipo: iniciativaTipo, id: iniciativaId } : null,
+          nuevoOffset,
+        ),
+      );
 
       if (corrida !== corridaRef.current) return;
 
@@ -139,7 +134,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
       setHayMas(filas.length === PAGINA);
       setCargando(false);
     },
-    [supabase, url, texto, edadMin, edadMax, generos, habilidades, ubicacion, radioMetros, iniciativa?.tipo, iniciativa?.id],
+    [supabase, url, texto, edadMin, edadMax, generos, habilidades, ubicacion, radioMetros, iniciativaTipo, iniciativaId],
   );
 
   // Debounce: cambiar cualquier filtro reinicia la búsqueda desde el offset 0.
@@ -150,13 +145,8 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
 
   const opcionesRadio = opcionesDeRadio("km", tEtiquetas);
 
-  const hayFiltros =
-    texto.trim() !== "" ||
-    edadMin !== "" ||
-    edadMax !== "" ||
-    generos.length > 0 ||
-    habilidades.length > 0 ||
-    ubicacion !== null;
+  const filtros = { texto, edadMin, edadMax, generos, habilidades, ubicacion, radioMetros };
+  const hayFiltros = hayFiltrosTalento(filtros);
 
   function limpiarFiltros() {
     setTexto("");
@@ -168,11 +158,7 @@ export function BuscadorTalento({ iniciativa }: { iniciativa: IniciativaPlaca | 
     setRadioMetros(RADIO_INICIAL_METROS);
   }
 
-  const nAvanzados =
-    (edadMin !== "" || edadMax !== "" ? 1 : 0) +
-    (generos.length > 0 ? 1 : 0) +
-    (habilidades.length > 0 ? 1 : 0) +
-    (ubicacion !== null ? 1 : 0);
+  const nAvanzados = filtrosAvanzadosActivos(filtros);
 
   return (
     <div className="flex flex-col gap-6">

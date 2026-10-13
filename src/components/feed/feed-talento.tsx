@@ -1,5 +1,5 @@
 import { createClient } from "@/lib/supabase/server";
-import { aRolFeed } from "@/lib/feed-roles";
+import { aEquipoFeed, aRolFeed } from "@/lib/feed-roles";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { PilaTarjetas } from "./pila-tarjetas";
 import type { RolFeed } from "./tarjeta-rol";
@@ -33,15 +33,7 @@ export async function FeedTalento({ talentoId }: { talentoId: string }) {
   // La foto del creador sale de su Perfil de Talento (0072).
   const roles: RolFeed[] = (rolesRaw ?? []).map((r) => aRolFeed(r, publicUrl));
 
-  const equipos: EquipoFeed[] = (equiposRaw ?? []).map((e) => ({
-    equipo_id: e.equipo_id,
-    titulo: e.titulo,
-    cupo: e.cupo,
-    creador_id: e.creador_id,
-    creador_nombre: e.creador_nombre,
-    creador_imagen_url: e.creador_foto_path ? publicUrl(e.creador_foto_path) : null,
-    fotos: (e.fotos ?? []).map(publicUrl),
-  }));
+  const equipos: EquipoFeed[] = (equiposRaw ?? []).map((e) => aEquipoFeed(e, publicUrl));
 
   return (
     <PilaTarjetas

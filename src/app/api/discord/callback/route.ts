@@ -3,7 +3,7 @@ import * as Sentry from "@sentry/nextjs";
 import { createClient } from "@/lib/supabase/server";
 import { createAdminClient } from "@/lib/supabase/admin";
 import { sincronizarEspaciosDe, sumarAlServidor } from "@/lib/discord-servidor";
-import { destinoVuelta, redirectDiscord, SITIO } from "../comun";
+import { destinoVuelta, leerPaseApp, redirectDiscord, SITIO } from "../comun";
 
 /**
  * Vuelta de Discord (#269): verifica el `state`, cambia el código por un token, lee quién es
@@ -14,19 +14,26 @@ export async function GET(req: NextRequest) {
   const sitio = SITIO;
   // Bien vinculado, vuelve al chat de donde salió (#296); los errores se explican en Perfil.
   const chat = destinoVuelta(req.cookies.get("discord_volver")?.value);
+  // Desde la app nativa (#395): quién es sale del pase firmado, y la vuelta es a la app.
+  const deLaApp = leerPaseApp(req.cookies.get("discord_app")?.value);
   const volver = (resultado: string) => {
-    const destino =
-      resultado === "vinculado" && chat ? `${sitio}${chat}` : `${sitio}/perfil?discord=${resultado}`;
+    const destino = deLaApp
+      ? `${deLaApp.esquema}://perfil?discord=${resultado}`
+      : resultado === "vinculado" && chat
+        ? `${sitio}${chat}`
+        : `${sitio}/perfil?discord=${resultado}`;
     const res = NextResponse.redirect(destino);
     res.cookies.delete({ name: "discord_estado", path: "/api/discord" });
     res.cookies.delete({ name: "discord_volver", path: "/api/discord" });
+    res.cookies.delete({ name: "discord_app", path: "/api/discord" });
     return res;
   };
 
   const supabase = createClient();
   const {
-    data: { user },
+    data: { user: deLaWeb },
   } = await supabase.auth.getUser();
+  const user = deLaApp ? { id: deLaApp.usuario } : deLaWeb;
   if (!user) return NextResponse.redirect(`${sitio}/ingresar`);
 
   const codigo = req.nextUrl.searchParams.get("code");

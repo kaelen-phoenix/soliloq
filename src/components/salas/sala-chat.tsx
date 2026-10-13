@@ -10,12 +10,7 @@ import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
 import { notificarMensajeNuevo } from "@/app/acciones-push";
 import { borradorSaludo } from "@/app/acciones-ia";
 import { useNoLeidos } from "./no-leidos";
-
-/** Primer nombre: en el chat no hay lugar para nombre y apellido, y desambigua con la
- *  foto y la placa de perfil, no con el apellido (issue #149). */
-function primerNombre(nombre: string) {
-  return nombre.trim().split(/\s+/)[0] ?? nombre;
-}
+import { MAX_MENSAJE, primerNombre } from "@/lib/salas-reglas";
 
 export interface Mensaje {
   id: string;
@@ -143,7 +138,7 @@ export function SalaChat({
   async function enviar(e: React.FormEvent) {
     e.preventDefault();
     const contenido = texto.trim();
-    if (!contenido || contenido.length > 2000) return;
+    if (!contenido || contenido.length > MAX_MENSAJE) return;
 
     const idTemporal = crypto.randomUUID();
     const optimista: Mensaje = {
@@ -345,7 +340,7 @@ export function SalaChat({
             setTexto(e.target.value);
             if (saludo !== "listo" && saludo !== "escribiendo") setSaludo("listo");
           }}
-          maxLength={2000}
+          maxLength={MAX_MENSAJE}
           placeholder={t("placeholder")}
           className="flex-1 rounded-full border border-borde bg-superficie px-4 py-2.5 text-base text-texto placeholder:text-texto-tenue focus:border-accion"
         />

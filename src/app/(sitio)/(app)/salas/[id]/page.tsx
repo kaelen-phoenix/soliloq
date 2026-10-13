@@ -5,6 +5,7 @@ import { SalaChat, type Integrante } from "@/components/salas/sala-chat";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
 import { EspacioDiscord } from "@/components/comunidad/espacio-discord";
 import { discordConfigurado, urlCanal } from "@/lib/discord-servidor";
+import { claveRolEnSala } from "@/lib/salas-reglas";
 
 export default async function SalaPage({ params }: { params: { id: string } }) {
   const supabase = createClient();
@@ -62,7 +63,7 @@ export default async function SalaPage({ params }: { params: { id: string } }) {
       nombre: talento?.nombre ?? (esDeIniciativa ? t("integrante") : t("perfilSinCompletar")),
       foto_url: fotoPrincipal ? supabase.storage.from("fotos-perfil").getPublicUrl(fotoPrincipal.storage_path).data.publicUrl : null,
       // La sala nace de un interés mutuo + convocatoria, no de un casting con roles.
-      rol_en_obra: esDirector ? t("director") : esDeIniciativa ? t("elenco") : t("contacto"),
+      rol_en_obra: t(claveRolEnSala(esDirector, esDeIniciativa)),
       // #149: sólo los mensajes de quien tiene perfil de Talento abren la placa de perfil.
       esTalento: !!talento,
     };

@@ -7,15 +7,9 @@ import { Imagen } from "@/components/ui/imagen";
 import { Superposicion } from "@/components/ui/superposicion";
 import { Avatar } from "@/components/convocatorias/avatar";
 import { marcarMatchMostrado } from "@/app/(sitio)/(app)/matches/acciones";
+import type { MatchNuevo } from "@/lib/matches";
 
-export interface MatchNuevo {
-  matchId: string;
-  nombre: string;
-  fotoUrl: string | null;
-  esEquipo: boolean;
-  iniciativaTitulo: string;
-  iniciativaFotoUrl: string | null;
-}
+export type { MatchNuevo } from "@/lib/matches";
 
 /**
  * Ventana «Hay interés» (#194, #365) para el match que se formó del lado del Talento: aparece

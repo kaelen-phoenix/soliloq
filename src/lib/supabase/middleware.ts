@@ -18,8 +18,9 @@ const RUTAS_SIEMPRE_DISPONIBLES = ["/cambiar-clave"];
 // pública `robots.ts` y `sitemap.ts`, pero faltaba acá y a quien no tenía sesión lo mandaba a
 // `/ingresar` (#226). Política de Privacidad y Términos, igual: se enlazan desde el alta (#352).
 // `/api/app/` son los endpoints de la app nativa (#396): llegan sin cookies, con la sesión en
-// `Authorization`, y cada uno la valida (`usuarioDesdeApp`).
-const RUTAS_ABIERTAS = ["/p/", "/normas", "/apoyar", "/privacidad", "/terminos", "/api/app/"];
+// `Authorization`, y cada uno la valida (`usuarioDesdeApp`). `/api/discord/` resuelve quién es
+// por su cuenta: la sesión de la web o, desde la app, un pase firmado (#395).
+const RUTAS_ABIERTAS = ["/p/", "/normas", "/apoyar", "/privacidad", "/terminos", "/api/app/", "/api/discord/"];
 
 /** Solo destinos internos: `next` viaja por la URL y no puede convertirse en un redirect abierto. */
 function conNext(destino: string, next: string): string {

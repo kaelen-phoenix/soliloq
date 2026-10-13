@@ -39,6 +39,7 @@ import { desdeColumnas, unidadPorPais, type Ubicacion } from "@/lib/ubicacion";
 import { llamarApi } from "~/lib/api";
 import { supabase } from "~/lib/supabase";
 import { Casilla, Opciones, Rotulo, Tarjeta } from "../basicos";
+import { MejorarRedaccion, SugerirHabilidades } from "../ia";
 import { Boton } from "../boton";
 import { Campo } from "../campo";
 import { Texto } from "../texto";
@@ -431,6 +432,7 @@ export function FormularioPerfil({
       <Texto variante="chico" style={{ textAlign: "right" }}>
         {v[clave].length}/{MAX_TEXTO_LARGO}
       </Texto>
+      {clave === "experiencia" && <MejorarRedaccion texto={v.experiencia} onUsar={(x) => cambiar("experiencia", x)} />}
     </View>
   );
 
@@ -442,6 +444,7 @@ export function FormularioPerfil({
   );
 
   const habilidades = (
+    <View style={{ gap: 10 }}>
     <Chips
       valores={HABILIDADES}
       elegidos={v.habilidades}
@@ -450,6 +453,12 @@ export function FormularioPerfil({
         cambiar("habilidades", v.habilidades.includes(h) ? v.habilidades.filter((x) => x !== h) : [...v.habilidades, h])
       }
     />
+      <SugerirHabilidades
+        experiencia={v.experiencia}
+        marcadas={v.habilidades}
+        onMarcar={(nuevas) => setV((prev) => ({ ...prev, habilidades: [...prev.habilidades, ...nuevas.filter((h) => !prev.habilidades.includes(h))] }))}
+      />
+    </View>
   );
 
   const videoreel = (

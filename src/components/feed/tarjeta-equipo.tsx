@@ -5,18 +5,10 @@ import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
+import type { EquipoFeed } from "@/lib/feed-tipos";
 
-export interface EquipoFeed {
-  equipo_id: string;
-  titulo: string;
-  /** null = sin límite de integrantes (#330). */
-  cupo: number | null;
-  creador_id: string;
-  creador_nombre: string;
-  creador_imagen_url: string | null;
-  /** URLs ya resueltas. Al menos 1 (lo garantiza `feed_equipos_para_talento`). */
-  fotos: string[];
-}
+// El tipo vive en `@/lib/feed-tipos` (lo usa también la app nativa).
+export type { EquipoFeed } from "@/lib/feed-tipos";
 
 /**
  * Tarjeta de "Armar equipo" en el feed del talento. A diferencia de la de un proyecto

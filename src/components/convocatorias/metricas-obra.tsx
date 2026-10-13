@@ -2,6 +2,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
+import { resumirMetricas } from "@/lib/iniciativa-reglas";
 
 export async function MetricasObra({ obraId }: { obraId: string }) {
   const supabase = createClient();
@@ -9,8 +10,9 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
   const { data, error } = await supabase.rpc("metricas_obra", { p_obra_id: obraId });
   if (error) reportarErrorSupabase(error, { rpc: "metricas_obra", obraId });
   const m = data?.[0];
+  const r = resumirMetricas(m);
 
-  if (!m || m.cupo === 0) {
+  if (r.estado === "sinRoles") {
     return (
       <EstadoVacio
         icono="tablero"
@@ -20,7 +22,7 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
     );
   }
 
-  if (m.alcance === 0) {
+  if (r.estado === "sinAlcance") {
     return (
       <EstadoVacio
         icono="feed"
@@ -32,8 +34,7 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
 
   // Cuánta de la gente que decidió algo (Me interesa o Paso) se interesó. Es el número que
   // dice si la convocatoria es atractiva; el alcance solo dice si se está mostrando.
-  const tasa = Math.round((m.interes_recibido / m.alcance) * 100);
-  const convocadosCubierto = Math.min(m.convocados, m.cupo ?? 0);
+  const { tasa, convocados: convocadosCubierto } = r;
 
   return (
     <div className="rounded-2xl border border-borde bg-superficie p-4">
@@ -48,20 +49,20 @@ export async function MetricasObra({ obraId }: { obraId: string }) {
         <p className="pb-0.5 text-xs leading-snug text-texto-tenue">
           {t("seIntereso")}
           <br />
-          {t("dePersonas", { n: m.alcance })}
+          {t("dePersonas", { n: m!.alcance })}
         </p>
       </div>
 
       <dl className="mt-4 grid grid-cols-2 gap-3 border-t border-borde pt-3.5">
         <div>
           <dt className="text-2xs uppercase tracking-wide text-texto-tenue">{t("interesMutuo")}</dt>
-          <dd className="mt-0.5 text-lg font-semibold leading-none text-texto">{m.matches}</dd>
+          <dd className="mt-0.5 text-lg font-semibold leading-none text-texto">{m!.matches}</dd>
         </div>
         <div>
           <dt className="text-2xs uppercase tracking-wide text-texto-tenue">{t("convocados")}</dt>
           <dd className="mt-0.5 text-lg font-semibold leading-none text-texto">
             {convocadosCubierto}
-            <span className="text-sm font-normal text-texto-tenue"> {t("deCupo", { cupo: m.cupo ?? "" })}</span>
+            <span className="text-sm font-normal text-texto-tenue"> {t("deCupo", { cupo: m!.cupo ?? "" })}</span>
           </dd>
         </div>
       </dl>

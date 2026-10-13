@@ -9,6 +9,7 @@ import { createClient } from "@/lib/supabase/client";
 import type { TipoNotificacion } from "@/lib/supabase/types";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { avisarCambioNotificaciones, cerrarPushDe, tagPush } from "@/lib/notificaciones-cliente";
+import { destinoNotificacion, primeraFila } from "@/lib/notificaciones-reglas";
 
 type Obra = { titulo: string };
 
@@ -28,11 +29,7 @@ interface Notificacion {
   proyecto_foto_url: string | null;
 }
 
-/** PostgREST devuelve la relación como objeto o como array según la cardinalidad que infiere. */
-function primero<T>(v: T | T[] | null): T | null {
-  if (!v) return null;
-  return Array.isArray(v) ? v[0] ?? null : v;
-}
+const primero = primeraFila;
 
 /** `null` si la obra no vino (p. ej. la esconde un bloqueo): el texto lo pone quien llama. */
 function tituloObra(n: Notificacion): string | null {
@@ -126,20 +123,9 @@ export function ListaNotificaciones({
 
   async function abrir(n: Notificacion) {
     await marcarLeida(n.id);
-    if ((n.tipo === "sala_creada" || n.tipo === "equipo_armado") && n.sala_id) {
-      router.push(`/salas/${n.sala_id}`);
-    } else if (n.tipo === "convocado") {
-      // #143: el Talento confirma la convocatoria antes de entrar a la sala.
-      router.push("/convocatoria");
-    } else if (n.tipo === "match" && n.obra_id) {
-      router.push(`/obras/${n.obra_id}`);
-    } else if (n.tipo === "nuevo_match") {
-      router.push("/matches");
-    } else if (n.tipo === "solicitud_acceso") {
-      router.push("/admin");
-    } else if (n.tipo === "acceso_habilitado") {
-      router.push("/perfil");
-    }
+    // El mismo destino que en la app nativa (`destinoNotificacion`).
+    const destino = destinoNotificacion(n);
+    if (destino) router.push(destino);
   }
 
   if (notificaciones.length === 0) {

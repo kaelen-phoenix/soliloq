@@ -8,6 +8,7 @@ import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { GENEROS_BUSCABLES, claveGenero, type Genero } from "@/lib/constantes";
 import type { TipoRol } from "@/lib/supabase/types";
+import { columnasRol, validarRol } from "@/lib/iniciativa-reglas";
 import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
 
@@ -40,34 +41,16 @@ export function FormularioRol({
     e.preventDefault();
     setError(null);
 
-    if (!nombre.trim()) {
-      setError(t("errorNombre"));
-      return;
-    }
-    const min = edadMinima ? Number(edadMinima) : null;
-    const max = edadMaxima ? Number(edadMaxima) : null;
-    if (min !== null && max !== null && min > max) {
-      setError(t("errorEdades"));
-      return;
-    }
-    const vacantesNum = Number(vacantes);
-    if (!Number.isInteger(vacantesNum) || vacantesNum < 1) {
-      setError(t("errorVacantes"));
+    const valores = { nombre, tipo, edadMinima, edadMaxima, vacantes, descripcion, generos };
+    const problema = validarRol(valores);
+    if (problema) {
+      setError(t(problema));
       return;
     }
 
     setCargando(true);
     const supabase = createClient();
-    const { error: errorInsert } = await supabase.from("roles").insert({
-      obra_id: obraId,
-      nombre: nombre.trim(),
-      tipo,
-      edad_minima: min,
-      edad_maxima: max,
-      vacantes: vacantesNum,
-      descripcion: descripcion || null,
-      generos_buscados: generos,
-    });
+    const { error: errorInsert } = await supabase.from("roles").insert(columnasRol(obraId, valores));
 
     setCargando(false);
 

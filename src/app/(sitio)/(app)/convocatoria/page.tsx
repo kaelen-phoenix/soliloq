@@ -4,6 +4,7 @@ import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ConvocatoriasLista } from "@/components/talento/convocatorias-lista";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
+import { aFilaConvocatoria } from "@/lib/convocatoria-talento";
 
 export async function generateMetadata() {
   const t = await getTranslations("proyectos.convocatoria");
@@ -19,17 +20,8 @@ export default async function ConvocatoriaPage() {
   const { data, error } = await supabase.rpc("mis_convocatorias");
   if (error) reportarErrorSupabase(error, { rpc: "mis_convocatorias", userId: user.id });
 
-  const url = (p: string | null) =>
-    p ? supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl : null;
-
-  const filas = (data ?? []).map((c) => ({
-    convocatoriaId: c.convocatoria_id,
-    esEquipo: c.es_equipo,
-    iniciativaTitulo: c.iniciativa_titulo,
-    creadorNombre: c.creador_nombre,
-    talentoFotoUrl: url(c.talento_foto),
-    iniciativaFotoUrl: url(c.iniciativa_foto),
-  }));
+  const url = (p: string) => supabase.storage.from("fotos-perfil").getPublicUrl(p).data.publicUrl;
+  const filas = (data ?? []).map((c) => aFilaConvocatoria(c, url));
 
   return (
     <main className="px-5 py-5">

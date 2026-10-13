@@ -2,13 +2,16 @@ import { NextResponse, type NextRequest } from "next/server";
 import { randomUUID } from "node:crypto";
 import { createClient } from "@/lib/supabase/server";
 import { discordConfigurado } from "@/lib/discord-servidor";
-import { destinoVuelta, redirectDiscord, SITIO } from "../comun";
+import { destinoVuelta, leerPaseApp, redirectDiscord, SITIO } from "../comun";
 
 /**
  * «Vincular mi Discord» (#269): manda a la pantalla de permiso de Discord. El `state` va en
  * una cookie httpOnly y se compara a la vuelta, para que nadie pueda completar la
  * vinculación de otra persona con un link armado. Desde un chat llega `?volver=/salas/…`
  * (#296): se guarda igual, en cookie, y la vuelta termina ahí.
+ *
+ * Desde la app nativa (#395) llega `?pase=` (firmado por `/api/app/discord`) en lugar de la
+ * sesión de las cookies: también se guarda en cookie, y la vuelta termina en la app.
  */
 export async function GET(req: NextRequest) {
   const sitio = SITIO;
@@ -16,7 +19,9 @@ export async function GET(req: NextRequest) {
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return NextResponse.redirect(`${sitio}/ingresar`);
+  const pase = req.nextUrl.searchParams.get("pase");
+  const deLaApp = leerPaseApp(pase);
+  if (!user && !deLaApp) return NextResponse.redirect(`${sitio}/ingresar`);
   if (!discordConfigurado()) return NextResponse.redirect(`${sitio}/perfil?discord=no-configurado`);
 
   const estado = randomUUID();
@@ -37,6 +42,9 @@ export async function GET(req: NextRequest) {
     path: "/api/discord",
     maxAge: 600,
   });
+  if (deLaApp && pase) {
+    res.cookies.set("discord_app", pase, { httpOnly: true, secure: true, sameSite: "lax", path: "/api/discord", maxAge: 600 });
+  }
   const volver = destinoVuelta(req.nextUrl.searchParams.get("volver"));
   if (volver) {
     res.cookies.set("discord_volver", volver, {

@@ -1,244 +1,71 @@
 "use server";
 
-import * as Sentry from "@sentry/nextjs";
 import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
-import { revisarFidelidad } from "@/lib/fidelidad-ia";
-import { consumirUsoIa, devolverUsoIa, enBloque, llamarModelo, objetoJson } from "@/lib/ia-servidor";
-import { GENEROS_BUSCABLES, HABILIDADES } from "@/lib/constantes";
 import {
-  INSTRUCCIONES,
-  INSTRUCCIONES_BUSQUEDA,
-  INSTRUCCIONES_HABILIDADES,
-  INSTRUCCIONES_SALUDO,
-  MAX_ENTRADA,
-  MAX_SALIDA,
-  type TipoRedaccion,
-} from "@/lib/ia-prompts";
+  borradorSaludoDe,
+  interpretarBusquedaDe,
+  mejorarRedaccionDe,
+  sugerirHabilidadesDe,
+  type ErrorIa,
+  type FiltrosBusqueda,
+} from "@/lib/ia-acciones";
+import type { TipoRedaccion } from "@/lib/ia-prompts";
 
-type Resultado = { ok: true; texto: string } | { ok: false; error: string };
+export type { FiltrosBusqueda } from "@/lib/ia-acciones";
 
 /**
- * «✨ Mejorar redacción» (#313, #319): la Experiencia del perfil, la sinopsis del Proyecto, la
- * descripción del Equipo y la de cada rol. Cada uso pasa antes por el tope de
- * `consumir_uso_ia()` (0100), y la propuesta solo se muestra si sale del texto de la persona
- * (#317). La persona la ve y elige si la usa.
+ * Las funciones de IA de la web. La lógica vive en `@/lib/ia-acciones`, que usa también la app
+ * nativa (`/api/app/ia`); acá se resuelve la sesión de las cookies y se traduce el error.
  */
-export async function mejorarRedaccion(texto: string, tipo: TipoRedaccion = "experiencia"): Promise<Resultado> {
-  const t = await getTranslations("admin.ia");
-  const entrada = texto.trim();
-  if (!Object.hasOwn(INSTRUCCIONES, tipo)) return { ok: false, error: t("noSePuedeMejorar") };
-  if (entrada.length < 15) return { ok: false, error: t("masTexto") };
-  if (entrada.length > MAX_ENTRADA) {
-    return { ok: false, error: t("muyLargoMaximo", { max: MAX_ENTRADA }) };
-  }
-
+async function sesion() {
   const supabase = createClient();
   const {
     data: { user },
   } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: t("sinSesion") };
-  const uso = await consumirUsoIa(supabase);
-  if (uso.error !== undefined) return { ok: false, error: uso.error };
-
-  try {
-    const salida = (
-      await llamarModelo({ sistema: INSTRUCCIONES[tipo], usuario: enBloque("texto", entrada) })
-    ).slice(0, MAX_SALIDA);
-    const veredicto = revisarFidelidad(entrada, salida);
-    if (!veredicto.ok) {
-      // La persona no recibe nada: el uso no cuenta (#343).
-      await devolverUsoIa(uso.usoId).catch(() => {});
-      return {
-        ok: false,
-        error:
-          veredicto.motivo === "sin_datos"
-            ? t(`sinDatos.${tipo}`)
-            : t("noSinCambiar"),
-      };
-    }
-    return { ok: true, texto: salida };
-  } catch (e) {
-    // #343: si falló, el uso no cuenta.
-    await devolverUsoIa(uso.usoId).catch(() => {});
-    Sentry.captureException(e, { extra: { accion: "mejorar redacción", tipo } });
-    return { ok: false, error: t("mejorarFallo") };
-  }
+  return { supabase, user };
 }
 
-/**
- * «Sugerir habilidades» (#320): lee la Experiencia y propone cuáles de las habilidades de la
- * lista aparecen ahí. Solo devuelve valores de `HABILIDADES`; la persona las marca o no.
- */
+async function traducir(error: ErrorIa) {
+  const t = await getTranslations("admin.ia");
+  return t(error.clave, error.valores);
+}
+
+/** «✨ Mejorar redacción» (#313, #319). */
+export async function mejorarRedaccion(
+  texto: string,
+  tipo: TipoRedaccion = "experiencia",
+): Promise<{ ok: true; texto: string } | { ok: false; error: string }> {
+  const { supabase, user } = await sesion();
+  if (!user) return { ok: false, error: await traducir({ clave: "sinSesion" }) };
+  const r = await mejorarRedaccionDe(supabase, texto, tipo);
+  return r.ok ? r : { ok: false, error: await traducir(r.error) };
+}
+
+/** «Sugerir habilidades» (#320). */
 export async function sugerirHabilidades(
   texto: string,
 ): Promise<{ ok: true; habilidades: string[] } | { ok: false; error: string }> {
-  const t = await getTranslations("admin.ia");
-  const entrada = texto.trim();
-  if (entrada.length < 15) return { ok: false, error: t("primeroExperiencia") };
-  if (entrada.length > MAX_ENTRADA) return { ok: false, error: t("muyLargo") };
-
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: t("sinSesion") };
-  const uso = await consumirUsoIa(supabase);
-  if (uso.error !== undefined) return { ok: false, error: uso.error };
-
-  try {
-    const crudo = await llamarModelo({ sistema: INSTRUCCIONES_HABILIDADES, usuario: enBloque("texto", entrada), maxTokens: 200, json: true });
-    const json = objetoJson(crudo);
-    // Una respuesta que no es JSON es una falla (y el uso se devuelve en el catch).
-    if (!json) throw new Error("sugerir habilidades: la respuesta no es un objeto JSON");
-    const crudas = json.habilidades;
-    // Sin la lista no es «no hay habilidades»: es una respuesta que no sirve.
-    if (!Array.isArray(crudas)) throw new Error("sugerir habilidades: falta la lista");
-    const lista: unknown[] = crudas;
-    const validas = HABILIDADES.filter((h) => lista.includes(h));
-    return { ok: true, habilidades: validas };
-  } catch (e) {
-    // #343: si falló, el uso no cuenta.
-    await devolverUsoIa(uso.usoId).catch(() => {});
-    Sentry.captureException(e, { extra: { accion: "sugerir habilidades" } });
-    return { ok: false, error: t("sugerirFallo") };
-  }
+  const { supabase, user } = await sesion();
+  if (!user) return { ok: false, error: await traducir({ clave: "sinSesion" }) };
+  const r = await sugerirHabilidadesDe(supabase, texto);
+  return r.ok ? r : { ok: false, error: await traducir(r.error) };
 }
 
-export interface FiltrosBusqueda {
-  edadMin?: number;
-  edadMax?: number;
-  generos?: string[];
-  habilidades?: string[];
-  zona?: string;
-  texto?: string;
-}
-
-/**
- * «Buscar escribiendo» (#321): convierte lo que alguien escribió («actriz de 30 a 40 que cante,
- * cerca de Palermo») en los filtros del buscador. Todo se valida contra las listas cerradas;
- * la persona ve los filtros aplicados y los corrige.
- */
+/** «Buscar escribiendo» (#321). */
 export async function interpretarBusqueda(
   consulta: string,
 ): Promise<{ ok: true; filtros: FiltrosBusqueda } | { ok: false; error: string }> {
-  const t = await getTranslations("admin.ia");
-  const entrada = consulta.trim();
-  if (entrada.length < 3) return { ok: false, error: t("escribiQueBuscas") };
-  if (entrada.length > 300) return { ok: false, error: t("masCorto", { max: 300 }) };
-
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: t("sinSesion") };
-  const uso = await consumirUsoIa(supabase);
-  if (uso.error !== undefined) return { ok: false, error: uso.error };
-
-  try {
-    const crudo = await llamarModelo({
-      sistema: INSTRUCCIONES_BUSQUEDA,
-      usuario: enBloque("busqueda", entrada),
-      maxTokens: 200,
-      json: true,
-    });
-    const json = objetoJson(crudo);
-    // Mal formada no es «sin filtros»: es una falla (#343), y el uso se devuelve en el catch.
-    if (!json) throw new Error("interpretar búsqueda: la respuesta no es un objeto JSON");
-    const j = json as Record<string, any>;
-    const edad = (v: unknown) =>
-      typeof v === "number" && Number.isInteger(v) && v >= 16 && v <= 100 ? v : undefined;
-    const generosValidos = GENEROS_BUSCABLES.map((g) => g.valor as string);
-    const filtros: FiltrosBusqueda = {
-      edadMin: edad(j.edadMin),
-      edadMax: edad(j.edadMax),
-      generos: Array.isArray(j.generos) ? j.generos.filter((g: unknown) => generosValidos.includes(g as string)) : [],
-      habilidades: Array.isArray(j.habilidades) ? HABILIDADES.filter((h) => j.habilidades.includes(h)) : [],
-      zona: typeof j.zona === "string" && j.zona.trim() ? j.zona.trim().slice(0, 80) : undefined,
-      texto: typeof j.texto === "string" && j.texto.trim() ? j.texto.trim().slice(0, 40) : undefined,
-    };
-    if (filtros.edadMin && filtros.edadMax && filtros.edadMin > filtros.edadMax) {
-      [filtros.edadMin, filtros.edadMax] = [filtros.edadMax, filtros.edadMin];
-    }
-    return { ok: true, filtros };
-  } catch (e) {
-    // #343: si falló, el uso no cuenta.
-    await devolverUsoIa(uso.usoId).catch(() => {});
-    Sentry.captureException(e, { extra: { accion: "interpretar búsqueda" } });
-    return { ok: false, error: t("interpretarFallo") };
-  }
+  const { supabase, user } = await sesion();
+  if (!user) return { ok: false, error: await traducir({ clave: "sinSesion" }) };
+  const r = await interpretarBusquedaDe(supabase, consulta);
+  return r.ok ? r : { ok: false, error: await traducir(r.error) };
 }
 
-/**
- * «✨ Escribir un saludo» en el chat de un Proyecto o Equipo propio (#322): arma un primer
- * mensaje de bienvenida con el título, la descripción y quiénes se sumaron (y su rol). Va al
- * campo de texto para editarlo; no se manda solo.
- */
-export async function borradorSaludo(salaId: string): Promise<Resultado> {
-  const t = await getTranslations("admin.ia");
-  const supabase = createClient();
-  const {
-    data: { user },
-  } = await supabase.auth.getUser();
-  if (!user) return { ok: false, error: t("sinSesion") };
-
-  const { data: sala } = await supabase
-    .from("salas")
-    .select("obra_id, equipo_id, obras(titulo, sinopsis, creador_id), equipos(titulo, descripcion, creador_id)")
-    .eq("id", salaId)
-    .maybeSingle();
-  const obra = (Array.isArray(sala?.obras) ? sala?.obras[0] : sala?.obras) as
-    | { titulo: string; sinopsis: string | null; creador_id: string }
-    | null
-    | undefined;
-  const equipo = (Array.isArray(sala?.equipos) ? sala?.equipos[0] : sala?.equipos) as
-    | { titulo: string; descripcion: string | null; creador_id: string }
-    | null
-    | undefined;
-  if (!sala || (obra?.creador_id ?? equipo?.creador_id) !== user.id) {
-    return { ok: false, error: t("soloQuienArmo") };
-  }
-
-  const { data: integrantes } = await supabase
-    .from("sala_integrantes")
-    .select("perfil_id")
-    .eq("sala_id", salaId)
-    .neq("perfil_id", user.id);
-  const ids = (integrantes ?? []).map((i) => i.perfil_id);
-  if (ids.length === 0) return { ok: false, error: t("nadieSeSumo") };
-  const { data: talentos } = await supabase.from("perfiles_talento").select("id, nombre").in("id", ids);
-
-  // El rol de cada uno, si es un Proyecto (un Equipo no tiene roles).
-  const rolPorTalento = new Map<string, string>();
-  if (sala.obra_id) {
-    const { data: cobertura } = await supabase.rpc("cobertura_iniciativa", {
-      p_obra_id: sala.obra_id,
-      p_equipo_id: null,
-    });
-    for (const c of cobertura ?? []) if (c.talento_id && c.rol_nombre) rolPorTalento.set(c.talento_id, c.rol_nombre);
-  }
-
-  const personas = (talentos ?? [])
-    // Nombres y roles los escribe cada persona: van como datos JSON, no como texto suelto.
-    .map((t) => JSON.stringify({ nombre: t.nombre, rol: rolPorTalento.get(t.id) ?? null }))
-    .join("\n");
-  const datos = [
-    `${obra ? "Proyecto" : "Equipo"}: ${obra?.titulo ?? equipo?.titulo}`,
-    (obra?.sinopsis ?? equipo?.descripcion) ? `Descripción: ${(obra?.sinopsis ?? equipo?.descripcion)!.slice(0, 1000)}` : "",
-    `Se suman:\n${personas}`,
-  ]
-    .filter(Boolean)
-    .join("\n");
-
-  const uso = await consumirUsoIa(supabase);
-  if (uso.error !== undefined) return { ok: false, error: uso.error };
-  try {
-    const salida = await llamarModelo({ sistema: INSTRUCCIONES_SALUDO, usuario: enBloque("datos", datos), maxTokens: 400 });
-    return { ok: true, texto: salida.slice(0, 600) };
-  } catch (e) {
-    // #343: si falló, el uso no cuenta.
-    await devolverUsoIa(uso.usoId).catch(() => {});
-    Sentry.captureException(e, { extra: { accion: "borrador saludo" } });
-    return { ok: false, error: t("saludoFallo") };
-  }
+/** «✨ Escribir un saludo» en el chat de un Proyecto o Equipo propio (#322). */
+export async function borradorSaludo(salaId: string): Promise<{ ok: true; texto: string } | { ok: false; error: string }> {
+  const { supabase, user } = await sesion();
+  if (!user) return { ok: false, error: await traducir({ clave: "sinSesion" }) };
+  const r = await borradorSaludoDe(supabase, user, salaId);
+  return r.ok ? r : { ok: false, error: await traducir(r.error) };
 }

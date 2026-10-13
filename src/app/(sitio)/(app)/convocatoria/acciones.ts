@@ -5,6 +5,7 @@ import { getTranslations } from "next-intl/server";
 import { createClient } from "@/lib/supabase/server";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { sincronizarEspaciosDe } from "@/lib/discord-servidor";
+import { claveErrorResponder } from "@/lib/convocatoria-talento";
 
 type Resultado = { ok: true } | { ok: false; error: string };
 
@@ -20,11 +21,10 @@ export async function responderConvocatoria(
   });
   if (error) {
     const t = await getTranslations("proyectos.convocatoria.errores");
-    if (error.message?.includes("no encontrada")) {
-      return { ok: false, error: t("noDisponible") };
-    }
-    reportarErrorSupabase(error, { rpc: "responder_convocatoria", convocatoriaId, aceptar });
-    return { ok: false, error: t("noSePudo") };
+    // La misma regla que la app nativa (`claveErrorResponder`).
+    const clave = claveErrorResponder(error.message);
+    if (clave === "noSePudo") reportarErrorSupabase(error, { rpc: "responder_convocatoria", convocatoriaId, aceptar });
+    return { ok: false, error: t(clave) };
   }
   // Si aceptó, ya está en la sala: entra también al espacio de Discord, si hay (#269).
   if (aceptar) {

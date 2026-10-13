@@ -7,6 +7,8 @@ import { useEffect } from "react";
 import { ActivityIndicator, View } from "react-native";
 import { ProveedorIdioma } from "~/lib/intl";
 import { ProveedorSesion, useSesion } from "~/lib/sesion";
+import { ProveedorNotificaciones } from "~/ui/notificaciones/campanita";
+import { ProveedorNoLeidos } from "~/ui/salas/no-leidos";
 import { ProveedorTema, useColores, useTema } from "~/ui/tema";
 
 SplashScreen.preventAutoHideAsync();
@@ -60,6 +62,18 @@ function Navegacion() {
         <Stack.Screen name="(tabs)" />
         <Stack.Screen name="ajustes" />
         <Stack.Screen name="editar-perfil" />
+        {/* Etapa 2 (#393): convocatorias, iniciativas y talento. */}
+        <Stack.Screen name="convocatoria" />
+        <Stack.Screen name="obras/[id]" />
+        <Stack.Screen name="equipos/[id]" />
+        <Stack.Screen name="iniciativa/nuevo-proyecto" />
+        <Stack.Screen name="iniciativa/nuevo-equipo" />
+        <Stack.Screen name="iniciativa/editar-proyecto/[id]" />
+        <Stack.Screen name="talentos/index" />
+        <Stack.Screen name="talentos/[id]" />
+        {/* Etapa 3 (#394): chats y notificaciones. */}
+        <Stack.Screen name="salas/[id]" />
+        <Stack.Screen name="notificaciones" />
       </Stack.Protected>
       {/* Como en la web, cambiar la contraseña está disponible con la cuenta a medio armar. */}
       <Stack.Protected guard={!!sesion}>
@@ -76,7 +90,12 @@ export default function Raiz() {
     <ProveedorTema>
       <ProveedorIdioma>
         <ProveedorSesion>
-          <Navegacion />
+          {/* No leídos de los chats y notificaciones: solo se activan con la cuenta en la app. */}
+          <ProveedorNoLeidos>
+            <ProveedorNotificaciones>
+              <Navegacion />
+            </ProveedorNotificaciones>
+          </ProveedorNoLeidos>
         </ProveedorSesion>
       </ProveedorIdioma>
     </ProveedorTema>

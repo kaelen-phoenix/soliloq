@@ -7,7 +7,8 @@ import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
-import { aColumnas, desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
+import { desdeColumnas, type Ubicacion } from "@/lib/ubicacion";
+import { columnasObra, validarObra } from "@/lib/iniciativa-reglas";
 import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
 interface ObraEditable {
@@ -42,9 +43,11 @@ export function EditarObra({ obra }: { obra: ObraEditable }) {
   async function guardar(e: React.FormEvent) {
     e.preventDefault();
     setErrorGeneral(null);
-    const nuevos: Record<string, string> = {};
-    if (!titulo.trim()) nuevos.titulo = t("errorTituloObra");
-    if (!ubicacion) nuevos.ubicacion = t("errorUbicacionCorta");
+    const nuevos = Object.fromEntries(
+      Object.entries(
+        validarObra({ titulo, ubicacion }, { titulo: "errorTituloObra", ubicacion: "errorUbicacionCorta" }),
+      ).map(([campo, clave]) => [campo, t(clave)]),
+    );
     setErrores(nuevos);
     if (Object.keys(nuevos).length > 0) return;
 
@@ -52,12 +55,7 @@ export function EditarObra({ obra }: { obra: ObraEditable }) {
     const supabase = createClient();
     const { error } = await supabase
       .from("obras")
-      .update({
-        titulo: titulo.trim(),
-        sinopsis: sinopsis.trim() || null,
-        fecha_estreno_estimada: fechaEstreno || null,
-        ...aColumnas(ubicacion!),
-      })
+      .update(columnasObra({ titulo, sinopsis, ubicacion, fechaEstreno }))
       .eq("id", obra.id);
     setCargando(false);
 

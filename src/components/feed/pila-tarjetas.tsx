@@ -7,21 +7,13 @@ import { Icono } from "@/components/ui/icono";
 import { usePrefiereReduccion } from "@/components/ui/movimiento";
 import { createClient } from "@/lib/supabase/client";
 import { aRolFeed } from "@/lib/feed-roles";
+import { claveErrorDeshacer, claveErrorInteres } from "@/lib/feed-errores";
+import { UMBRAL_SWIPE, type Decision, type ItemFeed } from "@/lib/feed-tipos";
 import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { rolesEjemplo } from "@/lib/onboarding-ejemplo";
 import { opcionesDeRadio, radioMasCercano, type UnidadDistancia } from "@/lib/ubicacion";
 import { TarjetaRol, type RolFeed } from "./tarjeta-rol";
 import { TarjetaEquipo, type EquipoFeed } from "./tarjeta-equipo";
-
-const UMBRAL_SWIPE = 120;
-
-type Decision = "postular" | "descartar";
-
-// La pila mezcla dos cosas: roles de un proyecto y equipos. Se etiquetan para que la
-// tarjeta y la decisión sepan con qué están tratando.
-type ItemFeed =
-  | { kind: "rol"; data: RolFeed }
-  | { kind: "equipo"; data: EquipoFeed };
 
 // Un golpecito corto al decidir. No todos los navegadores lo tienen (iOS Safari no).
 function vibrar() {
@@ -168,13 +160,9 @@ export function PilaTarjetas({
       p_interesa: decision === "postular",
     });
     if (errInteres) {
-      const esLimite = errInteres.message?.includes("limite_me_interesa");
-      if (!esLimite) reportarErrorSupabase(errInteres, { rpc: "marcar_interes", rolId: rol.rol_id });
-      setAvisoError(
-        esLimite
-          ? t("limiteMeInteresa")
-          : t("errorDecision"),
-      );
+      const clave = claveErrorInteres(errInteres.message);
+      if (clave !== "limiteMeInteresa") reportarErrorSupabase(errInteres, { rpc: "marcar_interes", rolId: rol.rol_id });
+      setAvisoError(t(clave));
       setRoles((prev) => [rol, ...prev]);
       setHistorial((prev) => prev.filter((h) => h.rol.rol_id !== rol.rol_id));
     }
@@ -208,14 +196,10 @@ export function PilaTarjetas({
       p_interesa: decision === "postular",
     });
     if (errInteres) {
-      const esLimite = errInteres.message?.includes("limite_me_interesa");
-      if (!esLimite)
+      const clave = claveErrorInteres(errInteres.message);
+      if (clave !== "limiteMeInteresa")
         reportarErrorSupabase(errInteres, { rpc: "marcar_interes", equipoId: equipo.equipo_id });
-      setAvisoError(
-        esLimite
-          ? t("limiteMeInteresa")
-          : t("errorDecision"),
-      );
+      setAvisoError(t(clave));
       setEquipos((prev) => [equipo, ...prev]);
     }
   }
@@ -285,13 +269,9 @@ export function PilaTarjetas({
     });
 
     if (error) {
-      const esMatch = error.message?.includes("match");
-      if (!esMatch) reportarErrorSupabase(error, { rpc: "deshacer_interes", obraId: ultima.rol.obra_id });
-      setAvisoError(
-        esMatch
-          ? t("deshacerConMatch")
-          : t("errorDeshacer"),
-      );
+      const clave = claveErrorDeshacer(error.message);
+      if (clave !== "deshacerConMatch") reportarErrorSupabase(error, { rpc: "deshacer_interes", obraId: ultima.rol.obra_id });
+      setAvisoError(t(clave));
       setHistorial((prev) => [...prev, ultima]);
       setIndice((i) => i + 1);
     }

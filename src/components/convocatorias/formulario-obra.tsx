@@ -8,15 +8,10 @@ import { CampoTexto } from "@/components/ui/campo-texto";
 import { CampoUbicacion } from "@/components/ui/campo-ubicacion";
 import { Icono } from "@/components/ui/icono";
 import { createClient } from "@/lib/supabase/client";
-import { aColumnas, type Ubicacion } from "@/lib/ubicacion";
+import type { Ubicacion } from "@/lib/ubicacion";
+import { columnasObra, filasRolesNuevos, validarObra, type RolNuevo } from "@/lib/iniciativa-reglas";
 import { MejorarRedaccion } from "@/components/perfil/mejorar-redaccion";
 
-
-interface RolNuevo {
-  id: string;
-  nombre: string;
-  descripcion: string;
-}
 
 /**
  * Creación inline de un Proyecto (issue #157): mismo patrón que "Armar equipo" —
@@ -77,9 +72,11 @@ export function FormularioObra({
     e.preventDefault();
     setErrorGeneral(null);
 
-    const nuevos: Record<string, string> = {};
-    if (!titulo.trim()) nuevos.titulo = t("errorTitulo");
-    if (!ubicacion) nuevos.ubicacion = t("errorUbicacion");
+    const nuevos = Object.fromEntries(
+      Object.entries(validarObra({ titulo, ubicacion }, { titulo: "errorTitulo", ubicacion: "errorUbicacion" })).map(
+        ([campo, clave]) => [campo, t(clave)],
+      ),
+    );
     // Reemplaza los avisos de título y locación: uno ya corregido no tiene que quedar en rojo.
     setErrores((p) => ({ rol: p.rol ?? "", ...nuevos }));
     if (Object.keys(nuevos).length > 0) return;
@@ -89,13 +86,7 @@ export function FormularioObra({
 
     const { data: obra, error: errorObra } = await supabase
       .from("obras")
-      .insert({
-        creador_id: creadorId,
-        titulo: titulo.trim(),
-        sinopsis: sinopsis || null,
-        ...aColumnas(ubicacion!),
-        fecha_estreno_estimada: fechaEstreno || null,
-      })
+      .insert({ creador_id: creadorId, ...columnasObra({ titulo, sinopsis, ubicacion, fechaEstreno }) })
       .select()
       .single();
 
@@ -106,15 +97,7 @@ export function FormularioObra({
     }
 
     if (roles.length > 0) {
-      await supabase.from("roles").insert(
-        roles.map((r) => ({
-          obra_id: obra.id,
-          nombre: r.nombre,
-          tipo: "actuacion" as const,
-          vacantes: 1,
-          descripcion: r.descripcion || null,
-        })),
-      );
+      await supabase.from("roles").insert(filasRolesNuevos(obra.id, roles));
       // Un fallo acá no se le muestra a nadie: el proyecto ya quedó creado y los roles se
       // pueden agregar o ajustar desde su pantalla, que es adonde se entra a continuación.
     }

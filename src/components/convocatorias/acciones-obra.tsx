@@ -7,13 +7,13 @@ import { createClient } from "@/lib/supabase/client";
 import { Boton } from "@/components/ui/boton";
 import { ConfirmarBorrado } from "@/components/ui/confirmar-borrado";
 import type { EstadoObra } from "@/lib/supabase/types";
+import { problemaParaPublicar } from "@/lib/iniciativa-reglas";
 import {
   borrarCanalesDeIniciativa,
   canalesParaBorrar,
   sincronizarEspacioDeIniciativa,
 } from "@/app/acciones-discord";
 
-const MIN_FOTOS = 1; // issue #162
 
 export function AccionesObra({
   obraId,
@@ -63,14 +63,10 @@ export function AccionesObra({
       setError(t("errorVerificar"));
       return;
     }
-    if (roles === 0) {
+    const problema = problemaParaPublicar(roles, fotos);
+    if (problema) {
       setCargando(false);
-      setError(t("faltaRol"));
-      return;
-    }
-    if (fotos < MIN_FOTOS) {
-      setCargando(false);
-      setError(t("faltaFoto"));
+      setError(t(problema));
       return;
     }
     await supabase.from("obras").update({ estado: "publicada" }).eq("id", obraId);

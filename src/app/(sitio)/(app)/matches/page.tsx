@@ -5,9 +5,10 @@ import { reportarErrorSupabase } from "@/lib/observabilidad";
 import { EstadoVacio } from "@/components/ui/estado-vacio";
 import { ConvocadosLista } from "@/components/convocatorias/convocados-lista";
 import { ModalNuevoMatch } from "@/components/convocatorias/modal-nuevo-match";
-import { MisMatchesTalento, type FilaMatchTalento } from "@/components/convocatorias/mis-matches-talento";
+import { MisMatchesTalento } from "@/components/convocatorias/mis-matches-talento";
 import { PestanasMatches } from "@/components/convocatorias/pestanas-matches";
 import { usuarioDeLaRequest } from "@/lib/sesion-servidor";
+import { armarConvocatorias, obrasConMatches, pestanaInicial, rolesDeCobertura, type RolDisponible } from "@/lib/matches";
 
 export async function generateMetadata() {
   const t = await getTranslations("titulos");
@@ -53,24 +54,15 @@ export default async function MatchesPage() {
   // Roles de cada Proyecto con matches, para elegir a cuál queda asociado al convocar (#152).
   // Con varios Proyectos a la vez (#330), cada match ofrece los roles del suyo. Un Equipo no
   // tiene roles: no hace falta elegir nada. Un rol ya cubierto no se puede elegir de nuevo.
-  const obraIds = Array.from(
-    new Set([...(matches ?? []), ...(convocados ?? [])].map((m) => m.obra_id).filter((x): x is string => !!x)),
-  );
-  const rolesPorObra: Record<string, { id: string; nombre: string; disponible: boolean }[]> = {};
+  const rolesPorObra: Record<string, RolDisponible[]> = {};
   await Promise.all(
-    obraIds.map(async (obraId) => {
+    obrasConMatches(matches, convocados).map(async (obraId) => {
       const { data: cobertura, error } = await supabase.rpc("cobertura_iniciativa", {
         p_obra_id: obraId,
         p_equipo_id: null,
       });
       if (error) reportarErrorSupabase(error, { rpc: "cobertura_iniciativa", obraId });
-      rolesPorObra[obraId] = [...new Map((cobertura ?? []).filter((r) => r.rol_id).map((r) => [r.rol_id, r])).values()].map(
-        (r) => ({
-          id: r.rol_id as string,
-          nombre: r.rol_nombre as string,
-          disponible: (cobertura ?? []).filter((x) => x.rol_id === r.rol_id && x.talento_id).length < r.vacantes,
-        }),
-      );
+      rolesPorObra[obraId] = rolesDeCobertura(cobertura);
     }),
   );
 
@@ -78,82 +70,12 @@ export default async function MatchesPage() {
     path ? supabase.storage.from("fotos-perfil").getPublicUrl(path).data.publicUrl : null;
 
 
-  const filas = (matches ?? []).map((m) => ({
-    matchId: m.match_id,
-    talentoId: m.talento_id,
-    nombre: m.nombre,
-    fotoUrl: url(m.foto_path),
-    expiraEn: m.expira_en,
-    esEquipo: m.es_equipo,
-    iniciativaTitulo: m.iniciativa_titulo,
-    iniciativaFotoUrl: url(m.iniciativa_foto),
-    cupoLleno: m.cupo_lleno,
-    obraId: m.obra_id,
-  }));
+  // Las filas de las dos pestañas y los avisos «Hay interés» (#194, #287, #298): las arma
+  // `@/lib/matches`, igual que la app nativa.
+  const { filasCreador, filasTalento, nuevos } = armarConvocatorias(matches, convocados, comoTalento, url);
 
-  // Aviso de "¡Tenés un Match!" (#194): uno por match, la primera vez que este Creador
-  // entra a Matches después de que se generó.
-  const nuevos = (matches ?? [])
-    .filter((m) => !m.mostrado_en)
-    .map((m) => ({
-      matchId: m.match_id,
-      nombre: m.nombre,
-      fotoUrl: url(m.foto_path),
-      esEquipo: m.es_equipo,
-      iniciativaTitulo: m.iniciativa_titulo,
-      iniciativaFotoUrl: url(m.iniciativa_foto),
-    }));
-
-  // #287: un match nuevo se convoca directo, en la misma lista (antes había que aceptarlo
-  // primero para que pasara a Convocados).
-  const filasMatches = filas.map((f) => ({
-    matchId: f.matchId,
-    convocatoriaId: null,
-    talentoId: f.talentoId,
-    nombre: f.nombre,
-    fotoUrl: f.fotoUrl,
-    esEquipo: f.esEquipo,
-    iniciativaTitulo: f.iniciativaTitulo,
-    estado: "en_convocados" as const,
-    expiraEn: f.expiraEn,
-    cupoLleno: f.cupoLleno,
-    obraId: f.obraId,
-  }));
-
-  const filasConvocados = (convocados ?? []).map((c) => ({
-    matchId: c.match_id,
-    convocatoriaId: c.convocatoria_id,
-    talentoId: c.talento_id,
-    nombre: c.nombre,
-    fotoUrl: url(c.foto_path),
-    esEquipo: c.es_equipo,
-    iniciativaTitulo: c.iniciativa_titulo,
-    estado: c.estado as "en_convocados" | "esperando_confirmacion" | "en_sala",
-    obraId: c.obra_id,
-  }));
-
-  const filasTalento: FilaMatchTalento[] = (comoTalento ?? []).map((m) => ({
-    matchId: m.match_id,
-    esEquipo: m.es_equipo,
-    obraId: m.obra_id,
-    titulo: m.iniciativa_titulo,
-    fotoUrl: url(m.iniciativa_foto),
-    creadorNombre: m.creador_nombre,
-    expiraEn: m.expira_en,
-    estado: m.estado as FilaMatchTalento["estado"],
-    salaId: m.sala_id,
-  }));
-  const filasCreador = [...filasMatches, ...filasConvocados];
-
-  // #304: arranca en la pestaña que tiene algo; si ninguna, en la de proyectos solo si tiene
-  // uno abierto (la fila de Creador queda aunque haya borrado todos).
-  const tienePerfilCreador = iniciativa != null;
-  const inicial =
-    filasCreador.length > 0
-      ? "proyectos"
-      : filasTalento.length > 0 || !tienePerfilCreador
-        ? "talento"
-        : "proyectos";
+  // #304: arranca en la pestaña que tiene algo.
+  const inicial = pestanaInicial(filasCreador.length, filasTalento.length, iniciativa != null);
 
   return (
     <main className="px-5 py-5">

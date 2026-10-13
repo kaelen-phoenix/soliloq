@@ -1,8 +1,6 @@
 import Ionicons from "@expo/vector-icons/Ionicons";
-import { decode } from "base64-arraybuffer";
 import * as Crypto from "expo-crypto";
 import { Image } from "expo-image";
-import { ImageManipulator, SaveFormat } from "expo-image-manipulator";
 import * as ImagePicker from "expo-image-picker";
 import { useState } from "react";
 import { ActivityIndicator, Pressable, View } from "react-native";
@@ -15,11 +13,9 @@ import {
   type FotoTalento,
 } from "@/lib/perfil-talento";
 import { supabase } from "~/lib/supabase";
+import { comprimirFoto } from "../comprimir-foto";
 import { Texto } from "../texto";
 import { fuente, radio, useColores } from "../tema";
-
-// El lado mayor con el que se guardan (como `comprimirImagen` de la web: liviana, pero nítida).
-const LADO_MAXIMO = 1600;
 
 /**
  * Como `SubirFotos` de la web: hasta `MAX_FOTOS`, varias a la vez, la primera es la principal.
@@ -44,23 +40,13 @@ export function SubirFotos({
   const ordenadas = [...fotos].sort((a, b) => a.orden - b.orden);
 
   async function subirUna(uri: string, ancho: number, alto: number, orden: number): Promise<FotoTalento | string> {
-    let base64: string | undefined;
-    try {
-      const contexto = ImageManipulator.manipulate(uri);
-      if (Math.max(ancho, alto) > LADO_MAXIMO) {
-        contexto.resize(ancho >= alto ? { width: LADO_MAXIMO } : { height: LADO_MAXIMO });
-      }
-      const imagen = await contexto.renderAsync();
-      base64 = (await imagen.saveAsync({ format: SaveFormat.JPEG, compress: 0.82, base64: true })).base64;
-    } catch {
-      base64 = undefined;
-    }
-    if (!base64) return t("errorSubir");
+    const foto = await comprimirFoto(uri, ancho, alto);
+    if (!foto) return t("errorSubir");
 
     const ruta = `${talentoId}/${Crypto.randomUUID()}.jpg`;
     const { error: errorSubida } = await supabase.storage
       .from(BUCKET_FOTOS)
-      .upload(ruta, decode(base64), { contentType: "image/jpeg" });
+      .upload(ruta, foto, { contentType: "image/jpeg" });
     if (errorSubida) return t("errorSubir");
     const url = supabase.storage.from(BUCKET_FOTOS).getPublicUrl(ruta).data.publicUrl;
     if (!persistir) return { id: Crypto.randomUUID(), storage_path: ruta, orden, url, enBd: false };

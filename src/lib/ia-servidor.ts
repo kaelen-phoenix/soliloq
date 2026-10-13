@@ -15,17 +15,28 @@ import { createAdminClient } from "./supabase/admin";
 const MODELO = process.env.IA_MODELO ?? "openai/gpt-4.1-mini";
 
 /** Anota un uso (0100). Devuelve el mensaje para la persona si no se puede, o `null`. */
+/**
+ * Consume un uso del tope de IA (0100). El error vuelve como clave de `admin.ia` («limite» o
+ * «errorGenerico»): así lo traduce quien lo muestra, la web o la app nativa.
+ */
+export async function consumirUsoIaClave(
+  supabase: SupabaseClient<Database>,
+): Promise<{ usoId: number; error?: undefined } | { error: "limite" | "errorGenerico"; usoId?: undefined }> {
+  const { data, error } = await supabase.rpc("consumir_uso_ia");
+  if (!error && typeof data === "number") return { usoId: data };
+  if (error?.message?.includes("limite_ia")) return { error: "limite" };
+  Sentry.captureException(error ?? new Error("consumir_uso_ia sin id"), { extra: { accion: "consumir_uso_ia" } });
+  return { error: "errorGenerico" };
+}
+
+/** Lo mismo, con el error ya traducido en el idioma del request (para las server actions). */
 export async function consumirUsoIa(
   supabase: SupabaseClient<Database>,
 ): Promise<{ usoId: number; error?: undefined } | { error: string; usoId?: undefined }> {
-  const { data, error } = await supabase.rpc("consumir_uso_ia");
-  if (!error && typeof data === "number") return { usoId: data };
-  // El mensaje sale en el idioma del request (cookie `NEXT_LOCALE`): esto solo corre en
-  // server actions.
+  const r = await consumirUsoIaClave(supabase);
+  if (r.error === undefined) return r;
   const t = await getTranslations("admin.ia");
-  if (error?.message?.includes("limite_ia")) return { error: t("limite") };
-  Sentry.captureException(error ?? new Error("consumir_uso_ia sin id"), { extra: { accion: "consumir_uso_ia" } });
-  return { error: t("errorGenerico") };
+  return { error: t(r.error) };
 }
 
 /**

@@ -5,27 +5,10 @@ import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { PlacaPerfilTalento } from "@/components/perfil/placa-perfil-talento";
+import type { RolFeed } from "@/lib/feed-tipos";
 
-export interface RolFeed {
-  rol_id: string;
-  rol_nombre: string;
-  rol_tipo: string;
-  edad_minima: number | null;
-  edad_maxima: number | null;
-  rol_descripcion: string | null;
-  vacantes: number;
-  obra_id: string;
-  obra_titulo: string;
-  obra_sinopsis: string | null;
-  obra_ubicacion_texto: string;
-  creador_id: string;
-  creador_nombre: string;
-  creador_imagen_url: string | null;
-  /** URLs ya resueltas de las fotos de la obra (0048). Puede venir vacío. */
-  fotos?: string[];
-  /** Tarjeta del onboarding, no una convocatoria real. Ver `lib/onboarding-ejemplo.ts`. */
-  es_ejemplo?: boolean;
-}
+// El tipo vive en `@/lib/feed-tipos` (lo usa también la app nativa).
+export type { RolFeed } from "@/lib/feed-tipos";
 
 export function TarjetaRol({ rol }: { rol: RolFeed }) {
   const t = useTranslations("proyectos.tarjeta");

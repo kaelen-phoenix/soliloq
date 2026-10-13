@@ -6,15 +6,10 @@ import { useTranslations } from "next-intl";
 import { Icono } from "@/components/ui/icono";
 import { Imagen } from "@/components/ui/imagen";
 import { responderConvocatoria } from "@/app/(sitio)/(app)/convocatoria/acciones";
+import type { FilaConvocatoria } from "@/lib/convocatoria-talento";
 
-export interface FilaConvocatoria {
-  convocatoriaId: string;
-  esEquipo: boolean;
-  iniciativaTitulo: string;
-  creadorNombre: string;
-  talentoFotoUrl: string | null;
-  iniciativaFotoUrl: string | null;
-}
+// El tipo vive en `@/lib/convocatoria-talento` (lo usa también la app nativa).
+export type { FilaConvocatoria } from "@/lib/convocatoria-talento";
 
 export function ConvocatoriasLista({ filas: filasIniciales }: { filas: FilaConvocatoria[] }) {
   const router = useRouter();
