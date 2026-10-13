@@ -58,7 +58,9 @@ export async function metadatosBase(idioma: Idioma): Promise<Metadata> {
     appleWebApp: {
       capable: true,
       statusBarStyle: "default",
-      title: "Yalope",
+      // Igual que el `short_name` del manifest (#408): distingue la web agregada a la pantalla
+      // de inicio de la app nativa.
+      title: "Yalope Web",
     },
   };
 }

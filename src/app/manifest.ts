@@ -6,7 +6,9 @@ export default async function manifest(): Promise<MetadataRoute.Manifest> {
   const t = await getTranslations("cuenta.manifest");
   return {
     name: t("nombre"),
-    short_name: "Yalope",
+    // #408: «Yalope Web» para distinguirla en el teléfono de la app nativa («Yalope»), que
+    // pueden convivir. Es el nombre que se ve debajo del ícono; el logo es el mismo.
+    short_name: "Yalope Web",
     description: t("descripcion"),
     start_url: "/",
     display: "standalone",
