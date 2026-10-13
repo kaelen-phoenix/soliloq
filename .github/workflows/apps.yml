@@ -1,10 +1,10 @@
-# Las apps de Android y iPhone (#387). Una sola base de código, tres versiones:
-#   - web: yalope.com, la deploya Vercel en cada push a main (como siempre);
-#   - Android: APK firmado (y el AAB para Google Play, cuando se publique);
-#   - iPhone: por ahora el paquete para el simulador (sin cuenta de Apple Developer no se firma).
-# Las apps abren yalope.com, así que cada deploy de la web ya les llega. Estos paquetes solo
-# cambian si cambia algo nativo, pero se arman en cada push a main para tenerlos siempre al día.
-# Los de main quedan en la release «apps-ultima»: un link fijo para bajar el APK al teléfono.
+# Las apps de Android y iPhone. Tres versiones de Yalope: la web (Vercel, en cada push a main)
+# y las apps, que salen en cada push a main de acá:
+#   - app de Capacitor (#387): abre yalope.com; es la que se usa mientras dura la migración;
+#   - app nativa (#396, `movil/`, Expo): vista previa (`com.yalope.app.previa`) hasta estar a la
+#     par de la web (#395); se instala al lado de la otra.
+# De cada una: APK firmado (y AAB) para Android, y el paquete para el simulador de iPhone (sin
+# cuenta de Apple Developer todavía no se firma). Los de main quedan en la release «apps-ultima».
 name: Apps
 
 on:
@@ -18,6 +18,10 @@ on:
       - "capacitor.config.ts"
       - "package.json"
       - "package-lock.json"
+      - "movil/**"
+      - "src/mensajes/**"
+      - "src/lib/**"
+      - "src/i18n/**"
       - ".github/workflows/apps.yml"
   workflow_dispatch:
 
@@ -107,9 +111,92 @@ jobs:
           path: salida/
           if-no-files-found: error
 
+  android-nativa:
+    runs-on: ubuntu-latest
+    defaults:
+      run:
+        working-directory: movil
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: movil/package-lock.json
+      - run: npm ci
+      - run: npm run typecheck
+      - run: npx expo prebuild --platform android --no-install
+      - uses: actions/setup-java@v4
+        with:
+          distribution: temurin
+          java-version: 21
+      - uses: gradle/actions/setup-gradle@v4
+      - name: Clave de firma
+        env:
+          KEYSTORE_BASE64: ${{ secrets.ANDROID_KEYSTORE_BASE64 }}
+        run: |
+          if [ -z "$KEYSTORE_BASE64" ]; then
+            echo "::warning::Sin ANDROID_KEYSTORE_BASE64: el APK sale con la firma de depuración."; exit 0
+          fi
+          echo "$KEYSTORE_BASE64" | base64 -d > "$RUNNER_TEMP/yalope.p12"
+          echo "ANDROID_KEYSTORE=$RUNNER_TEMP/yalope.p12" >> "$GITHUB_ENV"
+      - name: Compilar
+        working-directory: movil/android
+        env:
+          ANDROID_KEYSTORE_CLAVE: ${{ secrets.ANDROID_KEYSTORE_CLAVE }}
+          ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
+        run: ./gradlew assembleRelease --no-daemon
+      - name: Ordenar el paquete
+        run: |
+          mkdir -p ../salida
+          cp "$(ls android/app/build/outputs/apk/release/*.apk | head -1)" ../salida/Yalope-nativa-previa.apk
+          ls -la ../salida
+      - uses: actions/upload-artifact@v4
+        with:
+          name: android-nativa-${{ env.VERSION_NAME }}
+          path: salida/
+          if-no-files-found: error
+
+  ios-nativa:
+    runs-on: macos-latest
+    defaults:
+      run:
+        working-directory: movil
+    env:
+      EXPO_PUBLIC_SUPABASE_URL: ${{ vars.EXPO_PUBLIC_SUPABASE_URL }}
+      EXPO_PUBLIC_SUPABASE_ANON_KEY: ${{ vars.EXPO_PUBLIC_SUPABASE_ANON_KEY }}
+    steps:
+      - uses: actions/checkout@v4
+      - uses: actions/setup-node@v4
+        with:
+          node-version: 22
+          cache: npm
+          cache-dependency-path: movil/package-lock.json
+      - run: npm ci
+      - run: npx expo prebuild --platform ios
+      - name: Compilar para el simulador
+        run: |
+          WS=$(ls -d ios/*.xcworkspace | head -1)
+          ESQUEMA=$(basename "$WS" .xcworkspace)
+          xcodebuild             -workspace "$WS"             -scheme "$ESQUEMA"             -configuration Release             -sdk iphonesimulator             -destination "generic/platform=iOS Simulator"             -derivedDataPath build-ios             CODE_SIGNING_ALLOWED=NO             build
+      - name: Ordenar el paquete
+        run: |
+          mkdir -p ../salida
+          APP=$(ls -d build-ios/Build/Products/Release-iphonesimulator/*.app | head -1)
+          ditto -c -k --keepParent "$APP" ../salida/Yalope-nativa-previa-iphone-simulador.zip
+          ls -la ../salida
+      - uses: actions/upload-artifact@v4
+        with:
+          name: ios-nativa-${{ env.VERSION_NAME }}
+          path: salida/
+          if-no-files-found: error
+
   publicar:
     if: github.event_name == 'push' && github.ref == 'refs/heads/main'
-    needs: [android, ios]
+    needs: [android, ios, android-nativa, ios-nativa]
     runs-on: ubuntu-latest
     permissions:
       contents: write
@@ -129,13 +216,17 @@ jobs:
           - **Yalope.aab**: Android para Google Play (todavía no se publica).
           - **Yalope-iphone-simulador.zip**: iPhone, solo para el simulador de Xcode (sin firma de Apple todavía).
 
-          Las apps abren yalope.com: los cambios de la web les llegan solos, sin bajar un paquete nuevo."
+          Estas abren yalope.com: los cambios de la web les llegan solos, sin bajar un paquete nuevo.
+
+          **App nativa, vista previa** (se instala al lado de la de arriba; todavía tiene secciones que abren la web):
+          - **Yalope-nativa-previa.apk**: Android.
+          - **Yalope-nativa-previa-iphone-simulador.zip**: iPhone, para el simulador de Xcode."
           if ! gh release view apps-ultima >/dev/null 2>&1; then
             gh release create apps-ultima --prerelease --title "Apps · última versión" --notes "$NOTAS" --target "$GITHUB_SHA"
           else
             gh release edit apps-ultima --notes "$NOTAS"
           fi
-          gh release upload apps-ultima paquetes/Yalope.apk paquetes/Yalope.aab paquetes/Yalope-iphone-simulador.zip --clobber
+          gh release upload apps-ultima paquetes/Yalope.apk paquetes/Yalope.aab paquetes/Yalope-iphone-simulador.zip paquetes/Yalope-nativa-previa.apk paquetes/Yalope-nativa-previa-iphone-simulador.zip --clobber
       - name: Resumen
         run: |
           {
@@ -143,4 +234,5 @@ jobs:
             echo "- **Web**: yalope.com (Vercel)"
             echo "- **Android**: [Yalope.apk](https://github.com/${{ github.repository }}/releases/download/apps-ultima/Yalope.apk) · $VERSION_NAME"
             echo "- **iPhone (simulador)**: [Yalope-iphone-simulador.zip](https://github.com/${{ github.repository }}/releases/download/apps-ultima/Yalope-iphone-simulador.zip)"
+            echo "- **App nativa (vista previa)**: [Android](https://github.com/${{ github.repository }}/releases/download/apps-ultima/Yalope-nativa-previa.apk) · [iPhone simulador](https://github.com/${{ github.repository }}/releases/download/apps-ultima/Yalope-nativa-previa-iphone-simulador.zip)"
           } >> "$GITHUB_STEP_SUMMARY"
