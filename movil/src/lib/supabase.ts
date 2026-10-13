@@ -7,12 +7,27 @@ import { createClient } from "@supabase/supabase-js";
 import Constants from "expo-constants";
 import { AppState } from "react-native";
 import type { Database } from "@/lib/supabase/types";
+import { diag, rutaDe } from "./diagnostico";
 
 function fetchConTope(entrada: RequestInfo | URL, opciones?: RequestInit): Promise<Response> {
-  if (opciones?.signal) return fetch(entrada, opciones);
+  // Diagnóstico (#406): cada pedido, con su tiempo y su resultado.
+  const ruta = rutaDe(entrada);
+  const metodo = opciones?.method ?? "GET";
+  const t0 = Date.now();
+  diag("pedido", { metodo, ruta });
   const corte = new AbortController();
   const id = setTimeout(() => corte.abort(), 60_000);
-  return fetch(entrada, { ...opciones, signal: corte.signal }).finally(() => clearTimeout(id));
+  opciones?.signal?.addEventListener?.("abort", () => corte.abort());
+  return fetch(entrada, { ...opciones, signal: corte.signal })
+    .then((r) => {
+      diag("respuesta", { metodo, ruta, estado: r.status, ms: Date.now() - t0 });
+      return r;
+    })
+    .catch((e: unknown) => {
+      diag("falla", { metodo, ruta, error: String(e).slice(0, 120), ms: Date.now() - t0 });
+      throw e;
+    })
+    .finally(() => clearTimeout(id));
 }
 
 const extra = Constants.expoConfig?.extra as { supabaseUrl?: string; supabaseAnonKey?: string };
@@ -35,8 +50,28 @@ export const supabase = createClient<Database>(extra.supabaseUrl, extra.supabase
   global: { fetch: fetchConTope },
 });
 
+supabase.auth.onAuthStateChange((evento) => diag("sesion", { evento }));
+
+// Diagnóstico (#406): ¿responde el cliente? Si `getSession` no vuelve en 5 s, está trabado.
+const sondear = () => {
+  const t0 = Date.now();
+  let volvio = false;
+  supabase.auth
+    .getSession()
+    .then(({ data }) => {
+      volvio = true;
+      diag("getSession", { ms: Date.now() - t0, conSesion: !!data.session });
+    })
+    .catch((e: unknown) => diag("getSession-error", { error: String(e).slice(0, 120) }));
+  setTimeout(() => {
+    if (!volvio) diag("getSession-colgado", { ms: 5_000 });
+  }, 5_000);
+};
+for (let i = 1; i <= 24; i++) setTimeout(sondear, i * 10_000);
+
 // El refresco de la sesión corre solo con la app en primer plano.
 AppState.addEventListener("change", (estado) => {
+  diag("appState", { estado });
   if (estado === "active") supabase.auth.startAutoRefresh();
   else supabase.auth.stopAutoRefresh();
 });
