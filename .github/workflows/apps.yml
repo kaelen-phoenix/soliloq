@@ -197,7 +197,8 @@ jobs:
           if-no-files-found: error
 
   publicar:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    # También al dispararlo a mano sobre main (si GitHub no arrancó la corrida del push).
+    if: (github.event_name == 'push' || github.event_name == 'workflow_dispatch') && github.ref == 'refs/heads/main'
     needs: [android, ios, android-nativa, ios-nativa]
     runs-on: ubuntu-latest
     permissions:
