@@ -113,9 +113,9 @@
     },
     "crearProyecto": {
       "pregunta": "What do you want to put together?",
-      "proyectoTitulo": "A project with roles",
+      "proyectoTitulo": "A project",
       "proyectoTexto": "A play, a short, a film… with the roles you're looking for.",
-      "equipoTitulo": "Build a team",
+      "equipoTitulo": "A team",
       "equipoTexto": "Bring together people who want to create, like you; the idea can come along the way.",
       "crear": "Create"
     },

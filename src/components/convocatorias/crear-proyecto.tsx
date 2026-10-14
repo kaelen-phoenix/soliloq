@@ -48,17 +48,18 @@ export function CrearProyecto({ creadorId }: { creadorId: string }) {
     return (
       <section className="flex flex-col gap-3 rounded-2xl border border-borde bg-fondo-sutil/50 p-4">
         <h2 className="text-base font-semibold text-texto">{t("pregunta")}</h2>
-        {opcion(
-          "proyecto",
-          t("proyectoTitulo"),
-          t("proyectoTexto"),
-          "tablero",
-        )}
+        {/* #414: primero el Equipo, después el Proyecto, con la misma jerarquía. */}
         {opcion(
           "equipo",
           t("equipoTitulo"),
           t("equipoTexto"),
           "corazon",
+        )}
+        {opcion(
+          "proyecto",
+          t("proyectoTitulo"),
+          t("proyectoTexto"),
+          "tablero",
         )}
         <button
           type="button"

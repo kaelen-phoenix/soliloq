@@ -114,8 +114,9 @@ export default function Iniciativas() {
       {eligiendo ? (
         <Tarjeta style={{ backgroundColor: color.fondoSutil }}>
           <Texto variante="subtitulo">{tCrear("pregunta")}</Texto>
-          {opcion("/iniciativa/nuevo-proyecto" as Href, tCrear("proyectoTitulo"), tCrear("proyectoTexto"), "albums-outline")}
+          {/* #414: primero el Equipo, después el Proyecto. */}
           {opcion("/iniciativa/nuevo-equipo" as Href, tCrear("equipoTitulo"), tCrear("equipoTexto"), "heart-outline")}
+          {opcion("/iniciativa/nuevo-proyecto" as Href, tCrear("proyectoTitulo"), tCrear("proyectoTexto"), "albums-outline")}
           <Boton variante="fantasma" onPress={() => setEligiendo(false)}>
             {tc("cancelar")}
           </Boton>

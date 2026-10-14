@@ -113,9 +113,9 @@
     },
     "crearProyecto": {
       "pregunta": "¿Qué querés armar?",
-      "proyectoTitulo": "Un proyecto con roles",
+      "proyectoTitulo": "Un proyecto",
       "proyectoTexto": "Una obra, un corto, una película… con los roles que buscás.",
-      "equipoTitulo": "Armar equipo",
+      "equipoTitulo": "Un equipo",
       "equipoTexto": "Juntar gente con ganas de crear como vos; la idea puede surgir en el camino.",
       "crear": "Crear"
     },
