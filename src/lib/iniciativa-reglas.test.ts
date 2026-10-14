@@ -102,6 +102,18 @@ describe("reglas de Proyectos y Equipos (#393, compartidas web y app)", () => {
     ]);
   });
 
+  it("solo lo cerrado se puede quitar; si se reabre, deja de estar oculto (#413)", () => {
+    const items = itemsTablero(
+      [
+        { id: "c", titulo: "Cerrada", estado: "cerrada", creado_en: "2026-01-01", oculta_en: "2026-03-01" },
+        { id: "p", titulo: "Publicada", estado: "publicada", creado_en: "2026-01-02", oculta_en: "2026-03-01" },
+      ],
+      [{ id: "e", titulo: "Equipo", activo: false, creado_en: "2026-02-01", oculta_en: null }],
+    );
+    const por = Object.fromEntries(items.map((i) => [i.id, [i.cerrada, i.oculta]]));
+    expect(por).toEqual({ c: [true, true], p: [false, false], e: [true, false] });
+  });
+
   it("la ruta de la foto arranca con el uid del creador", () => {
     expect(rutaFotoIniciativa("u", "equipo", "e1", "a.jpg")).toBe("u/equipos/e1/a.jpg");
   });
