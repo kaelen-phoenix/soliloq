@@ -240,12 +240,16 @@ export interface ItemTablero {
   /** La clave de `proyectos.tablero.estado`. */
   estado: "borrador" | "publicada" | "cerrada" | "activo" | "cerrado";
   creadoEn: string;
+  /** Cerrada: se puede quitar de la lista (#413). */
+  cerrada: boolean;
+  /** Cerrada y quitada de la lista por su dueño (0115). Si se reabre, vuelve a mostrarse. */
+  oculta: boolean;
 }
 
 /** Proyectos y Equipos en una sola lista, lo más nuevo primero. */
 export function itemsTablero(
-  obras: { id: string; titulo: string; estado: string; creado_en: string }[],
-  equipos: { id: string; titulo: string; activo: boolean; creado_en: string }[],
+  obras: { id: string; titulo: string; estado: string; creado_en: string; oculta_en?: string | null }[],
+  equipos: { id: string; titulo: string; activo: boolean; creado_en: string; oculta_en?: string | null }[],
 ): ItemTablero[] {
   return [
     ...obras.map((o) => ({
@@ -254,6 +258,8 @@ export function itemsTablero(
       titulo: o.titulo,
       estado: o.estado as ItemTablero["estado"],
       creadoEn: o.creado_en,
+      cerrada: o.estado === "cerrada",
+      oculta: o.estado === "cerrada" && !!o.oculta_en,
     })),
     ...equipos.map((e) => ({
       id: e.id,
@@ -261,6 +267,8 @@ export function itemsTablero(
       titulo: e.titulo,
       estado: (e.activo ? "activo" : "cerrado") as ItemTablero["estado"],
       creadoEn: e.creado_en,
+      cerrada: !e.activo,
+      oculta: !e.activo && !!e.oculta_en,
     })),
   ].sort((a, b) => b.creadoEn.localeCompare(a.creadoEn));
 }

@@ -377,6 +377,7 @@ export type Database = {
           cupo: number | null
           descripcion: string | null
           id: string
+          oculta_en: string | null
           titulo: string
         }
         Insert: {
@@ -387,6 +388,7 @@ export type Database = {
           cupo?: number | null
           descripcion?: string | null
           id?: string
+          oculta_en?: string | null
           titulo: string
         }
         Update: {
@@ -397,6 +399,7 @@ export type Database = {
           cupo?: number | null
           descripcion?: string | null
           id?: string
+          oculta_en?: string | null
           titulo?: string
         }
         Relationships: [
@@ -917,6 +920,7 @@ export type Database = {
           estado: Database["public"]["Enums"]["estado_obra"]
           fecha_estreno_estimada: string | null
           id: string
+          oculta_en: string | null
           sinopsis: string | null
           titulo: string
           ubicacion_lat: number
@@ -933,6 +937,7 @@ export type Database = {
           estado?: Database["public"]["Enums"]["estado_obra"]
           fecha_estreno_estimada?: string | null
           id?: string
+          oculta_en?: string | null
           sinopsis?: string | null
           titulo: string
           ubicacion_lat: number
@@ -949,6 +954,7 @@ export type Database = {
           estado?: Database["public"]["Enums"]["estado_obra"]
           fecha_estreno_estimada?: string | null
           id?: string
+          oculta_en?: string | null
           sinopsis?: string | null
           titulo?: string
           ubicacion_lat?: number
@@ -1984,6 +1990,10 @@ export type Database = {
         }[]
       }
       nombre_de_perfil: { Args: { p_perfil_id: string }; Returns: string }
+      ocultar_iniciativa: {
+        Args: { p_equipo_id: string; p_obra_id: string; p_ocultar: boolean }
+        Returns: undefined
+      }
       perfil_oculto_a_nuevos: { Args: { p_perfil: string }; Returns: boolean }
       perfil_para_responder: {
         Args: { p_de: string }
