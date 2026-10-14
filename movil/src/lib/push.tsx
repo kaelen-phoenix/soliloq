@@ -3,7 +3,7 @@ import { createContext, useCallback, useContext, useEffect, useState } from "rea
 import { Platform } from "react-native";
 import { abrirDestino } from "./destinos";
 import { useSesion } from "./sesion";
-import { registrar } from "./push-token";
+import { registrar, registrarToken } from "./push-token";
 
 /**
  * Notificaciones push de la app (#389). Android las recibe por Firebase Cloud Messaging: el
@@ -47,8 +47,9 @@ function usePushNativa(activo: boolean) {
   useEffect(() => {
     if (!activo || !DISPONIBLE) return;
     activar();
-    // Si Firebase renueva el token, se vuelve a registrar.
-    const renovado = Notifications.addPushTokenListener(() => registrar());
+    // Si Firebase renueva el token, se registra el nuevo (el que trae el aviso: pedirlo otra vez
+    // dispara otro aviso y arma un bucle, #406).
+    const renovado = Notifications.addPushTokenListener(({ data }) => registrarToken(data));
     return () => renovado.remove();
   }, [activo, activar]);
 
