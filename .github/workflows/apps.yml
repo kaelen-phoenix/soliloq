@@ -130,6 +130,31 @@ jobs:
           path: salida/
           if-no-files-found: error
 
+  google-play:
+    # Sube el AAB a Google Play (#420). Queda apagado hasta que la app exista en Play Console,
+    # tenga el primer AAB subido a mano y la cuenta de servicio esté invitada: entonces se
+    # prende con la variable de repo `PLAY_ACTIVO=si`. El track (`PLAY_TRACK`, por defecto
+    # `internal`) y el estado (`PLAY_ESTADO`: `draft` mientras la app no esté publicada, que es
+    # lo único que Google acepta; después `completed`) también salen de variables.
+    if: >-
+      vars.PLAY_ACTIVO == 'si' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main'
+    needs: [android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: android-${{ env.VERSION_NAME }}
+          path: paquetes
+      - uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_CUENTA_SERVICIO }}
+          packageName: com.yalope.app
+          releaseFiles: paquetes/Yalope.aab
+          releaseName: ${{ env.VERSION_NAME }}
+          track: ${{ vars.PLAY_TRACK || 'internal' }}
+          status: ${{ vars.PLAY_ESTADO || 'draft' }}
+
   publicar:
     # También al dispararlo a mano sobre main (si GitHub no arrancó la corrida del push). Con que
     # salga el de Android alcanza: a veces GitHub no consigue una Mac y el de iPhone no corre; en
