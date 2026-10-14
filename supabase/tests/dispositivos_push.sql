@@ -48,7 +48,7 @@ reset role;
 do $$ begin
   assert (select perfil_id from dispositivos_push where token = 'token-de-prueba-del-telefono-1')
     = 'b4444444-2222-2222-2222-222222222222', 'T5: el teléfono debería quedar de la última cuenta';
-  assert (select count(*) from dispositivos_push) = 1, 'T6: un token es una sola fila';
+  assert (select count(*) from dispositivos_push where token like 'token-de-prueba-%') = 1, 'T6: un token es una sola fila';
 end $$;
 
 -- Sin sesión no se registra nada.
