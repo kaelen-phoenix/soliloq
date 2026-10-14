@@ -59,17 +59,41 @@ function Galeria({ fotos, alt }: { fotos: string[]; alt: string }) {
   );
 }
 
+/**
+ * El reproductor dentro de una página propia que el WebView carga «desde» yalope.com (#418):
+ * YouTube rechaza (error 153) los reproductores que no dicen desde qué sitio se cargan, y un
+ * WebView no lo informa solo como el navegador. Así se reproduce igual que en la web.
+ */
+function paginaReproductor(src: string) {
+  return `<!doctype html><html><head><meta name="viewport" content="width=device-width,initial-scale=1">
+<style>html,body{margin:0;height:100%;background:#000}iframe{border:0;width:100%;height:100%}</style></head>
+<body><iframe src="${src}" referrerpolicy="strict-origin-when-cross-origin"
+allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; fullscreen"
+allowfullscreen></iframe></body></html>`;
+}
+
 /** El videoreel de YouTube o Vimeo embebido (`VideoreelEmbed`). */
 export function Videoreel({ url }: { url: string }) {
   const videoreel = parsearVideoreel(url);
   if (!videoreel) return null;
+  const embed = urlEmbedVideoreel(videoreel);
+  // Que se reproduzca en el lugar y no salte a pantalla completa sola (iPhone).
+  const src = `${embed}${embed.includes("?") ? "&" : "?"}playsinline=1`;
   return (
     <View style={{ aspectRatio: 16 / 9, width: "100%", borderRadius: radio.campo, overflow: "hidden", backgroundColor: "#000" }}>
       <WebView
-        source={{ uri: urlEmbedVideoreel(videoreel) }}
+        source={{ html: paginaReproductor(src), baseUrl: "https://yalope.com/" }}
+        originWhitelist={["*"]}
         allowsFullscreenVideo
         allowsInlineMediaPlayback
         mediaPlaybackRequiresUserAction
+        setSupportMultipleWindows={false}
+        // Tocar el logo o «Ver en YouTube» abre la app o el navegador, no navega adentro del cuadro.
+        onShouldStartLoadWithRequest={(pedido) => {
+          if (!pedido.isTopFrame || pedido.url.startsWith("https://yalope.com") || pedido.url === "about:blank") return true;
+          Linking.openURL(pedido.url).catch(() => {});
+          return false;
+        }}
         style={{ backgroundColor: "#000" }}
       />
     </View>
