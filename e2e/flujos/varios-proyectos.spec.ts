@@ -91,11 +91,11 @@ test.describe("varios proyectos (UI)", () => {
     // «Crear» (#380) pregunta qué se quiere armar; cancelar vuelve a la pregunta.
     await page.getByRole("button", { name: "Crear", exact: true }).click();
     await expect(page.getByRole("heading", { name: "¿Qué querés armar?" })).toBeVisible();
-    await page.getByRole("button", { name: /Un proyecto con roles/ }).click();
+    await page.getByRole("button", { name: /^Un proyecto/ }).click();
     await expect(page.getByLabel("Título del proyecto")).toBeVisible();
     await page.getByRole("button", { name: "Cancelar" }).click();
     await expect(page.getByRole("heading", { name: "¿Qué querés armar?" })).toBeVisible();
-    await page.getByRole("button", { name: /Armar equipo/ }).click();
+    await page.getByRole("button", { name: /^Un equipo/ }).click();
     await expect(page.getByLabel("Título — por qué querés armar el equipo")).toBeVisible();
 
     // Convocar a T2 ofrece los roles de B, no los de A.
