@@ -18,8 +18,8 @@ function conUrl(fotos: { id: string; storage_path: string; orden: number }[] | n
 
 export async function leerTablero(creadorId: string): Promise<ItemTablero[]> {
   const [{ data: obras }, { data: equipos }] = await Promise.all([
-    supabase.from("obras").select("id, titulo, estado, creado_en").eq("creador_id", creadorId),
-    supabase.from("equipos").select("id, titulo, activo, creado_en").eq("creador_id", creadorId),
+    supabase.from("obras").select("id, titulo, estado, creado_en, oculta_en").eq("creador_id", creadorId),
+    supabase.from("equipos").select("id, titulo, activo, creado_en, oculta_en").eq("creador_id", creadorId),
   ]);
   return itemsTablero(obras ?? [], equipos ?? []);
 }

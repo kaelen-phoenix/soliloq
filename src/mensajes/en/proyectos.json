@@ -247,7 +247,15 @@
       "vacioTitulo": "You haven't set up any projects yet",
       "vacioDetalle": "Create a project with the roles you're looking for, or build a team to create with other people.",
       "equipo": "Team",
-      "proyecto": "Project"
+      "proyecto": "Project",
+      "quitar": "Remove from list",
+      "confirmarQuitar": "Remove “{titulo}” from your list? It is closed; the chat with the team stays in Chats.",
+      "quitarBoton": "Remove",
+      "cancelar": "Cancel",
+      "verOcultas": "Show hidden ({n})",
+      "esconderOcultas": "Hide hidden",
+      "mostrar": "Show again",
+      "error": "That didn’t work. Try again."
     },
     "tarjeta": {
       "armarEquipo": "Build a team",

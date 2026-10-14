@@ -247,7 +247,15 @@
       "vacioTitulo": "Todavía no armaste ningún proyecto",
       "vacioDetalle": "Creá un proyecto con los roles que buscás, o armá un equipo para crear con otras personas.",
       "equipo": "Equipo",
-      "proyecto": "Proyecto"
+      "proyecto": "Proyecto",
+      "quitar": "Quitar de la lista",
+      "confirmarQuitar": "¿Quitás «{titulo}» de tu lista? Está cerrada; el chat con el equipo sigue en Chats.",
+      "quitarBoton": "Quitar",
+      "cancelar": "Cancelar",
+      "verOcultas": "Ver ocultas ({n})",
+      "esconderOcultas": "Esconder ocultas",
+      "mostrar": "Volver a mostrar",
+      "error": "No se pudo. Probá de nuevo."
     },
     "tarjeta": {
       "armarEquipo": "Armar equipo",
