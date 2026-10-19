@@ -166,6 +166,98 @@
   }
 }
 
+/* Redes del perfil compartido (`/p/[token]`, #422): círculo lleno con el color de cada
+   red, ícono blanco, relieve (sombra tipo `shadow-md` + un brillo interior arriba) y se
+   levanta al pasar el mouse o al llegar con el teclado. Solo en la vidriera pública: el
+   resto de la app sigue con los íconos de borde fino.
+   Fuera de `@layer` a propósito: la clase `red-${clave}` se arma en tiempo de ejecución y
+   Tailwind purgaría de una capa las variantes que no ve escritas.
+   Contraste del ícono blanco (no-texto, alcanza 3:1): YouTube 4:1, LinkedIn 5.7:1,
+   TikTok/X 21:1, sitio (degradé de acción) 4.6–6.6:1. Vimeo usa #0e8fb8 (3.7:1) y no su
+   #1ab7ea oficial, que con blanco queda en 2.3:1. El degradé de Instagram arranca en el
+   amarillo solo en la esquina; detrás del ícono quedan el rosa y el violeta (4.5:1). */
+.red-social {
+  --red-fondo: #3a3536;
+  --red-borde: 0 0 0 0 transparent;
+  --red-brillo: inset 0 1px 0 rgb(255 255 255 / 0.3);
+  background: var(--red-fondo);
+  color: #fff;
+  box-shadow:
+    var(--red-brillo),
+    inset var(--red-borde),
+    0 4px 6px -1px rgb(0 0 0 / 0.2),
+    0 2px 4px -2px rgb(0 0 0 / 0.16);
+  transition:
+    transform 150ms ease-out,
+    box-shadow 150ms ease-out,
+    filter 150ms ease-out;
+}
+
+.red-social:hover,
+.red-social:focus-visible {
+  transform: translateY(-2px);
+  filter: brightness(1.08);
+  box-shadow:
+    var(--red-brillo),
+    inset var(--red-borde),
+    0 10px 15px -3px rgb(0 0 0 / 0.3),
+    0 4px 6px -4px rgb(0 0 0 / 0.22);
+}
+
+/* El anillo de foco de siempre (ver `:focus-visible`), pero entero y sumado a la sombra
+   levantada: sobre un círculo de color el 45 % se perdía. */
+.red-social:focus-visible {
+  box-shadow:
+    0 0 0 2px rgb(var(--superficie)),
+    0 0 0 4px var(--acento),
+    var(--red-brillo),
+    inset var(--red-borde),
+    0 10px 15px -3px rgb(0 0 0 / 0.3);
+}
+
+.red-social:active {
+  transform: translateY(0);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .red-social {
+    transition: none;
+  }
+  .red-social:hover,
+  .red-social:focus-visible {
+    transform: none;
+  }
+}
+
+.red-instagram {
+  --red-fondo: radial-gradient(
+    circle at 30% 107%,
+    #fdf497 0%,
+    #fdf497 5%,
+    #fd5949 45%,
+    #d6249f 60%,
+    #285aeb 90%
+  );
+}
+.red-youtube {
+  --red-fondo: #ff0000;
+}
+/* TikTok y X son negros: un borde claro sutil para que no se pierdan en el tema oscuro. */
+.red-tiktok,
+.red-x {
+  --red-fondo: #000;
+  --red-borde: 0 0 0 1px rgb(255 255 255 / 0.18);
+}
+.red-linkedin {
+  --red-fondo: #0a66c2;
+}
+.red-vimeo {
+  --red-fondo: #0e8fb8;
+}
+.red-sitio {
+  --red-fondo: linear-gradient(100deg, #d4430f 0%, #b3260a 100%);
+}
+
 /* Red de seguridad para `prefers-reduced-motion`: aunque un componente se olvide del
    hook `usePrefiereReduccion`, la preferencia del sistema se respeta igual. Las
    variantes de `framer-motion` además nunca dejan contenido en `opacity: 0` cuando
