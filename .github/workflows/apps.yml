@@ -76,14 +76,16 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         # Solo los procesadores de teléfonos (ARM de 64 y 32 bits): con los de emulador (x86) el
         # APK pasaba los 120 MB. El AAB lleva todo: Google Play reparte a cada teléfono lo suyo.
+        # R8 achica el código Java (#424); su `mapping.txt` va a Play para leer las fallas.
         run: |
-          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
-          ./gradlew bundleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a -Pandroid.enableMinifyInReleaseBuilds=true
+          ./gradlew bundleRelease --no-daemon -Pandroid.enableMinifyInReleaseBuilds=true
       - name: Ordenar los paquetes
         run: |
           mkdir -p ../salida
           cp "$(ls android/app/build/outputs/apk/release/*.apk | head -1)" ../salida/Yalope.apk
           cp android/app/build/outputs/bundle/release/app-release.aab ../salida/Yalope.aab
+          cp android/app/build/outputs/mapping/release/mapping.txt ../salida/mapping.txt
           ls -la ../salida
       - uses: actions/upload-artifact@v4
         with:
@@ -130,6 +132,32 @@ jobs:
           path: salida/
           if-no-files-found: error
 
+  google-play:
+    # Sube el AAB a Google Play (#420). Queda apagado hasta que la app exista en Play Console,
+    # tenga el primer AAB subido a mano y la cuenta de servicio esté invitada: entonces se
+    # prende con la variable de repo `PLAY_ACTIVO=si`. El track (`PLAY_TRACK`, por defecto
+    # `internal`) y el estado (`PLAY_ESTADO`: `draft` mientras la app no esté publicada, que es
+    # lo único que Google acepta; después `completed`) también salen de variables.
+    if: >-
+      vars.PLAY_ACTIVO == 'si' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch') &&
+      github.ref == 'refs/heads/main'
+    needs: [android]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/download-artifact@v4
+        with:
+          name: android-${{ env.VERSION_NAME }}
+          path: paquetes
+      - uses: r0adkll/upload-google-play@v1
+        with:
+          serviceAccountJsonPlainText: ${{ secrets.PLAY_CUENTA_SERVICIO }}
+          packageName: com.yalope.app
+          releaseFiles: paquetes/Yalope.aab
+          mappingFile: paquetes/mapping.txt
+          releaseName: ${{ env.VERSION_NAME }}
+          track: ${{ vars.PLAY_TRACK || 'internal' }}
+          status: ${{ vars.PLAY_ESTADO || 'draft' }}
+
   publicar:
     # También al dispararlo a mano sobre main (si GitHub no arrancó la corrida del push). Con que
     # salga el de Android alcanza: a veces GitHub no consigue una Mac y el de iPhone no corre; en
@@ -161,6 +189,8 @@ jobs:
           else
             gh release edit apps-ultima --notes "$NOTAS"
           fi
+          # El `mapping.txt` de R8 es solo para Google Play (#424): no va al release.
+          rm -f paquetes/mapping.txt
           gh release upload apps-ultima paquetes/* --clobber
           # Lo de la etapa de convivencia con la app de Capacitor (#395) ya no va.
           for viejo in Yalope-nativa-previa.apk Yalope-nativa-previa-iphone-simulador.zip; do
