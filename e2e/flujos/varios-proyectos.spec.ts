@@ -97,6 +97,20 @@ test.describe("varios proyectos (UI)", () => {
     await expect(page.getByRole("heading", { name: "¿Qué querés armar?" })).toBeVisible();
     await page.getByRole("button", { name: /^Un equipo/ }).click();
     await expect(page.getByLabel("Título — por qué querés armar el equipo")).toBeVisible();
+    // #423: «Volver», arriba del formulario, también regresa a la pregunta y descarta lo escrito.
+    await page.getByLabel("Título — por qué querés armar el equipo").fill(`Equipo descartado ${s}`);
+    await page.getByRole("button", { name: "Volver", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "¿Qué querés armar?" })).toBeVisible();
+    await page.getByRole("button", { name: /^Un proyecto/ }).click();
+    await page.getByLabel("Título del proyecto").fill(`Proyecto descartado ${s}`);
+    await page.getByRole("button", { name: "Volver", exact: true }).click();
+    await expect(page.getByRole("heading", { name: "¿Qué querés armar?" })).toBeVisible();
+    await page.getByRole("button", { name: /^Un equipo/ }).click();
+    await expect(page.getByLabel("Título — por qué querés armar el equipo")).toHaveValue("");
+    const { count: obrasCreadas } = await admin!.from("obras").select("id", { count: "exact", head: true }).eq("creador_id", creadora.id);
+    const { count: equiposCreados } = await admin!.from("equipos").select("id", { count: "exact", head: true }).eq("creador_id", creadora.id);
+    expect(obrasCreadas).toBe(2);
+    expect(equiposCreados).toBe(1);
 
     // Convocar a T2 ofrece los roles de B, no los de A.
     await page.goto("/matches");
