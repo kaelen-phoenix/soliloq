@@ -3,6 +3,7 @@ import { getTranslations } from "next-intl/server";
 import Link from "next/link";
 import { BannerSponsors } from "@/components/apoyar/banner-sponsors";
 import { BotonInstalar } from "@/components/pwa/boton-instalar";
+import { BotonDescargarApp } from "@/components/pwa/descargar-app";
 import { Icono } from "@/components/ui/icono";
 import { Logotipo, MarcaYalope } from "@/components/ui/logotipo";
 import { SelectorIdioma, alternativasIdioma, fijarIdioma } from "@/components/publico/idioma";
@@ -162,7 +163,15 @@ export default async function BienvenidaPage({ params }: Props) {
                   >
                     {t("verComoFunciona")}
                   </a>
-                  <BotonInstalar className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10" />
+                  {/* En Android, la app de Google Play en lugar de instalar la web (#425). */}
+                  <BotonDescargarApp
+                    idioma={idioma}
+                    className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
+                  />
+                  <BotonInstalar
+                    ocultarEnAndroid
+                    className="inline-flex items-center gap-2 rounded-full border border-white/25 px-5 py-3 text-sm font-medium text-white transition-colors hover:bg-white/10"
+                  />
                 </div>
               </div>
 

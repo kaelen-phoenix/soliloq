@@ -104,6 +104,27 @@
     "genericoPaso2": "Choose “Install app” or “Add to Home Screen”.",
     "genericoPaso3": "Confirm."
   },
+  "descargarApp": {
+    "boton": "Get the app",
+    "metaTitulo": "Download Yalope for Android",
+    "metaDescripcion": "Get the Yalope app for Android from Google Play.",
+    "titulo": "Yalope for Android",
+    "bajada": "The app is in testing on Google Play. Getting it takes two steps, and you only do them once.",
+    "cuentaGoogle": "Do both steps with your phone's Google account (the one you use on the Play Store). It doesn't have to be the one you use to log in to Yalope: if you signed up with your email, you log in the same way.",
+    "paso1Titulo": "Join the Yalope group",
+    "paso1Texto": "Open the group and tap “Join group”. It's open: no approval needed.",
+    "paso1Boton": "Open the group",
+    "paso2Titulo": "Accept the test and download it",
+    "paso2Texto": "Tap “Accept invitation” and then “Download it on Google Play”. If it says it's not available, wait a few minutes: the group takes a moment to let you in.",
+    "paso2Boton": "Accept the test",
+    "yaLaTengo": "Already accepted the test?",
+    "abrirPlay": "Open in Google Play",
+    "iphone": "On iPhone? The iPhone app is on its way. Meanwhile, use Yalope in Safari: you can add it to your home screen.",
+    "volver": "Back to Yalope",
+    "tarjetaTitulo": "Yalope now has an Android app",
+    "tarjetaTexto": "Get it on Google Play: instant notifications and everything faster.",
+    "cerrar": "Don't show again"
+  },
   "auth": {
     "titulo": "Log in to Yalope",
     "bajada": "The match for actors and actresses starts here.",

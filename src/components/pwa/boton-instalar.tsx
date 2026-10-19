@@ -4,6 +4,7 @@ import { useTranslations } from "next-intl";
 import { useEffect, useState } from "react";
 import { Icono } from "@/components/ui/icono";
 import { Superposicion } from "@/components/ui/superposicion";
+import { esAndroid } from "@/lib/descarga-app";
 
 // `beforeinstallprompt` no está en las tipas del DOM.
 interface EventoInstalacion extends Event {
@@ -42,11 +43,14 @@ type Ayuda = "ios" | "generico" | null;
 export function BotonInstalar({
   className,
   conSeccion = false,
+  ocultarEnAndroid = false,
 }: {
   /** Clases del botón. Si no se pasa, usa el estilo secundario por defecto. */
   className?: string;
   /** Envuelve el botón en una `<section>` con título y ayuda (para Ajustes). */
   conSeccion?: boolean;
+  /** En Android se ofrece la app de Google Play en su lugar (#425, `BotonDescargarApp`). */
+  ocultarEnAndroid?: boolean;
 }) {
   const t = useTranslations("instalar");
   const [evento, setEvento] = useState<EventoInstalacion | null>(null);
@@ -54,7 +58,7 @@ export function BotonInstalar({
   const [ayuda, setAyuda] = useState<Ayuda>(null);
 
   useEffect(() => {
-    if (yaInstalada()) {
+    if (yaInstalada() || (ocultarEnAndroid && esAndroid(window.navigator.userAgent))) {
       setOculto(true);
       return;
     }
@@ -80,7 +84,7 @@ export function BotonInstalar({
       window.removeEventListener("beforeinstallprompt", alPoderInstalar);
       window.removeEventListener("appinstalled", alInstalar);
     };
-  }, []);
+  }, [ocultarEnAndroid]);
 
   if (oculto) return null;
 

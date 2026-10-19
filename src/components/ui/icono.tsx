@@ -33,6 +33,7 @@ type NombreIcono =
   | "enlace"
   | "compartir"
   | "descargar"
+  | "android"
   | "qr"
   | "admin"
   | "ajustes";
@@ -191,6 +192,13 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
       <path d="M12 3v12" />
       <path d="m7 11 5 5 5-5" />
       <path d="M5 21h14" />
+    </>
+  ),
+  android: (
+    <>
+      <path d="M4 18a8 8 0 0 1 16 0Z" />
+      <path d="m7 10.5-2-3.5M17 10.5l2-3.5" />
+      <path d="M9 14.5h.01M15 14.5h.01" />
     </>
   ),
   qr: (

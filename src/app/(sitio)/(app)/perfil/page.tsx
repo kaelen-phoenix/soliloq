@@ -7,6 +7,7 @@ import { PerfilTalentoDetalle } from "@/components/perfil/perfil-talento-detalle
 import { Icono } from "@/components/ui/icono";
 import { VistaPerfilPropio } from "@/components/perfil/vista-perfil-propio";
 import { BotonCompartir } from "@/components/perfil/boton-compartir";
+import { TarjetaDescargarApp } from "@/components/pwa/descargar-app";
 import { InvitacionComunidad } from "@/components/comunidad/invitacion-comunidad";
 import { VincularDiscord } from "@/components/comunidad/vincular-discord";
 import { discordConfigurado } from "@/lib/discord-servidor";
@@ -155,6 +156,7 @@ export default async function PerfilPage({
           visitas={visitasEnlace}
         />
       )}
+      {!editando && <TarjetaDescargarApp />}
       {!editando && (
         <InvitacionComunidad variante="seccion">
           {discordConfigurado() && (
