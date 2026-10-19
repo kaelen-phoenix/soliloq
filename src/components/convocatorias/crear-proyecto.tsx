@@ -16,19 +16,40 @@ export function CrearProyecto({ creadorId }: { creadorId: string }) {
   const tc = useTranslations("comun");
   const [paso, setPaso] = useState<"cerrado" | "elegir" | "proyecto" | "equipo">("cerrado");
 
+  // #423: «Volver», arriba del formulario, regresa a la pregunta. Lo escrito se descarta: el
+  // formulario se desmonta y no se crea nada.
+  const volver = (
+    <button
+      type="button"
+      onClick={() => setPaso("elegir")}
+      className="flex items-center gap-1 self-start py-1 text-sm font-medium text-texto-tenue transition-colors hover:text-texto"
+    >
+      <Icono nombre="flecha-izquierda" className="h-4 w-4" />
+      {tc("volver")}
+    </button>
+  );
+
   if (paso === "proyecto") {
-    return <FormularioObra creadorId={creadorId} abiertoInicial onCancelar={() => setPaso("elegir")} />;
+    return (
+      <div className="flex flex-col gap-2">
+        {volver}
+        <FormularioObra creadorId={creadorId} abiertoInicial onCancelar={() => setPaso("elegir")} />
+      </div>
+    );
   }
   if (paso === "equipo") {
     return (
-      <GestionEquipo
-        creadorId={creadorId}
-        equipo={null}
-        fotos={[]}
-        cobertura={[]}
-        abiertoInicial
-        onCancelar={() => setPaso("elegir")}
-      />
+      <div className="flex flex-col gap-2">
+        {volver}
+        <GestionEquipo
+          creadorId={creadorId}
+          equipo={null}
+          fotos={[]}
+          cobertura={[]}
+          abiertoInicial
+          onCancelar={() => setPaso("elegir")}
+        />
+      </div>
     );
   }
   if (paso === "elegir") {

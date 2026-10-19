@@ -77,7 +77,7 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
       </header>
 
       {redes.length > 0 && (
-        <div className="mt-4 flex flex-wrap gap-2">
+        <div className="mt-4 flex flex-wrap gap-3">
           {redes.map((red) => (
             <a
               key={red.clave}
@@ -85,9 +85,10 @@ export function VidrieraPublica({ perfil }: { perfil: PerfilPublico }) {
               target="_blank"
               rel="noopener noreferrer nofollow"
               aria-label={tEtiquetas(claveRed(red.clave))}
-              className="flex h-9 w-9 items-center justify-center rounded-full border border-ink-200 text-ink-500 transition-colors hover:border-ink-400 hover:text-ink-800"
+              // Color oficial de cada red con relieve (#422); las clases viven en globals.css.
+              className={`red-social red-${red.clave} flex h-11 w-11 items-center justify-center rounded-full`}
             >
-              <Icono nombre={red.icono} className="h-4 w-4" />
+              <Icono nombre={red.icono} className="h-5 w-5" />
             </a>
           ))}
         </div>

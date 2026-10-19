@@ -3,6 +3,7 @@ import { useTranslations } from "use-intl";
 import { useSesion } from "~/lib/sesion";
 import { FormularioObra } from "~/ui/iniciativas/formulario-obra";
 import { Volver } from "~/ui/iniciativas/volver";
+import { olvidarVolverAElegir } from "~/ui/iniciativas/volver-a-elegir";
 import { Pantalla } from "~/ui/pantalla";
 import { Texto } from "~/ui/texto";
 
@@ -20,7 +21,10 @@ export default function NuevoProyecto() {
       </Texto>
       <FormularioObra
         creadorId={sesion.user.id}
-        alTerminar={(id) => router.replace(`/obras/${id}` as Href)}
+        alTerminar={(id) => {
+          olvidarVolverAElegir();
+          router.replace(`/obras/${id}` as Href);
+        }}
         onCancelar={() => router.back()}
       />
     </Pantalla>
