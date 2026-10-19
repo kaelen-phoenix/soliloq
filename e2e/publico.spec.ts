@@ -3,16 +3,16 @@ import { test, expect } from "@playwright/test";
 // Superficies públicas (sin sesión). Corren contra la app local con variables dummy.
 
 test.describe("landing", () => {
-  test("carga con la copy del modelo de match", async ({ page }) => {
+  test("carga con la copy de convocatorias", async ({ page }) => {
     await page.goto("/bienvenida");
     await expect(page.getByRole("heading", { level: 1 })).toContainText(
-      "El match de actores y actrices empieza acá",
+      "La convocatoria de actores y actrices empieza acá",
     );
-    // Copy nueva (#129): el match de dos lados, proyecto/equipo, deslizar.
+    // Copy (#129, #429): interés de los dos lados, proyecto/equipo, deslizar; sin «match».
     await expect(page.getByText(/deslizás perfiles y propuestas/i)).toBeVisible();
     await expect(page.getByRole("heading", { name: "Deslizá" })).toBeVisible();
     await expect(
-      page.getByRole("heading", { name: "Match, convocatoria y chat" }),
+      page.getByRole("heading", { name: "Convocatoria y chat" }),
     ).toBeVisible();
     await expect(page.getByRole("link", { name: /armar proyecto o equipo/i })).toBeVisible();
   });
@@ -54,7 +54,7 @@ test.describe("landing", () => {
   test("/ raíz sirve la landing para anónimos", async ({ page }) => {
     const res = await page.goto("/");
     expect(res?.status()).toBe(200);
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("match de actores");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("convocatoria de actores");
   });
 
   // `page.goto` sigue redirects y devuelve el status de la respuesta final, así que un 307
@@ -75,7 +75,7 @@ test.describe("idioma en la URL", () => {
     const res = await page.goto("/en/bienvenida");
     expect(res?.status()).toBe(200);
     await expect(page.locator("html")).toHaveAttribute("lang", "en");
-    await expect(page.getByRole("heading", { level: 1 })).toContainText("match for");
+    await expect(page.getByRole("heading", { level: 1 })).toContainText("casting call for");
     await expect(page.locator('link[rel="alternate"][hreflang="es"]')).toHaveAttribute("href", /yalope\.com\/?$/);
   });
 

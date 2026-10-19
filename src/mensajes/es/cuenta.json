@@ -1,15 +1,15 @@
 {
   "cuenta": {
     "metadatos": {
-      "titulo": "Yalope — El match de actores y actrices",
-      "descripcion": "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat. Armá tu equipo y compartí tu perfil como booking.",
+      "titulo": "Yalope — Convocatorias de actores y actrices",
+      "descripcion": "Yalope conecta actores, actrices y creadores de forma rápida y visual: cuando el interés es mutuo, llega la convocatoria y se abre el chat. Armá tu equipo y compartí tu perfil como booking.",
       "solicitudPendiente": "Solicitud pendiente — Yalope",
       "aceptarNormas": "Normas de la Comunidad — Yalope",
       "suspendido": "Cuenta suspendida — Yalope"
     },
     "manifest": {
-      "nombre": "Yalope — Match de Actores",
-      "descripcion": "Yalope conecta actores, actrices y creadores con un match rápido y visual: cuando el interés es mutuo, se abre el chat."
+      "nombre": "Yalope — Convocatorias de actores",
+      "descripcion": "Yalope conecta actores, actrices y creadores de forma rápida y visual: cuando el interés es mutuo, llega la convocatoria y se abre el chat."
     },
     "errores": {
       "emailInvalido": "Ingresá un email válido.",
@@ -77,7 +77,7 @@
       "argumento2Detalle": "Conocé gente con ganas de crear, incluso antes de tener la idea.",
       "argumento3Titulo": "Coordiná en un solo lugar",
       "argumento3Detalle": "Cuando hay equipo se abre una sala con todo el elenco.",
-      "pie": "Match de actores y actrices · Argentina"
+      "pie": "Convocatorias de actores y actrices · Argentina"
     },
     "ui": {
       "avisoGuardado": "Cambios guardados.",
