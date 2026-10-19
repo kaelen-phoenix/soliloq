@@ -104,6 +104,27 @@
     "genericoPaso2": "Elegí «Instalar app» o «Agregar a pantalla de inicio».",
     "genericoPaso3": "Confirmá."
   },
+  "descargarApp": {
+    "boton": "Descargar la app",
+    "metaTitulo": "Descargar Yalope para Android",
+    "metaDescripcion": "Bajá la app de Yalope para Android desde Google Play.",
+    "titulo": "Yalope para Android",
+    "bajada": "La app está en prueba en Google Play. Para bajarla son dos pasos, y se hacen una sola vez.",
+    "cuentaGoogle": "Hacé los dos pasos con la cuenta de Google de tu teléfono (la que usás en Play Store). No tiene que ser la misma con la que entrás a Yalope: si te registraste con tu email, entrás igual.",
+    "paso1Titulo": "Unite al grupo de Yalope",
+    "paso1Texto": "Abrí el grupo y tocá «Unirse al grupo». Es abierto: no hay que esperar aprobación.",
+    "paso1Boton": "Abrir el grupo",
+    "paso2Titulo": "Aceptá la prueba y descargala",
+    "paso2Texto": "Tocá «Aceptar invitación» y después «Descargar en Google Play». Si dice que no está disponible, esperá unos minutos: el grupo tarda un poco en habilitarte.",
+    "paso2Boton": "Aceptar la prueba",
+    "yaLaTengo": "¿Ya aceptaste la prueba?",
+    "abrirPlay": "Abrir en Google Play",
+    "iphone": "¿Tenés iPhone? La app de iPhone está en camino. Mientras tanto, usá Yalope desde Safari: podés agregarla a tu pantalla de inicio.",
+    "volver": "Volver a Yalope",
+    "tarjetaTitulo": "Yalope ya tiene app para Android",
+    "tarjetaTexto": "Bajala de Google Play: notificaciones al instante y todo más rápido.",
+    "cerrar": "No mostrar más"
+  },
   "auth": {
     "titulo": "Entrá a Yalope",
     "bajada": "El match de actores y actrices empieza acá.",
