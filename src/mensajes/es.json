@@ -177,6 +177,39 @@
     "norma10Titulo": "10. Nuestra filosofía",
     "norma10Texto": "Yalope existe para impulsar la colaboración artística.\n\nQueremos que cada proyecto sea una oportunidad para crear, aprender y conectar con nuevas personas en un entorno basado en la confianza, el respeto y la creatividad."
   },
+  "seguridadInfantil": {
+    "titulo": "Estándares de seguridad infantil",
+    "metaDescripcion": "Los estándares de Yalope contra la explotación y el abuso sexual infantil (CSAE).",
+    "actualizado": "Última actualización: 19 de octubre de 2026",
+    "intro": "Yalope tiene tolerancia cero con la explotación y el abuso sexual infantil (CSAE). Estos estándares valen para yalope.com y para la app de Android e iPhone, y completan las Normas de la Comunidad y los Términos y Condiciones.",
+    "secciones": [
+      {
+        "titulo": "1. Qué está prohibido",
+        "texto": "En Yalope está prohibido, en perfiles, fotos, videos, proyectos, equipos y chats:\n– Publicar, pedir, compartir o enlazar material de abuso sexual infantil (CSAM).\n– Cualquier contenido o conducta que sexualice a una persona menor de 18 años.\n– Contactar a una persona menor de edad con fines sexuales (grooming), pedirle fotos íntimas o proponerle encuentros con ese fin.\n– Ofrecer, promover o facilitar la trata o la explotación de menores, también con la excusa de un casting o un proyecto."
+      },
+      {
+        "titulo": "2. Edad mínima y cuentas",
+        "texto": "Yalope es para personas de 16 años o más: el perfil no acepta una fecha de nacimiento que indique menos edad. Cada cuenta nueva la revisa el equipo de Yalope antes de que pueda usar la plataforma."
+      },
+      {
+        "titulo": "3. Cómo denunciar",
+        "texto": "Desde la web y desde la app podés usar el botón «Denunciar» en perfiles, proyectos, equipos y mensajes, y bloquear a cualquier persona. También podés escribirnos a info@yalope.com, el contacto de Yalope para temas de seguridad infantil. Si alguien está en peligro inmediato, comunicate con las autoridades de tu país (en Argentina, al 911)."
+      },
+      {
+        "titulo": "4. Qué hacemos ante una denuncia",
+        "texto": "Cada denuncia de este tipo la revisa con prioridad una persona del equipo. Si se confirma:\n– Quitamos el contenido.\n– Suspendemos la cuenta de forma definitiva.\n– Conservamos la información necesaria y la denunciamos ante las autoridades competentes, como la Unidad Fiscal Especializada en Ciberdelincuencia (UFECI) del Ministerio Público Fiscal de la Nación."
+      },
+      {
+        "titulo": "5. Cumplimiento de la ley",
+        "texto": "Yalope cumple con las leyes de protección infantil aplicables, incluido el Código Penal argentino (artículos 128 y 131), y colabora con las autoridades cuando lo piden."
+      },
+      {
+        "titulo": "6. Contacto",
+        "texto": "Para cualquier consulta sobre estos estándares, escribinos a info@yalope.com."
+      }
+    ],
+    "volverApp": "Volver a Yalope"
+  },
   "apoyar": {
     "titulo": "Apoyá Yalope",
     "intro": "Yalope es un proyecto chico y autofinanciado. Tu aporte —una donación o un lugar como sponsor— ayuda a que siga en pie y creciendo.",
