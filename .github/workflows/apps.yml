@@ -76,14 +76,16 @@ jobs:
           ANDROID_KEY_ALIAS: ${{ secrets.ANDROID_KEY_ALIAS }}
         # Solo los procesadores de teléfonos (ARM de 64 y 32 bits): con los de emulador (x86) el
         # APK pasaba los 120 MB. El AAB lleva todo: Google Play reparte a cada teléfono lo suyo.
+        # R8 achica el código Java (#424); su `mapping.txt` va a Play para leer las fallas.
         run: |
-          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a
-          ./gradlew bundleRelease --no-daemon
+          ./gradlew assembleRelease --no-daemon -PreactNativeArchitectures=arm64-v8a,armeabi-v7a -Pandroid.enableMinifyInReleaseBuilds=true
+          ./gradlew bundleRelease --no-daemon -Pandroid.enableMinifyInReleaseBuilds=true
       - name: Ordenar los paquetes
         run: |
           mkdir -p ../salida
           cp "$(ls android/app/build/outputs/apk/release/*.apk | head -1)" ../salida/Yalope.apk
           cp android/app/build/outputs/bundle/release/app-release.aab ../salida/Yalope.aab
+          cp android/app/build/outputs/mapping/release/mapping.txt ../salida/mapping.txt
           ls -la ../salida
       - uses: actions/upload-artifact@v4
         with:
@@ -151,6 +153,7 @@ jobs:
           serviceAccountJsonPlainText: ${{ secrets.PLAY_CUENTA_SERVICIO }}
           packageName: com.yalope.app
           releaseFiles: paquetes/Yalope.aab
+          mappingFile: paquetes/mapping.txt
           releaseName: ${{ env.VERSION_NAME }}
           track: ${{ vars.PLAY_TRACK || 'internal' }}
           status: ${{ vars.PLAY_ESTADO || 'draft' }}
@@ -186,6 +189,8 @@ jobs:
           else
             gh release edit apps-ultima --notes "$NOTAS"
           fi
+          # El `mapping.txt` de R8 es solo para Google Play (#424): no va al release.
+          rm -f paquetes/mapping.txt
           gh release upload apps-ultima paquetes/* --clobber
           # Lo de la etapa de convivencia con la app de Capacitor (#395) ya no va.
           for viejo in Yalope-nativa-previa.apk Yalope-nativa-previa-iphone-simulador.zip; do
