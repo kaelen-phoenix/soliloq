@@ -44,12 +44,12 @@
   "landing": {
     "entrar": "Entrar",
     "crearPerfil": "Crear perfil",
-    "heroTitulo": "El match de <d>actores y actrices</d> empieza acá.",
-    "heroTexto": "Yalope conecta actores, actrices y creadores de proyectos. Deslizás perfiles y propuestas, y cuando el interés es de los dos lados hay match: te convocan y se abre el chat del proyecto. Además, tu perfil se comparte como booking.",
+    "heroTitulo": "La convocatoria de <d>actores y actrices</d> empieza acá.",
+    "heroTexto": "Yalope conecta actores, actrices y creadores de proyectos. Deslizás perfiles y propuestas, y cuando el interés es de los dos lados llega la convocatoria y se abre el chat del proyecto. Además, tu perfil se comparte como booking.",
     "heroTextoExpansion": "Yalope nace para conectar talentos del mundo de la actuación y se expande a toda la comunidad artística: músicos, bailarines, fotógrafos, directores, productores y más.",
     "verComoFunciona": "Ver cómo funciona",
     "paraArtistasTitulo": "Si actuás, dirigís o tenés un talento para compartir",
-    "paraArtistasTexto": "Creá tu perfil con fotos, videoreel y experiencia. Descubrí proyectos y equipos cerca tuyo, marcá «Me interesa» y, si hay match, te convocan y entrás al chat del proyecto. También podés compartir tu perfil como booking con un enlace.",
+    "paraArtistasTexto": "Creá tu perfil con fotos, videoreel y experiencia. Descubrí proyectos y equipos cerca tuyo, marcá «Me interesa» y, si el creador también te elige, te convoca y entrás al chat del proyecto. También podés compartir tu perfil como booking con un enlace.",
     "paraCreadoresTitulo": "Si estás armando un proyecto o querés formar un equipo",
     "paraCreadoresTexto": "¿Tenés un proyecto y te faltan integrantes? Publicalo con los roles que buscás o armá un equipo, buscá perfiles por zona, edad y habilidades, y convocá a quien te interese. Cuando acepta, se abre el chat para empezar a crear juntos.",
     "publicarConvocatoria": "Armar proyecto o equipo",
@@ -58,11 +58,11 @@
     "paso1Texto": "Creá tu perfil de Talento con fotos, experiencia, habilidades y redes. Desde ahí, podés descubrir y sumarte a proyectos y equipos, o crear los tuyos para convocar a otros talentos.",
     "paso2Titulo": "Deslizá",
     "paso2Texto": "El talento desliza proyectos y equipos; el creador desliza perfiles de talento. Cruz para pasar, corazón para conectar.",
-    "paso3Titulo": "Match, convocatoria y chat",
-    "paso3Texto": "Cuando el interés es de los dos lados hay match. El creador convoca, la persona acepta, y ahí se abre la sala para hablar. Te avisamos aunque tengas la app cerrada.",
-    "cierreTitulo": "Tu próximo elenco, o tu próximo papel, está a un match.",
+    "paso3Titulo": "Convocatoria y chat",
+    "paso3Texto": "Cuando el interés es de los dos lados, el creador convoca, la persona acepta, y ahí se abre la sala para hablar. Te avisamos aunque tengas la app cerrada.",
+    "cierreTitulo": "Tu próximo elenco, o tu próximo papel, está a una convocatoria.",
     "sumate": "Sumate a Yalope",
-    "pieLema": "Match de actores y actrices · Hecho en Argentina",
+    "pieLema": "Convocatorias de actores y actrices · Hecho en Argentina",
     "apoyarEnlace": "Apoyá el proyecto",
     "derechos": "Todos los derechos reservados."
   },
@@ -127,7 +127,7 @@
   },
   "auth": {
     "titulo": "Entrá a Yalope",
-    "bajada": "El match de actores y actrices empieza acá.",
+    "bajada": "La convocatoria de actores y actrices empieza acá.",
     "enlaceInvalido": "Ese enlace venció o ya fue usado. Pedí uno nuevo."
   },
   "suspendido": {

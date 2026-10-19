@@ -44,12 +44,12 @@
   "landing": {
     "entrar": "Log in",
     "crearPerfil": "Create profile",
-    "heroTitulo": "The match for <d>actors</d> starts here.",
-    "heroTexto": "Yalope connects actors, actresses and project creators. Swipe through profiles and projects, and when the interest is mutual it's a match: you get invited and the project chat opens. Plus, your profile can be shared as a booking page.",
+    "heroTitulo": "The casting call for <d>actors</d> starts here.",
+    "heroTexto": "Yalope connects actors, actresses and project creators. Swipe through profiles and projects, and when the interest is mutual you get a casting call and the project chat opens. Plus, your profile can be shared as a booking page.",
     "heroTextoExpansion": "Yalope started to connect talent from the acting world, and is expanding to the whole artistic community: musicians, dancers, photographers, directors, producers, and more.",
     "verComoFunciona": "See how it works",
     "paraArtistasTitulo": "If you act, direct, or have a talent to share",
-    "paraArtistasTexto": "Create your profile with photos, a reel and your experience. Discover projects and teams near you, tap “I'm interested” and, if it's a match, you get invited into the project chat. You can also share your profile as a booking page with a link.",
+    "paraArtistasTexto": "Create your profile with photos, a reel and your experience. Discover projects and teams near you, tap “I'm interested” and, if the creator picks you too, you get invited into the project chat. You can also share your profile as a booking page with a link.",
     "paraCreadoresTitulo": "If you're building a project or want to form a team",
     "paraCreadoresTexto": "Got a project and missing people? Publish it with the roles you need or build a team, search profiles by area, age and skills, and invite whoever you like. Once they accept, the chat opens so you can start creating together.",
     "publicarConvocatoria": "Build a project or team",
@@ -58,11 +58,11 @@
     "paso1Texto": "Create your Talent profile with photos, experience, skills, and links. From there, discover and join projects and teams, or create your own to invite other talent.",
     "paso2Titulo": "Swipe",
     "paso2Texto": "Talent swipes projects and teams; creators swipe talent profiles. Cross to pass, heart to connect.",
-    "paso3Titulo": "Match, invite, and chat",
-    "paso3Texto": "When the interest goes both ways, it's a match. The creator invites, the person accepts, and then a room opens to talk. We'll notify you even with the app closed.",
-    "cierreTitulo": "Your next cast, or your next role, is one match away.",
+    "paso3Titulo": "Casting call and chat",
+    "paso3Texto": "When the interest goes both ways, the creator invites, the person accepts, and then a room opens to talk. We'll notify you even with the app closed.",
+    "cierreTitulo": "Your next cast, or your next role, is one casting call away.",
     "sumate": "Join Yalope",
-    "pieLema": "Actors' match · Made in Argentina",
+    "pieLema": "Casting calls for actors · Made in Argentina",
     "apoyarEnlace": "Support the project",
     "derechos": "All rights reserved."
   },
@@ -127,7 +127,7 @@
   },
   "auth": {
     "titulo": "Log in to Yalope",
-    "bajada": "The match for actors and actresses starts here.",
+    "bajada": "The casting call for actors and actresses starts here.",
     "enlaceInvalido": "That link expired or was already used. Request a new one."
   },
   "suspendido": {
