@@ -10,6 +10,7 @@ import { Tarjeta } from "~/ui/basicos";
 import { Boton } from "~/ui/boton";
 import { leerTablero } from "~/ui/iniciativas/datos";
 import { EstadoVacio, EtiquetaEstado, EtiquetaTipo } from "~/ui/iniciativas/piezas";
+import { consumirVolverAElegir, marcarVolverAElegir } from "~/ui/iniciativas/volver-a-elegir";
 import { Pantalla } from "~/ui/pantalla";
 import { Texto } from "~/ui/texto";
 import { fuente, radio, useColores } from "~/ui/tema";
@@ -36,11 +37,12 @@ export default function Iniciativas() {
     if (userId) setItems(await leerTablero(userId));
   }, [userId]);
 
-  // Al volver de crear, editar o borrar, la lista se relee.
+  // Al volver de crear, editar o borrar, la lista se relee. Si se sale del formulario de creación
+  // sin crear nada, se vuelve a la pregunta «¿Qué querés armar?» (#423).
   useFocusEffect(
     useCallback(() => {
       cargar();
-      setEligiendo(false);
+      setEligiendo(consumirVolverAElegir());
     }, [cargar]),
   );
 
@@ -73,7 +75,10 @@ export default function Iniciativas() {
   ) => (
     <Pressable
       accessibilityRole="button"
-      onPress={() => router.push(destino)}
+      onPress={() => {
+        marcarVolverAElegir();
+        router.push(destino);
+      }}
       style={({ pressed }) => ({
         flexDirection: "row",
         gap: 12,

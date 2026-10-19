@@ -15,6 +15,7 @@ type NombreIcono =
   | "corazon"
   | "cambiar"
   | "flecha-derecha"
+  | "flecha-izquierda"
   | "chevron"
   | "imagen"
   | "bandera"
@@ -95,6 +96,7 @@ const TRAZOS: Record<NombreIcono, React.ReactNode> = {
   corazon: <path d="M20.3 5.7a5 5 0 0 0-7.1 0L12 6.9l-1.2-1.2a5 5 0 1 0-7.1 7.1l8.3 8.3 8.3-8.3a5 5 0 0 0 0-7.1Z" />,
   cambiar: <path d="M7 4 3 8l4 4M3 8h13a5 5 0 0 1 0 10h-2" />,
   "flecha-derecha": <path d="M5 12h14M13 6l6 6-6 6" />,
+  "flecha-izquierda": <path d="M19 12H5M11 6l-6 6 6 6" />,
   chevron: <path d="m6 9 6 6 6-6" />,
   imagen: (
     <>

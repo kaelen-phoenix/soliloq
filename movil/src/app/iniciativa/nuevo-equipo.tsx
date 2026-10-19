@@ -3,6 +3,7 @@ import { useTranslations } from "use-intl";
 import { useSesion } from "~/lib/sesion";
 import { FormularioEquipo } from "~/ui/iniciativas/formulario-equipo";
 import { Volver } from "~/ui/iniciativas/volver";
+import { olvidarVolverAElegir } from "~/ui/iniciativas/volver-a-elegir";
 import { Pantalla } from "~/ui/pantalla";
 import { Texto } from "~/ui/texto";
 
@@ -22,7 +23,10 @@ export default function NuevoEquipo() {
       <Texto variante="tenue">{tEquipo("invitacion")}</Texto>
       <FormularioEquipo
         creadorId={sesion.user.id}
-        alTerminar={(id) => router.replace(`/equipos/${id}` as Href)}
+        alTerminar={(id) => {
+          olvidarVolverAElegir();
+          router.replace(`/equipos/${id}` as Href);
+        }}
         onCancelar={() => router.back()}
       />
     </Pantalla>
