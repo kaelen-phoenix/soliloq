@@ -177,6 +177,39 @@
     "norma10Titulo": "10. Our philosophy",
     "norma10Texto": "Yalope exists to drive artistic collaboration.\n\nWe want every project to be a chance to create, learn and connect with new people, in an environment built on trust, respect and creativity."
   },
+  "seguridadInfantil": {
+    "titulo": "Child safety standards",
+    "metaDescripcion": "Yalope's standards against child sexual abuse and exploitation (CSAE).",
+    "actualizado": "Last updated: October 19, 2026",
+    "intro": "Yalope has zero tolerance for child sexual abuse and exploitation (CSAE). These standards apply to yalope.com and to the Android and iPhone app, and complement the Community Guidelines and the Terms and Conditions.",
+    "secciones": [
+      {
+        "titulo": "1. What is prohibited",
+        "texto": "On Yalope it is prohibited, in profiles, photos, videos, projects, teams and chats:\n– To post, request, share or link to child sexual abuse material (CSAM).\n– Any content or behavior that sexualizes a person under 18.\n– To contact a minor for sexual purposes (grooming), ask them for intimate photos or propose meetings for that purpose.\n– To offer, promote or facilitate the trafficking or exploitation of minors, including under the pretext of a casting or a project."
+      },
+      {
+        "titulo": "2. Minimum age and accounts",
+        "texto": "Yalope is for people aged 16 or older: the profile does not accept a date of birth showing a younger age. Every new account is reviewed by the Yalope team before it can use the platform."
+      },
+      {
+        "titulo": "3. How to report",
+        "texto": "On the web and in the app you can use the “Report” button on profiles, projects, teams and messages, and block anyone. You can also write to info@yalope.com, Yalope's contact for child safety matters. If someone is in immediate danger, contact the authorities in your country (in Argentina, call 911)."
+      },
+      {
+        "titulo": "4. What we do when something is reported",
+        "texto": "Every report of this kind is reviewed with priority by a person on the team. If it is confirmed:\n– We remove the content.\n– We permanently suspend the account.\n– We preserve the necessary information and report it to the competent authorities, such as the Specialized Cybercrime Prosecution Unit (UFECI) of Argentina's Public Prosecutor's Office."
+      },
+      {
+        "titulo": "5. Legal compliance",
+        "texto": "Yalope complies with applicable child protection laws, including the Argentine Criminal Code (articles 128 and 131), and cooperates with the authorities when requested."
+      },
+      {
+        "titulo": "6. Contact",
+        "texto": "For any questions about these standards, write to info@yalope.com."
+      }
+    ],
+    "volverApp": "Back to Yalope"
+  },
   "apoyar": {
     "titulo": "Support Yalope",
     "intro": "Yalope is a small, self-funded project. Your contribution — a donation or a sponsor spot — helps keep it running and growing.",

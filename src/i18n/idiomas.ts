@@ -2,7 +2,7 @@
  * Idiomas y rutas por idioma (#237). Sin dependencias de Next: lo usan el middleware, las
  * páginas y `request.ts`.
  *
- * Las páginas públicas (portada, Normas, Apoyar, Privacidad, Términos, Descargar) llevan el idioma en
+ * Las páginas públicas (portada, Normas, Apoyar, Privacidad, Términos, Descargar, Seguridad infantil) llevan el idioma en
  * la URL para poder armarse una sola vez y cachearse: en castellano sin prefijo
  * (`/privacidad`) y en inglés con `/en` (`/en/privacidad`). Por dentro las dos viven en
  * `app/[idioma]/…`: el middleware reescribe `/privacidad` a `/es/privacidad`. El resto de la
@@ -23,7 +23,7 @@ export function detectarIdioma(acceptLanguage: string | null | undefined): Idiom
 }
 
 /** Las páginas públicas con el idioma en la URL. */
-export const RUTAS_POR_IDIOMA = ["/bienvenida", "/normas", "/apoyar", "/privacidad", "/terminos", "/descargar"] as const;
+export const RUTAS_POR_IDIOMA = ["/bienvenida", "/normas", "/apoyar", "/privacidad", "/terminos", "/descargar", "/seguridad-infantil"] as const;
 
 export function esRutaPorIdioma(path: string): boolean {
   return RUTAS_POR_IDIOMA.some((r) => path === r || path.startsWith(`${r}/`));

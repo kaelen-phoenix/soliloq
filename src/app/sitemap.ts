@@ -10,6 +10,7 @@ const PUBLICAS: Entrada[] = [
   { ruta: "/", en: "/en/bienvenida", frecuencia: "monthly", prioridad: 1 },
   { ruta: "/apoyar", en: "/en/apoyar", frecuencia: "monthly", prioridad: 0.6 },
   { ruta: "/descargar", en: "/en/descargar", frecuencia: "monthly", prioridad: 0.5 },
+  { ruta: "/seguridad-infantil", en: "/en/seguridad-infantil", frecuencia: "yearly", prioridad: 0.3 },
   { ruta: "/normas", en: "/en/normas", frecuencia: "yearly", prioridad: 0.3 },
   { ruta: "/privacidad", en: "/en/privacidad", frecuencia: "yearly", prioridad: 0.3 },
   { ruta: "/terminos", en: "/en/terminos", frecuencia: "yearly", prioridad: 0.3 },
